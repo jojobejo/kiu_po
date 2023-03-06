@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /**
  *
  */
-class nama_controler extends CI_Controller
+class C_MasterBarang extends CI_Controller
 
 {
 
@@ -19,7 +19,7 @@ class nama_controler extends CI_Controller
     public function index()
     {
 
-        $data['title'] = 'User';
+        $data['title'] = 'Master Barang';
         $data["user"] = $this->M_User->getAll();
 
         $this->load->view('partial/header', $data);

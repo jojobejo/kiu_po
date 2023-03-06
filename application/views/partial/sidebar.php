@@ -28,19 +28,19 @@
           </a>
           <ul class="nav nav-treeview ml-2">
             <li class="nav-item">
-              <a href="pages/layout/top-nav.html" class="nav-link">
+              <a href="<?= base_url('suplier') ?>" class="nav-link">
                 <i class="fas fa-light fa-building nav-icon"></i>
                 <p>Data Suplier</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="pages/layout/top-nav-sidebar.html" class="nav-link">
+              <a href="<?= base_url('mbarang') ?>" class="nav-link">
                 <i class="fas fa-light fa-box nav-icon"></i>
                 <p>Data Barang</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="pages/layout/top-nav-sidebar.html" class="nav-link">
+              <a href="<?= base_url('user') ?>" class="nav-link">
                 <i class="fas fa-light fa-user nav-icon"></i>
                 <p>User Management</p>
               </a>
@@ -48,7 +48,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a href="pages/widgets.html" class="nav-link">
+          <a href="<?= base_url('purchase') ?>" class="nav-link">
             <i class="nav-icon fas fa-cash-register"></i>
             <p>
               Purchase Order
@@ -56,7 +56,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="pages/widgets.html" class="nav-link">
+          <a href="<?= base_url('status_order') ?>" class="nav-link">
             <i class="nav-icon fas fa-money-check"></i>
             <p>
               Purchase Order Status
@@ -65,7 +65,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="pages/widgets.html" class="nav-link">
+          <a href="<?= base_url('logout') ?>" class="nav-link">
             <i class="nav-icon fas fa-unlock"></i>
             <p>
               Log Out

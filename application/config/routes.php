@@ -59,4 +59,12 @@ $route['adduser'] = 'user/C_User/AddUser';
 
 //auth
 $route['login']     = 'auth/process';
+$route['logout']   = 'auth/logout';
 $route['dashboard'] = 'dashboard';
+
+//suplier 
+$route['suplier'] = 'Suplier/C_Suplier';
+
+//PurchaseOrder
+$route['purchase'] = 'purchaseorder/C_Order';
+$route['purchase/sup/(:any)']  = 'purchaseorder/C_Order/purchaseSuplier/$1';
