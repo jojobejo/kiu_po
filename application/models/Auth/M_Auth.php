@@ -18,13 +18,4 @@ class M_Auth extends CI_Model
         $this->db->where('username', $username);
         return $this->db->get('tb_user')->result();
     }
-
-    function cek_tmp($username)
-    {
-        $this->db->select('id_tmp');
-        $this->db->from('tmp a');
-        $this->db->join('tb_user b', 'b.id_user = a.id_user', 'left');
-        $this->db->where('username', $username);
-        return $this->db->get()->result();
-    }
 }

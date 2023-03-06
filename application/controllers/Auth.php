@@ -32,20 +32,19 @@ class Auth extends CI_Controller
             $check_password = $this->M_Auth->cek_password($username);
 
             foreach ($check_password as $key) {
-                if ($key->username == $username && password_verify($password, $key->password) && $key->departemen == "Admin") {
+                if ($key->username == $username && password_verify($password, $key->password) && $key->departement == "Admin") {
                     $data_session = array(
                         'id'            => $key->id_user,
                         'kode'          => $key->kode_user,
                         'username'      => $key->username,
                         'nama_user'     => $key->nama_user,
-                        'departemen'    => $key->departemen,
-                        'lv'            => $key->user_lv,
+                        'departemen'    => $key->departement,
+                        'lv'            => $key->aksess_lv,
                         'status'        => "is_login"
                     );
-
                     $this->session->set_userdata($data_session);
                     redirect('dashboard');
-                } else if ($key->username == $username && password_verify($password, $key->password) && $key->departemen == "Kasir") {
+                } else if ($key->username == $username && password_verify($password, $key->password) && $key->departement == "Direktur") {
                     $data_session = array(
                         'id'            => $key->id_user,
                         'kode'          => $key->kode_user,
@@ -59,7 +58,7 @@ class Auth extends CI_Controller
                     $this->session->set_userdata($data_session);
                     redirect('dashboardKasir');
                 } else {
-                    $this->session->set_flashdata("gagal", "username / password salah!!!");
+                    $this->session->set_flashdata("gagal", "password salah!!!");
                     redirect('Auth');
                 }
             }
