@@ -1,0 +1,18 @@
+.btnBawah{
+    text-align: end;
+    padding-right: 5%;
+}
+.conterbody1{
+    margin-top: -7px;
+    display: flex;
+    align-items: flex-start;
+    font-family: Century Gothic;
+}
+
+.conterbody1 label {
+    font-size: 16px;
+}
+
+.conterbody1 input{
+    height: 34px;
+}
