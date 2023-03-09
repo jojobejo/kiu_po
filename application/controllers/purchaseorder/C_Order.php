@@ -52,4 +52,21 @@ class C_Order extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
     }
+
+    public function addChart()
+    {
+        $kdbarang   = $this->input->post('kd_isi');
+        $nmbarang   = $this->input->post('nama_isi');
+        $satuan     = $this->input->post('satuan_isi');
+        $qty        = $this->input->post('qty_isi');
+        $tax        = $this->input->post('tax_isi');
+        $hargaQty   = $this->input->post('hrg_isi');
+        $hargaTax   = $hargaQty * $tax;
+        $hasiltax   = $hargaTax + $hargaQty;
+        $hargahasil = $hasiltax * $qty;
+
+        $data = array(
+            
+        );
+    }
 }
