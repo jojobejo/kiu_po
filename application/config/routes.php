@@ -69,3 +69,4 @@ $route['suplier'] = 'Suplier/C_Suplier';
 $route['purchase'] = 'purchaseorder/C_Order';
 $route['purchase/sup/(:any)']  = 'purchaseorder/C_Order/purchaseSuplier/$1';
 $route['purchase/addBarang/(:any)'] = 'purchaseorder/C_Order/addBarangSup/$1';
+$route['addchart'] = 'purchase/C_Order/addChart';

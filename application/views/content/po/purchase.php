@@ -50,6 +50,8 @@
                     <td>Satuan</td>
                     <td>Qty</td>
                     <td>Harga</td>
+                    <td>Tax(%)</td>
+                    <td>Total Harga</td>
                     <td>#</td>
                 </tr>
             </thead>
@@ -61,6 +63,8 @@
                     <td>Btl</td>
                     <td>50</td>
                     <td>Rp. 17,500</td>
+                    <td>0%</td>
+                    <td>Rp. 875,000</td>
                     <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#modalEditUser">
                             <i class="fa fa-solid fa-trash-alt"></i>
                         </a></td>
@@ -78,7 +82,10 @@
                     <td style="display: none;"></td>
                     <td style="display: none;"></td>
                     <td style="display: none;"></td>
-                    <td colspan="5" style="text-align: end; padding-right:10%; font-weight: bold;">Total Harga</td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                     <td colspan="2" style="font-weight: bold;">Rp. 875,000
                         <input type="number" class="form-control" id="total_item" name="total_item" value="" readonly hidden>
                         <input type="number" class="form-control" id="total_harga" name="total_harga" value="" readonly hidden>
