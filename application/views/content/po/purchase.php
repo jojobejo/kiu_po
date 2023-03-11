@@ -15,7 +15,7 @@
                 <?php foreach ($kode_suplier as $b) : ?>
                     <h3><?= $b->nama_suplier ?> </h3>
             </div>
-            <a href="<?= base_url('purchase/addBarang/') . $b->kd_suplier ?>" class="btn btn-primary mb-2 mt-2">
+            <a href="<?= base_url('purchase/listBarang/') . $b->kd_suplier ?>" class="btn btn-primary mb-2 mt-2">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang
             </a>
         <?php endforeach; ?>
@@ -56,41 +56,52 @@
                 </tr>
             </thead>
             <tbody>
+                <?php
+                $no = 1;
+                foreach ($tmp as $t) : ?>
+                    <tr>
+                        <td><?= $no++; ?></td>
+                        <td><?= $t->nama_barang ?></td>
+                        <td><?= $t->kemasan ?></td>
+                        <td><?= $t->satuan ?></td>
+                        <td><?= $t->qty ?></td>
+                        <td>Rp. <?= number_format($t->harga_satuan) ?></td>
+                        <td><?= $t->tax ?> (%)</td>
+                        <td>Rp. <?= number_format($t->total_harga) ?></td>
+                        <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#modalEditUser">
+                                <i class="fa fa-solid fa-trash-alt"></i>
+                            </a></td>
+                    </tr>
+                <?php endforeach; ?>
                 <tr>
-                    <td>1</td>
-                    <td>Abacell 18 EC</td>
-                    <td>10 X 1 ltr</td>
-                    <td>Btl</td>
-                    <td>50</td>
-                    <td>Rp. 17,500</td>
-                    <td>0%</td>
-                    <td>Rp. 875,000</td>
-                    <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#modalEditUser">
-                            <i class="fa fa-solid fa-trash-alt"></i>
-                        </a></td>
-                </tr>
-                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
                 </tr>
-                <tr>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                    <td colspan="2" style="font-weight: bold;">Rp. 875,000
-                        <input type="number" class="form-control" id="total_item" name="total_item" value="" readonly hidden>
-                        <input type="number" class="form-control" id="total_harga" name="total_harga" value="" readonly hidden>
-                    </td>
-                </tr>
+                <?php foreach ($total as $tot) : ?>
+                    <tr>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
+                            <input type="number" class="form-control" id="total_item" name="total_item" value="" readonly hidden>
+                            <input type="number" class="form-control" id="total_harga" name="total_harga" value="" readonly hidden>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
         <div class="btnBawah">

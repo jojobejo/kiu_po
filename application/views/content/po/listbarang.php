@@ -36,19 +36,19 @@
                                     <div class="col-md">
                                         <a class="btn btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalAddItem<?= $s->id_barang ?>">
                                             <i class="fas fa-check-double"></i>
-                                            Tambah Barang
+                                            Tambah Barang Ke Chart
                                         </a>
                                     </div>
                                     <div class="col-md">
-                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#modalAddItem<?= $s->id_barang ?>">
+                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $s->id_barang ?>">
                                             <i class="fas fa-pencil-alt"></i>
                                             Edit Barang
                                         </a>
                                     </div>
                                     <div class="col-md">
-                                        <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#modalAddItem<?= $s->id_barang ?>">
+                                        <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#hapus<?= $s->id_barang ?>">
                                             <i class="fas fa-trash"></i>
-                                            Edit Barang
+                                            Hapus Barang
                                         </a>
                                     </div>
                                 </div>

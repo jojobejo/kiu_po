@@ -10,7 +10,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('addchart'); ?>
+                    <?php echo form_open_multipart('tambahChart'); ?>
+                    <div class="form-group" hidden>
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="kd_sup" name="kd_sup" value="<?= $i->kd_suplier ?>" readonly /></div>
+                        </div>
+                    </div>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_barang<span class="required">*</span></label>
@@ -21,6 +27,12 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
                             <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $i->nama_barang ?>" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Kemasan<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="kemasan_isi" name="kemasan_isi" value="" /></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -54,7 +66,8 @@
                             <div class="col-sm-8">
                                 <select name="tax_isi" id="tax_isi" class="form-control">
                                     <option value="0">0 %</option>
-                                    <option value="0.11">11 %</option>
+                                    <option value="11">11 %</option>
+                                    <input type="number" min="0" id="hasil_ppn" class="form-control" name="hasil_ppn" step="0.01" hidden />
                                 </select>
                             </div>
                         </div>

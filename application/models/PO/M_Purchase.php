@@ -30,4 +30,24 @@ class M_Purchase extends CI_Model
         $query = $this->db->get();
         return $query;
     }
+    public function addChart($data)
+    {
+        $this->db->insert('tb_tmp_item', $data);
+    }
+    public function getTmpOrder($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_item');
+        $this->db->where('kode_suplier', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    function sumTransaksiPenjualan($id_tmp)
+    {
+        $this->db->select("SUM(total_harga) as total_harga");
+        $this->db->select("COUNT(id_tmp) as total_item");
+        $this->db->from('tb_tmp_item');
+        $this->db->where('kode_suplier', $id_tmp);
+        return $this->db->get()->result();
+    }
 }
