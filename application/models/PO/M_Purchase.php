@@ -50,4 +50,31 @@ class M_Purchase extends CI_Model
         $this->db->where('kode_suplier', $id_tmp);
         return $this->db->get()->result();
     }
+
+    public function hapusChart($id)
+    {
+        $this->db->where('id_tmp', $id);
+        return $this->db->delete('tb_tmp_item');
+    }
+
+    public function get_tmp($id_tmp)
+    {
+        $this->db->from('tb_tmp_item');
+        $this->db->where('kode_suplier', $id_tmp);
+        return $this->db->get()->result();
+    }
+
+    public function inputOrder($data)
+    {
+        $this->db->insert('tb_po', $data);
+    }
+    public function inputDetailPO($data)
+    {
+        $this->db->insert('tb_detail_po', $data);
+    }
+    public function hapusTmp($id_tmp)
+    {
+        $this->db->where('kode_suplier', $id_tmp);
+        return $this->db->delete('tb_tmp_item');
+    }
 }

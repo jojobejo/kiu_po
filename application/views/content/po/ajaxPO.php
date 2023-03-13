@@ -8,4 +8,43 @@
         });
 
     });
+
+    $("#selesai").on('click', function() {
+        var nopo = $("#po_isi").val();
+        var tgl = $("#tgl_isi").val();
+        var jml = $("#jmlitem").val();
+        var suplier = $("#kdsuplier").val();
+        var harga = $("#jmlharga").val();
+
+        if (jml == 0) {
+            alert('tidak ada transaksi');
+        } else {
+            if (nopo == "") {
+                alert('Nomor PO tidak terisi');
+            } else if (tgl == "") {
+                alert('tgl order belum terisi');
+            } else {
+                $.ajax({
+                    url: "<?= base_url('rekam_po') ?>",
+                    type: "POST",
+                    data: {
+                        nopo: nopo,
+                        tgl: tgl,
+                        jml: jml,
+                        suplier: suplier,
+                        harga: harga
+                    },
+                    dataType: "JSON",
+                    cache: false,
+                    success: function(data) {
+                        if (data.msg == "success") {
+                            location.reload(true);
+                        } else {
+                            alert('ada kesalahan data')
+                        }
+                    }
+                })
+            }
+        }
+    })
 </script>

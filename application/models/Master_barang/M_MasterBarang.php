@@ -14,11 +14,13 @@ class M_MasterBarang extends CI_Model
     {
         $this->db->insert('tb_barang', $data);
     }
+    
     public function editBarang($id, $data)
     {
         $this->db->where('id_barang', $id);
         return $this->db->update('tb_barang', $data);
     }
+
     public function hapusBarang($id)
     {
         $this->db->where('id_barang', $id);

@@ -41,6 +41,7 @@ class C_Order extends CI_Controller
         $this->load->view('content/po/purchase', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
+        $this->load->view('content/po/ajaxPO');
     }
 
     public function listBarang($kdsuplier)
@@ -48,6 +49,7 @@ class C_Order extends CI_Controller
         $data['title'] = 'Add Item List';
         $data['kode_suplier'] = $this->M_Purchase->Suplier($kdsuplier)->result();
         $data['barang'] = $this->M_Purchase->getBarangSup($kdsuplier)->result();
+        $data['tmp']    = $this->M_Purchase->getTmpOrder($kdsuplier);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -126,5 +128,56 @@ class C_Order extends CI_Controller
         );
         $this->M_Purchase->addChart($data);
         redirect('purchase/sup/' . $suplier);
+    }
+
+    public function hapusChart($id, $kdsuplier)
+    {
+        $this->M_Purchase->hapusChart($id);
+        redirect('purchase/sup/' . $kdsuplier);
+    }
+
+    public function rekam_po()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $suplier    = $this->input->post('suplier');
+        $nopo       = $this->input->post('nopo');
+        $tgl        = $this->input->post('tgl');
+        $jml        = $this->input->post('jml');
+        $harga      = $this->input->post('harga');
+        $tmp        = $this->M_Purchase->get_tmp($suplier);
+
+        $rekamData = array(
+            'no_po'         => $nopo,
+            'tgl_transaksi' => $tgl,
+            'kd_suplier'    => $suplier,
+            'jml_item'      => $jml,
+            'total_harga'   => $harga,
+            'status'        => 'ON PROGRESS'
+        );
+        $this->M_Purchase->inputOrder($rekamData);
+
+        if ($tmp) {
+            foreach ($tmp as $chart) {
+                $listTransaksi = array(
+                    'no_po'         => $nopo,
+                    'tgl_transaksi' => $tgl,
+                    'kd_barang'     => $chart->kode_barang,
+                    'nama_barang'   => $chart->nama_barang,
+                    'kd_suplier'    => $chart->kode_suplier,
+                    'kemasan'       => $chart->kemasan,
+                    'satuan'        => $chart->satuan,
+                    'qty'           => $chart->qty,
+                    'hrg_satuan'    => $chart->harga_satuan,
+                    'hrg_total'     => $chart->total_harga,
+                    'tax'           => $chart->tax
+                );
+
+                $this->M_Purchase->inputDetailPO($listTransaksi);
+            }
+            $this->M_Purchase->hapusTmp($suplier);
+            $msg = "success";
+            $data = array('msg' => $msg, 'nopo' => $nopo);
+            echo json_encode($data);
+        }
     }
 }
