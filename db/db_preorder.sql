@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 13, 2023 at 09:08 AM
+-- Generation Time: Mar 14, 2023 at 09:50 AM
 -- Server version: 10.4.18-MariaDB
 -- PHP Version: 7.0.0
 
@@ -2010,6 +2010,7 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 
 CREATE TABLE `tb_detail_po` (
   `id_det_po` int(11) NOT NULL,
+  `kd_po` varchar(255) NOT NULL,
   `no_po` varchar(255) NOT NULL,
   `tgl_transaksi` date NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
@@ -2028,8 +2029,11 @@ CREATE TABLE `tb_detail_po` (
 -- Dumping data for table `tb_detail_po`
 --
 
-INSERT INTO `tb_detail_po` (`id_det_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `kemasan`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `tax`, `create_at`) VALUES
-(4, '10101', '2023-03-13', 'SUP110', 'QBARU001', 'Barang1', '1 X  100', 'Btl', 25, 27750, 693750, 11, '2023-03-13 07:28:55');
+INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `kemasan`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `tax`, `create_at`) VALUES
+(1, 'KPO140323SUP1100001', '001/KIU/VII/2021', '2023-03-14', 'SUP110', 'QBARU001', 'Barang1', '1 X  100', 'Btl', 25, 39683, 992063, 11, '2023-03-14 02:41:20'),
+(2, 'KPO140323SUP1100001', '001/KIU/VII/2021', '2023-03-14', 'SUP110', 'QBARU002', 'Barang2', '1 X 10', 'Pcs', 50, 75000, 3750000, 11, '2023-03-14 02:41:20'),
+(3, 'KPO140323SUP0040002', '001/KIU/II/2023', '2023-03-13', 'SUP004', 'ABS08', 'Absina 36 EC', '1 X  100 ', 'Btl', 15, 61050, 915750, 11, '2023-03-14 07:31:10'),
+(4, 'KPO140323SUP0040002', '001/KIU/II/2023', '2023-03-13', 'SUP004', 'TRI1873', 'Triactive 500 SL', '1 x 50', 'Btl', 25, 35500, 887500, 0, '2023-03-14 07:31:10');
 
 -- --------------------------------------------------------
 
@@ -2052,20 +2056,23 @@ CREATE TABLE `tb_kemasan` (
 
 CREATE TABLE `tb_po` (
   `id_po` int(11) NOT NULL,
+  `kd_po` varchar(255) NOT NULL,
   `no_po` varchar(255) NOT NULL,
   `tgl_transaksi` date NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `jml_item` int(11) NOT NULL,
   `total_harga` int(11) NOT NULL,
-  `status` varchar(255) NOT NULL
+  `status` varchar(255) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_po`
 --
 
-INSERT INTO `tb_po` (`id_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`) VALUES
-(7, '10101', '2023-03-13', 'SUP110', 1, 693750, 'ON PROGRESS');
+INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `create_at`) VALUES
+(1, 'KPO140323SUP1100001', '001/KIU/VII/2021', '2023-03-14', 'SUP110', 2, 4742063, 'DONE', '2023-03-14 05:41:38'),
+(2, 'KPO140323SUP0040002', '001/KIU/II/2023', '2023-03-13', 'SUP004', 2, 1803250, 'ON PROGRESS', '2023-03-14 07:31:10');
 
 -- --------------------------------------------------------
 
@@ -2076,124 +2083,129 @@ INSERT INTO `tb_po` (`id_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`
 CREATE TABLE `tb_suplier` (
   `id_suplier` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
-  `nama_suplier` text NOT NULL
+  `nama_suplier` text NOT NULL,
+  `alamat_suplier` text NOT NULL,
+  `no_telpon` text NOT NULL,
+  `no_fax` text NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `gbr_logo` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `tb_suplier`
 --
 
-INSERT INTO `tb_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`) VALUES
-(1, 'SUP001', 'Excel Meg Indo, PT'),
-(2, 'SUP002', 'Artha Buana Mandiri/Graha Niaga Mandiri, CV'),
-(3, 'SUP003', 'Advansia Indotani, PT'),
-(4, 'SUP004', 'Dupont Agricultural Product Indonesia, PT'),
-(5, 'SUP005', 'Corteva Agriscience Indonesia, PT'),
-(6, 'SUP006', 'Sarana Tani Indonesia Makmur, PT'),
-(7, 'SUP007', 'Sinar General Industries, PT'),
-(8, 'SUP008', 'Asiana Chemicalindo Lestari, PT'),
-(9, 'SUP009', 'BASF Indonesia, PT'),
-(10, 'SUP010', 'Syngenta Indonesia, PT'),
-(11, 'SUP011', 'Global Agrotech, PT'),
-(12, 'SUP012', 'Bioworld Biosciencen ML, PT'),
-(13, 'SUP013', 'Royal Agro Indonesia, PT'),
-(14, 'SUP014', 'Bayer Indonesia, PT'),
-(15, 'SUP015', 'Era Tani, PT'),
-(16, 'SUP016', 'Asia Gala Kimia, PT'),
-(17, 'SUP017', 'Agro Dynamics Indo, PT'),
-(18, 'SUP018', 'Imta Sukses Abadi, PT'),
-(19, 'SUP019', 'Jawa Agrindo Internasional, PT'),
-(20, 'SUP020', 'Star Metal Ware Industry, PT'),
-(21, 'SUP021', 'Maju Makmur Utomo, PT'),
-(22, 'SUP022', 'Agro Guna Makmur, PT'),
-(23, 'SUP023', 'Johnny Jaya Makmur, PT'),
-(24, 'SUP024', 'Sari Kresna Kimia, PT'),
-(25, 'SUP025', 'Tanindo Intertraco, PT'),
-(26, 'SUP026', 'Adil Makmur Fajar, PT'),
-(27, 'SUP027', 'Inter Agro Indonesia, PT'),
-(28, 'SUP028', 'Bina Guna Kimia, PT'),
-(29, 'SUP029', 'Mitra Kreasi Dharma, PT'),
-(30, 'SUP030', 'Tiga Muara Emas Makmur, PT'),
-(31, 'SUP031', 'FAM Indonesia, PT.'),
-(32, 'SUP032', 'Petrokimia Kayaku, PT'),
-(33, 'SUP033', 'Agro Natural Technology, PT'),
-(34, 'SUP034', 'Mitra Indotani Abadi, PT'),
-(35, 'SUP035', 'Deli Standart, PT'),
-(36, 'SUP036', 'Nufarm Indonesia, PT'),
-(37, 'SUP037', 'Mitoku Sukses Makmur, PT'),
-(38, 'SUP038', 'Oat Mitoku Agrio, PT'),
-(39, 'SUP039', 'Saprotan Utama, CV '),
-(40, 'SUP040', 'Sinar Agro Kimia Indonesia, CV'),
-(41, 'SUP041', 'Lestari Inti Agro, CV'),
-(42, 'SUP042', 'Sarana Tani Makmur, CV'),
-(43, 'SUP043', 'Etong Chemical Indonesia'),
-(44, 'SUP044', 'Bio Agritech Nusantara, PT'),
-(45, 'SUP045', 'Rabana Agro Resources, PT'),
-(46, 'SUP046', 'Behn Meyer AgriCare, PT'),
-(47, 'SUP047', 'Benih Citra Asia, PT'),
-(48, 'SUP048', 'Bisi International, Tbk'),
-(49, 'SUP049', 'Indo Acidatama Tbk, PT'),
-(50, 'SUP050', 'Murni Mapan Makmur, PT'),
-(51, 'SUP051', 'Surya Mandiri Sejahtera, PT'),
-(52, 'SUP052', 'Dalzon Chemicals Indonesia, PT'),
-(53, 'SUP053', 'Wahana Pundhi Karsa Abadi, PT'),
-(54, 'SUP054', 'Putra Sejati Persada'),
-(55, 'SUP055', 'Agricon, PT'),
-(56, 'SUP056', 'Sinamyang Indonesia, PT'),
-(57, 'SUP057', 'Mitra Tani Abadi Jaya, CV'),
-(58, 'SUP058', 'Tani Murni'),
-(59, 'SUP059', 'Lili Somantry'),
-(60, 'SUP060', 'Agrotech Pesticide Industry, PT'),
-(61, 'SUP061', 'Tani Abadi, CV'),
-(62, 'SUP062', 'Dow Agro Sciences Ind, PT'),
-(63, 'SUP063', 'Farmco Kimia, PT'),
-(64, 'SUP064', 'Kalatham, PT'),
-(65, 'SUP065', 'Widjaya, UD'),
-(66, 'SUP066', 'Danken Indonesia, PT'),
-(67, 'SUP067', 'Ace Bio Care, PT'),
-(68, 'SUP068', 'Songgolangit Persada'),
-(69, 'SUP069', 'Golden Planter Indonesia, PT'),
-(70, 'SUP070', 'Imta Sukses Abadi'),
-(71, 'SUP071', 'Multiagro Sarana Cemerlang, CV'),
-(72, 'SUP072', 'Sanitas, PT'),
-(73, 'SUP073', 'Utomo Utomo, PT'),
-(74, 'SUP074', 'Agroiris Crop Protection Indonesia, PT'),
-(75, 'SUP075', 'Kertopaten Kencana, PT'),
-(76, 'SUP076', 'FMC Agricultural Manufacturing, PT'),
-(77, 'SUP077', 'Advanta Seeds Indonesia, PT'),
-(78, 'SUP078', 'Branita Sandhini, PT'),
-(79, 'SUP079', 'Surya Kencana Agrifarm, CV'),
-(80, 'SUP080', 'Agri Makmur Pertiwi, PT'),
-(81, 'SUP081', 'Syngenta Seed, PT'),
-(82, 'SUP082', 'Corteva Agriscience Seeds Indonesia, PT'),
-(83, 'SUP083', 'Semi, CV'),
-(84, 'SUP084', 'Wonderindo Pharmatama, PT'),
-(85, 'SUP085', 'Catur Agrodaya Mandiri, PT'),
-(86, 'SUP086', 'Bimatama Cipta Niaga, PT'),
-(87, 'SUP087', 'Agriculture Constraction Indonesia, PT'),
-(88, 'SUP088', 'Indotani, PT'),
-(89, 'SUP089', 'Java Karlos Indonesia, PT'),
-(90, 'SUP090', 'Prima Jaya, PT'),
-(91, 'SUP091', 'Karunia Sukses Utama, PT'),
-(92, 'SUP092', 'Multidaya Putra Sejahtera, PT'),
-(93, 'SUP093', 'Restu Tani, CV'),
-(94, 'SUP094', 'Tri Usaha Sejahtera Pratama, PT'),
-(95, 'SUP095', 'Mukti Jaya Agro, PT'),
-(96, 'SUP096', 'Satya Agro Indonesia, PT'),
-(97, 'SUP097', 'Jun Hok'),
-(98, 'SUP098', 'Bisi International, Tbk - Vegetable'),
-(99, 'SUP099', 'Indoin Business Group, PT'),
-(100, 'SUP100', 'Kelud Jaya, UD'),
-(101, 'SUP101', 'Abadi Nylon Rope & Fishing Net Manufacturing, PT'),
-(102, 'SUP102', 'Centa Brasindo Abadi, PT'),
-(103, 'SUP103', 'Golden Agin I, PT'),
-(104, 'SUP104', 'Trisna, CV'),
-(105, 'SUP105', 'Arysta Lifescience Tirta, PT'),
-(106, 'SUP106', 'Syukur Jamin Mulia, PT'),
-(107, 'SUP107', 'Zenith Cropsciences Indonesia, PT'),
-(108, 'SUP108', 'Deltragro Mulia Sejati, PT/ Sanitas'),
-(109, 'SUP109', 'Exindo Raharja Pratama, PT'),
-(110, 'SUP110', 'SUPLIER COBA');
+INSERT INTO `tb_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`, `alamat_suplier`, `no_telpon`, `no_fax`, `email`, `gbr_logo`) VALUES
+(1, 'SUP001', 'Excel Meg Indo, PT', '', '', '', '', ''),
+(2, 'SUP002', 'Artha Buana Mandiri/Graha Niaga Mandiri, CV', '', '', '', '', ''),
+(3, 'SUP003', 'Advansia Indotani, PT', '', '', '', '', ''),
+(4, 'SUP004', 'Dupont Agricultural Product Indonesia, PT', '', '', '', '', ''),
+(5, 'SUP005', 'Corteva Agriscience Indonesia, PT', '', '', '', '', ''),
+(6, 'SUP006', 'Sarana Tani Indonesia Makmur, PT', '', '', '', '', ''),
+(7, 'SUP007', 'Sinar General Industries, PT', '', '', '', '', ''),
+(8, 'SUP008', 'Asiana Chemicalindo Lestari, PT', '', '', '', '', ''),
+(9, 'SUP009', 'BASF Indonesia, PT', '', '', '', '', ''),
+(10, 'SUP010', 'Syngenta Indonesia, PT', '', '', '', '', ''),
+(11, 'SUP011', 'Global Agrotech, PT', '', '', '', '', ''),
+(12, 'SUP012', 'Bioworld Biosciencen ML, PT', '', '', '', '', ''),
+(13, 'SUP013', 'Royal Agro Indonesia, PT', '', '', '', '', ''),
+(14, 'SUP014', 'Bayer Indonesia, PT', '', '', '', '', ''),
+(15, 'SUP015', 'Era Tani, PT', '', '', '', '', ''),
+(16, 'SUP016', 'Asia Gala Kimia, PT', '', '', '', '', ''),
+(17, 'SUP017', 'Agro Dynamics Indo, PT', '', '', '', '', ''),
+(18, 'SUP018', 'Imta Sukses Abadi, PT', '', '', '', '', ''),
+(19, 'SUP019', 'Jawa Agrindo Internasional, PT', '', '', '', '', ''),
+(20, 'SUP020', 'Star Metal Ware Industry, PT', '', '', '', '', ''),
+(21, 'SUP021', 'Maju Makmur Utomo, PT', '', '', '', '', ''),
+(22, 'SUP022', 'Agro Guna Makmur, PT', '', '', '', '', ''),
+(23, 'SUP023', 'Johnny Jaya Makmur, PT', '', '', '', '', ''),
+(24, 'SUP024', 'Sari Kresna Kimia, PT', '', '', '', '', ''),
+(25, 'SUP025', 'Tanindo Intertraco, PT', '', '', '', '', ''),
+(26, 'SUP026', 'Adil Makmur Fajar, PT', '', '', '', '', ''),
+(27, 'SUP027', 'Inter Agro Indonesia, PT', '', '', '', '', ''),
+(28, 'SUP028', 'Bina Guna Kimia, PT', '', '', '', '', ''),
+(29, 'SUP029', 'Mitra Kreasi Dharma, PT', '', '', '', '', ''),
+(30, 'SUP030', 'Tiga Muara Emas Makmur, PT', '', '', '', '', ''),
+(31, 'SUP031', 'FAM Indonesia, PT.', '', '', '', '', ''),
+(32, 'SUP032', 'Petrokimia Kayaku, PT', '', '', '', '', ''),
+(33, 'SUP033', 'Agro Natural Technology, PT', '', '', '', '', ''),
+(34, 'SUP034', 'Mitra Indotani Abadi, PT', '', '', '', '', ''),
+(35, 'SUP035', 'Deli Standart, PT', '', '', '', '', ''),
+(36, 'SUP036', 'Nufarm Indonesia, PT', '', '', '', '', ''),
+(37, 'SUP037', 'Mitoku Sukses Makmur, PT', '', '', '', '', ''),
+(38, 'SUP038', 'Oat Mitoku Agrio, PT', '', '', '', '', ''),
+(39, 'SUP039', 'Saprotan Utama, CV ', '', '', '', '', ''),
+(40, 'SUP040', 'Sinar Agro Kimia Indonesia, CV', '', '', '', '', ''),
+(41, 'SUP041', 'Lestari Inti Agro, CV', '', '', '', '', ''),
+(42, 'SUP042', 'Sarana Tani Makmur, CV', '', '', '', '', ''),
+(43, 'SUP043', 'Etong Chemical Indonesia', '', '', '', '', ''),
+(44, 'SUP044', 'Bio Agritech Nusantara, PT', '', '', '', '', ''),
+(45, 'SUP045', 'Rabana Agro Resources, PT', '', '', '', '', ''),
+(46, 'SUP046', 'Behn Meyer AgriCare, PT', '', '', '', '', ''),
+(47, 'SUP047', 'Benih Citra Asia, PT', '', '', '', '', ''),
+(48, 'SUP048', 'Bisi International, Tbk', '', '', '', '', ''),
+(49, 'SUP049', 'Indo Acidatama Tbk, PT', '', '', '', '', ''),
+(50, 'SUP050', 'Murni Mapan Makmur, PT', '', '', '', '', ''),
+(51, 'SUP051', 'Surya Mandiri Sejahtera, PT', '', '', '', '', ''),
+(52, 'SUP052', 'Dalzon Chemicals Indonesia, PT', '', '', '', '', ''),
+(53, 'SUP053', 'Wahana Pundhi Karsa Abadi, PT', '', '', '', '', ''),
+(54, 'SUP054', 'Putra Sejati Persada', '', '', '', '', ''),
+(55, 'SUP055', 'Agricon, PT', '', '', '', '', ''),
+(56, 'SUP056', 'Sinamyang Indonesia, PT', '', '', '', '', ''),
+(57, 'SUP057', 'Mitra Tani Abadi Jaya, CV', '', '', '', '', ''),
+(58, 'SUP058', 'Tani Murni', '', '', '', '', ''),
+(59, 'SUP059', 'Lili Somantry', '', '', '', '', ''),
+(60, 'SUP060', 'Agrotech Pesticide Industry, PT', '', '', '', '', ''),
+(61, 'SUP061', 'Tani Abadi, CV', '', '', '', '', ''),
+(62, 'SUP062', 'Dow Agro Sciences Ind, PT', '', '', '', '', ''),
+(63, 'SUP063', 'Farmco Kimia, PT', '', '', '', '', ''),
+(64, 'SUP064', 'Kalatham, PT', '', '', '', '', ''),
+(65, 'SUP065', 'Widjaya, UD', '', '', '', '', ''),
+(66, 'SUP066', 'Danken Indonesia, PT', '', '', '', '', ''),
+(67, 'SUP067', 'Ace Bio Care, PT', '', '', '', '', ''),
+(68, 'SUP068', 'Songgolangit Persada', '', '', '', '', ''),
+(69, 'SUP069', 'Golden Planter Indonesia, PT', '', '', '', '', ''),
+(70, 'SUP070', 'Imta Sukses Abadi', '', '', '', '', ''),
+(71, 'SUP071', 'Multiagro Sarana Cemerlang, CV', '', '', '', '', ''),
+(72, 'SUP072', 'Sanitas, PT', '', '', '', '', ''),
+(73, 'SUP073', 'Utomo Utomo, PT', '', '', '', '', ''),
+(74, 'SUP074', 'Agroiris Crop Protection Indonesia, PT', '', '', '', '', ''),
+(75, 'SUP075', 'Kertopaten Kencana, PT', '', '', '', '', ''),
+(76, 'SUP076', 'FMC Agricultural Manufacturing, PT', '', '', '', '', ''),
+(77, 'SUP077', 'Advanta Seeds Indonesia, PT', '', '', '', '', ''),
+(78, 'SUP078', 'Branita Sandhini, PT', '', '', '', '', ''),
+(79, 'SUP079', 'Surya Kencana Agrifarm, CV', '', '', '', '', ''),
+(80, 'SUP080', 'Agri Makmur Pertiwi, PT', '', '', '', '', ''),
+(81, 'SUP081', 'Syngenta Seed, PT', '', '', '', '', ''),
+(82, 'SUP082', 'Corteva Agriscience Seeds Indonesia, PT', '', '', '', '', ''),
+(83, 'SUP083', 'Semi, CV', '', '', '', '', ''),
+(84, 'SUP084', 'Wonderindo Pharmatama, PT', '', '', '', '', ''),
+(85, 'SUP085', 'Catur Agrodaya Mandiri, PT', '', '', '', '', ''),
+(86, 'SUP086', 'Bimatama Cipta Niaga, PT', '', '', '', '', ''),
+(87, 'SUP087', 'Agriculture Constraction Indonesia, PT', '', '', '', '', ''),
+(88, 'SUP088', 'Indotani, PT', '', '', '', '', ''),
+(89, 'SUP089', 'Java Karlos Indonesia, PT', '', '', '', '', ''),
+(90, 'SUP090', 'Prima Jaya, PT', '', '', '', '', ''),
+(91, 'SUP091', 'Karunia Sukses Utama, PT', '', '', '', '', ''),
+(92, 'SUP092', 'Multidaya Putra Sejahtera, PT', '', '', '', '', ''),
+(93, 'SUP093', 'Restu Tani, CV', '', '', '', '', ''),
+(94, 'SUP094', 'Tri Usaha Sejahtera Pratama, PT', '', '', '', '', ''),
+(95, 'SUP095', 'Mukti Jaya Agro, PT', '', '', '', '', ''),
+(96, 'SUP096', 'Satya Agro Indonesia, PT', '', '', '', '', ''),
+(97, 'SUP097', 'Jun Hok', '', '', '', '', ''),
+(98, 'SUP098', 'Bisi International, Tbk - Vegetable', '', '', '', '', ''),
+(99, 'SUP099', 'Indoin Business Group, PT', '', '', '', '', ''),
+(100, 'SUP100', 'Kelud Jaya, UD', '', '', '', '', ''),
+(101, 'SUP101', 'Abadi Nylon Rope & Fishing Net Manufacturing, PT', '', '', '', '', ''),
+(102, 'SUP102', 'Centa Brasindo Abadi, PT', '', '', '', '', ''),
+(103, 'SUP103', 'Golden Agin I, PT', '', '', '', '', ''),
+(104, 'SUP104', 'Trisna, CV', '', '', '', '', ''),
+(105, 'SUP105', 'Arysta Lifescience Tirta, PT', '', '', '', '', ''),
+(106, 'SUP106', 'Syukur Jamin Mulia, PT', '', '', '', '', ''),
+(107, 'SUP107', 'Zenith Cropsciences Indonesia, PT', '', '', '', '', ''),
+(108, 'SUP108', 'Deltragro Mulia Sejati, PT/ Sanitas', '', '', '', '', ''),
+(109, 'SUP109', 'Exindo Raharja Pratama, PT', '', '', '', '', ''),
+(110, 'SUP110', 'SUPLIER COBA', 'Jl. Siliwangi No.68 Jember', '(0331) 8313070', '(0331) 8325391', 'supliercoba@gmail.com', 'Dupont LOGO.png');
 
 -- --------------------------------------------------------
 
@@ -2213,14 +2225,6 @@ CREATE TABLE `tb_tmp_item` (
   `total_harga` int(15) NOT NULL,
   `tax` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `tb_tmp_item`
---
-
-INSERT INTO `tb_tmp_item` (`id_tmp`, `kode_barang`, `nama_barang`, `kode_suplier`, `kemasan`, `satuan`, `qty`, `harga_satuan`, `total_harga`, `tax`) VALUES
-(4, 'ABS08', 'Absina 36 EC', 'SUP004', '1 X  100 ', 'Btl', 15, 61050, 915750, 11),
-(5, 'TRI1873', 'Triactive 500 SL', 'SUP004', '1 x 50', 'Btl', 25, 35500, 887500, 0);
 
 -- --------------------------------------------------------
 
@@ -2317,7 +2321,7 @@ ALTER TABLE `tb_kemasan`
 -- AUTO_INCREMENT for table `tb_po`
 --
 ALTER TABLE `tb_po`
-  MODIFY `id_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_suplier`
@@ -2329,7 +2333,7 @@ ALTER TABLE `tb_suplier`
 -- AUTO_INCREMENT for table `tb_tmp_item`
 --
 ALTER TABLE `tb_tmp_item`
-  MODIFY `id_tmp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_tmp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tb_user`
