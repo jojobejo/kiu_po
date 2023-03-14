@@ -11,9 +11,13 @@
                 <a href="<?= base_url('purchase') ?>">
                     <i class="fa fa-arrow-left  ml-4 mr-4 mt-2"></i>
                 </a>
-
+                <?php $this->load->view('content/po/modal/msuplier') ?>
                 <?php foreach ($kode_suplier as $b) : ?>
-                    <h3><?= $b->nama_suplier ?> </h3>
+                    <h3 class=""><?= $b->nama_suplier ?> </h3>
+                    &nbsp;
+                    <a href="#" class=" ml-3 btn btn-warning " data-toggle="modal" data-target="#editSuplier<?= $b->id_suplier ?>">
+                        <i class="fa fa-solid fa-pencil-alt"></i>
+                    </a>
             </div>
             <a href="<?= base_url('purchase/listBarang/') . $b->kd_suplier ?>" class="btn btn-primary mb-2 mt-2">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang
@@ -36,6 +40,14 @@
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                         </div>
                         <input type="date" class="form-control" placeholder="Tanggal Transaksi" value="" name="tgl_isi" id="tgl_isi">
+                    </div>
+                </div>
+                <div class="col-md-5" hidden>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Tanggal Transaksi" value="<?= $kdpo ?>" name="kd_po_isi" id="kd_po_isi" readonly>
                     </div>
                 </div>
             </div>
@@ -102,7 +114,7 @@
                             <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                             <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
                                 <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
-                                <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga?>" readonly hidden>
+                                <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -56,7 +56,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="<?= base_url('status_order') ?>" class="nav-link">
+          <a href="<?= base_url('postatus') ?>" class="nav-link">
             <i class="nav-icon fas fa-money-check"></i>
             <p>
               Purchase Order Status

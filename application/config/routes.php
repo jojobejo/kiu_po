@@ -70,6 +70,7 @@ $route['purchase'] = 'purchaseorder/C_Order';
 $route['purchase/sup/(:any)']  = 'purchaseorder/C_Order/purchaseSuplier/$1';
 $route['purchase/listBarang/(:any)'] = 'purchaseorder/C_Order/listBarang/$1';
 $route['addBarangSuplier'] = 'purchaseorder/C_Order/addBarang';
+$route['editSuplier'] = 'purchaseorder/C_Order/editSuplier';
 $route['editBarang'] = 'purchaseorder/C_Order/editBarang';
 $route['tambahChart'] = 'purchaseorder/C_Order/addChart';
 $route['addchart'] = 'purchase/C_Order/addChart';
@@ -77,4 +78,7 @@ $route['hapusBarang/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 
-//Status
+//postatus
+$route['postatus'] = 'postatus/C_PoStatus';
+$route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
+$route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';

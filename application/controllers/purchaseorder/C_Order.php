@@ -35,6 +35,7 @@ class C_Order extends CI_Controller
         $data["barang"] = $this->M_Purchase->getBarangSup($kdsuplier)->result();
         $data['tmp']    = $this->M_Purchase->getTmpOrder($kdsuplier);
         $data['total']  = $this->M_Purchase->sumTransaksiPenjualan($kdsuplier);
+        $data['kdpo']   = $this->M_Purchase->kdpo($kdsuplier);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -57,6 +58,28 @@ class C_Order extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
         $this->load->view('content/po/ajaxPO');
+    }
+
+    public function editSuplier()
+    {
+        $kdsup       = $this->input->post('kd_sup');
+        $namasup     = $this->input->post('nama_isi');
+        $alamatsup   = $this->input->post('alamat_isi');
+        $nosup       = $this->input->post('telp_isi');
+        $faxsup      = $this->input->post('fax_isi');
+        $emailsup    = $this->input->post('email_isi');
+
+        $dataSup = array(
+            'kd_suplier'    => $kdsup,
+            'nama_suplier'  => $namasup,
+            'alamat_suplier' => $alamatsup,
+            'no_telpon'     => $nosup,
+            'no_fax'        => $faxsup,
+            'email'         => $emailsup
+        );
+
+        $this->M_Purchase->editSuplier($kdsup, $dataSup);
+        redirect('purchase/sup/' . $kdsup);
     }
 
     public function addBarang()
@@ -142,12 +165,14 @@ class C_Order extends CI_Controller
         $suplier    = $this->input->post('suplier');
         $nopo       = $this->input->post('nopo');
         $tgl        = $this->input->post('tgl');
+        $kdpo       = $this->input->post('kdpo');
         $jml        = $this->input->post('jml');
         $harga      = $this->input->post('harga');
         $tmp        = $this->M_Purchase->get_tmp($suplier);
 
         $rekamData = array(
             'no_po'         => $nopo,
+            'kd_po'         => $kdpo,
             'tgl_transaksi' => $tgl,
             'kd_suplier'    => $suplier,
             'jml_item'      => $jml,
@@ -160,6 +185,7 @@ class C_Order extends CI_Controller
             foreach ($tmp as $chart) {
                 $listTransaksi = array(
                     'no_po'         => $nopo,
+                    'kd_po'         => $kdpo,
                     'tgl_transaksi' => $tgl,
                     'kd_barang'     => $chart->kode_barang,
                     'nama_barang'   => $chart->nama_barang,

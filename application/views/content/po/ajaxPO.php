@@ -13,6 +13,7 @@
         var nopo = $("#po_isi").val();
         var tgl = $("#tgl_isi").val();
         var jml = $("#jmlitem").val();
+        var kdpo = $("#kd_po_isi").val();
         var suplier = $("#kdsuplier").val();
         var harga = $("#jmlharga").val();
 
@@ -31,6 +32,7 @@
                         nopo: nopo,
                         tgl: tgl,
                         jml: jml,
+                        kdpo : kdpo,
                         suplier: suplier,
                         harga: harga
                     },
