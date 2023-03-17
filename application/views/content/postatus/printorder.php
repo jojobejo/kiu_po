@@ -41,17 +41,18 @@
                     <br>
                     <b>Nomor Order:</b> <?= $s->no_po ?><br>
                     <b>Tanggal Order:</b> <?= $s->tgl_transaksi ?><br>
-                    <img src="<?= base_url('assets/images/logoPT/') . $s->gbr_logo ?>" style="width: 250px; height: 100px;" alt="">
+                    <img src="<?= base_url('assets/images/logoPT/') . $s->gbr_logo ?>" style="margin: 15px; width: 250px; height: 100px;" alt="">
                 </div>
                 <!-- /.col -->
             </div>
             <!-- /.row -->
         <?php endforeach; ?>
         <!-- Table row -->
+        <h3>FORM PESANAN</h3>
         <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-striped">
-                    <thead>
+                    <thead class="theadprint">
                         <tr>
                             <td>No</td>
                             <td>Nama Barang</td>
@@ -64,16 +65,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        <?php
+                        $no = 1;
+                        foreach ($detail as $d) : ?>
+                            <tr>
+                                <td><?= $no++; ?></td>
+                                <td><?= $d->nama_barang ?></td>
+                                <td><?= $d->kemasan ?></td>
+                                <td><?= $d->satuan ?></td>
+                                <td><?= $d->qty ?></td>
+                                <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
+                                <td><?= $d->tax ?> %</td>
+                                <td>Rp. <?= number_format($d->hrg_total) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php
+                        foreach ($total as $t) : ?>
+                            <tr>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td style="display: none;"></td>
+                                <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -83,8 +104,8 @@
 
         <div class="row">
             <!-- accepted payments column -->
-            <div class="col-6">
-                <p class="text-muted well well-sm shadow-none" style="margin-top: 10px; background-color: yellow;">
+            <div class="col-6 noted">
+                <p class="text-muted well well-sm" style="margin-top: 10px;">
                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
                     NANDANG ERNOKO (Kadep Logistik) <br>
                     081 131 361 66 / 081 252 151 314 <br>
@@ -94,29 +115,15 @@
 
                 </p>
             </div>
-            <!-- /.col -->
             <div class="col-6">
-                <div class="table-responsive">
-                    <table class="table-borderless">
-                        <tr>
-                            <th style="width:50%">Pemesan</th>
-                        </tr>
-                        <tr>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                            <th style="display: none;"></th>
-                        </tr>
-                        <tr>
-                            <th>Agoes Santoso</th>
-                        </tr>
-                    </table>
-                </div>
+                <table class="mt-2" width='650' style='font-size:12pt;' cellspacing='2'>
+                    <tr>
+                        <td align="center">Pemesan,</br></br></br></br></br><u>( Agoes Santoso )</u></td>
+                        <td align="center">Disetujui,</br></br></br></br></br><u>(....................)</u></td>
+                    </tr>
+                </table>
             </div>
-            <!-- /.col -->
+
         </div>
         <!-- /.row -->
         </section>

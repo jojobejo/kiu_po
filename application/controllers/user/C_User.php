@@ -44,8 +44,8 @@ class C_User extends CI_Controller
             'nama_user'     => $nama_user,
             'username'      => $username,
             'password'      => $password,
-            'aksess_lv'       => $level,
-            'departement'    => $departemen,
+            'aksess_lv'     => $level,
+            'departement'   => $departemen,
         );
 
         $this->M_User->addUser($data);
