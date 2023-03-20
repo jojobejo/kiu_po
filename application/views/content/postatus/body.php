@@ -12,7 +12,7 @@
                 <a href="<?= base_url('postatus/done')?>" class="btn btn-success ml-3">DONE</a>
                 <a href="<?= base_url('postatus/reject')?>" class="btn btn-danger ml-3">REJET</a>
             </div>
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped" id="tballstatus">
                 <thead>
                     <tr>
                         <td>No</td>
@@ -60,6 +60,7 @@
                                             Detail
                                         </a>
                                     </div>
+                                    <?php if($this->session->userdata('lv') == '1' || $this->session->userdata('lv') == '3') : ?>
                                     <div class="col-md">
                                         <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrder/') . $p->kd_po ?>">
                                             <i class="fas fa-clipboard-check"></i>
@@ -72,6 +73,7 @@
                                             Reject
                                         </a>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

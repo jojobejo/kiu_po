@@ -26,6 +26,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/body', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
     public function getOnProgress()
     {
@@ -37,6 +38,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/bodyOnProgress', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
     public function getDone()
     {
@@ -48,6 +50,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/bodyDone', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
     public function getReject()
     {
@@ -59,6 +62,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/bodyReject', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 
     public function detailPO($kdpo)

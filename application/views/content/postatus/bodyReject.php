@@ -12,7 +12,7 @@
                 <a href="<?= base_url('postatus/done')?>" class="btn btn-success ml-3">DONE</a>
                 <a href="<?= base_url('postatus/reject')?>" class="btn btn-danger ml-3">REJET</a>
             </div>
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped" id="tbreject">
                 <thead>
                     <tr>
                         <td>No</td>

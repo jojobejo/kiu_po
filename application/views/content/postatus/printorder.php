@@ -50,10 +50,10 @@
         <!-- Table row -->
         <h3>FORM PESANAN</h3>
         <div class="row">
-            <div class="col-12 table-responsive">
+            <div class="col-12">
                 <table class="table table-striped">
-                    <thead class="theadprint">
-                        <tr>
+                    <thead>
+                        <tr class="asd">
                             <td>No</td>
                             <td>Nama Barang</td>
                             <td>Isi Kemasan</td>
@@ -116,7 +116,7 @@
                 </p>
             </div>
             <div class="col-6">
-                <table class="mt-2" width='650' style='font-size:12pt;' cellspacing='2'>
+                <table class="mt-2 ml-3" width='650' style='font-size:12pt;' cellspacing='2'>
                     <tr>
                         <td align="center">Pemesan,</br></br></br></br></br><u>( Agoes Santoso )</u></td>
                         <td align="center">Disetujui,</br></br></br></br></br><u>(....................)</u></td>

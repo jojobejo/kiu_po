@@ -53009,4 +53009,26 @@ a.text-muted:hover {
 .dark-mode .border-dark {
   border-color: #4b545c !important;
 }
+
+
+.noted{
+  background-color: yellow;
+  -webkit-print-color-adjust: exact !important;
+  color-adjust: exact !important;
+  
+}
+.theadprint{
+  background-color: #212529;
+  color:white;
+  -webkit-print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+@media print {
+  .table-striped tbody tr:nth-of-type(odd) td {
+      background-color: rgba(0,0,0,.05) !important;
+      -webkit-print-color-adjust: exact;
+  }
+}
+
 /*# sourceMappingURL=adminlte.css.map */

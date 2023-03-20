@@ -32,7 +32,7 @@ class Auth extends CI_Controller
             $check_password = $this->M_Auth->cek_password($username);
 
             foreach ($check_password as $key) {
-                if ($key->username == $username && password_verify($password, $key->password) && $key->departement == "Admin") {
+                if ($key->username == $username && password_verify($password, $key->password)) {
                     $data_session = array(
                         'id'            => $key->id_user,
                         'kode'          => $key->kode_user,
@@ -44,19 +44,6 @@ class Auth extends CI_Controller
                     );
                     $this->session->set_userdata($data_session);
                     redirect('dashboard');
-                } else if ($key->username == $username && password_verify($password, $key->password) && $key->departement == "Direktur") {
-                    $data_session = array(
-                        'id'            => $key->id_user,
-                        'kode'          => $key->kode_user,
-                        'username'      => $key->username,
-                        'nama_user'     => $key->nama_user,
-                        'departemen'    => $key->departemen,
-                        'lv'            => $key->user_lv,
-                        'status'        => "is_login"
-                    );
-
-                    $this->session->set_userdata($data_session);
-                    redirect('dashboardKasir');
                 } else {
                     $this->session->set_flashdata("gagal", "password salah!!!");
                     redirect('Auth');
@@ -70,9 +57,8 @@ class Auth extends CI_Controller
 
     function logout()
     {
-        // $id_tmp = $this->session->userdata("id_tmp");
-        // $this->Loginmodel->hapus_tmp($id_tmp);
+        $this->session->set_flashdata("logout", "Berhasil Log Out");
         $this->session->sess_destroy();
-        redirect("login");
+        redirect('Auth');
     }
 }
