@@ -7,10 +7,10 @@
                 </div><!-- /.col -->
             </div><!-- /.row -->
             <div class="row mb-2 mt-2">
-                <a href="<?= base_url('postatus')?>" class="btn btn-primary ml-2">All</a>
-                <a href="<?= base_url('postatus/onprogress')?>" class="btn btn-warning ml-3">PROGRESS</a>
-                <a href="<?= base_url('postatus/done')?>" class="btn btn-success ml-3">DONE</a>
-                <a href="<?= base_url('postatus/reject')?>" class="btn btn-danger ml-3">REJET</a>
+                <a href="<?= base_url('postatus') ?>" class="btn btn-primary ml-2">All</a>
+                <a href="<?= base_url('postatus/onprogress') ?>" class="btn btn-warning ml-3">PROGRESS</a>
+                <a href="<?= base_url('postatus/done') ?>" class="btn btn-success ml-3">DONE</a>
+                <a href="<?= base_url('postatus/reject') ?>" class="btn btn-danger ml-3">REJET</a>
             </div>
             <table class="table table-bordered table-striped" id="tbreject">
                 <thead>
@@ -60,18 +60,20 @@
                                             Detail
                                         </a>
                                     </div>
-                                    <div class="col-md">
-                                        <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrder/') . $p->kd_po ?>">
-                                            <i class="fas fa-clipboard-check"></i>
-                                            Accept
-                                        </a>
-                                    </div>
-                                    <div class="col-md">
-                                        <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('tolakOrder/') . $p->kd_po ?>">
-                                            <i class="fas fa-times"></i>
-                                            Reject
-                                        </a>
-                                    </div>
+                                    <?php if ($this->session->userdata('lv') == '1' || $this->session->userdata('lv') == '3') : ?>
+                                        <div class="col-md">
+                                            <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrder/') . $p->kd_po ?>">
+                                                <i class="fas fa-clipboard-check"></i>
+                                                Accept
+                                            </a>
+                                        </div>
+                                        <div class="col-md">
+                                            <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('tolakOrder/') . $p->kd_po ?>">
+                                                <i class="fas fa-times"></i>
+                                                Reject
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

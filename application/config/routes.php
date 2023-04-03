@@ -87,3 +87,10 @@ $route['tolakOrder/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1';
 $route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
 $route['postatus/done'] = 'postatus/C_PoStatus/getDone';
 $route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
+
+
+//settings-tax
+$route['taxseting'] = 'settings/C_TaxSetting';
+$route['addSatuanPajak'] = 'settings/C_TaxSetting/addPajak';
+$route['editSatuanPajak'] = 'settings/C_TaxSetting/editTax';
+$route['hapusPajak/(:num)'] = 'settings/C_TaxSetting/hapusPajak/$1';

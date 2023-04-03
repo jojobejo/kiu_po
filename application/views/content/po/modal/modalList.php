@@ -31,12 +31,6 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Kemasan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="kemasan_isi" name="kemasan_isi" value="" /></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
                             <div class="col-sm-8">
                                 <select name="satuan_isi" id="satuan_isi" class="form-control">
@@ -44,6 +38,9 @@
                                     <option value="Btl">Btl</option>
                                     <option value="Pcs">Pcs</option>
                                     <option value="Box">Box</option>
+                                    <option value="Roll">Roll</option>
+                                    <option value="Drum">Drum</option>
+                                    <option value="Zak">Zak</option>
                                 </select>
                             </div>
                         </div>
@@ -65,8 +62,9 @@
                             <label class="col-sm-3 control-label text-right" for="kd_user">TAX<span class="required">*</span></label>
                             <div class="col-sm-8">
                                 <select name="tax_isi" id="tax_isi" class="form-control">
-                                    <option value="0">0 %</option>
-                                    <option value="11">11 %</option>
+                                    <?php foreach ($tax as $t) : ?>
+                                        <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?> %</option>
+                                    <?php endforeach; ?>
                                     <input type="number" min="0" id="hasil_ppn" class="form-control" name="hasil_ppn" step="0.01" hidden />
                                 </select>
                             </div>

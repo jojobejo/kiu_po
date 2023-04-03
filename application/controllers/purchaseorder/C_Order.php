@@ -50,6 +50,7 @@ class C_Order extends CI_Controller
         $data['title'] = 'Add Item List';
         $data['kode_suplier'] = $this->M_Purchase->Suplier($kdsuplier)->result();
         $data['barang'] = $this->M_Purchase->getBarangSup($kdsuplier)->result();
+        $data['tax']    = $this->M_Purchase->getTax();
         $data['tmp']    = $this->M_Purchase->getTmpOrder($kdsuplier);
 
         $this->load->view('partial/header', $data);
@@ -126,7 +127,6 @@ class C_Order extends CI_Controller
     public function addChart()
     {
         $suplier    = $this->input->post('kd_sup');
-        $kemasan    = $this->input->post('kemasan_isi');
         $kdbarang   = $this->input->post('kd_isi');
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
@@ -142,7 +142,6 @@ class C_Order extends CI_Controller
             'kode_barang'   => $kdbarang,
             'nama_barang'   => $nmbarang,
             'kode_suplier'  => $suplier,
-            'kemasan'       => $kemasan,
             'satuan'        => $satuan,
             'qty'           => $qty,
             'harga_satuan'  => $hasiltax,
@@ -190,7 +189,6 @@ class C_Order extends CI_Controller
                     'kd_barang'     => $chart->kode_barang,
                     'nama_barang'   => $chart->nama_barang,
                     'kd_suplier'    => $chart->kode_suplier,
-                    'kemasan'       => $chart->kemasan,
                     'satuan'        => $chart->satuan,
                     'qty'           => $chart->qty,
                     'hrg_satuan'    => $chart->harga_satuan,

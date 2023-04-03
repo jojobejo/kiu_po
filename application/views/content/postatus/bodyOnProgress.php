@@ -53,13 +53,14 @@
                             <td><?= $p->no_po ?></td>
                             <td><?= $p->nama_suplier ?></td>
                             <td>
-                                <div class="row">
+                            <div class="row">
                                     <div class="col-md">
                                         <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('detailPO/') . $p->kd_po ?>">
                                             <i class="fas fa-eye"></i>
                                             Detail
                                         </a>
                                     </div>
+                                    <?php if($this->session->userdata('lv') == '1' || $this->session->userdata('lv') == '3') : ?>
                                     <div class="col-md">
                                         <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrder/') . $p->kd_po ?>">
                                             <i class="fas fa-clipboard-check"></i>
@@ -72,6 +73,7 @@
                                             Reject
                                         </a>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

@@ -46,6 +46,22 @@
                   <p>User Management</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="<?= base_url('taxseting') ?>" class="nav-link">
+                  <i class="nav-icon fas fa-percent"></i>
+                  <p>
+                    Tax Setting
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('noteseting') ?>" class="nav-link">
+                  <i class="nav-icon fas fa-pen-nib"></i>
+                  <p>
+                    Note Template Setting
+                  </p>
+                </a>
+              </li>
             </ul>
           </li>
         <?php endif; ?>
@@ -64,6 +80,30 @@
               <i class="nav-icon fas fa-money-check"></i>
               <p>
                 Purchase Order Status
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('taxseting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-percent"></i>
+              <p>
+                Tax Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('satuansetting') ?>" class="nav-link">
+              <i class="nav-icon fa fa-weight-hanging"></i>
+              <p>
+                Satuan Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('noteseting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-pen-nib"></i>
+              <p>
+                Note Template Setting
               </p>
             </a>
           </li>

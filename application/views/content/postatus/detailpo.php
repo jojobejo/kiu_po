@@ -56,12 +56,12 @@
                     <tr>
                         <td>No</td>
                         <td>Nama Barang</td>
-                        <td>Isi Kemasan</td>
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Harga</td>
                         <td>Tax(%)</td>
                         <td>Total Harga</td>
+                        <td>#</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,12 +70,16 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $d->nama_barang ?></td>
-                            <td><?= $d->kemasan ?></td>
                             <td><?= $d->satuan ?></td>
                             <td><?= $d->qty ?></td>
                             <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
                             <td><?= $d->tax ?> (%)</td>
                             <td>Rp. <?= number_format($d->hrg_total) ?></td>
+                            <td><a class="btn btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    Edit
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
@@ -90,7 +94,6 @@
                     </tr>
                     <?php foreach ($total as $t) : ?>
                         <tr>
-                            <td style="display: none;"></td>
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>

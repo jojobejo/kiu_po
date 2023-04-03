@@ -59,7 +59,6 @@
                     <tr>
                         <td>No</td>
                         <td>Nama Barang</td>
-                        <td>Isi Kemasan</td>
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Harga</td>
@@ -75,7 +74,6 @@
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $t->nama_barang ?></td>
-                            <td><?= $t->kemasan ?></td>
                             <td><?= $t->satuan ?></td>
                             <td><?= $t->qty ?></td>
                             <td>Rp. <?= number_format($t->harga_satuan) ?></td>
@@ -98,7 +96,6 @@
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
                     </tr>
                     <?php foreach ($total as $tot) : ?>
                         <tr>
@@ -110,8 +107,7 @@
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>
-                            <td style="display: none;"></td>
-                            <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                             <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
                                 <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                                 <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
