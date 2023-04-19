@@ -100,7 +100,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('noteseting') ?>" class="nav-link">
+            <a href="<?= base_url('notetemplate') ?>" class="nav-link">
               <i class="nav-icon fas fa-pen-nib"></i>
               <p>
                 Note Template Setting

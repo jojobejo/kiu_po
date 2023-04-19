@@ -173,6 +173,7 @@
     
 }
 
+
 .asd{
     background-color:#999999;
     -webkit-print-color-adjust: exact; 
@@ -191,3 +192,55 @@
         -webkit-print-color-adjust: exact;
     }
   }
+.noteDirektur{
+    border-style: solid;
+    background-color: #fca103;
+    position: relative;
+    max-height: 500px;
+    max-width: 100%;
+}
+.txtNoteDirektur{
+    text-size-adjust: 12px;
+    text-align: justify;
+    margin-left: 15px;
+    margin-right: 8px;
+    margin: 1;
+    line-height: 1;
+}
+
+.logNote{
+    text-size-adjust: 12px;
+    text-align: justify;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin: 1;
+    line-height: 1;
+}
+
+table {
+    border: 1px solid #fca103;
+    border-collapse: collapse;
+}
+
+thead td tr {
+    border: 1px solid #fca103;
+}
+
+td {
+    border: none;
+}
+
+
+.tdnote {
+    text-align: left;
+}
+
+.tduser{
+    text-align: center;
+}
+
+.log-status {
+    border-style: solid;
+    background-color: #fca103;
+    max-height: 500px;
+}

@@ -18,6 +18,10 @@ class M_Purchase extends CI_Model
     {
         return $this->db->get('tb_set_tax')->result();
     }
+    public function getSatuan()
+    {
+        return $this->db->get('tb_satuan')->result();
+    }
     public function getBarangSup($kd)
     {
         $this->db->select('*');

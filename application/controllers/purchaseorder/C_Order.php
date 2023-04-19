@@ -47,11 +47,12 @@ class C_Order extends CI_Controller
 
     public function listBarang($kdsuplier)
     {
-        $data['title'] = 'Add Item List';
-        $data['kode_suplier'] = $this->M_Purchase->Suplier($kdsuplier)->result();
-        $data['barang'] = $this->M_Purchase->getBarangSup($kdsuplier)->result();
-        $data['tax']    = $this->M_Purchase->getTax();
-        $data['tmp']    = $this->M_Purchase->getTmpOrder($kdsuplier);
+        $data['title']          = 'Add Item List';
+        $data['kode_suplier']   = $this->M_Purchase->Suplier($kdsuplier)->result();
+        $data['barang']         = $this->M_Purchase->getBarangSup($kdsuplier)->result();
+        $data['tax']            = $this->M_Purchase->getTax();
+        $data['satuan']         = $this->M_Purchase->getSatuan();
+        $data['tmp']            = $this->M_Purchase->getTmpOrder($kdsuplier);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -132,7 +133,7 @@ class C_Order extends CI_Controller
         $satuan     = $this->input->post('satuan_isi');
         $qty        = $this->input->post('qty_isi');
         $tax        = $this->input->post('tax_isi');
-        $hasilPPn   = $this->input->post('hasil_ppn');
+        $hasilPPn   = $tax / 100;
         $hargaQty   = $this->input->post('hrg_isi');
         $hargaTax   = $hargaQty * $hasilPPn;
         $hasiltax   = $hargaTax + $hargaQty;

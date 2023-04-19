@@ -72,9 +72,59 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->update('tb_po', $data);
     }
+
     function tolakPo($kdpo, $data)
     {
         $this->db->where('kd_po', $kdpo);
         return $this->db->update('tb_po', $data);
+    }
+
+    function addNote($data)
+    {
+        $this->db->insert('tb_note_direktur', $data);
+    }
+    function updateStatus($kdpo, $status)
+    {
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->update('tb_po', $status);
+    }
+    function getNoted($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_note_direktur');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+
+    public function getTax()
+    {
+        return $this->db->get('tb_set_tax')->result();
+    }
+    public function getSatuan()
+    {
+        return $this->db->get('tb_satuan')->result();
+    }
+    public function addRevisiChart($data)
+    {
+        $this->db->insert('tb_detail_po', $data);
+    }
+
+    function revisiPO($id, $data)
+    {
+        $this->db->where('id_det_po', $id);
+        return $this->db->update('tb_detail_po', $data);
+    }
+    function updateLog($data)
+    {
+        $this->db->insert('tb_tracking_po', $data);
+    }
+    function getLog()
+    {
+       return $this->db->get('tb_tracking_po')->result();
+    }
+    function hapusBarang($id)
+    {
+        $this->db->where('id_det_po', $id);
+        return $this->db->delete('tb_detail_po');
     }
 }

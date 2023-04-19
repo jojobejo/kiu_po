@@ -87,6 +87,13 @@ $route['tolakOrder/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1';
 $route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
 $route['postatus/done'] = 'postatus/C_PoStatus/getDone';
 $route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
+$route['NoteDirektur'] = 'postatus/C_PoStatus/addNote';
+$route['addBarangRevisi/(:any)/(:any)'] = 'postatus/C_PoStatus/listBarangRevisi/$1/$2';
+$route['tambahBarangRevisi'] = 'postatus/C_PoStatus/tambahBarangRevisi';
+$route['revisiPO'] = 'postatus/C_PoStatus/revisiPO';
+$route['hapusBarangPO/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusBarangPO/$1/$2';
+$route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/NoteUpdateKeuangan';
+
 
 
 //settings-tax
@@ -94,3 +101,12 @@ $route['taxseting'] = 'settings/C_TaxSetting';
 $route['addSatuanPajak'] = 'settings/C_TaxSetting/addPajak';
 $route['editSatuanPajak'] = 'settings/C_TaxSetting/editTax';
 $route['hapusPajak/(:num)'] = 'settings/C_TaxSetting/hapusPajak/$1';
+
+//setting-satuan
+$route['satuansetting'] = 'settings/C_SatuanSetting';
+$route['addSatuanBarang'] = 'settings/C_SatuanSetting/addSatuanBarang';
+$route['editSatuanBarang'] = 'settings/C_SatuanSetting/editSatuan';
+$route['hapusSatuan/(:num)'] = 'settings/C_SatuanSetting/hapusSatuan/$1';
+
+//setting-template
+$route['notetemplate'] = 'settings/C_NoteSetting';

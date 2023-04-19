@@ -10,7 +10,31 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('tambahChart'); ?>
+                    <?php echo form_open_multipart('tambahBarangRevisi'); ?>
+                    <div class="form-group" hidden>
+                        <?php foreach ($status as $s) : ?>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">kdpo<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="kd_po" name="kd_po" value="<?= $s->kd_po ?>" readonly /></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="form-group" hidden>
+                        <?php foreach ($status as $s) : ?>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">kdpo<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="tgl_transaksi" name="tgl_transaksi" value="<?= $s->tgl_transaksi ?>" readonly /></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="form-group" hidden>
+                        <?php foreach ($status as $s) : ?>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">kdpo<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="no_po" name="no_po" value="<?= $s->no_po ?>" readonly /></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
@@ -58,7 +82,7 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">TAX<span class="required">*</span></label>
                             <div class="col-sm-8">
-                                <select name="tax_isi" id="tax_isi" class="form-control tax_isi_value">
+                                <select name="tax_isi" id="tax_isi" class="form-control">
                                     <?php foreach ($tax as $t) : ?>
                                         <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?> %</option>
                                     <?php endforeach; ?>
