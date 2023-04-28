@@ -56,7 +56,6 @@
                         <tr class="asd">
                             <td>No</td>
                             <td>Nama Barang</td>
-                            <td>Isi Kemasan</td>
                             <td>Satuan</td>
                             <td>Qty</td>
                             <td>Harga</td>
@@ -71,7 +70,6 @@
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td><?= $d->nama_barang ?></td>
-                                <td><?= $d->kemasan ?></td>
                                 <td><?= $d->satuan ?></td>
                                 <td><?= $d->qty ?></td>
                                 <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
@@ -90,8 +88,7 @@
                                 <td style="display: none;"></td>
                                 <td style="display: none;"></td>
                                 <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                <td colspan="6" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
                                 <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
                             </tr>
                         <?php endforeach; ?>

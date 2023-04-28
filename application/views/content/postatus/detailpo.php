@@ -82,7 +82,7 @@
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                                <?php if ($this->session->userdata('lv') < '3') : ?>
+                                <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                     <div class="col">
                                         <div class="row">
                                             <div class="col">
@@ -94,6 +94,18 @@
                                             </div>
                                         </div>
                                     </div>
+                                <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="tgTrans" class="">Pilih Setting Note : &nbsp;&nbsp; </label>
+                                                <a class="btn btn-block btn-primary btn-md" data-toggle="modal" data-target="#modalAddNote">
+                                                    <i class="fas fa-clipboard-check"></i> &nbsp;
+                                                    Setting Note
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 <?php endif; ?>
 
                         </div>
@@ -101,7 +113,7 @@
 
                 </div>
             </div>
-            <?php if ($this->session->userdata('lv') < '3') : ?>
+            <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                 <div class="col m-2">
                     <a class="btn btn-primary btn-sm" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>  ">
                         <i class="fas fa-pencil-alt"></i>
@@ -109,76 +121,79 @@
                     </a>
                 </div>
             <?php endif; ?>
-        <?php endforeach; ?>
-        <table class="table table-bordered table-striped">
-            <thead style="background-color: #212529; color:white;">
-                <tr>
-                    <td>No</td>
-                    <td>Nama Barang</td>
-                    <td>Satuan</td>
-                    <td>Qty</td>
-                    <td>Harga</td>
-                    <td>Tax(%)</td>
-                    <td>Total Harga</td>
-                    <?php if ($this->session->userdata('lv') < '3') : ?>
-                        <td>#</td>
-                    <?php endif; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php $no = 1;
-                foreach ($detail as $d) : ?>
+
+            <table class="table table-bordered table-striped">
+                <thead style="background-color: #212529; color:white;">
                     <tr>
-                        <td><?= $no++; ?></td>
-                        <td><?= $d->nama_barang ?></td>
-                        <td><?= $d->satuan ?></td>
-                        <td><?= $d->qty ?></td>
-                        <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
-                        <td><?= $d->tax ?> (%)</td>
-                        <td>Rp. <?= number_format($d->hrg_total) ?></td>
-                        <?php if ($this->session->userdata('lv') < '3') : ?>
-                            <td>
-                                <div class="row">
-                                    <a class="btn btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
-                                        <i class="fas fa-pencil-alt"></i>
-                                        Edit
-                                    </a>
-                                    <a class="btn btn-block btn-danger btn-sm" href="<?= base_url('hapusBarangPO/'). $d->id_det_po . '/' . $d->kd_po?>">
-                                        <i class="fas fa-trash-alt"></i>
-                                        Hapus
-                                    </a>
-                                </div>
-                            </td>
+                        <td>No</td>
+                        <td>Nama Barang</td>
+                        <td>Satuan</td>
+                        <td>Qty</td>
+                        <td>Harga</td>
+                        <td>Tax(%)</td>
+                        <td>Total Harga</td>
+                        <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                            <td>#</td>
                         <?php endif; ?>
                     </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <?php if ($this->session->userdata('lv') < '3') : ?>
-                        <td></td>
-                    <?php endif; ?>
-                </tr>
-                <?php foreach ($total as $t) : ?>
+                </thead>
+                <tbody>
+                    <?php $no = 1;
+                                foreach ($detail as $d) : ?>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td><?= $d->nama_barang ?></td>
+                            <td><?= $d->satuan ?></td>
+                            <td><?= $d->qty ?></td>
+                            <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
+                            <td><?= $d->tax ?> (%)</td>
+                            <td>Rp. <?= number_format($d->hrg_total) ?></td>
+                            <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                                <td>
+                                    <div class="row">
+                                        <a class="btn btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
+                                            <i class="fas fa-pencil-alt"></i>
+                                            Edit
+                                        </a>
+                                        <a class="btn btn-block btn-danger btn-sm" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Hapus
+                                        </a>
+                                    </div>
+                                </td>
+                            <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
                     <tr>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                        <td colspan="2" style="font-weight: bold;">Rp.<?= number_format($t->total_harga) ?></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                            <td></td>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                        <?php endif; ?>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                    <?php foreach ($total as $t) : ?>
+                        <tr>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                            <td colspan="2" style="font-weight: bold;">Rp.<?= number_format($t->total_harga) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div><!-- /.container-fluid -->
         <div class="row ml-2 mr-2">
             <div class="col-md-8">
@@ -229,3 +244,4 @@
     </div>
     <!-- /.content-header -->
 </div>
+<?php endforeach; ?>
