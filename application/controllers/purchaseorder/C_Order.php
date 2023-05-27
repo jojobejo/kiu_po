@@ -132,12 +132,8 @@ class C_Order extends CI_Controller
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
         $qty        = $this->input->post('qty_isi');
-        $tax        = $this->input->post('tax_isi');
-        $hasilPPn   = $tax / 100;
         $hargaQty   = $this->input->post('hrg_isi');
-        $hargaTax   = $hargaQty * $hasilPPn;
-        $hasiltax   = $hargaTax + $hargaQty;
-        $hargahasil = $hasiltax * $qty;
+        $hargahasil = $hargaQty * $qty;
 
         $data = array(
             'kode_barang'   => $kdbarang,
@@ -145,9 +141,8 @@ class C_Order extends CI_Controller
             'kode_suplier'  => $suplier,
             'satuan'        => $satuan,
             'qty'           => $qty,
-            'harga_satuan'  => $hasiltax,
+            'harga_satuan'  => $hargaQty,
             'total_harga'   => $hargahasil,
-            'tax'           => $tax
         );
         $this->M_Purchase->addChart($data);
         redirect('purchase/sup/' . $suplier);
@@ -194,7 +189,6 @@ class C_Order extends CI_Controller
                     'qty'           => $chart->qty,
                     'hrg_satuan'    => $chart->harga_satuan,
                     'hrg_total'     => $chart->total_harga,
-                    'tax'           => $chart->tax
                 );
 
                 $this->M_Purchase->inputDetailPO($listTransaksi);

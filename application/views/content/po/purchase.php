@@ -62,7 +62,6 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Harga</td>
-                        <td>Tax(%)</td>
                         <td>Total Harga</td>
                         <td>#</td>
                     </tr>
@@ -77,7 +76,6 @@
                             <td><?= $t->satuan ?></td>
                             <td><?= $t->qty ?></td>
                             <td>Rp. <?= number_format($t->harga_satuan) ?></td>
-                            <td><?= $t->tax ?> (%)</td>
                             <td>Rp. <?= number_format($t->total_harga) ?></td>
                             <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
                                     <i class="fa fa-solid fa-trash-alt"></i>
@@ -88,7 +86,6 @@
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -107,7 +104,7 @@
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>
                             <td style="display: none;"></td>
-                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                            <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                             <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
                                 <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                                 <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>

@@ -2700,6 +2700,13 @@ fieldset:disabled a.btn {
   box-shadow: none;
 }
 
+.btn-atas {
+  color: #fff;
+  background-color: #8bc34a ;
+  border-color: #8bc34a ;
+  box-shadow: none;
+}
+
 .btn-info:hover {
   color: #fff;
   background-color: #138496;

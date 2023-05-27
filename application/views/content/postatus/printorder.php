@@ -46,83 +46,132 @@
                 <!-- /.col -->
             </div>
             <!-- /.row -->
-        <?php endforeach; ?>
-        <!-- Table row -->
-        <h3>FORM PESANAN</h3>
-        <div class="row">
-            <div class="col-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="asd">
-                            <td>No</td>
-                            <td>Nama Barang</td>
-                            <td>Satuan</td>
-                            <td>Qty</td>
-                            <td>Harga</td>
-                            <td>Tax(%)</td>
-                            <td>Total Harga</td>
+
+            <!-- Table row -->
+            <h3>FORM PESANAN</h3>
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-bordered  table-striped table-hover ">
+                        <thead>
+                            <tr class="asd">
+                                <td style="width: 1%;">No</td>
+                                <td>Nama Barang</td>
+                                <td>Satuan</td>
+                                <td>Qty</td>
+                                <td colspan="1">Harga</td>
+                                <td colspan="1">Total Harga</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $no = 1;
+                            foreach ($detail as $d) : ?>
+                                <tr>
+                                    <td><?= $no++; ?></td>
+                                    <td><?= $d->nama_barang ?></td>
+                                    <td><?= $d->satuan ?></td>
+                                    <td><?= $d->qty ?></td>
+                                    <td colspan="1">Rp. <?= number_format($d->hrg_satuan) ?></td>
+                                    <td colspan="2">Rp. <?= number_format($d->hrg_total) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php
+                            foreach ($total as $t) : ?>
+                                <tr>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td style="display: none;"></td>
+                                    <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered  table-striped table-hover ">
+                        <thead>
+                            <tr class="asd">
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="1" style="text-align: end;font-weight: bold;"> Syarat Pembayaran : </td>
+                                <td colspan="1" style="font-weight: bold;"> 30 Hari </td>
+                                <td colspan="1" style="text-align: end;font-weight: bold;"> Franko Pengiriman:</td>
+                                <td colspan="1" style="font-weight: bold;"> Gudang Jember </td>
+                                <td colspan="3" style="font-weight: bold;"></td>
+                            </tr>
+                            <?php foreach ($diskon as $d) : ?>
+                                <?php if ($diskon > 0) : ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align: end;font-weight: bold;width: 78.6%;"><?= $d->keterangan ?> : </td>
+                                        <td colspan="1" style="font-weight: bold;">
+                                            Rp. <?= number_format($d->nominal) ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                            <?php foreach ($total as $t) :
+                                foreach ($totalDiskon as $d) :
+                                    $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                    $tax = $s->tax / 100;
+                                    $hargaPajak = $stlhDiskon * $tax;
+                                    $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                                    <tr>
+                                        <td colspan="6" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                        <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon) ?> </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="6" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                        <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak) ?> </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="6" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        </tbody>
+
+                    </table>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-6 noted">
+                    <p class="text-muted well well-sm" style="margin-top: 10px;">
+                        * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
+                        NANDANG ERNOKO (Kadep Logistik) <br>
+                        081 131 361 66 / 081 252 151 314 <br>
+                        * Kedatangan barang maksimal: Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
+                        * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,
+                        jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
+
+                    </p>
+                </div>
+                <div class="col-6">
+                    <table class="table-bordered" width='100%' height='200px'>
+                        <tr>
+                            <td align="center">Pemesan,</br></br></br></br></br><u>( Agoes Santoso )</u></td>
+                            <td align="center">Disetujui,</br></br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $no = 1;
-                        foreach ($detail as $d) : ?>
-                            <tr>
-                                <td><?= $no++; ?></td>
-                                <td><?= $d->nama_barang ?></td>
-                                <td><?= $d->satuan ?></td>
-                                <td><?= $d->qty ?></td>
-                                <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
-                                <td><?= $d->tax ?> %</td>
-                                <td>Rp. <?= number_format($d->hrg_total) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                        <?php
-                        foreach ($total as $t) : ?>
-                            <tr>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td style="display: none;"></td>
-                                <td colspan="6" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
-                                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-            <!-- /.col -->
-        </div>
-        <!-- /.row -->
+                    </table>
+                </div>
 
-        <div class="row">
-            <!-- accepted payments column -->
-            <div class="col-6 noted">
-                <p class="text-muted well well-sm" style="margin-top: 10px;">
-                    * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
-                    NANDANG ERNOKO (Kadep Logistik) <br>
-                    081 131 361 66 / 081 252 151 314 <br>
-                    * Kedatangan barang maksimal: Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
-                    * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,
-                    jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
-
-                </p>
             </div>
-            <div class="col-6">
-                <table class="mt-2 ml-3" width='650' style='font-size:12pt;' cellspacing='2'>
-                    <tr>
-                        <td align="center">Pemesan,</br></br></br></br></br><u>( Agoes Santoso )</u></td>
-                        <td align="center">Disetujui,</br></br></br></br></br><u>(....................)</u></td>
-                    </tr>
-                </table>
-            </div>
-
-        </div>
-        <!-- /.row -->
+            <!-- /.row -->
         </section>
         <!-- /.content -->
 </div>
+<?php endforeach; ?>

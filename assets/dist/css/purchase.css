@@ -170,9 +170,7 @@
     background-color: yellow;
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
-    
 }
-
 
 .asd{
     background-color:#999999;
@@ -218,18 +216,15 @@
 }
 
 table {
-    border: 1px solid #fca103;
     border-collapse: collapse;
 }
-
-thead td tr {
-    border: 1px solid #fca103;
+table.autowidth td{
+    white-space:nowrap;
 }
 
 td {
     border: none;
 }
-
 
 .tdnote {
     text-align: left;
@@ -244,3 +239,16 @@ td {
     background-color: #fca103;
     max-height: 500px;
 }
+
+.btnAtas {
+    color: #fff;
+    background-color: #4dd0e1   ;
+    border-color: #4dd0e1   ;
+    box-shadow: none;
+  }
+
+  .btnAtas:hover {
+    color: #fff;
+    background-color: #30828d;
+    border-color: #30828d;
+  }

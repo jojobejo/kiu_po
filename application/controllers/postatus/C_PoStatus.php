@@ -74,8 +74,10 @@ class C_PoStatus extends CI_Controller
         $data['noted']  = $this->M_Postatus->getNoted($kdpo);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['satuan'] = $this->M_Postatus->getSatuan();
-        $data['log']    = $this->M_Postatus->getLog();
+        $data['log']    = $this->M_Postatus->getLog($kdpo);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
+        $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
+        $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -90,6 +92,8 @@ class C_PoStatus extends CI_Controller
         $data['detail'] = $this->M_Postatus->getDetail($kdpo);
         $data['status'] = $this->M_Postatus->getdataStatus($kdpo);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
+        $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
+        $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);
@@ -146,20 +150,15 @@ class C_PoStatus extends CI_Controller
         $kdpo       = $this->input->post('kdpo');
         $satuan     = $this->input->post('satuan_isi');
         $qty        = $this->input->post('qty_isi');
-        $tax        = $this->input->post('tax_isi_status');
-        $hasilPPn   = $tax / 100;
         $hargaQty   = $this->input->post('hrg_isi');
-        $hargaTax   = $hargaQty * $hasilPPn;
-        $hasiltax   = $hargaTax + $hargaQty;
-        $hargahasil = $hasiltax * $qty;
+        $hargahasil = $hargaQty * $qty;
 
 
         $data = array(
             'satuan'        => $satuan,
             'qty'           => $qty,
-            'hrg_satuan'    => $hasiltax,
+            'hrg_satuan'    => $hargaQty,
             'hrg_total'     => $hargahasil,
-            'tax'           => $tax
         );
 
         $this->M_Postatus->revisiPO($idpo, $data);
@@ -194,12 +193,8 @@ class C_PoStatus extends CI_Controller
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
         $qty        = $this->input->post('qty_isi');
-        $tax        = $this->input->post('tax_isi');
-        $hasilPPn   = $tax / 100;
         $hargaQty   = $this->input->post('hrg_isi');
-        $hargaTax   = $hargaQty * $hasilPPn;
-        $hasiltax   = $hargaTax + $hargaQty;
-        $hargahasil = $hasiltax * $qty;
+        $hargahasil = $hargaQty * $qty;
 
         $data = array(
             'kd_po'         => $kdpo,
@@ -210,9 +205,9 @@ class C_PoStatus extends CI_Controller
             'nama_barang'   => $nmbarang,
             'satuan'        => $satuan,
             'qty'           => $qty,
-            'hrg_satuan'    => $hasiltax,
+            'hrg_satuan'    => $hargaQty,
             'hrg_total'     => $hargahasil,
-            'tax'           => $tax
+
         );
         $this->M_Postatus->addRevisiChart($data);
         redirect('detailPO/' . $kdpo);
@@ -249,6 +244,97 @@ class C_PoStatus extends CI_Controller
     public function hapusBarangPO($id, $kdpo)
     {
         $this->M_Postatus->hapusBarang($id);
-        redirect('detailPO/'. $kdpo);
+        redirect('detailPO/' . $kdpo);
     }
+
+    public function tambahTax()
+    {
+        $kdpo       = $this->input->post('kdpo');
+        $tax        = $this->input->post('tax_isi_status');
+        $hargaA     = $this->input->post('total_harga');
+        $hasiltax   = $tax / 100;
+        $nominalTax = $hargaA * $hasiltax;
+
+        $updateHarga = array(
+            'kd_po' => $kdpo,
+            'tax'   => $tax,
+            'hrg_pajak' => $nominalTax
+
+        );
+
+        $this->M_Postatus->updateTax($kdpo, $updateHarga);
+
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function tempoPembayaran()
+    {
+        $kdpo       = $this->input->post('kdpo');
+        $hari        = $this->input->post('tempo_isi');
+
+        $updateTempo = array(
+            'kd_po' => $kdpo,
+            'tmpo_pembayaran'   => $hari
+        );
+
+        $this->M_Postatus->updateTax($kdpo, $updateTempo);
+
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function frankoPengiriman()
+    {
+        $kdpo       = $this->input->post('kdpo');
+        $gdg        = $this->input->post('gdg_isi');
+
+        $updateFranko = array(
+            'kd_po' => $kdpo,
+            'gdg_pengiriman'   => $gdg
+        );
+
+        $this->M_Postatus->updateTax($kdpo, $updateFranko);
+
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function tambahDiskon()
+    {
+        $kdpo = $this->input->post('kdpo');
+        $keterangan = $this->input->post('keterangan_isi');
+        $nominal = $this->input->post('nominal_isi');
+
+        $addDiskon = array(
+            'kd_po'         => $kdpo,
+            'keterangan'    => $keterangan,
+            'nominal'       => $nominal
+        );
+
+        $this->M_Postatus->insertDiskon($addDiskon);
+
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function editDiskon()
+    {
+        $iddiskon  = $this->input->post('id_diskon');
+        $kdpo = $this->input->post('kdpo');
+        $keterangan = $this->input->post('keterangan_isi');
+        $nominal = $this->input->post('nominal_isi');
+
+        $editDiskon = array(
+            'keterangan'    => $keterangan,
+            'nominal'       => $nominal
+        );
+
+        $this->M_Postatus->editDiskon($iddiskon, $editDiskon);
+
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function hapusDiskon($id, $kdpo)
+    {
+        $this->M_Postatus->hapusDiskon($id);
+        redirect('detailPO/' . $kdpo);
+    }
+
 }

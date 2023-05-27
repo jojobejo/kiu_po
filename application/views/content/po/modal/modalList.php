@@ -54,18 +54,6 @@
                             <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="" /></div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">TAX<span class="required">*</span></label>
-                            <div class="col-sm-8">
-                                <select name="tax_isi" id="tax_isi" class="form-control tax_isi_value">
-                                    <?php foreach ($tax as $t) : ?>
-                                        <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?> %</option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
