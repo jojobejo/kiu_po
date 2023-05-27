@@ -143,11 +143,11 @@
             </div>
             <!-- /.row -->
 
-            <div class="row mt-2">
+            <div class="row">
                 <div class="col">
                     <table class="table-bordered text-xs" width='100%' height=''>
                         <tr>
-                            <td align="center">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
+                            <td align="center" style="width: 50%;">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
                             <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
                     </table>
