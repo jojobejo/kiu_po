@@ -6,18 +6,20 @@
             <div class="row">
                 <div class="col-12">
                     <h2 class="page-header">
-                        <img src="<?= base_url('assets/images/logo1.png') ?>" style="width:175px;height:60px" alt="">PT. Karisma Indoagro Universal</i>
-                        <small class="float-right"></small>
+                        <div class="row">
+                            <img src="<?= base_url('assets/images/logo1.png') ?>" style="width:120px;height:40px" alt=""></i>
+                            <h2>PT. Karisma Indoagro Universal</h2>
+                        </div>
                     </h2>
                 </div>
                 <!-- /.col -->
             </div>
             <!-- info row -->
             <div class="row invoice-info">
-                <div class="col-sm-4 invoice-col">
+                <div class="col-sm-4 invoice-col text-xs">
                     Kepada Yth.
                     <address>
-                        <strong><?= $s->nama_suplier ?></strong><br>
+                        <strong><?= $s->nama_suplier ?></strong>
                         <?= $s->alamat_suplier ?><br>
                         Telp : <?= $s->no_telpon ?>,<br>
                         Fax : <?= $s->no_fax ?><br>
@@ -25,41 +27,39 @@
                     </address>
                 </div>
                 <!-- /.col -->
-                <div class="col-sm-4 invoice-col">
+                <div class="col-sm-4 invoice-col text-xs">
                     Pemesan
                     <address>
                         <strong>PT.Karisma Indoagro Universal</strong><br>
-                        Jl. Semeru No.89, Krajan, Ajung, Kec. Ajung,<br>
-                        Kabupaten Jember, Jawa Timur 68175<br>
-                        Telp 1: (0331) 4833 33<br>
-                        Telp 2: (0331) 4877 88<br>
-                        Email: karisma@gmail.com
+                        Jl. Semeru No.89, Ajung, Kabupaten Jember<br>
+                        Telp 1: (0331) 4833 33 / 4877 88<br>
+                        Email: karisma@kiu.co.id
                     </address>
                 </div>
                 <!-- /.col -->
-                <div class="col-sm-4 invoice-col">
+                <div class="col-sm-4 invoice-col text-xs">
                     <br>
                     <b>Nomor Order:</b> <?= $s->no_po ?><br>
                     <b>Tanggal Order:</b> <?= $s->tgl_transaksi ?><br>
-                    <img src="<?= base_url('assets/images/logoPT/') . $s->gbr_logo ?>" style="margin: 15px; width: 250px; height: 100px;" alt="">
+                    <img src="<?= base_url('assets/images/logoPT/') . $s->gbr_logo ?>" style="margin-top: 2px;margin-bottom: 5px; width: 200px; height: 75px;" alt="">
                 </div>
                 <!-- /.col -->
             </div>
             <!-- /.row -->
-
-            <!-- Table row -->
-            <h3>FORM PESANAN</h3>
             <div class="row">
                 <div class="col-12">
-                    <table class="table table-bordered  table-striped table-hover ">
+                    <table class="table-bordered text-xs" >
                         <thead>
-                            <tr class="asd">
+                            <tr>
+                                <td colspan="7" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
+                            </tr>
+                            <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
-                                <td>Qty</td>
-                                <td colspan="1">Harga</td>
-                                <td colspan="1">Total Harga</td>
+                                <td style="width: 10%;">Qty</td>
+                                <td >Harga</td>
+                                <td colspan="7" style="width: 17.88%;">Total Harga</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,51 +69,48 @@
                                 <tr>
                                     <td><?= $no++; ?></td>
                                     <td><?= $d->nama_barang ?></td>
-                                    <td><?= $d->satuan ?></td>
-                                    <td><?= $d->qty ?></td>
-                                    <td colspan="1">Rp. <?= number_format($d->hrg_satuan) ?></td>
-                                    <td colspan="2">Rp. <?= number_format($d->hrg_total) ?></td>
+                                    <td style="text-align: center;"><?= $d->satuan ?></td>
+                                    <td style="text-align: center;"><?= $d->qty ?></td>
+                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan) ?></td>
+                                    <td colspan="7">&nbsp;Rp. <?= number_format($d->hrg_total) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php
                             foreach ($total as $t) : ?>
                                 <tr>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td style="display: none;"></td>
-                                    <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
-                                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                                    <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                    <td style="font-weight: bold;">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
                                 </tr>
                             <?php endforeach; ?>
-
                         </tbody>
                     </table>
-                    <table class="table table-bordered  table-striped table-hover ">
+                    <table class="table-bordered text-xs" style="width: 100%;">
                         <thead>
-                            <tr class="asd">
-                                
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="1" style="text-align: end;font-weight: bold;"> Syarat Pembayaran : </td>
-                                <td colspan="1" style="font-weight: bold;"> 30 Hari </td>
-                                <td colspan="1" style="text-align: end;font-weight: bold;"> Franko Pengiriman:</td>
-                                <td colspan="1" style="font-weight: bold;"> Gudang Jember </td>
-                                <td colspan="3" style="font-weight: bold;"></td>
+                                <td rowspan="7" colspan="2" style="text-align: justify; background-color: yellow; width:50%">
+                                    * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
+                                    NANDANG ERNOKO (Kadep Logistik) <br>
+                                    081 131 361 66 / 081 252 151 314 <br>
+                                    * Kedatangan barang maksimal: Senin s/d Jumat <br>
+                                    maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
+                                    * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,<br>
+                                    jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
+                                </td>
                             </tr>
                             <?php foreach ($diskon as $d) : ?>
                                 <?php if ($diskon > 0) : ?>
                                     <tr>
-                                        <td colspan="6" style="text-align: end;font-weight: bold;width: 78.6%;"><?= $d->keterangan ?> : </td>
-                                        <td colspan="1" style="font-weight: bold;">
-                                            Rp. <?= number_format($d->nominal) ?>
-                                        </td>
+                                        <td colspan="1" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
+                                        <td colspan="4" style="font-weight: bold;">&nbsp;Rp. <?= number_format($d->nominal) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -124,47 +121,34 @@
                                     $hargaPajak = $stlhDiskon * $tax;
                                     $hargaAll = $stlhDiskon + $hargaPajak; ?>
                                     <tr>
-                                        <td colspan="6" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon) ?> </td>
+                                        <td colspan="1" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                        <td colspan="4" style="font-weight: bold;">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
                                     </tr>
 
                                     <tr>
-                                        <td colspan="6" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak) ?> </td>
+                                        <td colspan="1" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                        <td colspan="4" style="font-weight: bold;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
                                     </tr>
-
                                     <tr>
-                                        <td colspan="6" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll) ?></td>
+                                        <td colspan="1" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                        <td colspan="4" style="font-weight: bold;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
                         </tbody>
-
                     </table>
+
                 </div>
                 <!-- /.col -->
             </div>
             <!-- /.row -->
 
-            <div class="row">
-                <!-- accepted payments column -->
-                <div class="col-6 noted">
-                    <p class="text-muted well well-sm" style="margin-top: 10px;">
-                        * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
-                        NANDANG ERNOKO (Kadep Logistik) <br>
-                        081 131 361 66 / 081 252 151 314 <br>
-                        * Kedatangan barang maksimal: Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
-                        * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,
-                        jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
-
-                    </p>
-                </div>
-                <div class="col-6">
-                    <table class="table-bordered" width='100%' height='200px'>
+            <div class="row mt-2">
+                <div class="col">
+                    <table class="table-bordered text-xs" width='100%' height=''>
                         <tr>
-                            <td align="center">Pemesan,</br></br></br></br></br><u>( Agoes Santoso )</u></td>
-                            <td align="center">Disetujui,</br></br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
+                            <td align="center">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
+                            <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
                     </table>
                 </div>

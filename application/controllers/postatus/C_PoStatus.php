@@ -109,7 +109,7 @@ class C_PoStatus extends CI_Controller
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
 
-        $this->load->view('partial/header', $data);
+        $this->load->view('partial/headerprint', $data);
         $this->load->view('content/postatus/printorderBaru', $data);
         $this->load->view('partial/footerPrint');
     }
