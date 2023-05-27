@@ -100,6 +100,20 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerPrint');
     }
 
+    public function printOrderBaru($kdpo)
+    {
+        $data['title'] = 'PRINT ORDER';
+        $data['detail'] = $this->M_Postatus->getDetail($kdpo);
+        $data['status'] = $this->M_Postatus->getdataStatus($kdpo);
+        $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
+        $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
+        $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('content/postatus/printorderBaru', $data);
+        $this->load->view('partial/footerPrint');
+    }
+
     public function konfirmasiOrder($kdpo)
     {
         $dataKonfirm = array(

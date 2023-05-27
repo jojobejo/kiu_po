@@ -30,6 +30,9 @@
                                     <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
                                     <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                 </div>
+                                <div class="col-lg">
+                                    <a href="<?= base_url('printOrderBaru/') . $s->kd_po ?>" target="_blank" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> CETAK BARU</a>
+                                </div>
                                 <?php if ($this->session->userdata('lv') < '3') : ?>
                                     <div class="col-lg">
                                         <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
@@ -60,7 +63,7 @@
                                     <div class="col">
                                         <div class="row">
                                             <div class="col">
-                                                <label for="tgTrans" class="">Status Order :  </label>
+                                                <label for="tgTrans" class="">Status Order : </label>
                                                 <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrder/') . $s->kd_po ?>">
                                                     <i class="fas fa-clipboard-check"></i>
                                                     Accept

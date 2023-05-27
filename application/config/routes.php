@@ -82,6 +82,7 @@ $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 $route['postatus'] = 'postatus/C_PoStatus';
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
 $route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';
+$route['printOrderBaru/(:any)'] = 'postatus/C_PoStatus/printOrderBaru/$1';
 $route['konfirmasiOrder/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1';
 $route['tolakOrder/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1';
 $route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
