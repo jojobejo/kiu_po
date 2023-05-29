@@ -94,7 +94,7 @@ $route['tambahBarangRevisi'] = 'postatus/C_PoStatus/tambahBarangRevisi';
 $route['revisiPO'] = 'postatus/C_PoStatus/revisiPO';
 $route['hapusBarangPO/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusBarangPO/$1/$2';
 
-$route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/NoteUpdateKeuangan';
+$route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/addNote';
 $route['tambahTax'] = 'postatus/C_PoStatus/tambahTax';
 $route['tempoPembayaran'] = 'postatus/C_PoStatus/tempoPembayaran';
 $route['frankoPengiriman'] = 'postatus/C_PoStatus/frankoPengiriman';

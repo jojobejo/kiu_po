@@ -1,6 +1,9 @@
 /* /// faktur */
 @media print {
     ticket_element {page-break-after: always;}
+    table.listdb {
+      border-collapse: unset;
+  }
   }
   
   .tableAtas {

@@ -48,7 +48,7 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-12">
-                    <table class="table-bordered text-xs" >
+                    <table class="table-bordered text-xs listdb" >
                         <thead>
                             <tr>
                                 <td colspan="7" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
@@ -84,7 +84,7 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <table class="table-bordered text-xs" style="width: 100%;">
+                    <table class="table-bordered text-xs listdb" style="width: 100%;">
                         <thead>
                             <tr>
                                 <td></td>
@@ -145,7 +145,7 @@
 
             <div class="row">
                 <div class="col">
-                    <table class="table-bordered text-xs" width='100%' height=''>
+                    <table class="table-bordered text-xs listdb" width='100%' height=''>
                         <tr>
                             <td align="center" style="width: 50%;">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
                             <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>

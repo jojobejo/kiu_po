@@ -138,23 +138,42 @@ class C_PoStatus extends CI_Controller
 
     public function addNote()
     {
-        $kdpo   = $this->input->post('kdpo');
-        $note   = $this->input->post('noteDitektur');
-        $nama   = $this->session->userdata('nama_user');
+        $kdpo           = $this->input->post('kdpo');
+        $note           = $this->input->post('noteDitektur');
+        $stslogin       = $this->session->userdata('lv');
+        $departement    = $this->session->userdata('departemen');
+        $namauser       = $this->session->userdata('nama_user');
 
-        $addNote = array(
-            'kd_po'     => $kdpo,
-            'kd_user' => $nama,
-            'isi_note'  => $note
-        );
+        if ($stslogin == '2') {
+            $addNoteKeuangan = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => $note,
+                'kd_user'   => $departement,
+                'nm_user'   => $namauser,
+                'note_for'  => '1',
+                'update_status' => '1'
+            );
 
-        $updateStatus = array(
-            'status'    => 'NOTED'
-        );
-
-        $this->M_Postatus->addNote($addNote);
-        $this->M_Postatus->updateStatus($kdpo, $updateStatus);
-
+            $noteUpdateKeuangan = array(
+                'status'    => 'NOTE KEUANGAN'
+            );
+            $this->M_Postatus->addNote($addNoteKeuangan);
+            $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
+        } else if ($stslogin == '3') {
+            $addnoteDirektur = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => $note,
+                'kd_user'   => $departement,
+                'nm_user'   => $namauser,
+                'note_for'  => '2',
+                'update_status' => '1'
+            );
+            $noteUpdateDirektur = array(
+                'status'    => 'NOTE DIREKTUR'
+            );
+            $this->M_Postatus->addNote($addnoteDirektur);
+            $this->M_Postatus->updateStatus($kdpo, $noteUpdateDirektur);
+        }
         redirect('detailPO/' . $kdpo);
     }
 
@@ -350,5 +369,4 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->hapusDiskon($id);
         redirect('detailPO/' . $kdpo);
     }
-
 }

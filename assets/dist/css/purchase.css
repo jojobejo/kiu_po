@@ -186,8 +186,11 @@
 
 @media print {
     .table-striped tbody tr:nth-of-type(odd) td {
-        background-color: rgba(0,0,0,.05) !important;
+        background-color: rgba(0,0,0,.08) !important;
         -webkit-print-color-adjust: exact;
+    }
+    table.listdb {
+        border-collapse: unset;
     }
   }
 .noteDirektur{

@@ -36,15 +36,25 @@
                                                 <i class="fas fa-clock"></i>&nbsp;
                                                 <?= $p->status ?>
                                             </a>
-                                        <?php elseif ($p->status == 'NOTED') : ?>
+                                        <?php elseif ($p->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '2') : ?>
                                             <a class="btn btn-block btn-warning btn-sm">
                                                 <i class="fas fa-exclamation"></i>&nbsp;
-                                                Terdapat Note Dari Direktur
+                                                Terdapat Update Dari Direktur
                                             </a>
-                                        <?php elseif ($p->status == 'UPDATE') : ?>
+                                        <?php elseif ($p->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '3') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                ON PROGRESS
+                                            </a>
+                                        <?php elseif ($p->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '3') : ?>
                                             <a class="btn btn-block btn-warning btn-sm">
                                                 <i class="fas fa-exclamation"></i>&nbsp;
                                                 Terdapat Update Dari Keuangan
+                                            </a>
+                                        <?php elseif ($p->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '2') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                ON PROGRESS
                                             </a>
                                         <?php elseif ($p->status == 'DONE') : ?>
                                             <a class="btn btn-block btn-success btn-sm">

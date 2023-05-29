@@ -30,14 +30,11 @@
                                     <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
                                     <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                 </div>
-                                <div class="col-lg">
-                                    <a href="<?= base_url('printOrderBaru/') . $s->kd_po ?>" target="_blank" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> CETAK BARU</a>
-                                </div>
                                 <?php if ($this->session->userdata('lv') < '3') : ?>
                                     <div class="col-lg">
                                         <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
 
-                                        <?php if ($s->status == 'ON PROGRESS') : ?>
+                                        <?php if ($s->status == 'ON PROGRESS' || 'NOTE KEUANGAN') : ?>
                                             <div>
                                                 <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
                                             </div>
@@ -45,11 +42,7 @@
                                             <div>
                                                 <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
                                             </div>
-                                        <?php elseif ($s->status == 'NOTED') : ?>
-                                            <div>
-                                                <a href="#" class="btn btn-warning btn-block"><i class="fas fa-exclamation"></i> Note Direktur</a>
-                                            </div>
-                                        <?php elseif ($s->status == 'UPDATE') : ?>
+                                        <?php elseif ($s->status == 'UPDATE DIREKTUR') : ?>
                                             <div>
                                                 <a href="#" class="btn btn-warning btn-block"><i class="fas fa-exclamation"></i> Terdapat Update</a>
                                             </div>
@@ -59,7 +52,7 @@
                                             </div>
                                         <?php endif; ?>
                                     </div>
-                                <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '3' && $s->status == 'NOTED' || $this->session->userdata('lv') == '3' && $s->status == 'UPDATE') : ?>
+                                <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '3' && $s->status == 'NOTE KEUANGAN' || $this->session->userdata('lv') == '3' && $s->status == 'UPDATE KEUANGAN') : ?>
                                     <div class="col">
                                         <div class="row">
                                             <div class="col">
@@ -153,7 +146,7 @@
 
             <?php endif; ?>
 
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped ">
                 <thead style="background-color: #212529; color:white;">
                     <tr>
                         <td>No</td>

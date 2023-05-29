@@ -79,7 +79,7 @@
             <a href="<?= base_url('postatus') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>
               <p>
-                Purchase Order Status
+                Purchase Order Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
           </li>

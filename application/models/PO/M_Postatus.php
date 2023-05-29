@@ -24,6 +24,8 @@ class M_PoStatus extends CI_Model
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->where('a.status', 'ON PROGRESS');
+        $this->db->or_where('a.status', 'NOTE KEUANGAN');
+        $this->db->or_where('a.status', 'NOTE DIREKTUR');
         return $this->db->get()->result();
     }
     public function getDone()
