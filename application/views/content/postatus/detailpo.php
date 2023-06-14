@@ -30,17 +30,16 @@
                                     <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
                                     <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                 </div>
-                                <?php if ($this->session->userdata('lv') < '3') : ?>
+                                <?php if ($this->session->userdata('lv') == '2') : ?>
                                     <div class="col-lg">
                                         <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
-
-                                        <?php if ($s->status == 'ON PROGRESS' || 'NOTE KEUANGAN') : ?>
-                                            <div>
-                                                <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
-                                            </div>
-                                        <?php elseif ($s->status == 'DONE') : ?>
+                                        <?php if ($s->status == 'DONE') : ?>
                                             <div>
                                                 <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
+                                            </div>
+                                        <?php elseif ($s->status == 'ON PROGRESS' || 'NOTE KEUANGAN') : ?>
+                                            <div>
+                                                <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
                                             </div>
                                         <?php elseif ($s->status == 'UPDATE DIREKTUR') : ?>
                                             <div>

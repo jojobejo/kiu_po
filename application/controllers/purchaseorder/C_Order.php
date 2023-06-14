@@ -31,11 +31,14 @@ class C_Order extends CI_Controller
     public function purchaseSuplier($kdsuplier)
     {
         $data['title'] = 'Purchase Order';
+
+        $kduser = $this->session->userdata('kode');
+
         $data['kode_suplier'] = $this->M_Purchase->Suplier($kdsuplier)->result();
         $data["barang"] = $this->M_Purchase->getBarangSup($kdsuplier)->result();
         $data['tmp']    = $this->M_Purchase->getTmpOrder($kdsuplier);
         $data['total']  = $this->M_Purchase->sumTransaksiPenjualan($kdsuplier);
-        $data['kdpo']   = $this->M_Purchase->kdpo($kdsuplier);
+        $data['kdpo']   = $this->M_Purchase->kdpo($kduser,$kdsuplier);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

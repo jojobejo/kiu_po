@@ -42,7 +42,7 @@
                         <input type="date" class="form-control" placeholder="Tanggal Transaksi" value="" name="tgl_isi" id="tgl_isi">
                     </div>
                 </div>
-                <div class="col-md-5" hidden>
+                <div class="col-md-5">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
