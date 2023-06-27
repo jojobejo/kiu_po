@@ -51,19 +51,19 @@
                                             </div>
                                         <?php endif; ?>
                                     </div>
-                                <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '3' && $s->status == 'NOTE KEUANGAN' || $this->session->userdata('lv') == '3' && $s->status == 'UPDATE KEUANGAN') : ?>
+                                <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '3' && $s->status == 'NOTE DIREKTUR' ||$this->session->userdata('lv') == '3' && $s->status == 'NOTE KEUANGAN' || $this->session->userdata('lv') == '3' && $s->status == 'UPDATE KEUANGAN' ) : ?>
                                     <div class="col">
                                         <div class="row">
                                             <div class="col">
                                                 <label for="tgTrans" class="">Status Order : </label>
-                                                <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrder/') . $s->kd_po ?>">
+                                                <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
                                                     <i class="fas fa-clipboard-check"></i>
                                                     Accept
                                                 </a>
                                             </div>
                                             <div class="col">
                                                 <label for="tgTrans" class=""> &nbsp;&nbsp; </label>
-                                                <a class="btn btn-block btn-danger btn-md" href="<?= base_url('konfirmasiOrder/') . $s->kd_po ?>">
+                                                <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
                                                     <i class="fas fa-times"></i> &nbsp;
                                                     Reject
                                                 </a>
@@ -399,7 +399,7 @@
                             <?php foreach ($noted as $n) : ?>
                                 <tr>
                                     <td class="tdnote"><?= $n->isi_note ?></td>
-                                    <td class="tduser"><?= $n->kd_user ?></td>
+                                    <td class="tduser"><?= $n->nama_user ?></td>
                                     <td style="text-align: center;"><?= $n->log_create ?></td>
                                 </tr>
                             <?php endforeach; ?>

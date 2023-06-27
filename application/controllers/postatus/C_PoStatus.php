@@ -114,10 +114,11 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerPrint');
     }
 
-    public function konfirmasiOrder($kdpo)
+    public function konfirmasiOrder($kdpo,$kddirektur)
     {
         $dataKonfirm = array(
             'kd_po' => $kdpo,
+            'acc_with' => $kddirektur,
             'status' => 'DONE'
         );
 
@@ -125,10 +126,11 @@ class C_PoStatus extends CI_Controller
         redirect('postatus');
     }
 
-    public function tolakOrder($kdpo)
+    public function tolakOrder($kdpo,$kddirektur)
     {
         $dataKonfirm = array(
             'kd_po' => $kdpo,
+            'acc_with' => $kddirektur,
             'status' => 'REJECT'
         );
 
@@ -141,7 +143,7 @@ class C_PoStatus extends CI_Controller
         $kdpo           = $this->input->post('kdpo');
         $note           = $this->input->post('noteDitektur');
         $stslogin       = $this->session->userdata('lv');
-        $departement    = $this->session->userdata('departemen');
+        $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
         if ($stslogin == '2') {
@@ -149,7 +151,7 @@ class C_PoStatus extends CI_Controller
                 'kd_po'     => $kdpo,
                 'isi_note'  => $note,
                 'kd_user'   => $departement,
-                'nm_user'   => $namauser,
+                'nama_user'   => $namauser,
                 'note_for'  => '1',
                 'update_status' => '1'
             );
@@ -164,7 +166,7 @@ class C_PoStatus extends CI_Controller
                 'kd_po'     => $kdpo,
                 'isi_note'  => $note,
                 'kd_user'   => $departement,
-                'nm_user'   => $namauser,
+                'nama_user'   => $namauser,
                 'note_for'  => '2',
                 'update_status' => '1'
             );

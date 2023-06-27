@@ -48,7 +48,7 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-12">
-                    <table class="table-bordered text-xs listdb" >
+                    <table class="table-bordered text-xs listdb">
                         <thead>
                             <tr>
                                 <td colspan="7" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
@@ -58,7 +58,7 @@
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td >Harga</td>
+                                <td>Harga</td>
                                 <td colspan="7" style="width: 17.88%;">Total Harga</td>
                             </tr>
                         </thead>
@@ -146,8 +146,11 @@
             <div class="row">
                 <div class="col">
                     <table class="table-bordered text-xs listdb" width='100%' height=''>
+                        <?php
+                        $qrPath = base_url('assets/images/') . $s->acc_with . '.png'
+                        ?>
                         <tr>
-                            <td align="center" style="width: 50%;">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
+                            <td align="center" style="width: 50%;">Pemesan,</br><img src="<?= $qrPath ?>" style="width: 120px;; height: 120px;"></br><u>( <?= $s->nama_user ?> )</u></td>
                             <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
                     </table>

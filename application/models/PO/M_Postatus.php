@@ -80,6 +80,7 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        $this->db->join('tb_user c', 'c.kode_user = a.acc_with');
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
