@@ -16,7 +16,7 @@
             </div>
             <!-- info row -->
             <div class="row invoice-info">
-                <div class="col-sm-4 invoice-col text-xs">
+                <div class="col-sm-4 invoice-col text-s">
                     Kepada Yth.
                     <address>
                         <strong><?= $s->nama_suplier ?></strong>
@@ -27,7 +27,7 @@
                     </address>
                 </div>
                 <!-- /.col -->
-                <div class="col-sm-4 invoice-col text-xs">
+                <div class="col-sm-4 invoice-col text-s">
                     Pemesan
                     <address>
                         <strong>PT.Karisma Indoagro Universal</strong><br>
@@ -37,7 +37,7 @@
                     </address>
                 </div>
                 <!-- /.col -->
-                <div class="col-sm-4 invoice-col text-xs">
+                <div class="col-sm-4 invoice-col text-s">
                     <br>
                     <b>Nomor Order:</b> <?= $s->no_po ?><br>
                     <b>Tanggal Order:</b> <?= $s->tgl_transaksi ?><br>
@@ -48,7 +48,7 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-12">
-                    <table class="table-bordered text-xs listdb" >
+                    <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
                                 <td colspan="7" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
@@ -58,7 +58,7 @@
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td >Harga</td>
+                                <td>Harga</td>
                                 <td colspan="7" style="width: 17.88%;">Total Harga</td>
                             </tr>
                         </thead>
@@ -84,7 +84,7 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <table class="table-bordered text-xs listdb" style="width: 100%;">
+                    <table class="table-bordered text-s listdb" style="width: 100%;">
                         <thead>
                             <tr>
                                 <td></td>
@@ -145,10 +145,13 @@
 
             <div class="row">
                 <div class="col">
-                    <table class="table-bordered text-xs listdb" width='100%' height=''>
+                    <table class="table-bordered text-s listdb" width='100%' height=''>
+                        <?php
+                        $qrPath = base_url('assets/images/') . $s->acc_with . '.png'
+                        ?>
                         <tr>
-                            <td align="center" style="width: 50%;">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
-                            <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
+                            <td align="center" style="width: 50%;">Pemesan,</br><img src="<?= $qrPath ?>" style="width: 170px; height: 170px;"></br><u>( <?= $s->nama_user ?> )</u></td>
+                            <td align="center">Disetujui,</br></br></br></br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
                     </table>
                 </div>
