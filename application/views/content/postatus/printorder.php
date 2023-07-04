@@ -19,7 +19,7 @@
                 <div class="col-sm-4 invoice-col text-s">
                     Kepada Yth.
                     <address>
-                        <strong><?= $s->nama_suplier ?></strong>
+                        <strong><?= $s->nama_suplier ?></strong><br>
                         <?= $s->alamat_suplier ?><br>
                         Telp : <?= $s->no_telpon ?>,<br>
                         Fax : <?= $s->no_fax ?><br>
@@ -45,13 +45,50 @@
                 </div>
                 <!-- /.col -->
             </div>
-            <!-- /.row -->
+            <?php foreach ($CountItem as $c) :
+                if ($c->total_item == '15') {
+                    $a = '18';
+                } else if ($c->total_item == '14') {
+                    $a = '18';
+                } else if ($c->total_item == '13') {
+                    $a = '18';
+                } else if ($c->total_item == '12') {
+                    $a = '18';
+                } else if ($c->total_item == '11') {
+                    $a = '18';
+                } else if ($c->total_item == '10') {
+                    $a = '18';
+                } else if ($c->total_item == '9') {
+                    $a = '18';
+                } else if ($c->total_item == '8') {
+                    $a = '18';
+                } else if ($c->total_item == '7') {
+                    $a = '18';
+                } else if ($c->total_item == '6') {
+                    $a = '18';
+                } else if ($c->total_item == '5') {
+                    $a = '18';
+                } else if ($c->total_item == '4') {
+                    $a = '18';
+                } else if ($c->total_item == '3') {
+                    $a = '18';
+                } else if ($c->total_item == '2') {
+                    $a = '18';
+                } else if ($c->total_item == '1') {
+                    $a = '18';
+                } else {
+                    $a = '14';
+                }
+            ?>
+                <!-- /.row -->
+            <?php endforeach; ?>
+
             <div class="row">
                 <div class="col-12">
-                    <table class="table-bordered text-xs listdb" >
+                    <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
-                                <td colspan="7" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
+                                <td colspan="8" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
@@ -59,7 +96,7 @@
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
                                 <td>Harga</td>
-                                <td colspan="7" style="width: 17.88%;">Total Harga</td>
+                                <td colspan="7" style="width: <?= $a ?>%;">Total Harga</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,18 +122,29 @@
                         </tbody>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </thead>
                         <tbody>
+                            <?php foreach ($totalDiskon as $t) :
+                                if ($t->total_item == '7') {
+                                    $b = '11';
+                                } else if ($t->total_item == '6') {
+                                    $b = '10';
+                                } else if ($t->total_item == '5') {
+                                    $b = '9';
+                                } else if ($t->total_item == '4') {
+                                    $b = '8';
+                                } else if ($t->total_item == '3') {
+                                    $b = '7';
+                                } else if ($t->total_item == '2') {
+                                    $b = '6';
+                                } else if ($t->total_item == '1') {
+                                    $b = '5';
+                                } else {
+                                    $b = '5';
+                                }
+                            ?>
+                            <?php endforeach; ?>
                             <tr>
-                                <td rowspan="7" colspan="2" style="text-align: justify; background-color: yellow; width:50%">
+                                <td rowspan="<?= $b ?>" colspan="2" style="text-align: justify; background-color: yellow; width:50%">
                                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
                                     NANDANG ERNOKO (Kadep Logistik) <br>
                                     081 131 361 66 / 081 252 151 314 <br>
@@ -137,7 +185,6 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-
                 </div>
                 <!-- /.col -->
             </div>
@@ -145,10 +192,10 @@
 
             <div class="row">
                 <div class="col">
-                    <table class="table-bordered text-xs listdb" width='100%' height=''>
+                    <table class="table-bordered text-s listdb" width='100%' height=''>
                         <tr>
-                            <td align="center" style="width: 50%;">Pemesan,</br></br></br></br><u>( Agoes Santoso )</u></td>
-                            <td align="center">Disetujui,</br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
+                            <td align="center" style="width: 50%;">Pemesan,</br><img src=" <?= base_url('assets/images/qrcode/') . $s->acc_with ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nama_user ?> )</u></td>
+                            <td align="center">Disetujui,</br></br></br></br></br></br></br></br><u>( <?= $s->nama_suplier ?> )</u></td>
                         </tr>
                     </table>
                 </div>

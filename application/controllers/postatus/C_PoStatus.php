@@ -83,15 +83,15 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailpo', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/postatus/ajaxstatus');
     }
 
     public function printOrder($kdpo)
     {
         $data['title'] = 'PRINT ORDER';
         $data['detail'] = $this->M_Postatus->getDetail($kdpo);
-        $data['status'] = $this->M_Postatus->getdataStatus($kdpo);
+        $data['status'] = $this->M_Postatus->getDataStatuss($kdpo);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
+        $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result()  ;
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
 

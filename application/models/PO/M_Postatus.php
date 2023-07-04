@@ -17,7 +17,7 @@ class M_PoStatus extends CI_Model
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         return $this->db->get()->result();
     }
-    
+
     public function getOnProgress()
     {
         $this->db->select('*');
@@ -71,11 +71,21 @@ class M_PoStatus extends CI_Model
     function totalDiskon($kdpo)
     {
         $this->db->select("SUM(nominal) as total_diskon");
+        $this->db->select("count(id_diskon) as total_item");
         $this->db->from('tb_diskon');
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+
     function getdataStatus($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po a');
+        $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+    function getDataStatuss($kdpo)
     {
         $this->db->select('*');
         $this->db->from('tb_po a');
@@ -83,6 +93,14 @@ class M_PoStatus extends CI_Model
         $this->db->join('tb_user c', 'c.kode_user = a.acc_with');
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
+    }
+    function CountItem($kdpo)
+    {
+        return $this->db->query("SELECT 
+        COUNT(a.id_det_po) AS total_item
+        FROM tb_detail_po a
+        WHERE kd_po = '$kdpo'
+        ");
     }
 
     function konfirmPo($kdpo, $data)

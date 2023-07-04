@@ -195,7 +195,6 @@
   }
 .noteDirektur{
     border-style: solid;
-    background-color: #fca103;
     position: relative;
     max-height: 500px;
     max-width: 100%;
@@ -255,3 +254,7 @@ td {
     background-color: #30828d;
     border-color: #30828d;
   }
+
+  .table-stripeds > tbody > tr:nth-child(2n+1) > td, .table-stripeds > tbody > tr:nth-child(2n+1) > th {
+    background-color:#30828d ;
+ }
