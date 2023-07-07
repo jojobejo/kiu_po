@@ -79,4 +79,36 @@ class C_User extends CI_Controller
         $this->Usermodel->editUser($id_user, $data);
         redirect('user');
     }
+
+    public function usersetting()
+    {
+        if ($this->session->userdata('status') != "is_login") {
+            redirect("login");
+        }
+
+        $kd_user    = $this->session->userdata('kode');
+
+        $data['title']  = 'Account Setting';
+        $data['info']   = $this->M_User->getInfoUser($kd_user)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/user/bodysetting', $data);
+        $this->load->view('partial/footer');
+    }
+    public function editPassword()
+    {
+        $passold    = $this->input->post('passbaru');
+        $kd_user    = $this->input->post('kduser');
+        $password   = password_hash($passold, PASSWORD_DEFAULT);
+
+        $changePass = array(
+            'password' => $password
+        );
+
+        $this->M_User->editPassword($kd_user, $changePass);
+
+        $this->session->set_flashdata("edited", "Data Berhasil Dirubah");
+        redirect('Auth');
+    }
 }

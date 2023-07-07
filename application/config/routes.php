@@ -56,6 +56,8 @@ $route['translate_uri_dashes'] = FALSE;
 //user
 $route['user'] = 'User/C_User';
 $route['adduser'] = 'user/C_User/AddUser';
+$route['usersetting'] = 'user/C_User/usersetting';
+$route['editPass'] = 'user/C_User/editPassword';
 
 //auth
 $route['login']     = 'auth/process';

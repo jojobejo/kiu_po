@@ -38,6 +38,10 @@
                     <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
                         <?php echo "<center>" . $this->session->flashdata("logout") . "</center>" ?>
                     </div>
+                    <?php elseif ($this->session->flashdata("edited")) : ?>
+                    <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                        <?php echo "<center>" . $this->session->flashdata("edited") . "</center>" ?>
+                    </div>
                 <?php endif ?>
             </div>
             <!-- /.login-card-body -->
