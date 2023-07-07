@@ -97,7 +97,7 @@ class C_PoStatus extends CI_Controller
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);
-        $this->load->view('partial/footerPrint');
+        $this->load->view('partial/footerprint');
     }
 
     public function printOrderBaru($kdpo)
