@@ -80,6 +80,12 @@ $route['hapusBarang/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 
+//PurchaseOrderNonKomersil
+$route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
+$route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
+$route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
+
+
 //postatus
 $route['postatus'] = 'postatus/C_PoStatus';
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';

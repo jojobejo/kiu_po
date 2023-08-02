@@ -66,7 +66,7 @@
           </li>
         <?php endif; ?>
 
-        <?php if ($this->session->userdata('lv') <= '2') : ?>
+        <?php if ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
           <li class="nav-item">
             <a href="<?= base_url('purchase') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
@@ -108,8 +108,42 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('notetemplate') ?>" class="nav-link">
-              <i class="nav-icon fas fa-gear"></i>
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Account Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>
+                Log Out
+              </p>
+            </a>
+          </li>
+
+          <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'IT' || $this->session->userdata('departemen') == 'SALES' ) : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                PO Non Komersil
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('postatus') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                Purchase Order Status <span class="badge badge-warning right">!</span>
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
               <p>
                 Account Setting
               </p>

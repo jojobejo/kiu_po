@@ -29,6 +29,8 @@
                                 <option value="-" selected>-- Pilih Departemen --</option>
                                 <option value="KEUANGAN">KEUANGAN</option>
                                 <option value="DIREKTUR">DIREKTUR</option>
+                                <option value="IT">IT</option>
+                                <option value="SALES">SALES</option>
                             </select>
                         </div>
                     </div>

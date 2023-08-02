@@ -146,4 +146,81 @@ class M_Purchase extends CI_Model
             return 'NKPO' . date('dmy') . $kdsuplier . $kd;
         }
     }
+    // NON KOMERSIL
+    function kdnonkomersial()
+    {
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_detail_po_nk WHERE DATE(create_at)=CURDATE()");
+        $kd = "";
+        if ($cd->num_rows() > 0) {
+            foreach ($cd->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd = "0001";
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'NK' . date('dmy') . $kd;
+        return $kdnk1;
+    }
+    function getkdnoponk()
+    {
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po_nk,4)) AS kd_max FROM tb_detail_po_nk WHERE DATE(create_at)=CURDATE()");
+        $kd = "";
+        if ($cd->num_rows() > 0) {
+            foreach ($cd->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd = "0001";
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'NKPO' . date('dmy') . $kd;
+        return $kdnk1;
+    }
+    function get_tmp_non_komersil($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_item_nk');
+        $this->db->where('kd_user', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    function input_tmp_nk($data)
+    {
+        $this->db->insert('tb_tmp_item_nk', $data);
+    }
+    function edit_input_nk($kd, $data)
+    {
+        $this->db->where('id_tmp_nk', $kd);
+        return $this->db->update('tb_tmp_item_nk', $data);
+    }
+    public function hapus_item_nk($id)
+    {
+        $this->db->where('id_tmp_nk', $id);
+        return $this->db->delete('tb_tmp_item_nk');
+    }
+    function sumtransaksink()
+    {
+        $this->db->select("SUM(total_harga) as total_harga");
+        $this->db->select("COUNT(id_tmp_nk) as total_item");
+        $this->db->from('tb_tmp_item_nk');
+        return $this->db->get()->result();
+    }
+    function input_po_nk($data)
+    {
+        $this->db->insert('tb_po_nk', $data);
+    }
+    function input_detail_po_nk($data)
+    {
+        $this->db->insert('tb_detail_po_nk', $data);
+    }
+    function hapus_tmp_nk($id)
+    {
+        $this->db->where('kd_user', $id);
+        return $this->db->delete('tb_tmp_item_nk');
+    }
 }
