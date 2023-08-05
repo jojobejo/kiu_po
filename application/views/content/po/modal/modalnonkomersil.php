@@ -14,8 +14,8 @@
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
                         <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="" />
-                        <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $kdbarang ?>" readonly />
-                    </div>
+                            <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $kdbarang ?>" readonly />
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">

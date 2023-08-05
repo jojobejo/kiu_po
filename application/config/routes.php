@@ -84,6 +84,12 @@ $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
 $route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
+//PurchaseOrderNonKomersil - STATUS
+$route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
+$route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
+$route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
+$route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
+$route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
 
 
 //postatus

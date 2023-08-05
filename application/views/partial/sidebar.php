@@ -18,55 +18,7 @@
             <a href="#" class="d-block"><?= $this->session->userdata('nama_user') ?></a>
           </div>
         </div>
-        <?php if ($this->session->userdata('lv') == '1') : ?>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-database"></i>
-              <p>
-                Master Data
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview ml-2">
-              <li class="nav-item">
-                <a href="<?= base_url('suplier') ?>" class="nav-link">
-                  <i class="fas fa-light fa-building nav-icon"></i>
-                  <p>Data Suplier</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?= base_url('mbarang') ?>" class="nav-link">
-                  <i class="fas fa-light fa-box nav-icon"></i>
-                  <p>Data Barang</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?= base_url('user') ?>" class="nav-link">
-                  <i class="fas fa-light fa-user nav-icon"></i>
-                  <p>User Management</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?= base_url('taxseting') ?>" class="nav-link">
-                  <i class="nav-icon fas fa-percent"></i>
-                  <p>
-                    Tax Setting
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="<?= base_url('noteseting') ?>" class="nav-link">
-                  <i class="nav-icon fas fa-pen-nib"></i>
-                  <p>
-                    Note Template Setting
-                  </p>
-                </a>
-              </li>
-            </ul>
-          </li>
-        <?php endif; ?>
-
-        <?php if ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
+        <?php if ($this->session->userdata('lv') <= '1' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
           <li class="nav-item">
             <a href="<?= base_url('purchase') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
@@ -80,6 +32,22 @@
               <i class="nav-icon fas fa-money-check"></i>
               <p>
                 Purchase Order Status <span class="badge badge-warning right">!</span>
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                PO Non Komersil
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
           </li>
@@ -124,7 +92,7 @@
             </a>
           </li>
 
-          <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'IT' || $this->session->userdata('departemen') == 'SALES' ) : ?>
+          <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'HRD' ) : ?>
           <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
@@ -134,10 +102,44 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('postatus') ?>" class="nav-link">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>
               <p>
-                Purchase Order Status <span class="badge badge-warning right">!</span>
+                PO non Komersil Status <span class="badge badge-warning right">!</span>
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Account Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>
+                Log Out
+              </p>
+            </a>
+          </li>
+          <!-- MENU KADEP -->
+          <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD' ) : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                PO Non Komersil
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
           </li>
@@ -158,7 +160,7 @@
             </a>
           </li>
 
-        <?php elseif ($this->session->userdata('lv') == '3') : ?>
+        <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'DIREKTUR') : ?>
           <li class="nav-item">
             <a href="<?= base_url('postatus') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>
