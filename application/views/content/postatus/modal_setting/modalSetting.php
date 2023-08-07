@@ -222,3 +222,117 @@
             <!-- /.modal-dialog -->
         </div>
     <?php endforeach; ?>
+
+    <?php foreach ($status as $s) : ?>
+        <div class="modal fade" id="modalnotebarang<?= $s->kd_po ?>">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Note Barang Suplier</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo form_open_multipart('note_barang_suplier'); ?>
+                        <div class="form-group" hidden>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po ?>" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Isi Note<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="isi_note" name="isi_note" value="" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    <?php endforeach; ?>
+
+    <?php foreach ($notebarang as $n) : ?>
+        <div class="modal fade" id="modalnotebarangedit<?= $n->id_nt_barang ?>">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Edit Note Barang Suplier</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo form_open_multipart('note_barang_suplier_edit'); ?>
+                        <div class="form-group" hidden>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $n->kd_po ?>" readonly />
+                                    <input class="form-control" type="text" id="idnote" name="idnote" value="<?= $n->id_nt_barang ?>" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-2" for="kd_user">Isi Note<span class="required">*</span></label>
+                                <div class="col-sm-9"><input class="form-control" type="text" id="isi_note" name="isi_note" value="<?= $n->isi_note ?>" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    <?php endforeach; ?>
+    <?php foreach ($notebarang as $n) : ?>
+        <div class="modal fade" id="modalnotebaranghapus<?= $n->id_nt_barang ?>">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Hapus Note Barang Suplier</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo form_open_multipart('note_barang_suplier_hapus'); ?>
+                        <div class="form-group" hidden>
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $n->kd_po ?>" readonly />
+                                    <input class="form-control" type="text" id="idnote" name="idnote" value="<?= $n->id_nt_barang ?>" readonly />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <h4>Note akan terhapus secara permanen !!!</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    <?php endforeach; ?>

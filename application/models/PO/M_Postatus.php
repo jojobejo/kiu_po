@@ -119,6 +119,10 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_note_direktur', $data);
     }
+    function addnotesuplier($data)
+    {
+        $this->db->insert('tb_note_barang', $data);
+    }
     function insertDiskon($data)
     {
         $this->db->insert('tb_diskon', $data);
@@ -194,5 +198,21 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('id_det_po', $id);
         return $this->db->delete('tb_detail_po');
+    }
+    public function get_note_barang($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_note_barang');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+    function editnotesuplier($id, $data)
+    {
+        $this->db->where('id_nt_barang', $id);
+        return $this->db->update('tb_note_barang', $data);
+    }
+    function hapusnotesuplier($id)
+    {
+        return $this->db->delete('tb_note_barang', array('id_nt_barang' => $id));
     }
 }

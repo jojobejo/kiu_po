@@ -144,6 +144,12 @@
                         Tambah Diskon
                     </a>
                 </div>
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalnotebarang<?= $s->kd_po ?>  ">
+                        <i class="fas fa-notes-medical"> </i>
+                        Tambah Note Barang
+                    </a>
+                </div>
             </div>
 
         <?php endif; ?>
@@ -382,6 +388,34 @@
                         <?php endforeach; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+            </tbody>
+        </table>
+        <table class="table table-bordered table-striped ">
+            <thead style="background-color: #212529; color:white;">
+                <tr>
+                    <td>Note Untuk Suplier</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <?php foreach ($notebarang as $n) : ?>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <?= $n->isi_note ?>
+                                </div>
+                                <div class="col-md-1">
+                                    <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalnotebaranghapus<?= $n->id_nt_barang ?>">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    <?php endforeach; ?>
+                </tr>
             </tbody>
         </table>
         <div class="row ml-2 mr-2">

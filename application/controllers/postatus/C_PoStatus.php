@@ -78,6 +78,7 @@ class C_PoStatus extends CI_Controller
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
+        $data['notebarang'] = $this->M_Postatus->get_note_barang($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -91,7 +92,7 @@ class C_PoStatus extends CI_Controller
         $data['detail'] = $this->M_Postatus->getDetail($kdpo);
         $data['status'] = $this->M_Postatus->getDataStatuss($kdpo);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualan($kdpo);
-        $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result()  ;
+        $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result();
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
 
@@ -114,7 +115,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerPrint');
     }
 
-    public function konfirmasiOrder($kdpo,$kddirektur)
+    public function konfirmasiOrder($kdpo, $kddirektur)
     {
         $dataKonfirm = array(
             'kd_po' => $kdpo,
@@ -126,7 +127,7 @@ class C_PoStatus extends CI_Controller
         redirect('postatus');
     }
 
-    public function tolakOrder($kdpo,$kddirektur)
+    public function tolakOrder($kdpo, $kddirektur)
     {
         $dataKonfirm = array(
             'kd_po' => $kdpo,
@@ -369,6 +370,39 @@ class C_PoStatus extends CI_Controller
     public function hapusDiskon($id, $kdpo)
     {
         $this->M_Postatus->hapusDiskon($id);
+        redirect('detailPO/' . $kdpo);
+    }
+    public function note_barang_suplier()
+    {
+        $kdpo       = $this->input->post('kdpo');
+        $isinote    = $this->input->post('isi_note');
+
+        $datanote = array(
+            'kd_po' => $kdpo,
+            'isi_note' => $isinote
+        );
+        $this->M_Postatus->addnotesuplier($datanote);
+        redirect('detailPO/' . $kdpo);
+    }
+    public function note_barang_suplier_edit()
+    {
+        $id         = $this->input->post('idnote');
+        $kdpo       = $this->input->post('kdpo');
+        $isinote    = $this->input->post('isi_note');
+
+        $datanote = array(
+            'kd_po' => $kdpo,
+            'isi_note' => $isinote
+        );
+        $this->M_Postatus->editnotesuplier($id, $datanote);
+        redirect('detailPO/' . $kdpo);
+    }
+    public function note_barang_suplier_hapus()
+    {
+        $id         = $this->input->post('idnote');
+        $kdpo       = $this->input->post('kdpo');
+       
+        $this->M_Postatus->hapusnotesuplier($id);
         redirect('detailPO/' . $kdpo);
     }
 }

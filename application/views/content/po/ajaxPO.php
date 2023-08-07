@@ -12,6 +12,8 @@
     $("#selesai").on('click', function() {
         var nopo = $("#po_isi").val();
         var tgl = $("#tgl_isi").val();
+        var tmpo = $("#tmpo").val();
+        var gdg = $("#gdgpengiriman").val();
         var jml = $("#jmlitem").val();
         var kdpo = $("#kd_po_isi").val();
         var suplier = $("#kdsuplier").val();
@@ -31,8 +33,10 @@
                     data: {
                         nopo: nopo,
                         tgl: tgl,
+                        tmpo: tmpo,
+                        gdg: gdg,
                         jml: jml,
-                        kdpo : kdpo,
+                        kdpo: kdpo,
                         suplier: suplier,
                         harga: harga
                     },

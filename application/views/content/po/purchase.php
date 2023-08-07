@@ -26,7 +26,7 @@
 
         <form action="#">
             <div class="row mb-2">
-                <div class="col-md-5">
+                <div class="col-md">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
@@ -34,7 +34,7 @@
                         <input type="text" class="form-control" placeholder="Nomor PO" value="" name="po_isi" id="po_isi">
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
@@ -42,7 +42,23 @@
                         <input type="date" class="form-control" placeholder="Tanggal Transaksi" value="" name="tgl_isi" id="tgl_isi">
                     </div>
                 </div>
-                <div class="col-md-5" hidden>
+                <div class="col-md">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-truck"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Franko Pengiriman" value="" name="gdgpengiriman" id="gdgpengiriman">
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Tempo Pembayaran" value="" name="tmpo" id="tmpo">
+                    </div>
+                </div>
+                <div class="col-md" hidden>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
@@ -51,6 +67,21 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block mb-2" data-toggle="modal" data-target="#modalnotebarang">
+                        <i class="fas fa-notes-medical"> </i>
+                        Tambah Note Barang
+                    </a>
+                </div>
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block mb-2" data-toggle="modal" data-target="#modaldiskon">
+                        <i class="fas fa-tags"> </i>
+                        Tambah Diskon
+                    </a>
+                </div>
+            </div>
+
 
             <?php $this->load->view('content/po/modalpo') ?>
 
@@ -77,7 +108,10 @@
                             <td><?= $t->qty ?></td>
                             <td>Rp. <?= number_format($t->harga_satuan) ?></td>
                             <td>Rp. <?= number_format($t->total_harga) ?></td>
-                            <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
+                            <td><a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>">
+                                    <i class="fa fa-solid fa-pencil-alt"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
                                     <i class="fa fa-solid fa-trash-alt"></i>
                                 </a>
                                 <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>
@@ -108,6 +142,65 @@
                             <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
                                 <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                                 <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <table id="" class="table table-striped mt-2">
+                <thead style="background-color: #212529; color:white;">
+                    <tr>
+                        <td colspan="3" style="text-align: center;">LIST DISKON</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">Deskripsi Diskon</td>
+                        <td style="text-align: center;">Nominal Diskon</td>
+                        <td style="text-align: center;"></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($tmpdiskon as $d) : ?>
+                        <tr>
+                            <td style="text-align: center;"><?= $d->nama_diskon ?></td>
+                            <td style="text-align: center;"><?= number_format($d->nominal) ?></td>
+                            <td style="text-align: center;">
+                                <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $d->id_tmp_diskon ?>">
+                                    <i class="fa fa-solid fa-pencil-alt"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusdiskon<?= $d->id_tmp_diskon ?>">
+                                    <i class="fa fa-solid fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <table id="" class="table table-striped mt-2">
+                <thead style="background-color: #212529; color:white;">
+                    <tr>
+                        <td style="text-align: center;">LIST Note Barang</td>
+                    </tr>
+                    <tr>
+                        <td>Deskripsi Note</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($tmpnote as $n) : ?>
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col">
+                                        <?= $n->isi_note ?>
+                                    </div>
+                                    <div class="col">
+                                        <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $n->id_nt_tmp_barang ?>">
+                                            <i class="fa fa-solid fa-pencil-alt"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusdiskon<?= $n->id_nt_tmp_barang ?>">
+                                            <i class="fa fa-solid fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
