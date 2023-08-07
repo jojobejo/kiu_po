@@ -35,7 +35,7 @@
               </p>
             </a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
@@ -50,7 +50,7 @@
                 PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('taxseting') ?>" class="nav-link">
               <i class="nav-icon fas fa-percent"></i>
@@ -93,7 +93,7 @@
           </li>
 
           <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'HRD' ) : ?>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
@@ -108,7 +108,7 @@
                 PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('usersetting') ?>" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>
@@ -127,7 +127,7 @@
           </li>
           <!-- MENU KADEP -->
           <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD' ) : ?>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
@@ -142,7 +142,7 @@
                 PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('usersetting') ?>" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>

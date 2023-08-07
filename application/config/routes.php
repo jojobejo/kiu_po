@@ -79,6 +79,7 @@ $route['addchart'] = 'purchase/C_Order/addChart';
 $route['hapusBarang/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
+$route['edit_barang_tmp'] = 'purchaseorder/C_Order/edit_barang_tmp';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';

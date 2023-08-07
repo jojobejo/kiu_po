@@ -223,4 +223,9 @@ class M_Purchase extends CI_Model
         $this->db->where('kd_user', $id);
         return $this->db->delete('tb_tmp_item_nk');
     }
+    function edit_chart_tmp($kd, $data)
+    {
+        $this->db->where('id_tmp', $kd);
+        return $this->db->update('tb_tmp_item', $data);
+    }
 }

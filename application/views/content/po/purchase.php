@@ -26,7 +26,7 @@
 
         <form action="#">
             <div class="row mb-2">
-                <div class="col-md-5">
+                <div class="col-md">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
@@ -34,7 +34,7 @@
                         <input type="text" class="form-control" placeholder="Nomor PO" value="" name="po_isi" id="po_isi">
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
@@ -42,7 +42,23 @@
                         <input type="date" class="form-control" placeholder="Tanggal Transaksi" value="" name="tgl_isi" id="tgl_isi">
                     </div>
                 </div>
-                <div class="col-md-5" hidden>
+                <div class="col-md">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-truck"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Franko Pengiriman" value="" name="gdgpengiriman" id="gdgpengiriman">
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Tempo Pembayaran" value="" name="tmpo" id="tmpo">
+                    </div>
+                </div>
+                <div class="col-md" hidden>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
@@ -77,7 +93,10 @@
                             <td><?= $t->qty ?></td>
                             <td>Rp. <?= number_format($t->harga_satuan) ?></td>
                             <td>Rp. <?= number_format($t->total_harga) ?></td>
-                            <td><a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
+                            <td><a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>">
+                                    <i class="fa fa-solid fa-pencil-alt"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
                                     <i class="fa fa-solid fa-trash-alt"></i>
                                 </a>
                                 <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>

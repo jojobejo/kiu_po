@@ -43,40 +43,65 @@
 </div>
 
 <!-- MODAL ADD -->
-<?php foreach ($barang as $i) : ?>
-    <div class="modal fade" id="modalEdit<?= $i->id_barang ?>">
+<?php foreach ($tmp as $t) : ?>
+    <div class="modal fade" id="modalEdit<?= $t->id_tmp ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Edit Barang</h4>
+                    <h4 class="modal-title">Edit Item Chart</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('editBarang'); ?>
+                    <?php echo form_open_multipart('edit_barang_tmp'); ?>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">idbarang<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $i->id_barang ?>" /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $t->id_tmp ?>" /></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Kode Barang<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $i->kode_barang ?>" /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $t->kode_barang ?>" readonly /></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $i->nama_barang ?>" /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $t->nama_barang ?>" /></div>
                         </div>
                     </div>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label for="kd_suplier" class="col-sm-3 control-label text-right">Kode Suplier <span class="required" *></span></label>
-                            <div class="col-sm-8"><input type="text" class="form-control" id="kd_sup_isi" name="kd_sup_isi" value="<?= $i->kd_suplier ?>" readonly></div>
+                            <div class="col-sm-8"><input type="text" class="form-control" id="kd_sup_isi" name="kd_sup_isi" value="<?= $t->kode_suplier ?>" readonly></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <select name="satuan_isi" id="satuan_isi" class="form-control">
+                                    <option value="">-- QTY --</option>
+                                    <?php foreach ($satuan as $s) : ?>
+                                        <option value="<?= $s->nm_satuan ?>"> <?= $s->nm_satuan ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="<?= $t->qty ?>" /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="<?= $t->harga_satuan ?>" /></div>
                         </div>
                     </div>
 
