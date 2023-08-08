@@ -95,6 +95,8 @@ class C_PoStatus extends CI_Controller
         $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result();
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
+        $data['totalnote'] = $this->M_Postatus->totalnote($kdpo);
+        $data['notesuplier'] = $this->M_Postatus->get_note_barang($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);

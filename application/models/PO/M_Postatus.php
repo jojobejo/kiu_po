@@ -76,6 +76,14 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function totalnote($kdpo)
+    {
+        $this->db->select("SUM(id_nt_barang) as total_note");
+        $this->db->select("count(id_nt_barang) as total_nt_item");
+        $this->db->from('tb_note_barang');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
 
     function getdataStatus($kdpo)
     {
