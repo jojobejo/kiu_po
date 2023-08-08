@@ -81,9 +81,13 @@ $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 $route['edit_barang_tmp'] = 'purchaseorder/C_Order/edit_barang_tmp';
 $route['addnotebarangsupliertmp'] = 'purchaseorder/C_Order/addnotebarangsupliertmp';
-$route['editnotebarangsupliertmp'] = 'purchaseorder/C_Order/editnotebarangsupliertmp';
-$route['hapusnotebarangsupliertmp'] = 'purchaseorder/C_Order/hapusnotebarangsupliertmp';
+$route['edit_note_tmp_barang'] = 'purchaseorder/C_Order/edit_note_tmp_barang';
+$route['hapus_note_tmp_barang'] = 'purchaseorder/C_Order/hapus_note_tmp_barang';
 $route['add_diskon_po'] = 'purchaseorder/C_Order/add_diskon_po';
+$route['edit_diskon_po'] = 'purchaseorder/C_Order/edit_diskon_po';
+$route['hapus_diskon_po'] = 'purchaseorder/C_Order/hapus_diskon_po';
+$route['add_diskon_barang_tmp'] = 'purchaseorder/C_Order/add_diskon_barang_tmp';
+
 
 //postatus
 $route['postatus'] = 'postatus/C_PoStatus';
@@ -111,6 +115,7 @@ $route['frankoPengiriman'] = 'postatus/C_PoStatus/frankoPengiriman';
 $route['addDiskon'] = 'postatus/C_PoStatus/tambahDiskon';
 $route['diskonEdit'] = 'postatus/C_PoStatus/editDiskon';
 $route['hapusDiskon/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
+$route['add_diskon_barang'] = 'postatus/C_PoStatus/add_diskon_barang';
 
 
 

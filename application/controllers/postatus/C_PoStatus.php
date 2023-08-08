@@ -401,8 +401,29 @@ class C_PoStatus extends CI_Controller
     {
         $id         = $this->input->post('idnote');
         $kdpo       = $this->input->post('kdpo');
-       
+
         $this->M_Postatus->hapusnotesuplier($id);
+        redirect('detailPO/' . $kdpo);
+    }
+    public function add_diskon_barang()
+    {
+        $kdsup       = $this->input->post('kdsup');
+        $kdpo       = $this->input->post('kdpo');
+        $nmbarang       = $this->input->post('nmbarang');
+        $tax        = $this->input->post('disc_isi');
+        $hargaA     = $this->input->post('tot_harga');
+        $hasiltax   = $tax / 100;
+        $nominalTax = $hargaA * $hasiltax;
+
+        $tambahDiskon = array(
+            'kd_po' => $kdpo,
+            'kd_suplier' => $kdsup,
+            'keterangan' => 'Diskon Barang' . '-' . $nmbarang . '(' . $tax . '%' . ')',
+            'nominal' => $nominalTax
+        );
+
+        $this->M_Postatus->insertDiskon($tambahDiskon);
+
         redirect('detailPO/' . $kdpo);
     }
 }

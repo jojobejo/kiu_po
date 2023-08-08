@@ -188,7 +188,7 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_diskon', $data);
     }
-     public function delete_tmp_diskon($id_tmp)
+    public function delete_tmp_diskon($id_tmp)
     {
         $this->db->where('kd_suplier', $id_tmp);
         return $this->db->delete('tb_tmp_diskon');
@@ -198,12 +198,32 @@ class M_Purchase extends CI_Model
         $this->db->where('kd_suplier', $id_tmp);
         return $this->db->delete('tb_tmp_note_barang');
     }
+    public function input_note($data)
+    {
+        $this->db->insert('tb_note_barang', $data);
+    }
+    public function edit_note_tmp_barang($id_tmp, $data)
+    {
+        $this->db->where('id_nt_tmp_barang', $id_tmp);
+        return $this->db->update('tb_tmp_note_barang', $data);
+    }
+    public function hapus_note_tmp_barang($id_tmp)
+    {
+        $this->db->where('id_nt_tmp_barang', $id_tmp);
+        return $this->db->delete('tb_tmp_note_barang');
+    }
     public function input_diskon($data)
     {
         $this->db->insert('tb_diskon', $data);
     }
-    public function input_note($data)
+    public function edit_diskon_po($id_tmp, $data)
     {
-        $this->db->insert('tb_note_barang', $data);
+        $this->db->where('id_tmp_diskon', $id_tmp);
+        return $this->db->update('tb_tmp_diskon', $data);
+    }
+    public function hapus_tmp_diskon($id_tmp)
+    {
+        $this->db->where('id_tmp_diskon', $id_tmp);
+        return $this->db->delete('tb_tmp_diskon');
     }
 }

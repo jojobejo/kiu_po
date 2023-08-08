@@ -219,7 +219,7 @@ class C_Order extends CI_Controller
             }
             foreach ($tmpdiskon as $diskon) {
                 $listdiskon = array(
-                    'kd_po' => $nopo,
+                    'kd_po' => $kdpo,
                     'kd_suplier' => $diskon->kd_suplier,
                     'keterangan' => $diskon->nama_diskon,
                     'nominal'    => $diskon->nominal
@@ -228,7 +228,7 @@ class C_Order extends CI_Controller
             }
             foreach ($tmpnote as $note) {
                 $listnote = array(
-                    'kd_po' => $nopo,
+                    'kd_po' => $kdpo,
                     'kd_suplier' => $note->kd_suplier,
                     'isi_note'  => $note->isi_note
                 );
@@ -272,6 +272,26 @@ class C_Order extends CI_Controller
         $this->M_Purchase->add_tmp_note_suplier($addnote);
         redirect('purchase/sup/' . $supp);
     }
+    public function edit_note_tmp_barang()
+    {
+        $id         = $this->input->post('id_isi');
+        $supp       = $this->input->post('kd_sup');
+        $isi        = $this->input->post('isi');
+
+        $note = array(
+            'kd_suplier'    => $supp,
+            'isi_note'       => $isi
+        );
+        $this->M_Purchase->edit_note_tmp_barang($id, $note);
+        redirect('purchase/sup/' . $supp);
+    }
+    public function hapus_note_tmp_barang()
+    {
+        $id = $this->input->post('id_isi');
+        $supp       = $this->input->post('kd_sup');
+        $this->M_Purchase->hapus_note_tmp_barang($id);
+        redirect('purchase/sup/' . $supp);
+    }
     public function add_diskon_po()
     {
         $supp       = $this->input->post('kd_sup');
@@ -285,5 +305,45 @@ class C_Order extends CI_Controller
         );
         $this->M_Purchase->add_diskon_po($addnote);
         redirect('purchase/sup/' . $supp);
+    }
+    public function edit_diskon_po()
+    {
+        $id         = $this->input->post('id_isi');
+        $supp       = $this->input->post('kd_sup');
+        $deskripsi  = $this->input->post('deskripsi_isi');
+        $nominal    = $this->input->post('nominal_isi');
+
+        $addnote = array(
+            'kd_suplier'    => $supp,
+            'nama_diskon'   => $deskripsi,
+            'nominal'       => $nominal
+        );
+        $this->M_Purchase->edit_diskon_po($id, $addnote);
+        redirect('purchase/sup/' . $supp);
+    }
+    public function hapus_diskon_po()
+    {
+        $id = $this->input->post('id_isi');
+        $supp       = $this->input->post('kd_sup');
+        $this->M_Purchase->hapus_tmp_diskon($id);
+        redirect('purchase/sup/' . $supp);
+    }
+    public function add_diskon_barang_tmp()
+    {
+        $kdsup      = $this->input->post('kdsup');
+        $nmbarang   = $this->input->post('nmbarang');
+        $tax        = $this->input->post('disc_isi');
+        $hargaA     = $this->input->post('tot_harga');
+        $hasiltax   = $tax / 100;
+        $nominalTax = $hargaA * $hasiltax;
+
+        $tambahDiskon = array(
+            'kd_suplier' => $kdsup,
+            'nama_diskon' => 'Diskon Barang' . '-' . $nmbarang . '(' . $tax . '%' . ')',
+            'nominal' => $nominalTax
+        );
+
+        $this->M_Purchase->add_diskon_po($tambahDiskon);
+        redirect('purchase/sup/' . $kdsup);
     }
 }
