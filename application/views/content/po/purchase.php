@@ -117,6 +117,10 @@
                                 </a>
                                 <a class="btn btn-sm bg-lightblue" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>">
                                     <i class="fas fa-tags"></i>
+                                    Diskon(%)Barang
+                                </a>
+                                <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>">
+                                    <i class="fas fa-tags"></i>
                                     Diskon Barang
                                 </a>
                                 <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>

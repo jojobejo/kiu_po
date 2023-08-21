@@ -33,7 +33,7 @@
                         <strong>PT.Karisma Indoagro Universal</strong><br>
                         Jl. Semeru No.89, Ajung, Kabupaten Jember<br>
                         Telp 1: (0331) 4833 33 / 4877 88<br>
-                        Email: karisma@kiu.co.id
+                        Email: karismaindoagro@gmail.com
                     </address>
                 </div>
                 <!-- /.col -->
@@ -174,7 +174,7 @@
                             <?php endforeach; ?>
                         </thead>
                     </table>
-                    <table class="table-bordered text-s listdb" style="width: 100%;">
+                    <table class="table-bordered text-s listdb" style="width: 100%; border-color: black;">
                         <tbody>
                             <?php foreach ($totalDiskon as $t) :
                                 if ($t->total_item == '7') {
@@ -225,16 +225,18 @@
                                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
                                     NANDANG ERNOKO (Kadep Logistik) <br>
                                     081 131 361 66 / 081 252 151 314 <br>
-                                    * Kedatangan barang maksimal: Senin s/d Jumat <br>
-                                    maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
-                                    * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,<br>
+                                    * Kedatangan barang maksimal: <br>
+                                    Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
+                                    * Maksimal terdiri dari 2 No. Batch <br>
+                                    * Mohon info terlebih dahulu,<br>
                                     jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
                                 </td>
                                 <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>
-                            <?php foreach ($notesuplier as $ns) : ?>
+                            <?php foreach ($notesuplier as $ns) :
+                            ?>
                                 <tr>
-                                    <td colspan="2" class="bg-orange"><?= $ns->isi_note ?></td>
+                                    <td colspan="2" class="bg-orange"><?= nl2br($ns->isi_note); ?></td>
                                 </tr>
                             <?php endforeach; ?>
 

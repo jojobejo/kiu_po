@@ -245,7 +245,9 @@
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Isi Note<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="isi_note" name="isi_note" value="" /></div>
+                                <div class="col-sm-8">
+                                    <textarea name="isi_note" id="isi_note" cols="30" rows="10" class="form-control"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -283,8 +285,10 @@
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-2" for="kd_user">Isi Note<span class="required">*</span></label>
-                                <div class="col-sm-9"><input class="form-control" type="text" id="isi_note" name="isi_note" value="<?= $n->isi_note ?>" /></div>
+                                <label class="col-sm-3" for="kd_user">Isi Note<span class="required">*</span></label>
+                                <div class="col-sm-8">
+                                    <textarea name="isi_note" id="isi_note" cols="30" rows="10" class="form-control"><?= $n->isi_note ?></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -351,10 +355,54 @@
                         <?php echo form_open_multipart('add_diskon_barang'); ?>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-2" for="kd_user">Persentase Diskon<span class="required">*</span></label>
-                                <div class="col-sm-9">
+                                <label class="col-sm-3" for="kd_user">Persentase Diskon<span class="required">*</span></label>
+                                <div class="col-sm-8">
                                     <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" />
                                     <input class="form-control" type="text" id="tot_harga" name="tot_harga" value="<?= $d->hrg_total ?>" readonly hidden />
+                                    <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly hidden />
+                                    <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kd_suplier ?>" readonly hidden />
+                                    <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    <?php endforeach; ?>
+
+    <?php foreach ($detail as $d) : ?>
+        <div class="modal fade" id="diskonbarangs<?= $d->id_det_po ?>">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Tambah Diskon</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo form_open_multipart('add_diskon_barangs'); ?>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3" for="kd_user">Deskripsi Diskon<span class="required">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text" id="desc_isi" name="desc_isi" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3" for="kd_user">Nominal<span class="required">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" />
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kd_suplier ?>" readonly hidden />
                                     <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />

@@ -188,6 +188,10 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_diskon', $data);
     }
+    public function add_diskons_po($data)
+    {
+        $this->db->insert('tb_tmp_diskon', $data);
+    }
     public function delete_tmp_diskon($id_tmp)
     {
         $this->db->where('kd_suplier', $id_tmp);

@@ -339,11 +339,27 @@ class C_Order extends CI_Controller
 
         $tambahDiskon = array(
             'kd_suplier' => $kdsup,
-            'nama_diskon' => 'Diskon Barang' . '-' . $nmbarang . '(' . $tax . '%' . ')',
+            'nama_diskon' => 'Diskon Barang' . ' ' . '-' . ' ' . $nmbarang . ' ' . '(' . $tax . '%' . ')',
             'nominal' => $nominalTax
         );
 
         $this->M_Purchase->add_diskon_po($tambahDiskon);
+        redirect('purchase/sup/' . $kdsup);
+    }
+    public function add_diskon_barangs_tmp()
+    {
+        $kdsup      = $this->input->post('kdsup');
+        $nmbarang   = $this->input->post('nmbarang');
+        $deskripsi  = $this->input->post('desc_isi');
+        $nominal    = $this->input->post('disc_isi');
+
+        $tambahDiskon = array(
+            'kd_suplier' => $kdsup,
+            'nama_diskon' => $nmbarang . ' ' . '-' . ' ' . $deskripsi,
+            'nominal' => $nominal
+        );
+
+        $this->M_Purchase->add_diskons_po($tambahDiskon);
         redirect('purchase/sup/' . $kdsup);
     }
 }

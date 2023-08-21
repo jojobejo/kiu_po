@@ -428,4 +428,24 @@ class C_PoStatus extends CI_Controller
 
         redirect('detailPO/' . $kdpo);
     }
+
+    public function add_diskon_barangs()
+    {
+        $kdsup      = $this->input->post('kdsup');
+        $kdpo       = $this->input->post('kdpo');
+        $nmbarang   = $this->input->post('nmbarang');
+        $desc       = $this->input->post('desc_isi');
+        $nominal    = $this->input->post('disc_isi');
+
+        $tambahDiskon = array(
+            'kd_po' => $kdpo,
+            'kd_suplier' => $kdsup,
+            'keterangan' => $nmbarang . ' ' . '-' . ' ' . $desc,
+            'nominal' => $nominal
+        );
+
+        $this->M_Postatus->insertDiskon($tambahDiskon);
+
+        redirect('detailPO/' . $kdpo);
+    }
 }

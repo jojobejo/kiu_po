@@ -182,7 +182,7 @@
                         <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                             <td>
                                 <div class="row">
-                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
+                                    <a class="btn btn-success btn-sm mr-1" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
                                         <i class="fas fa-pencil-alt"></i>
                                         Edit
                                     </a>
@@ -190,9 +190,13 @@
                                         <i class="fas fa-trash-alt"></i>
                                         Hapus
                                     </a>
-                                    <a class="btn ml-2 btn-sm bg-lightblue color-palette" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>">
+                                    <a class="btn btn-sm bg-lightblue color-palette mr-1 ml-1" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>">
                                         <i class="fas fa-tags"></i>
-                                        Diskon Barang
+                                        Diskon(%)
+                                    </a>
+                                    <a class="btn btn-sm btn-info color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>">
+                                        <i class="fas fa-tags"></i>
+                                        Diskon Value
                                     </a>
                                 </div>
                             </td>
@@ -424,33 +428,31 @@
             <thead style="background-color: #212529; color:white;">
                 <tr>
                     <td>Note Untuk Suplier</td>
+                    <td>#</td>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <?php foreach ($notebarang as $n) : ?>
+                <?php foreach ($notebarang as $n) : ?>
+                    <tr>
                         <td>
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <?= $n->isi_note ?>
-                                </div>
-                                <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
-                                    <div class="col-md-1">
-                                        <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalnotebaranghapus<?= $n->id_nt_barang ?>">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </div>
-                                <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
-
-                                <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
-                                <?php endif; ?>
-                            </div>
+                            <?= $n->isi_note ?>
                         </td>
-                    <?php endforeach; ?>
-                </tr>
+                        <td>
+                            <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                                <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalnotebaranghapus<?= $n->id_nt_barang ?>">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
+
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
+
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
         <div class="row ml-2 mr-2">

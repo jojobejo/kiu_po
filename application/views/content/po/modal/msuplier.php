@@ -80,7 +80,9 @@
                 <div class="form-group">
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi Note<span class="required">*</span></label>
-                        <div class="col-sm-8"><input class="form-control" type="text" id="isi" name="isi" value="" /></div>
+                        <div class="col-sm-8">
+                            <textarea name="isi" id="isi" cols="30" rows="10" class="form-control"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,7 +234,8 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi Note<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="isi" name="isi" value="<?= $tn->isi_note ?>" /></div>
+                            <div class="col-sm-8"><textarea name="isi" id="isi" cols="30" rows="10" class="form-control"><?= $tn->isi_note ?></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -293,10 +296,54 @@
                         <div class="row">
                             <label class="col-sm-2" for="kd_user">Persentase Diskon<span class="required">*</span></label>
                             <div class="col-sm-9">
-                                <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" />
+                                <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" step=".01" />
                                 <input class="form-control" type="text" id="tot_harga" name="tot_harga" value="<?= $d->total_harga ?>" readonly hidden />
                                 <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kode_suplier ?>" readonly hidden />
                                 <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+<?php endforeach; ?>
+
+<?php foreach ($tmp as $d) : ?>
+    <div class="modal fade" id="diskonbarangs<?= $d->id_tmp ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Tambah Diskon</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('add_diskon_barangs_tmp'); ?>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3" for="kd_user">Deskripsi Diskon<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" id="desc_isi" name="desc_isi" value="" />
+                                <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kode_suplier ?>" readonly hidden />
+                                <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3" for="kd_user">Nominal Diskon<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" />
                             </div>
                         </div>
                     </div>
