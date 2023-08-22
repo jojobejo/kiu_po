@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2023 at 09:53 AM
+-- Generation Time: Aug 22, 2023 at 09:37 AM
 -- Server version: 10.4.16-MariaDB
 -- PHP Version: 7.3.24
 
@@ -3134,7 +3134,7 @@ CREATE TABLE `tb_detail_po` (
   `nama_barang` text NOT NULL,
   `satuan` text NOT NULL,
   `qty` int(11) NOT NULL,
-  `hrg_satuan` int(15) NOT NULL,
+  `hrg_satuan` double NOT NULL,
   `hrg_total` int(15) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -3145,9 +3145,7 @@ CREATE TABLE `tb_detail_po` (
 --
 
 INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
-(1, 'SKPO050723SYNGE010001', 'TEST01', '2023-07-05', 'SYNGE01', 'QACTA01', 'Actara WG 4 X 25 X 10 gr', 'Box', 10, 78500, 785000, '', '2023-07-05 03:26:27'),
-(2, 'SKPO050723BAYER010002', 'POTEST2', '2023-07-05', 'BAYER01', 'QDECI05', 'Decis 2.5 EC 40 X 250 ml', 'Box', 5, 1250000, 6250000, '', '2023-08-02 01:21:23'),
-(3, 'SKPO050723BAYER010002', 'POTEST2', '2023-07-05', 'BAYER01', 'QANTR01', 'Antracol 70 WP 12 X 1 kg', 'Box', 12, 78500, 942000, '', '2023-08-02 01:21:41');
+(1, 'SKPO220823SYNGE010001', 'PO2023/27/05/2023', '2023-08-22', 'SYNGE01', 'QALIK01', 'Alika 247 ZC 100 X 50 ml', 'Pcs', 20, 87500, 1750000, '', '2023-08-22 07:34:37');
 
 -- --------------------------------------------------------
 
@@ -3170,13 +3168,6 @@ CREATE TABLE `tb_detail_po_nk` (
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `tb_detail_po_nk`
---
-
-INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `total_harga`, `create_at`) VALUES
-(2, 'KNK01', 'KEUIT01', '2023-08-02', 'NK0208230002', 'b', 'b', 'b', 2, 50, 100, '2023-08-04 06:31:02');
-
 -- --------------------------------------------------------
 
 --
@@ -3186,6 +3177,7 @@ INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_trans
 CREATE TABLE `tb_diskon` (
   `id_diskon` int(11) NOT NULL,
   `kd_po` varchar(255) NOT NULL,
+  `kd_suplier` varchar(25) NOT NULL,
   `keterangan` varchar(255) NOT NULL,
   `nominal` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -3194,10 +3186,31 @@ CREATE TABLE `tb_diskon` (
 -- Dumping data for table `tb_diskon`
 --
 
-INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `keterangan`, `nominal`) VALUES
-(1, 'SKPO050723SYNGE010001', '2%', 10000),
-(2, 'SKPO050723SYNGE010001', 'Tambah Discount 1%', 0),
-(3, 'SKPO050723BAYER010002', 'Diskon Pelanggan Setia', 150000);
+INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nominal`) VALUES
+(1, 'SKPO220823SYNGE010001', 'SYNGE01', 'Diskon Barang-Alika 247 ZC 100 X 50 ml(2%)', 35000),
+(2, 'SKPO220823SYNGE010001', 'SYNGE01', 'Alika 247 ZC 100 X 50 ml - Diskon per 100ltr', 50000);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_note_barang`
+--
+
+CREATE TABLE `tb_note_barang` (
+  `id_nt_barang` int(25) NOT NULL,
+  `kd_po` varchar(25) NOT NULL,
+  `kd_suplier` varchar(25) NOT NULL,
+  `isi_note` text NOT NULL,
+  `color_box` text NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_note_barang`
+--
+
+INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
+(1, 'SKPO220823SYNGE010001', '', 'Note Untuk pengiriman 2 kali \r\n- pada setiap bulan @10box\r\n- setiap bulan @5 Box', '', '2023-08-22 07:36:20');
 
 -- --------------------------------------------------------
 
@@ -3221,13 +3234,7 @@ CREATE TABLE `tb_note_direktur` (
 --
 
 INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
-(1, 'SKPO050723SYNGE010001', ' Minta No Lot yang sama', 'KEU01', 'Supriyanto', 1, 1, '2023-07-05 03:28:12'),
-(2, 'SKPO050723SYNGE010001', ' tidak jadi nolot sama', 'KEU01', 'Supriyanto', 1, 1, '2023-07-05 03:29:09'),
-(3, 'SKPO050723SYNGE010001', ' Tambahkan discount 1%', 'KIUDIREKTUR01', 'Agoes Santoso', 2, 1, '2023-07-05 03:30:34'),
-(4, 'SKPO050723BAYER010002', ' Test 1', 'KEU01', 'Supriyanto', 1, 1, '2023-08-02 01:21:09'),
-(5, 'SKPO050723BAYER010002', 'penambahan barang\r\n', 'KEU01', 'Supriyanto', 1, 1, '2023-08-02 01:22:21'),
-(6, 'SKPO050723BAYER010002', ' oke', 'KIUDIREKTUR01', 'Agoes Santoso', 2, 1, '2023-08-02 01:22:45'),
-(7, 'KNK01', ' update_note', 'KEUIT01', 'Bram', 1, 1, '2023-08-04 06:15:48');
+(1, 'SKPO220823SYNGE010001', 'Purchase Order Baru', 'KEU01', 'Supriyanto', 1, 1, '2023-08-22 07:34:37');
 
 -- --------------------------------------------------------
 
@@ -3249,7 +3256,6 @@ CREATE TABLE `tb_po` (
   `tmpo_pembayaran` int(5) NOT NULL,
   `gdg_pengiriman` varchar(255) NOT NULL,
   `acc_with` varchar(25) NOT NULL,
-  `jns_po` int(2) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -3257,9 +3263,8 @@ CREATE TABLE `tb_po` (
 -- Dumping data for table `tb_po`
 --
 
-INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `jns_po`, `create_at`) VALUES
-(1, 'SKPO050723SYNGE010001', 'TEST01', '2023-07-05', 'SYNGE01', 1, 785000, 'DONE', 11, 86350, 30, 'Gudang Jember', 'KIUDIREKTUR01', 1, '2023-08-02 02:05:39'),
-(2, 'SKPO050723BAYER010002', 'POTEST2', '2023-07-05', 'BAYER01', 1, 437500, 'DONE', 11, 791120, 30, 'Gdg Jember', 'KIUDIREKTUR01', 1, '2023-08-02 02:05:41');
+INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `create_at`) VALUES
+(1, 'SKPO220823SYNGE010001', 'PO2023/27/05/2023', '2023-08-22', 'SYNGE01', 1, 1750000, 'DONE', 11, 192500, 30, 'Gdg Ajung', 'KIUDIREKTUR01', '2023-08-22 07:36:37');
 
 -- --------------------------------------------------------
 
@@ -3281,13 +3286,6 @@ CREATE TABLE `tb_po_nk` (
   `acc_with` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `tb_po_nk`
---
-
-INSERT INTO `tb_po_nk` (`id_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `hrg_pajak`, `acc_with`, `create_at`) VALUES
-(1, 'KNK01', 'KEUIT01', '2023-08-02', 2, 50, 'ON PROGRESS', 'KEUANGAN', 'Inventaris Baru', 0, '', '2023-08-03 07:44:07');
 
 -- --------------------------------------------------------
 
@@ -3602,6 +3600,20 @@ INSERT INTO `tb_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`, `alamat_su
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tb_tmp_diskon`
+--
+
+CREATE TABLE `tb_tmp_diskon` (
+  `id_tmp_diskon` int(11) NOT NULL,
+  `kd_suplier` varchar(25) NOT NULL,
+  `nama_diskon` text NOT NULL,
+  `nominal` double NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tb_tmp_item`
 --
 
@@ -3633,6 +3645,19 @@ CREATE TABLE `tb_tmp_item_nk` (
   `total_harga` int(25) NOT NULL,
   `kd_barang` varchar(25) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_tmp_note_barang`
+--
+
+CREATE TABLE `tb_tmp_note_barang` (
+  `id_nt_tmp_barang` int(11) NOT NULL,
+  `kd_suplier` varchar(25) NOT NULL,
+  `isi_note` text NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -3671,12 +3696,12 @@ CREATE TABLE `tb_user` (
 
 INSERT INTO `tb_user` (`id_user`, `kode_user`, `nama_user`, `username`, `password`, `aksess_lv`, `departement`) VALUES
 (1, 'KIUADMIN', 'Admin', 'admin', '$2y$10$seJv4qBUldBZQUjvoWUxGuJvtNsO.cLzT.9IGqshkdla6QLxladGW', 1, 'Admin'),
-(4, 'KEU01', 'Supriyanto', 'keuangan1', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 1, 'KEUANGAN'),
+(4, 'KEU01', 'Supriyanto', 'keuangan1', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
 (5, 'KIUDIREKTUR01', 'Agoes Santoso', 'direktur1', '$2y$10$qLeOW1ucirZcgyU.XhtgVOn8k4Wk1RENGS1GKiGEBKFs/stSmNtje', 3, 'DIREKTUR'),
 (6, 'KIUDIREKTUR02', 'Annelia Kartika', 'direktur2', '$2y$10$38U9C0djqLMkLMOTBKIyE.faT3UAFpfkKgMj4jzd2teYu547aHpZK', 3, 'DIREKTUR'),
 (7, 'KIUDIREKTUR03', 'Yuanita Setiawati', 'direktur3', '$2y$10$38U9C0djqLMkLMOTBKIyE.faT3UAFpfkKgMj4jzd2teYu547aHpZK', 3, 'DIREKTUR'),
-(8, 'KEU02', 'Arini', 'keuangan2', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 1, 'KEUANGAN'),
-(9, 'KEU03', 'Nadia', 'keuangan3', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 1, 'KEUANGAN'),
+(8, 'KEU02', 'Arini', 'keuangan2', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
+(9, 'KEU03', 'Nadia', 'keuangan3', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
 (10, 'KEUIT01', 'Bram', 'it', '$2y$10$4gjmacfHrwtoKveNz65eneZON1wWOOTPbILDFqQbIJXW2cfxp6whm', 2, 'KEUANGAN'),
 (11, 'SALES01', 'Admin Sales', 'kiusales', '$2y$10$PaOYuLOb4W0PyHfmChL9t.0mBijADRzvTEJa1JM0sKIwn4VFSHYii', 2, 'SALES'),
 (12, 'KADEPKEU01', 'Diana Wulandari', 'kadepkeu', '$2y$10$9HspAomvB/a7VB5PfU3t1u6F.We5fNTEmcXOM0ieUfeEuZmAVjaLG', 3, 'KEUANGAN');
@@ -3708,6 +3733,12 @@ ALTER TABLE `tb_detail_po_nk`
 --
 ALTER TABLE `tb_diskon`
   ADD PRIMARY KEY (`id_diskon`);
+
+--
+-- Indexes for table `tb_note_barang`
+--
+ALTER TABLE `tb_note_barang`
+  ADD PRIMARY KEY (`id_nt_barang`);
 
 --
 -- Indexes for table `tb_note_direktur`
@@ -3752,6 +3783,12 @@ ALTER TABLE `tb_suplier`
   ADD PRIMARY KEY (`id_suplier`);
 
 --
+-- Indexes for table `tb_tmp_diskon`
+--
+ALTER TABLE `tb_tmp_diskon`
+  ADD PRIMARY KEY (`id_tmp_diskon`);
+
+--
 -- Indexes for table `tb_tmp_item`
 --
 ALTER TABLE `tb_tmp_item`
@@ -3762,6 +3799,12 @@ ALTER TABLE `tb_tmp_item`
 --
 ALTER TABLE `tb_tmp_item_nk`
   ADD PRIMARY KEY (`id_tmp_nk`);
+
+--
+-- Indexes for table `tb_tmp_note_barang`
+--
+ALTER TABLE `tb_tmp_note_barang`
+  ADD PRIMARY KEY (`id_nt_tmp_barang`);
 
 --
 -- Indexes for table `tb_tracking_po`
@@ -3789,37 +3832,43 @@ ALTER TABLE `tb_barang`
 -- AUTO_INCREMENT for table `tb_detail_po`
 --
 ALTER TABLE `tb_detail_po`
-  MODIFY `id_det_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_det_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_detail_po_nk`
 --
 ALTER TABLE `tb_detail_po_nk`
-  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tb_diskon`
 --
 ALTER TABLE `tb_diskon`
-  MODIFY `id_diskon` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_diskon` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tb_note_barang`
+--
+ALTER TABLE `tb_note_barang`
+  MODIFY `id_nt_barang` int(25) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_note_direktur`
 --
 ALTER TABLE `tb_note_direktur`
-  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_po`
 --
 ALTER TABLE `tb_po`
-  MODIFY `id_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_po_nk`
 --
 ALTER TABLE `tb_po_nk`
-  MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tb_satuan`
@@ -3846,16 +3895,28 @@ ALTER TABLE `tb_suplier`
   MODIFY `id_suplier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=233;
 
 --
+-- AUTO_INCREMENT for table `tb_tmp_diskon`
+--
+ALTER TABLE `tb_tmp_diskon`
+  MODIFY `id_tmp_diskon` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tb_tmp_item`
 --
 ALTER TABLE `tb_tmp_item`
-  MODIFY `id_tmp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_tmp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_tmp_item_nk`
 --
 ALTER TABLE `tb_tmp_item_nk`
   MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tb_tmp_note_barang`
+--
+ALTER TABLE `tb_tmp_note_barang`
+  MODIFY `id_nt_tmp_barang` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tb_tracking_po`
