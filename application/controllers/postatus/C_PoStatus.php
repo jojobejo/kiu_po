@@ -149,7 +149,7 @@ class C_PoStatus extends CI_Controller
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
-        if ($stslogin == '2') {
+        if ($stslogin == '1') {
             $addNoteKeuangan = array(
                 'kd_po'     => $kdpo,
                 'isi_note'  => $note,
@@ -374,6 +374,119 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->hapusDiskon($id);
         redirect('detailPO/' . $kdpo);
     }
+
+    public function postatusnk()
+    {
+        $data['title'] = 'PO Status';
+        $kd = $this->session->userdata('departemen');
+        $data['po']    = $this->M_Postatus->getAllNK($kd);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/nonkomersilstatus', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+    public function detailponk($kd)
+    {
+        $data['title'] = 'PO Status';
+        $data['detail'] = $this->M_Postatus->getDetailnk($kd);
+        $data['status'] = $this->M_Postatus->getdataStatusnk($kd);
+        $data['log']    = $this->M_Postatus->getNoted($kd);
+        $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kd);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/detailponk', $data);
+        $this->load->view('partial/footer');
+    }
+    public function edit_faktur_item_nk()
+    {
+        $id         = $this->input->post('idisi');
+        $kd         = $this->input->post('kdponk');
+        $namabarang = $this->input->post('nama_isi');
+        $descbarang  = $this->input->post('desc_isi');
+        $ketbarang  = $this->input->post('ket_isi');
+        $qtybarang  = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
+        $totalharga = $qtybarang * $hrgsatuan;
+
+        $dataBarang = array(
+            'nama_barang'   => $namabarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybarang,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalharga,
+        );
+        $this->M_Postatus->edit_faktur_item_nk($id, $dataBarang);
+
+        redirect('detailponk/' . $kd);
+    }
+    public function hapus_faktur_item_nk()
+    {
+        $id         = $this->input->post('idisi');
+        $kd         = $this->input->post('kdponk');
+        
+        $this->M_Postatus->hapus_faktur_item_nk($id);
+
+        redirect('detailponk/' . $kd);
+    }
+    public function addnotenk()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $note           = $this->input->post('noteDitektur');
+        $stslogin       = $this->session->userdata('lv');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        if ($stslogin == '1') {
+            $addNoteKeuangan = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => $note,
+                'kd_user'   => $departement,
+                'nama_user'   => $namauser,
+                'note_for'  => '1',
+                'update_status' => '1'
+            );
+
+            $noteUpdateKeuangan = array(
+                'status'    => 'NOTE KEUANGAN'
+            );
+            $this->M_Postatus->addNote($addNoteKeuangan);
+            $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
+        } else if ($stslogin == '2') {
+            $addnoteuser = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => $note,
+                'kd_user'   => $departement,
+                'nama_user'   => $namauser,
+                'note_for'  => '1',
+                'update_status' => '1'
+            );
+
+            $noteupdateuser = array(
+                'status'    => 'NOTE PENGAJUAN'
+            );
+            $this->M_Postatus->addNote($addnoteuser);
+            $this->M_Postatus->updateStatus($kdpo, $noteupdateuser);
+        } else if ($stslogin == '3') {
+            $addnoteDirektur = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => $note,
+                'kd_user'   => $departement,
+                'nama_user'   => $namauser,
+                'note_for'  => '2',
+                'update_status' => '1'
+            );
+            $noteUpdateDirektur = array(
+                'status'    => 'NOTE DIREKTUR'
+            );
+            $this->M_Postatus->addNote($addnoteDirektur);
+            $this->M_Postatus->updateStatus($kdpo, $noteUpdateDirektur);
+        }
+        redirect('detailponk/' . $kdpo);
+
     public function note_barang_suplier()
     {
         $kdpo       = $this->input->post('kdpo');

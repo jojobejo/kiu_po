@@ -80,6 +80,17 @@ $route['hapusBarang/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 $route['edit_barang_tmp'] = 'purchaseorder/C_Order/edit_barang_tmp';
+
+//PurchaseOrderNonKomersil
+$route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
+$route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
+$route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
+//PurchaseOrderNonKomersil - STATUS
+$route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
+$route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
+$route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
+$route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
+$route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
 $route['addnotebarangsupliertmp'] = 'purchaseorder/C_Order/addnotebarangsupliertmp';
 $route['edit_note_tmp_barang'] = 'purchaseorder/C_Order/edit_note_tmp_barang';
 $route['hapus_note_tmp_barang'] = 'purchaseorder/C_Order/hapus_note_tmp_barang';

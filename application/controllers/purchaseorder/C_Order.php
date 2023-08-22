@@ -242,6 +242,116 @@ class C_Order extends CI_Controller
             echo json_encode($data);
         }
     }
+
+
+    public function pononkomersil()
+    {
+        $data['title'] = 'Purchase Order Non Komersil';
+        $user = $this->session->userdata('kode');
+        $data['kdbarang'] = $this->M_Purchase->kdnonkomersial();
+        $data['tmp']    = $this->M_Purchase->get_tmp_non_komersil($user);
+        $data['total'] = $this->M_Purchase->sumtransaksink();
+        $data['nopo'] = $this->M_Purchase->getkdnoponk();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/nonkomersil', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/datatables');
+        $this->load->view('content/po/ajaxPO');
+    }
+
+    public function tmp_add_barang_komersil()
+    {
+        $kdbarang   = $this->input->post('kd_isi');
+        $namabarang = $this->input->post('nama_isi');
+        $descbarang  = $this->input->post('desc_isi');
+        $ketbarang  = $this->input->post('ket_isi');
+        $qtybarang  = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
+        $kduser     = $this->session->userdata('kode');
+        $totalharga = $qtybarang * $hrgsatuan;
+
+        $dataBarang = array(
+            'nama_barang'   => $namabarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybarang,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalharga,
+            'kd_barang'     => $kdbarang,
+            'kd_user'       => $kduser
+        );
+        $this->M_Purchase->input_tmp_nk($dataBarang);
+
+        redirect('pononkomersil');
+    }
+    public function rekam_po_nk()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $kdnk       = $this->input->post('nopo');
+        $tgl        = $this->input->post('tgl');
+        $departemen = $this->input->post('departemen');
+        $tjuan      = $this->input->post('tujuan');
+        $jml        = $this->input->post('jml');
+        $hrg        = $this->input->post('harga');
+        $kduser     = $this->session->userdata('kode');
+        $tmp        = $this->M_Purchase->get_tmp_non_komersil($kduser);
+
+        $rekamData = array(
+            'kd_po_nk'      => $kdnk,
+            'kd_user'       => $kduser,
+            'tgl_transaksi' => $tgl,
+            'jml_item'      => $jml,
+            'total_harga'   => $hrg,
+            'status'        => 'ON PROGRESS',
+            'departemen'    => $departemen,
+            'tj_pembelian'  => $tjuan
+        );
+        $this->M_Purchase->input_po_nk($rekamData);
+
+        if ($tmp) {
+            foreach ($tmp as $chart) {
+                $listTransaksi = array(
+                    'kd_po_nk'          => $kdnk,
+                    'kd_user'           => $kduser,
+                    'tgl_transaksi'     => $tgl,
+                    'kd_barang'         => $chart->kd_barang,
+                    'nama_barang'       => $chart->nama_barang,
+                    'deskripsi'         => $chart->deskripsi,
+                    'keterangan'        => $chart->keterangan,
+                    'qty'               => $chart->qty,
+                    'hrg_satuan'        => $chart->hrg_satuan,
+                    'total_harga'         => $chart->total_harga,
+                );
+
+                $this->M_Purchase->input_detail_po_nk($listTransaksi);
+            }
+            $this->M_Purchase->hapus_tmp_nk($kduser);
+            $msg = "success";
+            $data = array('msg' => $msg, 'nopo' => $kdnk);
+            echo json_encode($data);
+        }
+    }
+
+    public function edit_barang_tmp()
+    {
+        $id         = $this->input->post('id_isi');
+        $supp       = $this->input->post('kd_sup_isi');
+        $satuan     = $this->input->post('satuan_isi');
+        $qty        = $this->input->post('qty_isi');
+        $hrg_satuan = $this->input->post('hrg_isi');
+        $total      = $qty * $hrg_satuan;
+
+        $dataedit = array(
+            'satuan'    => $satuan,
+            'qty'       => $qty,
+            'harga_satuan' => $hrg_satuan,
+            'total_harga' => $total
+        );
+        $this->M_Purchase->edit_chart_tmp($id, $dataedit);
+        redirect('purchase/sup/' . $supp);
+
     public function edit_barang_tmp()
     {
         $id         = $this->input->post('id_isi');
@@ -361,5 +471,6 @@ class C_Order extends CI_Controller
 
         $this->M_Purchase->add_diskons_po($tambahDiskon);
         redirect('purchase/sup/' . $kdsup);
+
     }
 }

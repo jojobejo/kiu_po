@@ -207,6 +207,49 @@ class M_PoStatus extends CI_Model
         $this->db->where('id_det_po', $id);
         return $this->db->delete('tb_detail_po');
     }
+
+    public function getAllNK($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->where('departemen', $kd);
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        return $this->db->get()->result();
+    }
+    public function getDetailnk($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('kd_po_nk', $kd);
+        return $this->db->get()->result();
+    }
+    function getdataStatusnk($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function sumTransaksiPenjualannk($kdpo)
+    {
+        $this->db->select("SUM(total_harga) as total_harga");
+        $this->db->select("COUNT(id_det_po_nk) as total_item");
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function edit_faktur_item_nk($id, $kdpo)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->update('tb_detail_po_nk', $kdpo);
+    }
+    function hapus_faktur_item_nk($id)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->delete('tb_detail_po_nk');
+
     public function get_note_barang($kdpo)
     {
         $this->db->select('*');
@@ -222,5 +265,6 @@ class M_PoStatus extends CI_Model
     function hapusnotesuplier($id)
     {
         return $this->db->delete('tb_note_barang', array('id_nt_barang' => $id));
+
     }
 }
