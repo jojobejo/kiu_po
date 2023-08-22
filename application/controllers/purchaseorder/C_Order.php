@@ -351,24 +351,6 @@ class C_Order extends CI_Controller
         );
         $this->M_Purchase->edit_chart_tmp($id, $dataedit);
         redirect('purchase/sup/' . $supp);
-
-    public function edit_barang_tmp()
-    {
-        $id         = $this->input->post('id_isi');
-        $supp       = $this->input->post('kd_sup_isi');
-        $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
-        $hrg_satuan = $this->input->post('hrg_isi');
-        $total      = $qty * $hrg_satuan;
-
-        $dataedit = array(
-            'satuan'    => $satuan,
-            'qty'       => $qty,
-            'harga_satuan' => $hrg_satuan,
-            'total_harga' => $total
-        );
-        $this->M_Purchase->edit_chart_tmp($id, $dataedit);
-        redirect('purchase/sup/' . $supp);
     }
     public function addnotebarangsupliertmp()
     {
@@ -471,6 +453,5 @@ class C_Order extends CI_Controller
 
         $this->M_Purchase->add_diskons_po($tambahDiskon);
         redirect('purchase/sup/' . $kdsup);
-
     }
 }

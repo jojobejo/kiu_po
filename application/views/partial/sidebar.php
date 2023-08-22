@@ -18,7 +18,7 @@
             <a href="#" class="d-block"><?= $this->session->userdata('nama_user') ?></a>
           </div>
         </div>
-        <?php if ($this->session->userdata('lv') <= '1' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
+        <?php if ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
           <li class="nav-item">
             <a href="<?= base_url('purchase') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>

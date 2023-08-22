@@ -228,11 +228,6 @@ class M_Purchase extends CI_Model
     {
         $this->db->where('id_tmp', $kd);
         return $this->db->update('tb_tmp_item', $data);
-
-    function edit_chart_tmp($kd, $data)
-    {
-        $this->db->where('id_tmp', $kd);
-        return $this->db->update('tb_tmp_item', $data);
     }
     function addNote($data)
     {

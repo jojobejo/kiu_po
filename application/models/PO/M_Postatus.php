@@ -249,7 +249,7 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_po_nk');
-
+    }
     public function get_note_barang($kdpo)
     {
         $this->db->select('*');
@@ -265,6 +265,5 @@ class M_PoStatus extends CI_Model
     function hapusnotesuplier($id)
     {
         return $this->db->delete('tb_note_barang', array('id_nt_barang' => $id));
-
     }
 }

@@ -427,7 +427,7 @@ class C_PoStatus extends CI_Controller
     {
         $id         = $this->input->post('idisi');
         $kd         = $this->input->post('kdponk');
-        
+
         $this->M_Postatus->hapus_faktur_item_nk($id);
 
         redirect('detailponk/' . $kd);
@@ -486,7 +486,7 @@ class C_PoStatus extends CI_Controller
             $this->M_Postatus->updateStatus($kdpo, $noteUpdateDirektur);
         }
         redirect('detailponk/' . $kdpo);
-
+    }
     public function note_barang_suplier()
     {
         $kdpo       = $this->input->post('kdpo');
