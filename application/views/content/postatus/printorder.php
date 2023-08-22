@@ -33,7 +33,7 @@
                         <strong>PT.Karisma Indoagro Universal</strong><br>
                         Jl. Semeru No.89, Ajung, Kabupaten Jember<br>
                         Telp 1: (0331) 4833 33 / 4877 88<br>
-                        Email: karisma@kiu.co.id
+                        Email: karismaindoagro@gmail.com
                     </address>
                 </div>
                 <!-- /.col -->
@@ -88,7 +88,7 @@
                     <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
-                                <td colspan="8" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
+                                <td colspan="8" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
@@ -122,46 +122,33 @@
                         </tbody>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%;">
-                        <tbody>
-                            <?php foreach ($totalDiskon as $t) :
-                                if ($t->total_item == '7') {
-                                    $b = '11';
-                                } else if ($t->total_item == '6') {
-                                    $b = '10';
-                                } else if ($t->total_item == '5') {
-                                    $b = '9';
-                                } else if ($t->total_item == '4') {
-                                    $b = '8';
-                                } else if ($t->total_item == '3') {
-                                    $b = '7';
-                                } else if ($t->total_item == '2') {
-                                    $b = '6';
-                                } else if ($t->total_item == '1') {
-                                    $b = '5';
-                                } else {
-                                    $b = '5';
-                                }
-                            ?>
-                            <?php endforeach; ?>
+                        <thead>
                             <tr>
-                                <td rowspan="<?= $b ?>" colspan="2" style="text-align: justify; background-color: yellow; width:50%">
-                                    * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
-                                    NANDANG ERNOKO (Kadep Logistik) <br>
-                                    081 131 361 66 / 081 252 151 314 <br>
-                                    * Kedatangan barang maksimal: Senin s/d Jumat <br>
-                                    maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
-                                    * Maksimal terdiri dari 2 No. Batch* Mohon info terlebih dahulu,<br>
-                                    jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
-                                </td>
+                                <th class="bg-black color-palette" style="text-align: center;">FRANGKO PENGIRIMAN</th>
+                                <th class="bg-black color-palette" style="text-align: center;">TEMPO PEMBAYARAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center;"><?= $s->gdg_pengiriman ?></td>
+                                <td style="text-align: center;"><?= $s->tmpo_pembayaran ?> Hari</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table-bordered text-s listdb" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
                             <?php foreach ($diskon as $d) : ?>
                                 <?php if ($diskon > 0) : ?>
                                     <tr>
-                                        <td colspan="1" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
-                                        <td colspan="4" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal) ?></td>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+
                             <?php foreach ($total as $t) :
                                 foreach ($totalDiskon as $d) :
                                     $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -169,20 +156,90 @@
                                     $hargaPajak = $stlhDiskon * $tax;
                                     $hargaAll = $stlhDiskon + $hargaPajak; ?>
                                     <tr>
-                                        <td colspan="1" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="4" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td colspan="1" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="4" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
+                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="1" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="4" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
+                        </thead>
+                    </table>
+                    <table class="table-bordered text-s listdb" style="width: 100%; border-color: black;">
+                        <tbody>
+                            <?php foreach ($totalDiskon as $t) :
+                                if ($t->total_item == '7') {
+                                    $b = '14';
+                                } else if ($t->total_item == '6') {
+                                    $b = '13';
+                                } else if ($t->total_item == '5') {
+                                    $b = '12';
+                                } else if ($t->total_item == '4') {
+                                    $b = '11';
+                                } else if ($t->total_item == '3') {
+                                    $b = '10';
+                                } else if ($t->total_item == '2') {
+                                    $b = '9';
+                                } else if ($t->total_item == '1') {
+                                    $b = '8';
+                                } else {
+                                    $b = '15';
+                                }
+                                foreach ($totalnote as $tn) {
+                                    if ($tn->total_nt_item == '1') {
+                                        $c = '1';
+                                    } else if ($tn->total_nt_item == '2') {
+                                        $c = '2';
+                                    } else if ($tn->total_nt_item == '3') {
+                                        $c = '3';
+                                    } else if ($tn->total_nt_item == '4') {
+                                        $c = '4';
+                                    } else if ($tn->total_nt_item == '5') {
+                                        $c = '5';
+                                    } else if ($tn->total_nt_item == '6') {
+                                        $c = '6';
+                                    } else if ($tn->total_nt_item == '7') {
+                                        $c = '7';
+                                    } else if ($tn->total_nt_item == '8') {
+                                        $c = '8';
+                                    } else {
+                                        $c = '9';
+                                    }
+
+                                    $d = $b + $c;
+                                }
+
+                            ?>
+                            <?php endforeach; ?>
+                            <tr>
+                                <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
+                                    * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
+                                    NANDANG ERNOKO (Kadep Logistik) <br>
+                                    081 131 361 66 / 081 252 151 314 <br>
+                                    * Kedatangan barang maksimal: <br>
+                                    Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
+                                    * Maksimal terdiri dari 2 No. Batch <br>
+                                    * Mohon info terlebih dahulu,<br>
+                                    jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
+                                </td>
+                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
+                            </tr>
+                            <?php foreach ($notesuplier as $ns) :
+                            ?>
+                                <tr>
+                                    <td colspan="2" class="bg-orange"><?= nl2br($ns->isi_note); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+
                         </tbody>
                     </table>
                 </div>

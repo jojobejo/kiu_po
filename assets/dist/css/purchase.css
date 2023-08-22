@@ -243,14 +243,14 @@ td {
 }
 
 .btnAtas {
-    color: #fff;
+    color: #212529;
     background-color: #4dd0e1   ;
     border-color: #4dd0e1   ;
     box-shadow: none;
   }
 
   .btnAtas:hover {
-    color: #fff;
+    color: #212529;
     background-color: #30828d;
     border-color: #30828d;
   }

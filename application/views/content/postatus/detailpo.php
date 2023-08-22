@@ -144,6 +144,12 @@
                         Tambah Diskon
                     </a>
                 </div>
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalnotebarang<?= $s->kd_po ?>  ">
+                        <i class="fas fa-notes-medical"> </i>
+                        Tambah Note Barang
+                    </a>
+                </div>
             </div>
 
         <?php endif; ?>
@@ -176,13 +182,21 @@
                         <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                             <td>
                                 <div class="row">
-                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
+                                    <a class="btn btn-success btn-sm mr-1" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
                                         <i class="fas fa-pencil-alt"></i>
                                         Edit
                                     </a>
                                     <a class="btn btn-danger btn-sm" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>">
                                         <i class="fas fa-trash-alt"></i>
                                         Hapus
+                                    </a>
+                                    <a class="btn btn-sm bg-lightblue color-palette mr-1 ml-1" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>">
+                                        <i class="fas fa-tags"></i>
+                                        Diskon(%)
+                                    </a>
+                                    <a class="btn btn-sm btn-info color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>">
+                                        <i class="fas fa-tags"></i>
+                                        Diskon Value
                                     </a>
                                 </div>
                             </td>
@@ -197,7 +211,7 @@
                         <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
                     </tr>
                 <?php endforeach; ?>
-
+                <!-- TAMPILAN KEUANGAN TOTAL HARGA STATUS ON PROGRESS -->
                 <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                     <tr>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
@@ -205,6 +219,9 @@
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
                         <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                         <td colspan="2" style="font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
                     </tr>
                     <?php foreach ($diskon as $d) : ?>
                         <?php if ($diskon > 0) : ?>
@@ -222,6 +239,9 @@
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                    </tr>
                     <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
                                         $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -244,6 +264,7 @@
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
+                    <!-- TAMPILAN KEUANGAN TOTAL HARGA STATUS DONE -->
                 <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
                     <tr>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
@@ -251,6 +272,9 @@
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
                         <td colspan="1" style="font-weight: bold;"><?= $s->gdg_pengiriman ?></td>
                         <td colspan="2" style="font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
                     </tr>
                     <?php foreach ($diskon as $d) : ?>
                         <?php if ($diskon > 0) : ?>
@@ -262,6 +286,9 @@
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                    </tr>
                     <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
                                         $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -284,6 +311,7 @@
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
+                    <!-- TAMPILAN DIREKTUR TOTAL HARGA STATUS BELUM DONE -->
                 <?php elseif ($this->session->userdata('lv') == '3' && $s->status != 'DONE') : ?>
                     <tr>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
@@ -292,6 +320,9 @@
                         <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                         <td colspan="1" style="font-weight: bold;"></td>
                     </tr>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+                    </tr>
                     <?php foreach ($diskon as $d) : ?>
                         <?php if ($diskon > 0) : ?>
                             <tr>
@@ -310,6 +341,9 @@
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                    </tr>
                     <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
                                         $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -332,7 +366,7 @@
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
-
+                    <!-- TAMPILAN DIREKTUR TOTAL HARGA STATUS DONE -->
                 <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
                     <tr>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
@@ -340,6 +374,9 @@
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
                         <td colspan="1" style="font-weight: bold;"> Gudang Jember </td>
                         <td colspan="2" style="font-weight: bold;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
                     </tr>
                     <?php foreach ($diskon as $d) : ?>
                         <?php if ($diskon > 0) : ?>
@@ -359,6 +396,9 @@
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                    </tr>
                     <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
                                         $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -382,6 +422,37 @@
                         <?php endforeach; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
+            </tbody>
+        </table>
+        <table class="table table-bordered table-striped ">
+            <thead style="background-color: #212529; color:white;">
+                <tr>
+                    <td>Note Untuk Suplier</td>
+                    <td>#</td>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($notebarang as $n) : ?>
+                    <tr>
+                        <td>
+                            <?= $n->isi_note ?>
+                        </td>
+                        <td>
+                            <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                                <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalnotebaranghapus<?= $n->id_nt_barang ?>">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
+
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
+
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
         <div class="row ml-2 mr-2">

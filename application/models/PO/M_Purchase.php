@@ -146,6 +146,7 @@ class M_Purchase extends CI_Model
             return 'NKPO' . date('dmy') . $kdsuplier . $kd;
         }
     }
+
     // NON KOMERSIL
     function kdnonkomersial()
     {
@@ -227,5 +228,89 @@ class M_Purchase extends CI_Model
     {
         $this->db->where('id_tmp', $kd);
         return $this->db->update('tb_tmp_item', $data);
+
+    function edit_chart_tmp($kd, $data)
+    {
+        $this->db->where('id_tmp', $kd);
+        return $this->db->update('tb_tmp_item', $data);
+    }
+    function addNote($data)
+    {
+        $this->db->insert('tb_note_direktur', $data);
+    }
+    function getTmpDiskonOrder($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_diskon');
+        $this->db->where('kd_suplier', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    public function add_tmp_note_suplier($data)
+    {
+        $this->db->insert('tb_tmp_note_barang', $data);
+    }
+    function edit_tmp_note_suplier($kd, $data)
+    {
+        $this->db->where('id_nt_tmp_barang', $kd);
+        return $this->db->update('tb_tmp_note_barang', $data);
+    }
+    function delete_tmp_note_suplier($id)
+    {
+        return $this->db->delete('tb_tmp_note_barang', array('id_nt_tmp_barang' => $id));
+    }
+    function getTmpNoteOrder($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_note_barang');
+        $this->db->where('kd_suplier', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    public function add_diskon_po($data)
+    {
+        $this->db->insert('tb_tmp_diskon', $data);
+    }
+    public function add_diskons_po($data)
+    {
+        $this->db->insert('tb_tmp_diskon', $data);
+    }
+    public function delete_tmp_diskon($id_tmp)
+    {
+        $this->db->where('kd_suplier', $id_tmp);
+        return $this->db->delete('tb_tmp_diskon');
+    }
+    public function delete_tmp_note_sp_i($id_tmp)
+    {
+        $this->db->where('kd_suplier', $id_tmp);
+        return $this->db->delete('tb_tmp_note_barang');
+    }
+    public function input_note($data)
+    {
+        $this->db->insert('tb_note_barang', $data);
+    }
+    public function edit_note_tmp_barang($id_tmp, $data)
+    {
+        $this->db->where('id_nt_tmp_barang', $id_tmp);
+        return $this->db->update('tb_tmp_note_barang', $data);
+    }
+    public function hapus_note_tmp_barang($id_tmp)
+    {
+        $this->db->where('id_nt_tmp_barang', $id_tmp);
+        return $this->db->delete('tb_tmp_note_barang');
+    }
+    public function input_diskon($data)
+    {
+        $this->db->insert('tb_diskon', $data);
+    }
+    public function edit_diskon_po($id_tmp, $data)
+    {
+        $this->db->where('id_tmp_diskon', $id_tmp);
+        return $this->db->update('tb_tmp_diskon', $data);
+    }
+    public function hapus_tmp_diskon($id_tmp)
+    {
+        $this->db->where('id_tmp_diskon', $id_tmp);
+        return $this->db->delete('tb_tmp_diskon');
     }
 }

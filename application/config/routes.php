@@ -91,6 +91,14 @@ $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
+$route['addnotebarangsupliertmp'] = 'purchaseorder/C_Order/addnotebarangsupliertmp';
+$route['edit_note_tmp_barang'] = 'purchaseorder/C_Order/edit_note_tmp_barang';
+$route['hapus_note_tmp_barang'] = 'purchaseorder/C_Order/hapus_note_tmp_barang';
+$route['add_diskon_po'] = 'purchaseorder/C_Order/add_diskon_po';
+$route['edit_diskon_po'] = 'purchaseorder/C_Order/edit_diskon_po';
+$route['hapus_diskon_po'] = 'purchaseorder/C_Order/hapus_diskon_po';
+$route['add_diskon_barang_tmp'] = 'purchaseorder/C_Order/add_diskon_barang_tmp';
+$route['add_diskon_barangs_tmp'] = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
 
 
 //postatus
@@ -108,6 +116,9 @@ $route['addBarangRevisi/(:any)/(:any)'] = 'postatus/C_PoStatus/listBarangRevisi/
 $route['tambahBarangRevisi'] = 'postatus/C_PoStatus/tambahBarangRevisi';
 $route['revisiPO'] = 'postatus/C_PoStatus/revisiPO';
 $route['hapusBarangPO/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusBarangPO/$1/$2';
+$route['note_barang_suplier']   = 'postatus/C_PoStatus/note_barang_suplier';
+$route['note_barang_suplier_edit']   = 'postatus/C_PoStatus/note_barang_suplier_edit';
+$route['note_barang_suplier_hapus']   = 'postatus/C_PoStatus/note_barang_suplier_hapus';
 
 $route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/addNote';
 $route['tambahTax'] = 'postatus/C_PoStatus/tambahTax';
@@ -116,6 +127,9 @@ $route['frankoPengiriman'] = 'postatus/C_PoStatus/frankoPengiriman';
 $route['addDiskon'] = 'postatus/C_PoStatus/tambahDiskon';
 $route['diskonEdit'] = 'postatus/C_PoStatus/editDiskon';
 $route['hapusDiskon/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
+$route['add_diskon_barang'] = 'postatus/C_PoStatus/add_diskon_barang';
+$route['add_diskon_barangs'] = 'postatus/C_PoStatus/add_diskon_barangs';
+
 
 
 

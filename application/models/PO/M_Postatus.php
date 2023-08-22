@@ -76,6 +76,14 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function totalnote($kdpo)
+    {
+        $this->db->select("SUM(id_nt_barang) as total_note");
+        $this->db->select("count(id_nt_barang) as total_nt_item");
+        $this->db->from('tb_note_barang');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
 
     function getdataStatus($kdpo)
     {
@@ -118,6 +126,10 @@ class M_PoStatus extends CI_Model
     function addNote($data)
     {
         $this->db->insert('tb_note_direktur', $data);
+    }
+    function addnotesuplier($data)
+    {
+        $this->db->insert('tb_note_barang', $data);
     }
     function insertDiskon($data)
     {
@@ -195,6 +207,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('id_det_po', $id);
         return $this->db->delete('tb_detail_po');
     }
+
     public function getAllNK($kd)
     {
         $this->db->select('*');
@@ -236,5 +249,22 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_po_nk');
+
+    public function get_note_barang($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_note_barang');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+    function editnotesuplier($id, $data)
+    {
+        $this->db->where('id_nt_barang', $id);
+        return $this->db->update('tb_note_barang', $data);
+    }
+    function hapusnotesuplier($id)
+    {
+        return $this->db->delete('tb_note_barang', array('id_nt_barang' => $id));
+
     }
 }
