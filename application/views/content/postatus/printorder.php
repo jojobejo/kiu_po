@@ -222,6 +222,7 @@
                             <?php endforeach; ?>
                             <tr>
                                 <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
+                                    * Apabila ada perubahan kemasan, isi, ataupun logo, mohon di informasikan <br>
                                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
                                     NANDANG ERNOKO (Kadep Logistik) <br>
                                     081 131 361 66 / 081 252 151 314 <br>
