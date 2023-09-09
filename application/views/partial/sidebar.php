@@ -92,7 +92,7 @@
             </a>
           </li>
 
-          <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'HRD' ) : ?>
+        <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'HRD') : ?>
           <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
@@ -126,7 +126,7 @@
             </a>
           </li>
           <!-- MENU KADEP -->
-          <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD' ) : ?>
+        <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD') : ?>
           <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
@@ -159,10 +159,10 @@
               </p>
             </a>
           </li>
-
+          <!-- MENU DIREKTUR -->
         <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'DIREKTUR') : ?>
           <li class="nav-item">
-            <a href="<?= base_url('postatus') ?>" class="nav-link">
+            <a href="<?= base_url('postatus/today') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>
               <p>
                 Purchase Order Status

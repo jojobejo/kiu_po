@@ -15,7 +15,18 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
+    }
+    public function getpotoday()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po a
+        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
+        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW())
+        ORDER BY a.id_po DESC
+            ");
     }
 
     public function getOnProgress()
@@ -26,22 +37,56 @@ class M_PoStatus extends CI_Model
         $this->db->where('a.status', 'ON PROGRESS');
         $this->db->or_where('a.status', 'NOTE KEUANGAN');
         $this->db->or_where('a.status', 'NOTE DIREKTUR');
+        $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
     }
-    public function getDone()
+    public function getDoneToday()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po a
+        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
+        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW()) AND a.status = 'DONE'
+        ORDER BY a.id_po DESC
+            ");
+    }
+    public function getOnProgressToday()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po a
+        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
+        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW()) AND a.status = 'ON PROGRESS'
+        ORDER BY a.id_po DESC
+            ");
+    }
+    public function getRejectToday()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po a
+        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
+        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW()) AND a.status = 'REJECT'
+        ORDER BY a.id_po DESC
+            ");
+    }
+    public function getdone()
     {
         $this->db->select('*');
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->where('a.status', 'DONE');
+        $this->db->order_by('a.id_po','DESC');
         return $this->db->get()->result();
     }
+
     public function getReject()
     {
         $this->db->select('*');
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->where('a.status', 'REJECT');
+        $this->db->order_by('a.id_po','DESC');
         return $this->db->get()->result();
     }
 
@@ -265,5 +310,19 @@ class M_PoStatus extends CI_Model
     function hapusnotesuplier($id)
     {
         return $this->db->delete('tb_note_barang', array('id_nt_barang' => $id));
+    }
+    function srcdatepo($dt1, $dt2)
+    {
+        $this->db->select("*");
+        $this->db->where("a.tgl_transaksi >='$dt1'");
+        $this->db->where("a.tgl_transaksi <='$dt2'");
+        $this->db->from('tb_po a');
+        $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function pengeluaranHarian()
+    {
     }
 }

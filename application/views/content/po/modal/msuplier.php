@@ -359,3 +359,77 @@
         <!-- /.modal-dialog -->
     </div>
 <?php endforeach; ?>
+<?php foreach ($taxpo as $tp) : ?>
+    <div class="modal fade" id="taxsett<?= $tp->kd_suplier ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Setting Tax</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('update_tax_tmp'); ?>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3" for="kd_user">Tax (%)<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" id="kd_suplier_isi" name="kd_suplier_isi" value="<?= $kdsuplier ?>" hidden>
+                                <select name="tax_isi_status" id="tax_isi_status" class="form-control">
+                                    <option value="<?= $tp->tax ?>"><?= $tp->tax ?> %</option>
+                                    <?php foreach ($taxx as $t) : ?>
+                                        <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?>%</option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+<?php endforeach; ?>
+
+<div class="modal fade" id="taxsetts">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Setting Tax</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <?php echo form_open_multipart('add_tax_tmp'); ?>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3" for="kd_user">Tax (%)<span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" id="kd_suplier_isi" name="kd_suplier_isi" value="<?= $kdsuplier ?>" hidden>
+                            <select name="tax_isi_status" id="tax_isi_status" class="form-control">
+                                <?php foreach ($taxx as $t) : ?>
+                                    <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?> %</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

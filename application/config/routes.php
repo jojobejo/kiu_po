@@ -66,6 +66,7 @@ $route['dashboard'] = 'dashboard';
 
 //suplier 
 $route['suplier'] = 'Suplier/C_Suplier';
+$route['add_suplier'] = 'purchaseorder/C_Order/addSuplier';
 
 //PurchaseOrder
 $route['purchase'] = 'purchaseorder/C_Order';
@@ -80,6 +81,8 @@ $route['hapusBarang/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)'] = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po'] = 'purchaseorder/C_Order/rekam_po';
 $route['edit_barang_tmp'] = 'purchaseorder/C_Order/edit_barang_tmp';
+$route['add_tax_tmp'] = 'purchaseorder/C_Order/add_tax_tmp';
+$route['update_tax_tmp'] = 'purchaseorder/C_Order/update_tax_tmp';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
@@ -102,15 +105,24 @@ $route['add_diskon_barangs_tmp'] = 'purchaseorder/C_Order/add_diskon_barangs_tmp
 
 
 //postatus
-$route['postatus'] = 'postatus/C_PoStatus';
+$route['postatus'] = 'postatus/C_PoStatus/postatus';
+$route['postatus/today'] = 'postatus/C_PoStatus';
+$route['postatusall'] = 'postatus/C_PoStatus/postatus';
+$route['postatus/postatusall/done'] = 'postatus/C_PoStatus/getDone';
+$route['postatus/postatusall/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
+$route['postatus/postatusall/reject'] = 'postatus/C_PoStatus/getReject';
+$route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgres';
+$route['postatus/done'] = 'postatus/C_PoStatus/getDone';
+$route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
+$route['postatus/today/done'] = 'postatus/C_PoStatus/getDoneToday';
+$route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
+$route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
+
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
 $route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrderBaru/(:any)'] = 'postatus/C_PoStatus/printOrderBaru/$1';
 $route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
 $route['tolakOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1/$2';
-$route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
-$route['postatus/done'] = 'postatus/C_PoStatus/getDone';
-$route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
 $route['NoteDirektur'] = 'postatus/C_PoStatus/addNote';
 $route['addBarangRevisi/(:any)/(:any)'] = 'postatus/C_PoStatus/listBarangRevisi/$1/$2';
 $route['tambahBarangRevisi'] = 'postatus/C_PoStatus/tambahBarangRevisi';
@@ -119,6 +131,7 @@ $route['hapusBarangPO/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusBarangPO/$1/$2
 $route['note_barang_suplier']   = 'postatus/C_PoStatus/note_barang_suplier';
 $route['note_barang_suplier_edit']   = 'postatus/C_PoStatus/note_barang_suplier_edit';
 $route['note_barang_suplier_hapus']   = 'postatus/C_PoStatus/note_barang_suplier_hapus';
+$route['searchPOdate']  = 'postatus/C_PoStatus/searchdatepo';
 
 $route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/addNote';
 $route['tambahTax'] = 'postatus/C_PoStatus/tambahTax';

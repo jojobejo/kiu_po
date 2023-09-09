@@ -42,7 +42,10 @@ class C_Order extends CI_Controller
         $data['tmpnote'] = $this->M_Purchase->getTmpNoteOrder($kdsuplier);
         $data['total']  = $this->M_Purchase->sumTransaksiPenjualan($kdsuplier);
         $data['kdpo']   = $this->M_Purchase->kdpo($kduser, $kdsuplier);
-        $data['satuan']         = $this->M_Purchase->getSatuan();
+        $data['satuan'] = $this->M_Purchase->getSatuan();
+        $data['tax']    = $this->M_Purchase->gettmptax($kdsuplier)->result();
+        $data['taxx']    = $this->M_Purchase->getTax();
+        $data['taxpo'] = $this->M_Purchase->gettaxposup($kdsuplier)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -50,6 +53,30 @@ class C_Order extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
         $this->load->view('content/po/ajaxPO');
+    }
+    public function add_tax_tmp()
+    {
+        $kdsup  = $this->input->post('kd_suplier_isi');
+        $tax    = $this->input->post('tax_isi_status');
+
+        $tmptax = array(
+            'kd_suplier'    => $kdsup,
+            'tax'           => $tax
+        );
+        $this->M_Purchase->add_tax_tmp($tmptax);
+        redirect('purchase/sup/' . $kdsup);
+    }
+    public function update_tax_tmp()
+    {
+        $kdsup  = $this->input->post('kd_suplier_isi');
+        $tax    = $this->input->post('tax_isi_status');
+
+        $tmptax = array(
+            'kd_suplier'    => $kdsup,
+            'tax'           => $tax
+        );
+        $this->M_Purchase->update_tax_tmp($kdsup, $tmptax);
+        redirect('purchase/sup/' . $kdsup);
     }
     public function listBarang($kdsuplier)
     {
@@ -66,6 +93,28 @@ class C_Order extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
         $this->load->view('content/po/ajaxPO');
+    }
+
+    public function addSuplier()
+    {
+        $kdsup       = $this->input->post('kd_isi');
+        $namasup     = $this->input->post('nm_isi');
+        $alamatsup   = $this->input->post('almt_isi');
+        $nosup       = $this->input->post('tlp_isi');
+        $faxsup      = $this->input->post('fax_isi');
+        $emailsup    = $this->input->post('em_isi');
+
+        $dataSup = array(
+            'kd_suplier'    => $kdsup,
+            'nama_suplier'  => $namasup,
+            'alamat_suplier' => $alamatsup,
+            'no_telpon'     => $nosup,
+            'no_fax'        => $faxsup,
+            'email'         => $emailsup
+        );
+
+        $this->M_Purchase->addSuplier($dataSup);
+        redirect('purchase');
     }
 
     public function editSuplier()
@@ -171,6 +220,7 @@ class C_Order extends CI_Controller
         $kdpo       = $this->input->post('kdpo');
         $jml        = $this->input->post('jml');
         $harga      = $this->input->post('harga');
+        $tax        = $this->input->post('tax');
         $nmuser     = $this->session->userdata('nama_user');
         $user       = $this->session->userdata('kode');
         $tmp        = $this->M_Purchase->get_tmp($suplier);
@@ -187,6 +237,7 @@ class C_Order extends CI_Controller
             'total_harga'   => $harga,
             'tmpo_pembayaran' => $tmpo,
             'gdg_pengiriman'  => $gdg,
+            'tax'           => $tax,
             'status'        => 'ON PROGRESS'
         );
         $this->M_Purchase->inputOrder($rekamData);
@@ -236,6 +287,7 @@ class C_Order extends CI_Controller
             }
             $this->M_Purchase->delete_tmp_diskon($suplier);
             $this->M_Purchase->delete_tmp_note_sp_i($suplier);
+            $this->M_Purchase->delete_tmp_tax($suplier);
             $this->M_Purchase->hapusTmp($suplier);
             $msg = "success";
             $data = array('msg' => $msg, 'nopo' => $nopo);

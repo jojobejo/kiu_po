@@ -19,13 +19,42 @@ class C_PoStatus extends CI_Controller
 
     public function index()
     {
+        $data['title'] = 'PO Status';
+        $data['po']    = $this->M_Postatus->getpotoday()->result();
 
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/bodytoday', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
+    public function postatus()
+    {
         $data['title'] = 'PO Status';
         $data['po']    = $this->M_Postatus->getAll();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/body', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
+    public function searchdatepo()
+    {
+
+        $date1  = $this->input->post('dt1');
+        $date2  = $this->input->post('dt2');
+
+        $data['title'] = 'PO Status';
+        $data['response1'] = $date1;
+        $data['response2'] = $date2;
+        $data['po']    = $this->M_Postatus->srcdatepo($date1, $date2);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/bodysearchdate', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/datatables');
     }
@@ -53,6 +82,40 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/datatables');
     }
+    public function getDoneToday()
+    {
+        $data['title'] = 'PO Status Done Today';
+        $data['po']    = $this->M_Postatus->getDoneToday()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/bodytodaydone', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+    public function getOnProgresToday()
+    {
+        $data['title'] = 'PO Status Done Today';
+        $data['po']    = $this->M_Postatus->getOnProgressToday()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/bodytodayonprogress', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+    public function getRejectToday()
+    {
+        $data['title'] = 'PO Status Done Today';
+        $data['po']    = $this->M_Postatus->getRejectToday()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/bodytodayreject', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
     public function getReject()
     {
 
@@ -560,5 +623,24 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->insertDiskon($tambahDiskon);
 
         redirect('detailPO/' . $kdpo);
+    }
+    
+    public function get_server_all_po()
+    {
+        $list = $this->M_Postatus->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $l) {
+            $row = array();
+            $row[]  = $l->id_po;
+            $data[] = $row;
+        }
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordTotal" => $this->M_Postatus->count_all(),
+            "recordsFiltered" => $this->M_Postatus->count_filtered(),
+            "data" => $data,
+        );
+        echo json_encode($output);
     }
 }

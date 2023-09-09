@@ -24,4 +24,5 @@ class C_Suplier extends CI_Controller
         $this->load->view('content/suplier/body', $data);
         $this->load->view('partial/footer');
     }
+    
 }

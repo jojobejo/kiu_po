@@ -18,6 +18,14 @@ class M_Purchase extends CI_Model
     {
         return $this->db->get('tb_set_tax')->result();
     }
+    public function gettmptax($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_tax a');
+        $this->db->where('kd_suplier', $kd);
+        $query = $this->db->get();
+        return $query;
+    }
     public function getSatuan()
     {
         return $this->db->get('tb_satuan')->result();
@@ -30,6 +38,16 @@ class M_Purchase extends CI_Model
         $query = $this->db->get();
         return $query;
     }
+    public function gettaxposup($kd)
+    {
+        $this->db->select('COUNT(a.id_tmp_tax) as tot');
+        $this->db->select('a.tax');
+        $this->db->select('a.kd_suplier');
+        $this->db->from('tb_tmp_tax a');
+        $this->db->where('kd_suplier', $kd);
+        $query = $this->db->get();
+        return $query;
+    }
     public function Suplier($kd)
     {
         $this->db->select('*');
@@ -37,6 +55,10 @@ class M_Purchase extends CI_Model
         $this->db->where('kd_suplier', $kd);
         $query = $this->db->get();
         return $query;
+    }
+    public function addSuplier($data)
+    {
+        $this->db->insert('tb_suplier', $data);
     }
     function editSuplier($kd, $data)
     {
@@ -46,6 +68,15 @@ class M_Purchase extends CI_Model
     public function addChart($data)
     {
         $this->db->insert('tb_tmp_item', $data);
+    }
+    public function update_tax_tmp($kd, $data)
+    {
+        $this->db->where('kd_suplier', $kd);
+        return $this->db->update('tb_tmp_tax', $data);
+    }
+    public function add_tax_tmp($data)
+    {
+        $this->db->insert('tb_tmp_tax', $data);
     }
     public function getTmpOrder($kd)
     {
@@ -274,6 +305,11 @@ class M_Purchase extends CI_Model
     {
         $this->db->where('kd_suplier', $id_tmp);
         return $this->db->delete('tb_tmp_diskon');
+    }
+    public function delete_tmp_tax($id_tmp)
+    {
+        $this->db->where('kd_suplier', $id_tmp);
+        return $this->db->delete('tb_tmp_tax');
     }
     public function delete_tmp_note_sp_i($id_tmp)
     {

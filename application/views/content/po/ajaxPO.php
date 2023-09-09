@@ -18,6 +18,7 @@
         var kdpo = $("#kd_po_isi").val();
         var suplier = $("#kdsuplier").val();
         var harga = $("#jmlharga").val();
+        var tax = $("#taxisi").val();
 
         if (jml == 0) {
             alert('tidak ada transaksi');
@@ -38,7 +39,8 @@
                         jml: jml,
                         kdpo: kdpo,
                         suplier: suplier,
-                        harga: harga
+                        harga: harga,
+                        tax: tax
                     },
                     dataType: "JSON",
                     cache: false,

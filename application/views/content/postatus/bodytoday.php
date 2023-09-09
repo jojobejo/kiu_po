@@ -3,15 +3,15 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">ALL - PO STATUS</h1>
+                    <h1 class="m-0">All-PO STATUS TODAY</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
             <div class="row mb-2 mt-2">
                 <a href="<?= base_url('postatusall') ?>" class="btn btn-primary ml-2">All</a>
                 <a href="<?= base_url('postatus/today') ?>" class="btn btn-info ml-3">Today</a>
-                <a href="<?= base_url('postatus/postatusall/onprogress') ?>" class="btn btn-warning ml-3">PROGRESS</a>
-                <a href="<?= base_url('postatus/postatusall/done') ?>" class="btn btn-success ml-3">DONE</a>
-                <a href="<?= base_url('postatus/postatusall/reject') ?>" class="btn btn-danger ml-3">REJET</a>
+                <a href="<?= base_url('postatus/today/onprogress') ?>" class="btn btn-warning ml-3">PROGRESS</a>
+                <a href="<?= base_url('postatus/today/done') ?>" class="btn btn-success ml-3">DONE</a>
+                <a href="<?= base_url('postatus/today/reject') ?>" class="btn btn-danger ml-3">REJET</a>
                 <form action="<?= base_url('searchPOdate') ?>" method="POST">
                     <div class="row ml-2">
                         <div class="col">
