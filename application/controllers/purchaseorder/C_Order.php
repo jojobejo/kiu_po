@@ -360,6 +360,9 @@ class C_Order extends CI_Controller
             'departemen'    => $departemen,
             'tj_pembelian'  => $tjuan
         );
+        $addnote = array(
+            ''
+        );
         $this->M_Purchase->input_po_nk($rekamData);
 
         if ($tmp) {
