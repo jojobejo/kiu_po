@@ -148,6 +148,34 @@ class C_PoStatus extends CI_Controller
         $this->load->view('content/postatus/detailpo', $data);
         $this->load->view('partial/footer');
     }
+    public function unpostpo($kdpo)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $addNoteKeuangan = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'UNPOST - PO',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteUpdateKeuangan = array(
+            'status'    => 'ON PROGRESS'
+        );
+        $this->M_Postatus->addNote($addNoteKeuangan);
+        $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
+
+        redirect('detailPO/' . $kdpo);
+    }
+    public function hapuspo($kdpo)
+    {
+        $this->M_Postatus->deletepo($kdpo);
+        $this->M_Postatus->deletepodet($kdpo);
+        redirect('postatus');
+    }
 
     public function printOrder($kdpo)
     {
@@ -182,25 +210,50 @@ class C_PoStatus extends CI_Controller
 
     public function konfirmasiOrder($kdpo, $kddirektur)
     {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
         $dataKonfirm = array(
             'kd_po' => $kdpo,
             'acc_with' => $kddirektur,
             'status' => 'DONE'
         );
 
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO ACCEPT',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
         $this->M_Postatus->konfirmPo($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
         redirect('postatus');
     }
 
     public function tolakOrder($kdpo, $kddirektur)
     {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
         $dataKonfirm = array(
             'kd_po' => $kdpo,
             'acc_with' => $kddirektur,
             'status' => 'REJECT'
         );
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO REJECT',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
 
         $this->M_Postatus->tolakPo($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
         redirect('postatus');
     }
 
@@ -624,7 +677,7 @@ class C_PoStatus extends CI_Controller
 
         redirect('detailPO/' . $kdpo);
     }
-    
+
     public function get_server_all_po()
     {
         $list = $this->M_Postatus->get_datatables();

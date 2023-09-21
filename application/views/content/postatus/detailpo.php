@@ -40,7 +40,11 @@
                                         <div>
                                             <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
                                         </div>
-                                    <?php elseif ($s->status == 'ON PROGRESS' || 'NOTE KEUANGAN') : ?>
+                                    <?php elseif ($s->status == 'ON PROGRESS') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
+                                        </div>
+                                    <?php elseif ($s->status == 'NOTE KEUANGAN') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
                                         </div>
@@ -65,13 +69,14 @@
                                             </a>
                                         </div>
                                         <div class="col">
-                                            <label for="tgTrans" class=""> &nbsp;&nbsp; </label>
+                                            <label for="tgTrans" class="">Status Order : </label>
                                             <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
-                                                <i class="fas fa-times"></i> &nbsp;
+                                                <i class="fas fa-times"></i>
                                                 Reject
                                             </a>
                                         </div>
                                     </div>
+
                                 </div>
                                 <div class="col">
                                     <label for="tgTrans" class="">Note Direktur : &nbsp;&nbsp; </label>
@@ -79,8 +84,43 @@
                                         <a href="#" class="btn btn-warning btn-block" data-toggle="modal" data-target="#modalAddNote"><i class="fas fa-exclamation"> </i> &nbsp; Add Note</a>
                                     </div>
                                 </div>
+
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class="">Status Order :</label>
+                                    <a class="btn btn-success btn-block"><i class="fas fa-thumbs-up"></i> PO - DONE</a>
+                                </div>
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'REJECT') : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class=""> Status Order :</label>
+                                    <a class="btn btn-block btn-danger btn-md"><i class="fas fa-times"></i> PO - REJECT</a>
+                                </div>
+
                             <?php endif; ?>
-                            <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                            <?php if ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
+                                            <a class="btn btn-block btn-primary btn-md" href="<?= base_url('unpostpo/') . $s->kd_po ?>">
+                                                <i class="fas fa-sync"></i> &nbsp;
+                                                UNPOST
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class=""> &nbsp;&nbsp; </label>
+                                            <a class="btn btn-block btn-warning btn-md" href="<?= base_url('hapuspo/') . $s->kd_po ?>">
+                                                <i class="fas fa-trash"></i> &nbsp;
+                                                HAPUS PO
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                 <div class="col">
                                     <div class="row">
                                         <div class="col">
@@ -93,17 +133,7 @@
                                     </div>
                                 </div>
                             <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col">
-                                            <label for="tgTrans" class="">Pilih Setting Note : &nbsp;&nbsp; </label>
-                                            <a class="btn btn-block btn-primary btn-md" data-toggle="modal" data-target="#modalAddNote">
-                                                <i class="fas fa-clipboard-check"></i> &nbsp;
-                                                Setting Note
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+
                             <?php endif; ?>
 
                     </div>
@@ -112,7 +142,11 @@
             </div>
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>
-        <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">
@@ -151,7 +185,6 @@
                     </a>
                 </div>
             </div>
-
         <?php endif; ?>
 
         <table class="table table-bordered table-striped ">
@@ -163,7 +196,9 @@
                     <td>Qty</td>
                     <td>Harga</td>
                     <td>Total Harga</td>
-                    <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                    <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                         <td>#</td>
                     <?php endif; ?>
                 </tr>
@@ -179,7 +214,9 @@
                         <td style="display: none;"></td>
                         <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
                         <td>Rp. <?= number_format($d->hrg_total) ?></td>
-                        <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                             <td>
                                 <div class="row">
                                     <a class="btn btn-success btn-sm mr-1" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
@@ -200,7 +237,6 @@
                                     </a>
                                 </div>
                             </td>
-                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
 
                         <?php endif; ?>
                     </tr>
@@ -229,12 +265,16 @@
                                 <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
                                 <td colspan="2" style="font-weight: bold;">
                                     Rp. <?= number_format($d->nominal) ?>
-                                    <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
+                                    <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                                        <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -428,7 +468,11 @@
             <thead style="background-color: #212529; color:white;">
                 <tr>
                     <td>Note Untuk Suplier</td>
-                    <td>#</td>
+                    <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                    <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                        <td>#</td>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -437,20 +481,22 @@
                         <td>
                             <?= $n->isi_note ?>
                         </td>
-                        <td>
-                            <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                        <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                            <td>
                                 <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
                                 <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalnotebaranghapus<?= $n->id_nt_barang ?>">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
-                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
+                            </td>
+                        <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
 
-                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
+                        <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
 
-                            <?php endif; ?>
-                        </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -132,6 +132,8 @@ $route['note_barang_suplier']   = 'postatus/C_PoStatus/note_barang_suplier';
 $route['note_barang_suplier_edit']   = 'postatus/C_PoStatus/note_barang_suplier_edit';
 $route['note_barang_suplier_hapus']   = 'postatus/C_PoStatus/note_barang_suplier_hapus';
 $route['searchPOdate']  = 'postatus/C_PoStatus/searchdatepo';
+$route['unpostpo/(:any)']  = 'postatus/C_PoStatus/unpostpo/$1';
+$route['hapuspo/(:any)']  = 'postatus/C_PoStatus/hapuspo/$1';
 
 $route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/addNote';
 $route['tambahTax'] = 'postatus/C_PoStatus/tambahTax';

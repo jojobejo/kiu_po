@@ -76,7 +76,7 @@ class M_PoStatus extends CI_Model
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->where('a.status', 'DONE');
-        $this->db->order_by('a.id_po','DESC');
+        $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
     }
 
@@ -86,7 +86,7 @@ class M_PoStatus extends CI_Model
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->where('a.status', 'REJECT');
-        $this->db->order_by('a.id_po','DESC');
+        $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
     }
 
@@ -251,6 +251,16 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('id_det_po', $id);
         return $this->db->delete('tb_detail_po');
+    }
+    function deletepodet($kdpo)
+    {
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->delete('tb_detail_po');
+    }
+    function deletepo($kdpo)
+    {
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->delete('tb_po');
     }
 
     public function getAllNK($kd)
