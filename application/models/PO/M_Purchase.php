@@ -175,6 +175,19 @@ class M_Purchase extends CI_Model
             }
             date_default_timezone_set('Asia/Jakarta');
             return 'NKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU04') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'MKPO' . date('dmy') . $kdsuplier . $kd;
         }
     }
 
