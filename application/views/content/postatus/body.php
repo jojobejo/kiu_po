@@ -113,6 +113,19 @@
                                             Reject
                                         </a>
                                     </div>
+                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status != 'DONE') : ?>
+                                    <div class="col">
+                                        <a class="btn btn-block btn-info btn-sm" href="<?= base_url('unpostpo/') . $p->kd_po ?>">
+                                            <i class="fas fa-sync"></i> &nbsp;
+                                            UNPOST
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('hapuspo/') . $p->kd_po ?>">
+                                            <i class="fas fa-trash"></i> &nbsp;
+                                            HAPUS PO
+                                        </a>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </td>
