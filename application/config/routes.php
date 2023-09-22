@@ -73,6 +73,7 @@ $route['purchase'] = 'purchaseorder/C_Order';
 $route['purchase/sup/(:any)']  = 'purchaseorder/C_Order/purchaseSuplier/$1';
 $route['purchase/listBarang/(:any)'] = 'purchaseorder/C_Order/listBarang/$1';
 $route['addBarangSuplier'] = 'purchaseorder/C_Order/addBarang';
+$route['editbarangsuplier'] = 'purchaseorder/C_Order/editBarangSuplier';
 $route['editSuplier'] = 'purchaseorder/C_Order/editSuplier';
 $route['editBarang'] = 'purchaseorder/C_Order/editBarang';
 $route['tambahChart'] = 'purchaseorder/C_Order/addChart';

@@ -174,6 +174,24 @@ class C_Order extends CI_Controller
         $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
         redirect('purchase/listBarang/' . $kdsuplier);
     }
+
+    public function editBarangSuplier()
+    {
+        $idbarang   = $this->input->post('id_isi');
+        $kdbarang   = $this->input->post('kd_isi');
+        $namabarang = $this->input->post('nama_isi');
+        $kdsuplier  = $this->input->post('kd_sup_isi');
+
+        $dataBarang = array(
+            'id_barang'     => $idbarang,
+            'kode_barang'   => $kdbarang,
+            'kd_suplier'    => $kdsuplier,
+            'nama_barang'   => $namabarang
+        );
+
+        $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
+        redirect('purchase/listBarang/' . $kdsuplier);
+    }
     public function hapusBarang($id, $kdsuplier)
     {
         $this->M_MasterBarang->hapusBarang($id);
