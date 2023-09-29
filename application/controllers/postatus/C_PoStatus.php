@@ -170,6 +170,28 @@ class C_PoStatus extends CI_Controller
 
         redirect('detailPO/' . $kdpo);
     }
+    public function repostpo($kdpo)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $addNoteKeuangan = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'REPOST - PO',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteUpdateKeuangan = array(
+            'status'    => 'ON PROGRESS'
+        );
+        $this->M_Postatus->addNote($addNoteKeuangan);
+        $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
+
+        redirect('detailPO/' . $kdpo);
+    }
     public function hapuspo($kdpo)
     {
         $this->M_Postatus->deletepo($kdpo);

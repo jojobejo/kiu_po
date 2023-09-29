@@ -126,8 +126,14 @@
                                             HAPUS PO
                                         </a>
                                     </div>
+                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status == 'DONE') : ?>
+                                    <div class="col">
+                                        <a class="btn btn-block btn-info btn-sm" href="<?= base_url('repostpo/') . $p->kd_po ?>">
+                                            <i class="fas fa-sync"></i> &nbsp;
+                                            RE-POST
+                                        </a>
+                                    </div>
                                 <?php endif; ?>
-                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
