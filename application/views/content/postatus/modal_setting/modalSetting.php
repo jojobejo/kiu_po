@@ -102,7 +102,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Nominal<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="" step="0.0001" /></div>
+                                <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="" step="0.000000000001" /></div>
                             </div>
                         </div>
                     </div>
@@ -207,7 +207,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Nominal<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="<?= $d->nominal ?>" step="0.0001" /></div>
+                                <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="<?= $d->nominal ?>" step="0.000000000001" /></div>
                             </div>
                         </div>
                     </div>
@@ -402,7 +402,7 @@
                             <div class="row">
                                 <label class="col-sm-3" for="kd_user">Nominal<span class="required">*</span></label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" step="0.0001" />
+                                    <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" step="0.000000000001" />
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kd_suplier ?>" readonly hidden />
                                     <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
