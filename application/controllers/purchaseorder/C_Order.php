@@ -233,7 +233,7 @@ class C_Order extends CI_Controller
         $suplier    = $this->input->post('suplier');
         $nopo       = $this->input->post('nopo');
         $tgl        = $this->input->post('tgl');
-        $tmpo        = $this->input->post('tmpo');
+        $tmpo       = $this->input->post('tmpo');
         $gdg        = $this->input->post('gdg');
         $kdpo       = $this->input->post('kdpo');
         $jml        = $this->input->post('jml');

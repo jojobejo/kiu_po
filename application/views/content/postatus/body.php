@@ -85,6 +85,11 @@
                                             <i class="fas fa-times"></i>&nbsp;
                                             <?= $p->status ?>
                                         </a>
+                                    <?php elseif ($p->status == 'PO REVISI') : ?>
+                                        <a class="btn btn-block btn-warning btn-sm">
+                                            <i class="fas fa-undo"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -113,7 +118,7 @@
                                             Reject
                                         </a>
                                     </div>
-                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status != 'DONE') : ?>
+                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status == 'REJECT') : ?>
                                     <div class="col">
                                         <a class="btn btn-block btn-info btn-sm" href="<?= base_url('unpostpo/') . $p->kd_po ?>">
                                             <i class="fas fa-sync"></i> &nbsp;
@@ -123,14 +128,14 @@
                                     <div class="col">
                                         <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('hapuspo/') . $p->kd_po ?>">
                                             <i class="fas fa-trash"></i> &nbsp;
-                                            HAPUS PO
+                                            DELETE
                                         </a>
                                     </div>
-                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status == 'DONE') : ?>
+                                <?php elseif ($this->session->userdata('lv') == '2' && $p->status != 'DONE') : ?>
                                     <div class="col">
-                                        <a class="btn btn-block btn-info btn-sm" href="<?= base_url('repostpo/') . $p->kd_po ?>">
-                                            <i class="fas fa-sync"></i> &nbsp;
-                                            RE-POST
+                                        <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('hapuspo/') . $p->kd_po ?>">
+                                            <i class="fas fa-trash"></i> &nbsp;
+                                            DELETE
                                         </a>
                                     </div>
                                 <?php endif; ?>

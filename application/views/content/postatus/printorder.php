@@ -108,15 +108,15 @@
                                     <td><?= $d->nama_barang ?></td>
                                     <td style="text-align: center;"><?= $d->satuan ?></td>
                                     <td style="text-align: center;"><?= $d->qty ?></td>
-                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan) ?></td>
-                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total) ?></td>
+                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan,2) ?></td>
+                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total,2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php
                             foreach ($total as $t) : ?>
                                 <tr>
                                     <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
-                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
+                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga,2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -144,7 +144,7 @@
                                 <?php if ($diskon > 0) : ?>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal) ?></td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal,2) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -160,15 +160,15 @@
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon,2) ?> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak,2) ?> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll,2) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>

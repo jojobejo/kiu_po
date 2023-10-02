@@ -64,6 +64,11 @@
                                             <i class="fas fa-times"></i>&nbsp;
                                             <?= $p->status ?>
                                         </a>
+                                    <?php elseif ($p->status == 'PO REVISI') : ?>
+                                        <a class="btn btn-block btn-warning btn-sm">
+                                            <i class="fas fa-undo"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
                                     <?php endif; ?>
                                 </div>
                             </div>

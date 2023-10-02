@@ -37,6 +37,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('a.status', 'ON PROGRESS');
         $this->db->or_where('a.status', 'NOTE KEUANGAN');
         $this->db->or_where('a.status', 'NOTE DIREKTUR');
+        $this->db->or_where('a.status', 'PO REVISI');
         $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
     }
@@ -56,7 +57,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po a
         JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
-        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW()) AND a.status = 'ON PROGRESS'
+        WHERE SUBSTR(a.tgl_transaksi,1,10)=DATE(NOW()) AND a.status = 'ON PROGRESS' OR a.status = 'PO REVISI'
         ORDER BY a.id_po DESC
             ");
     }
@@ -332,7 +333,52 @@ class M_PoStatus extends CI_Model
         return $query->result();
     }
 
-    function pengeluaranHarian()
+    function kdpo($kdpo)
     {
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE() ");
+        $kd = "";
+        if ($cd->num_rows() > 0) {
+            foreach ($cd->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd = "0001";
+        }
+        date_default_timezone_set('Asia/Jakarta');
+        return 'KPO' . 'REV' . date('dmy') . $kd;
+    }
+
+    public function get_ori_po($id_tmp)
+    {
+        $this->db->from('tb_detail_po');
+        $this->db->where('kd_po', $id_tmp);
+        return $this->db->get()->result();
+    }
+    public function inputRevisi($data)
+    {
+        $this->db->insert('tb_po', $data);
+    }
+    public function inputDetailPO($data)
+    {
+        $this->db->insert('tb_detail_po', $data);
+    }
+    public function input_diskon($data)
+    {
+        $this->db->insert('tb_diskon', $data);
+    }
+    public function input_note($data)
+    {
+        $this->db->insert('tb_note_barang', $data);
+    }
+    function editnopo($id, $kdpo)
+    {
+        $this->db->where('id_po', $id);
+        return $this->db->update('tb_po', $kdpo);
+    }
+    function editnopodet($id, $kdpo)
+    {
+        $this->db->where('kd_po', $id);
+        return $this->db->update('tb_detail_po', $kdpo);
     }
 }

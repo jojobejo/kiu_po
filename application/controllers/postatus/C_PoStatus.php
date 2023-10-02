@@ -142,11 +142,13 @@ class C_PoStatus extends CI_Controller
         $data['diskon'] = $this->M_Postatus->getDiskon($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
         $data['notebarang'] = $this->M_Postatus->get_note_barang($kdpo);
+        $data['kdpo'] = $this->M_Postatus->kdpo($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailpo', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/postatus/ajaxstatus');
     }
     public function unpostpo($kdpo)
     {
@@ -170,26 +172,113 @@ class C_PoStatus extends CI_Controller
 
         redirect('detailPO/' . $kdpo);
     }
-    public function repostpo($kdpo)
-    {
-        $departement    = $this->session->userdata('kode');
-        $namauser       = $this->session->userdata('nama_user');
 
-        $addNoteKeuangan = array(
-            'kd_po'     => $kdpo,
-            'isi_note'  => 'REPOST - PO',
-            'kd_user'   => $departement,
-            'nama_user'   => $namauser,
-            'note_for'  => '1',
+    public function repostpo()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $kdpolama   = $this->input->post('kd_lama');
+        $suplier    = $this->input->post('suplier');
+        $nopo       = $this->input->post('nopo');
+        $tgl        = $this->input->post('tgl');
+        $tmpo       = $this->input->post('tmpo');
+        $gdg        = $this->input->post('gdg');
+        $kdpo       = $this->input->post('kdpo');
+        $jml        = $this->input->post('jml');
+        $harga      = $this->input->post('harga');
+        $tax        = $this->input->post('tax');
+        $nmuser     = $this->session->userdata('nama_user');
+        $user       = $this->session->userdata('kode');
+        $tmp        = $this->M_Postatus->get_ori_po($kdpolama);
+        $tmpdiskon  = $this->M_Postatus->getDiskon($kdpolama);
+        $note    = $this->M_Postatus->getNoted($suplier);
+        $tmpnotebr  = $this->M_Postatus->get_note_barang($kdpolama);
+
+        $rekamData = array(
+            'kd_po'         => $kdpo,
+            'no_po'         => $nopo,
+            'tgl_transaksi' => $tgl,
+            'kd_suplier'    => $suplier,
+            'jml_item'      => $jml,
+            'total_harga'   => $harga,
+            'tmpo_pembayaran' => $tmpo,
+            'gdg_pengiriman'  => $gdg,
+            'tax'           => $tax,
+            'status'        => 'PO REVISI'
+        );
+        $this->M_Postatus->inputRevisi($rekamData);
+
+        // UPDATE NOTE - REKAM BARU
+        $updatenote = array(
+            'kd_po' => $kdpo,
+            'isi_note' => 'Revisi PO',
+            'kd_user' => $user,
+            'nama_user' => $nmuser,
+            'note_for' => '1',
             'update_status' => '1'
         );
+        $this->M_Postatus->addNote($updatenote);
+        if ($tmp) {
+            foreach ($tmp as $chart) {
+                $listTransaksi = array(
+                    'no_po'         => $nopo,
+                    'kd_po'         => $kdpo,
+                    'tgl_transaksi' => $tgl,
+                    'kd_barang'     => $chart->kd_barang,
+                    'nama_barang'   => $chart->nama_barang,
+                    'kd_suplier'    => $chart->kd_suplier,
+                    'satuan'        => $chart->satuan,
+                    'qty'           => $chart->qty,
+                    'hrg_satuan'    => $chart->hrg_satuan,
+                    'hrg_total'     => $chart->hrg_total,
+                );
 
-        $noteUpdateKeuangan = array(
-            'status'    => 'ON PROGRESS'
+                $this->M_Postatus->inputDetailPO($listTransaksi);
+            }
+            foreach ($tmpdiskon as $diskon) {
+                $listdiskon = array(
+                    'kd_po' => $kdpo,
+                    'kd_suplier' => $diskon->kd_suplier,
+                    'keterangan' => $diskon->keterangan,
+                    'nominal'    => $diskon->nominal
+                );
+                $this->M_Postatus->input_diskon($listdiskon);
+            }
+            foreach ($note as $nt) {
+                $listnote = array(
+                    'kd_po' => $kdpo,
+                    'isi_note' => $nt->isi_note,
+                    'kd_user' => $user,
+                    'nama_user' => $nmuser,
+                    'note_for' => '1',
+                    'update_status' => '1'
+                );
+                $this->M_Postatus->addNote($listnote);
+            }
+            foreach ($tmpnotebr as $ntbr) {
+                $listnotebr = array(
+                    'kd_po' => $kdpo,
+                    'kd_suplier' => $ntbr->kd_suplier,
+                    'isi_note'  => $ntbr->isi_note
+                );
+                $this->M_Postatus->input_note($listnotebr);
+            }
+            $msg = "success";
+            $data = array('msg' => $msg, 'nopo' => $nopo);
+            echo json_encode($data);
+        }
+    }
+    public function edit_no_po()
+    {
+        $idpo = $this->input->post('id_po');
+        $kdpo = $this->input->post('kdpo');
+        $nopo = $this->input->post('nopo');
+
+        $dataedited = array(
+            'no_po' => $nopo
         );
-        $this->M_Postatus->addNote($addNoteKeuangan);
-        $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
 
+        $this->M_Postatus->editnopo($idpo, $dataedited);
+        $this->M_Postatus->editnopodet($kdpo, $dataedited);
         redirect('detailPO/' . $kdpo);
     }
     public function hapuspo($kdpo)
