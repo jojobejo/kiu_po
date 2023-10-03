@@ -1,6 +1,6 @@
 <script>
     $(document).ready(function() {
-
+        var baseUrl = '<?php echo base_url('postatus'); ?>';
 
         $("#repost").on('click', function() {
             var kd_lama = $("#kd_lama").val();
@@ -27,7 +27,7 @@
                         url: "<?= base_url('repost_po') ?>",
                         type: "POST",
                         data: {
-                            kd_lama:kd_lama,
+                            kd_lama: kd_lama,
                             kdpo: kdpo,
                             nopo: nopo,
                             tgl: tgl,
@@ -42,7 +42,7 @@
                         cache: false,
                         success: function(data) {
                             if (data.msg == "success") {
-                                location.href = "http://localhost/purchaseorder/postatus"
+                                location.href = baseUrl
                             } else {
                                 alert('ada kesalahan data')
                             }
