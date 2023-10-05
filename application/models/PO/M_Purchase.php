@@ -194,20 +194,24 @@ class M_Purchase extends CI_Model
     // NON KOMERSIL
     function kdnonkomersial()
     {
-        $cd = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_detail_po_nk WHERE DATE(create_at)=CURDATE()");
-        $kd = "";
-        if ($cd->num_rows() > 0) {
-            foreach ($cd->result() as $k) {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
                 $tmp = ((int)$k->kd_max) + 1;
-                $kd = sprintf("%04s", $tmp);
+                $kd1 = sprintf("%04s", $tmp);
             }
         } else {
-            $kd = "0001";
+            $kd1 = "0001";
         }
 
         date_default_timezone_set('Asia/Jakarta');
-        $kdnk1 = 'NK' . date('dmy') . $kd;
+        $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
+    }
+    function generatekd($data)
+    {
+        $this->db->insert('tb_generate_kd', $data);
     }
     function getkdnoponk()
     {
@@ -356,5 +360,17 @@ class M_Purchase extends CI_Model
     {
         $this->db->where('id_tmp_diskon', $id_tmp);
         return $this->db->delete('tb_tmp_diskon');
+    }
+    public function input_diskon_tmp_nk($data)
+    {
+        $this->db->insert('tb_tmp_diskon_nk', $data);
+    }
+    public function get_diskon_tmp($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_tmp_diskon_nk a');
+        $this->db->where('kd_user', $kd);
+        $query = $this->db->get();
+        return $query;
     }
 }

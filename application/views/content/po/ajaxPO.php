@@ -57,7 +57,9 @@
     })
 
     $("#selesaink").on('click', function() {
-        var nopo = $("#po_isi").val();
+        var kdpo = $("#po_isi").val();
+        var nopo = $("#no_po_isi").val();
+        var nm_user = $("#nm_user").val();
         var tgl = $("#tgl_isi").val();
         var departemen = $("#dep_isi").val();
         var tujuan = $("#tujuan_isi").val();
@@ -76,7 +78,9 @@
                     url: "<?= base_url('rekam_po_nk') ?>",
                     type: "POST",
                     data: {
+                        kdpo: kdpo,
                         nopo: nopo,
+                        nm_user: nm_user,
                         tgl: tgl,
                         departemen: departemen,
                         tujuan: tujuan,

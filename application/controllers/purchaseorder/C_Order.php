@@ -217,7 +217,9 @@ class C_Order extends CI_Controller
             'harga_satuan'  => $hargaQty,
             'total_harga'   => $hargahasil,
         );
+
         $this->M_Purchase->addChart($data);
+
         redirect('purchase/sup/' . $suplier);
     }
 
@@ -352,6 +354,10 @@ class C_Order extends CI_Controller
             'kd_barang'     => $kdbarang,
             'kd_user'       => $kduser
         );
+        $kdgenerate = array(
+            'kd_barang' => $kdbarang
+        );
+        $this->M_Purchase->generatekd($kdgenerate);
         $this->M_Purchase->input_tmp_nk($dataBarang);
 
         redirect('pononkomersil');
@@ -359,18 +365,23 @@ class C_Order extends CI_Controller
     public function rekam_po_nk()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $kdnk       = $this->input->post('nopo');
+        $kdnk       = $this->input->post('kdpo');
+        $nopo       = $this->input->post('nopo');
         $tgl        = $this->input->post('tgl');
         $departemen = $this->input->post('departemen');
+        $nmuser     = $this->input->post('nm_user');
         $tjuan      = $this->input->post('tujuan');
         $jml        = $this->input->post('jml');
         $hrg        = $this->input->post('harga');
         $kduser     = $this->session->userdata('kode');
+        $nmuser1     = $this->session->userdata('nama_user');
         $tmp        = $this->M_Purchase->get_tmp_non_komersil($kduser);
 
         $rekamData = array(
             'kd_po_nk'      => $kdnk,
+            'nopo'          => $nopo,
             'kd_user'       => $kduser,
+            'nm_user'       => $nmuser,
             'tgl_transaksi' => $tgl,
             'jml_item'      => $jml,
             'total_harga'   => $hrg,
@@ -378,6 +389,7 @@ class C_Order extends CI_Controller
             'departemen'    => $departemen,
             'tj_pembelian'  => $tjuan
         );
+
         $this->M_Purchase->input_po_nk($rekamData);
 
         if ($tmp) {
@@ -397,7 +409,19 @@ class C_Order extends CI_Controller
 
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);
             }
+
+            $updatenote = array(
+                'kd_po' => $kdnk,
+                'isi_note' => 'Purchase Order Baru',
+                'kd_user' => $kduser,
+                'nama_user' => $nmuser1,
+                'note_for' => '1',
+                'update_status' => '1'
+            );
+
+            $this->M_Purchase->addNote($updatenote);
             $this->M_Purchase->hapus_tmp_nk($kduser);
+
             $msg = "success";
             $data = array('msg' => $msg, 'nopo' => $kdnk);
             echo json_encode($data);
@@ -422,6 +446,22 @@ class C_Order extends CI_Controller
         $this->M_Purchase->edit_chart_tmp($id, $dataedit);
         redirect('purchase/sup/' . $supp);
     }
+
+    public function tmp_add_diskon_komersil()
+    {
+        $kdponk  =  $this->input->post();
+        $desc    =  $this->input->post();
+        $nominal =  $this->input->post();
+
+        $datadskon = array(
+            "kd_po_nk" => $kdponk,
+            "deskripsi" => $desc,
+            "nominal"   => $nominal
+        );
+        $this->M_Purchase->add_diskon_tmp($datadskon);
+        redirect('pononkomersil/');
+    }
+
     public function addnotebarangsupliertmp()
     {
         $supp       = $this->input->post('kd_sup');

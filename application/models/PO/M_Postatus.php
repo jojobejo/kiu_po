@@ -148,12 +148,28 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function getDataStatussnk($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user c', 'c.kode_user = a.acc_with');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
     function CountItem($kdpo)
     {
         return $this->db->query("SELECT 
         COUNT(a.id_det_po) AS total_item
         FROM tb_detail_po a
         WHERE kd_po = '$kdpo'
+        ");
+    }
+    function CountItemnk($kdpo)
+    {
+        return $this->db->query("SELECT 
+        COUNT(a.id_det_po_nk) AS total_item
+        FROM tb_detail_po_nk a
+        WHERE kd_po_nk = '$kdpo'
         ");
     }
 
@@ -167,6 +183,17 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('kd_po', $kdpo);
         return $this->db->update('tb_po', $data);
+    }
+    function konfirmPonk($kdpo, $data)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->update('tb_po_nk', $data);
+    }
+
+    function tolakPonk($kdpo, $data)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->update('tb_po_nk', $data);
     }
 
     function addNote($data)
@@ -191,6 +218,11 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->update('tb_po', $status);
     }
+    function updateStatusnk($kdpo, $status)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->update('tb_po_nk', $status);
+    }
     function updateTax($kdpo, $updateTax)
     {
         $this->db->where('kd_po', $kdpo);
@@ -198,6 +230,13 @@ class M_PoStatus extends CI_Model
     }
 
     function getDiskon($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_diskon');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+    function getDiskonnk($kdpo)
     {
         $this->db->select('*');
         $this->db->from('tb_diskon');
@@ -264,11 +303,10 @@ class M_PoStatus extends CI_Model
         return $this->db->delete('tb_po');
     }
 
-    public function getAllNK($kd)
+    public function getAllNK()
     {
         $this->db->select('*');
         $this->db->from('tb_po_nk a');
-        $this->db->where('departemen', $kd);
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         return $this->db->get()->result();
     }
@@ -380,5 +418,60 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_detail_po', $kdpo);
+    }
+    function generatekd()
+    {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd1 = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd1 = "0001";
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'PONK' . date('dmy') . $kd1;
+        return $kdnk1;
+    }
+    function insertkd($data)
+    {
+        $this->db->insert('tb_generate_kd', $data);
+    }
+    function add_faktur_nk($data)
+    {
+        $this->db->insert('tb_detail_po_nk', $data);
+    }
+    function add_tax_nk($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
+    function editedponk($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
+    function deletepodetnk($kdpo)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->delete('tb_detail_po_nk');
+    }
+    function deleteponk($kdpo)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->delete('tb_po_nk');
+    }
+    function deletediskonk($kdpo)
+    {
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->delete('tb_diskon');
+    }
+    function deletenotenk($kdpo)
+    {
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->delete('tb_note_direktur');
     }
 }

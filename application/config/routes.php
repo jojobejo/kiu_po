@@ -88,11 +88,18 @@ $route['update_tax_tmp'] = 'purchaseorder/C_Order/update_tax_tmp';
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
 $route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
+$route['addtmpdiskonnk'] = 'purchaseorder/C_Order/tmp_add_diskon_komersil';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
+
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
 $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
+$route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
+$route['add_tax_nk'] = 'postatus/C_PoStatus/add_tax_fk_nk';
+$route['add_diskon_nk'] = 'postatus/C_PoStatus/add_diskon_nk';
+$route['editedponk'] = 'postatus/C_PoStatus/edited_fk_nk';
+
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
 $route['addnotebarangsupliertmp'] = 'purchaseorder/C_Order/addnotebarangsupliertmp';
@@ -103,7 +110,8 @@ $route['edit_diskon_po'] = 'purchaseorder/C_Order/edit_diskon_po';
 $route['hapus_diskon_po'] = 'purchaseorder/C_Order/hapus_diskon_po';
 $route['add_diskon_barang_tmp'] = 'purchaseorder/C_Order/add_diskon_barang_tmp';
 $route['add_diskon_barangs_tmp'] = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
-
+$route['unpostponk/(:any)']  = 'postatus/C_PoStatus/unpostponk/$1';
+$route['hapusponk/(:any)']  = 'postatus/C_PoStatus/hapusponk/$1';
 
 //postatus
 $route['postatus'] = 'postatus/C_PoStatus/postatus';
@@ -118,10 +126,12 @@ $route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
 $route['postatus/today/done'] = 'postatus/C_PoStatus/getDoneToday';
 $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
+$route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
+$route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
 $route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';
-$route['printOrderBaru/(:any)'] = 'postatus/C_PoStatus/printOrderBaru/$1';
+$route['printOrdernk/(:any)'] = 'postatus/C_PoStatus/printOrdernk/$1';
 $route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
 $route['tolakOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1/$2';
 $route['NoteDirektur'] = 'postatus/C_PoStatus/addNote';

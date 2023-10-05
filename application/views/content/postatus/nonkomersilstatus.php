@@ -11,7 +11,7 @@
                     <tr>
                         <td>No</td>
                         <td>Status Order</td>
-                        <td>Kode PO</td>
+                        <td>Tanggal PO</td>
                         <td>Nama Pembuat</td>
                         <td>Tujuan Pembelian</td>
                         <td></td>
@@ -61,11 +61,16 @@
                                                 <i class="fas fa-times"></i>&nbsp;
                                                 <?= $p->status ?>
                                             </a>
+                                        <?php elseif ($p->status == 'PO REVISI') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-undo"></i>&nbsp;
+                                                <?= $p->status ?>
+                                            </a>
                                         <?php endif; ?>
                                     </div>
                                 </div>
                             </td>
-                            <td><?= $p->kd_po_nk ?></td>
+                            <td><?= format_indo($p->tgl_transaksi) ?></td>
                             <td><?= $p->nama_user ?></td>
                             <td><?= $p->tj_pembelian ?></td>
                             <td>
@@ -76,7 +81,40 @@
                                             Detail
                                         </a>
                                     </div>
-                                </div>
+                                    <?php if ($this->session->userdata('lv') == '1') : ?>
+                                        <div class="col-md">
+                                            <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrderNK/') . $p->kd_po_nk ?>">
+                                                <i class="fas fa-clipboard-check"></i>
+                                                Accept
+                                            </a>
+                                        </div>
+                                        <div class="col-md">
+                                            <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('tolakOrderNK/') . $p->kd_po_nk ?>">
+                                                <i class="fas fa-times"></i>
+                                                Reject
+                                            </a>
+                                        </div>
+                                    <?php elseif ($this->session->userdata('lv') == '2' && $p->status == 'REJECT') : ?>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-info btn-sm" href="<?= base_url('unpostponk/') . $p->kd_po_nk ?>">
+                                                <i class="fas fa-sync"></i> &nbsp;
+                                                UNPOST
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('hapusponk/') . $p->kd_po_nk ?>">
+                                                <i class="fas fa-trash"></i> &nbsp;
+                                                DELETE
+                                            </a>
+                                        </div>
+                                    <?php elseif ($this->session->userdata('lv') == '2' && $p->status != 'DONE') : ?>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('hapusponk/') . $p->kd_po_nk ?>">
+                                                <i class="fas fa-trash"></i> &nbsp;
+                                                DELETE
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

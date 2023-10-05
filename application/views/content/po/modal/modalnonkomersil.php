@@ -14,7 +14,7 @@
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
                         <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="" />
-                            <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $kdbarang ?>" readonly />
+                            <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $kdbarang ?>" readonly hidden />
                         </div>
                     </div>
                 </div>
@@ -40,6 +40,44 @@
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
                         <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="" /></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="add_tmp_diskon_nk">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tambah Diskon</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <?php echo form_open_multipart('addtmpdiskonnk'); ?>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi Diskon<span class="required">*</span></label>
+                        <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="" />
+                            <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $nopo ?>" readonly hidden />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Nominal<span class="required">*</span></label>
+                        <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="" step="0.000000000001" />
+                        </div>
                     </div>
                 </div>
             </div>

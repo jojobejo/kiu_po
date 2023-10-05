@@ -20,37 +20,51 @@
         </div>
         <?php if ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
           <li class="nav-item">
-            <a href="<?= base_url('purchase') ?>" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
                 Purchase Order
+                <i class="right fas fa-angle-left"></i>
               </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('purchase') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('postatus') ?>" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>
               <p>
-                Purchase Order Status <span class="badge badge-warning right">!</span>
+                Purchase Order Status
+                <i class="right fas fa-angle-left"></i>
               </p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('postatus') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <!-- <li class="nav-item">
-            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
-              <i class="nav-icon fas fa-cash-register"></i>
-              <p>
-                PO Non Komersil
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
-              <i class="nav-icon fas fa-money-check"></i>
-              <p>
-                PO non Komersil Status <span class="badge badge-warning right">!</span>
-              </p>
-            </a>
-          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('taxseting') ?>" class="nav-link">
               <i class="nav-icon fas fa-percent"></i>
@@ -127,7 +141,7 @@
           </li>
           <!-- MENU KADEP -->
         <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD') : ?>
-          <!-- <li class="nav-item">
+          <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
@@ -142,7 +156,7 @@
                 PO non Komersil Status <span class="badge badge-warning right">!</span>
               </p>
             </a>
-          </li> -->
+          </li>
           <li class="nav-item">
             <a href="<?= base_url('usersetting') ?>" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>
@@ -161,6 +175,14 @@
           </li>
           <!-- MENU DIREKTUR -->
         <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'DIREKTUR') : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                PO non Komersil Status <span class="badge badge-warning right">!</span>
+              </p>
+            </a>
+          </li>
           <li class="nav-item">
             <a href="<?= base_url('postatus/today') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>

@@ -173,6 +173,7 @@ class C_PoStatus extends CI_Controller
         redirect('detailPO/' . $kdpo);
     }
 
+
     public function repostpo()
     {
         date_default_timezone_set("Asia/Jakarta");
@@ -302,6 +303,21 @@ class C_PoStatus extends CI_Controller
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);
+        $this->load->view('partial/footerprint');
+    }
+
+    public function printOrdernk($kdpo)
+    {
+        $data['title'] = 'PRINT ORDER';
+        $data['detail'] = $this->M_Postatus->getDetailnk($kdpo);
+        $data['status'] = $this->M_Postatus->getDataStatussnk($kdpo);
+        $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kdpo);
+        $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result();
+        $data['diskon'] = $this->M_Postatus->getDiskonnk($kdpo);
+        $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('content/postatus/printordernk', $data);
         $this->load->view('partial/footerprint');
     }
 
@@ -606,7 +622,7 @@ class C_PoStatus extends CI_Controller
     {
         $data['title'] = 'PO Status';
         $kd = $this->session->userdata('departemen');
-        $data['po']    = $this->M_Postatus->getAllNK($kd);
+        $data['po']    = $this->M_Postatus->getAllNK();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -621,18 +637,93 @@ class C_PoStatus extends CI_Controller
         $data['status'] = $this->M_Postatus->getdataStatusnk($kd);
         $data['log']    = $this->M_Postatus->getNoted($kd);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kd);
+        $data['kdbarang']  = $this->M_Postatus->generatekd();
+        $data['tax']    = $this->M_Postatus->getTax();
+        $data['diskon'] = $this->M_Postatus->getDiskon($kd);
+        $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailponk', $data);
         $this->load->view('partial/footer');
     }
+    public function edited_fk_nk()
+    {
+        $kdponk = $this->input->post('kdponk');
+        $nmuser = $this->input->post('nm_pengaju');
+        $dep    = $this->input->post('dep_isi');
+        $tjpem  = $this->input->post('tj_pem');
+
+        $dataedit = array(
+            'nm_user'       => $nmuser,
+            'departemen'    => $dep,
+            'tj_pembelian'  => $tjpem
+        );
+
+        $this->M_Postatus->editedponk($kdponk, $dataedit);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function add_item_faktur_nk()
+    {
+        $kdponk     = $this->input->post('kdponk');
+        $kduser     = $this->session->userdata('kode');
+        $tgltrsk    = $this->input->post('tgltr');
+        $kdbarang   = $this->input->post('kdbrponk');
+        $nmbarang   = $this->input->post('nama_isi');
+        $descbarang = $this->input->post('desc_isi');
+        $ketbarang  = $this->input->post('ket_isi');
+        $qtybr      = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
+        $totalhrg   = $qtybr * $hrgsatuan;
+
+        $addbarang = array(
+            'kd_po_nk'      => $kdponk,
+            'kd_user'       => $kduser,
+            'tgl_transaksi' => $tgltrsk,
+            'kd_barang'     => $kdbarang,
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybr,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalhrg
+        );
+
+        $this->M_Postatus->add_faktur_nk($addbarang);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function add_tax_fk_nk()
+    {
+        $kdponk = $this->input->post('kdponk');
+        $tax    = $this->input->post('tax_isi');
+
+        $data_tax = array(
+            'tax'   => $tax
+        );
+        $this->M_Postatus->add_tax_nk($kdponk, $data_tax);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function add_diskon_nk()
+    {
+        $kdponk = $this->input->post('kdponk');
+        $disc   = $this->input->post('desc_isi');
+        $nominal = $this->input->post('nominal_isi');
+
+        $datadisc = array(
+            'kd_po' => $kdponk,
+            'keterangan' => $disc,
+            'nominal'   => $nominal
+        );
+
+        $this->M_Postatus->insertDiskon($datadisc);
+        redirect('detailponk/' . $kdponk);
+    }
     public function edit_faktur_item_nk()
     {
         $id         = $this->input->post('idisi');
         $kd         = $this->input->post('kdponk');
         $namabarang = $this->input->post('nama_isi');
-        $descbarang  = $this->input->post('desc_isi');
+        $descbarang = $this->input->post('desc_isi');
         $ketbarang  = $this->input->post('ket_isi');
         $qtybarang  = $this->input->post('qty_isi');
         $hrgsatuan  = $this->input->post('hrg_isi');
@@ -714,6 +805,38 @@ class C_PoStatus extends CI_Controller
         }
         redirect('detailponk/' . $kdpo);
     }
+
+    public function unpostponk($kdpo)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $addNoteKeuangan = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'UNPOST - PO',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteUpdateKeuangan = array(
+            'status'    => 'ON PROGRESS'
+        );
+        $this->M_Postatus->addNote($addNoteKeuangan);
+        $this->M_Postatus->updateStatusnk($kdpo, $noteUpdateKeuangan);
+
+        redirect('detailponk/' . $kdpo);
+    }
+    public function hapusponk($kdpo)
+    {
+        $this->M_Postatus->deleteponk($kdpo);
+        $this->M_Postatus->deletepodetnk($kdpo);
+        $this->M_Postatus->deletediskonk($kdpo);
+        $this->M_Postatus->deletenotenk($kdpo);
+        redirect('postatusnk');
+    }
+
     public function note_barang_suplier()
     {
         $kdpo       = $this->input->post('kdpo');
@@ -806,5 +929,53 @@ class C_PoStatus extends CI_Controller
             "data" => $data,
         );
         echo json_encode($output);
+    }
+    public function konfirmasiOrderNK($kdpo, $kddirektur)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpo,
+            'acc_with' => $kddirektur,
+            'status' => 'DONE'
+        );
+
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO ACCEPT',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->konfirmPonk($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
+
+    public function tolakOrderNK($kdpo, $kddirektur)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpo,
+            'acc_with' => $kddirektur,
+            'status' => 'REJECT'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO REJECT',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->tolakPonk($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
     }
 }

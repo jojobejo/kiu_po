@@ -16,10 +16,11 @@
             <a href="#" class="btn btn-primary mb-2 mt-2" data-toggle="modal" data-target="#add_barang_nonkomersil">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang
             </a>
+
             <?php $this->load->view('content/po/modal/modalnonkomersil') ?>
             <form action="#">
                 <div class="row mb-2">
-                    <div class="col-md-3">
+                    <div class="col-md-3" hidden>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
@@ -27,12 +28,28 @@
                             <input type="text" class="form-control" placeholder="Nomor PO" value="<?= $nopo ?>" name="po_isi" id="po_isi" readonly>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Nomor Po" value="" name="no_po_isi" id="no_po_isi">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Nama Pengaju" value="" name="nm_user" id="nm_user">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-landmark"></i></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Departemen" value="<?= $this->session->userdata('departemen') ?>" name="dep_isi" id="dep_isi" readonly>
+                            <input type="text" class="form-control" placeholder="Departemen" value="" name="dep_isi" id="dep_isi">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -107,6 +124,18 @@
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
+                </table>
+                <table id="" class="table table-striped mt-2">
+                    <thead style="background-color: #212529; color:white;">
+                        <tr>
+                            <td colspan="3" style="text-align: center;">LIST DISKON</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Deskripsi Diskon</td>
+                            <td style="text-align: center;">Nominal Diskon</td>
+                            <td style="text-align: center;"></td>
+                        </tr>
+                    </thead>
                 </table>
                 <div class="btnBawah">
                     <button class="btn btn-warning mr-2" type="reset">Reset</button>
