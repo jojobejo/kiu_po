@@ -362,6 +362,35 @@ class C_Order extends CI_Controller
 
         redirect('pononkomersil');
     }
+    public function tmp_edit_barang_komersil()
+    {
+        $id         = $this->input->post('id_isi');
+        $namabarang = $this->input->post('nama_isi');
+        $descbarang  = $this->input->post('desc_isi');
+        $ketbarang  = $this->input->post('ket_isi');
+        $qtybarang  = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
+        $totalharga = $qtybarang * $hrgsatuan;
+
+        $dataBarang = array(
+            'nama_barang'   => $namabarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybarang,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalharga,
+        );
+
+        $this->M_Purchase->edit_input_nk($id, $dataBarang);
+
+        redirect('pononkomersil');
+    }
+    public function tmp_hapus_barang_komersil()
+    {
+        $id = $this->input->post('id_isi');
+        $this->M_Purchase->hapus_item_nk($id);
+        redirect('pononkomersil');
+    }
     public function rekam_po_nk()
     {
         date_default_timezone_set("Asia/Jakarta");

@@ -88,6 +88,8 @@ $route['update_tax_tmp'] = 'purchaseorder/C_Order/update_tax_tmp';
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
 $route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
+$route['edittmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_edit_barang_komersil';
+$route['hapustmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_hapus_barang_komersil';
 $route['addtmpdiskonnk'] = 'purchaseorder/C_Order/tmp_add_diskon_komersil';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
 
