@@ -116,7 +116,7 @@
                             foreach ($total as $t) : ?>
                                 <tr>
                                     <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
-                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga,2) ?></td>
+                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -160,15 +160,15 @@
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon,2) ?> </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak,2) ?> </td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll,2) ?></td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>

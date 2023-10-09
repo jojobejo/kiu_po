@@ -324,6 +324,7 @@ class C_Order extends CI_Controller
         $data['tmp']    = $this->M_Purchase->get_tmp_non_komersil($user);
         $data['total'] = $this->M_Purchase->sumtransaksink();
         $data['nopo'] = $this->M_Purchase->getkdnoponk();
+        $data['tmpntpembelian'] = $this->M_Purchase->gettmp_note_pembelian($user);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -391,6 +392,18 @@ class C_Order extends CI_Controller
         $this->M_Purchase->hapus_item_nk($id);
         redirect('pononkomersil');
     }
+    public function add_note_pembelian_tmp()
+    {
+        $kduser = $this->session->userdata('kode');
+        $ket    = $this->input->post('ket_isi');
+
+        $datanote = array(
+            'keterangan'   => $ket,
+            'kd_user'   => $kduser
+        );
+        $this->M_Purchase->input_note_pembelian_nt($datanote);
+        redirect('pononkomersil');
+    }
     public function rekam_po_nk()
     {
         date_default_timezone_set("Asia/Jakarta");
@@ -403,8 +416,9 @@ class C_Order extends CI_Controller
         $jml        = $this->input->post('jml');
         $hrg        = $this->input->post('harga');
         $kduser     = $this->session->userdata('kode');
-        $nmuser1     = $this->session->userdata('nama_user');
+        $nmuser1    = $this->session->userdata('nama_user');
         $tmp        = $this->M_Purchase->get_tmp_non_komersil($kduser);
+        $tmpntpmbln = $this->M_Purchase->gettmp_note_pembelian($kduser);
 
         $rekamData = array(
             'kd_po_nk'      => $kdnk,
@@ -439,6 +453,16 @@ class C_Order extends CI_Controller
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);
             }
 
+            foreach ($tmpntpmbln as $pm) {
+                $notepemeblian = array(
+                    'kd_po'         => $kdnk,
+                    'keterangan'    => $pm->keterangan,
+                    'kd_user'       => $kduser
+                );
+
+                $this->M_Purchase->input_detail_nt_pembelian($notepemeblian);
+            }
+
             $updatenote = array(
                 'kd_po' => $kdnk,
                 'isi_note' => 'Purchase Order Baru',
@@ -450,6 +474,7 @@ class C_Order extends CI_Controller
 
             $this->M_Purchase->addNote($updatenote);
             $this->M_Purchase->hapus_tmp_nk($kduser);
+            $this->M_Purchase->hapus_tmp_nk_nt_pembelian($kduser);
 
             $msg = "success";
             $data = array('msg' => $msg, 'nopo' => $kdnk);

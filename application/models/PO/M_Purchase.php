@@ -242,6 +242,23 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_item_nk', $data);
     }
+    function input_note_pembelian_nt($data)
+    {
+        $this->db->insert('tb_nt_tmp_pembelian', $data);
+    }
+    function input_detail_nt_pembelian($data)
+    {
+        $this->db->insert('tb_note_pembelian', $data);
+    }
+    function gettmp_note_pembelian($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_nt_tmp_pembelian');
+        $this->db->where('kd_user', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+
     function edit_input_nk($kd, $data)
     {
         $this->db->where('id_tmp_nk', $kd);
@@ -252,6 +269,12 @@ class M_Purchase extends CI_Model
         $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_tmp_item_nk');
     }
+    public function hapus_tmp_nk_nt_pembelian($id)
+    {
+        $this->db->where('kd_user', $id);
+        return $this->db->delete('tb_nt_tmp_pembelian');
+    }
+
     function sumtransaksink()
     {
         $this->db->select("SUM(total_harga) as total_harga");

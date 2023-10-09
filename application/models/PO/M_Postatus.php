@@ -393,6 +393,12 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id_tmp);
         return $this->db->get()->result();
     }
+    public function get_note_pembelian($kd)
+    {
+        $this->db->from('tb_note_pembelian');
+        $this->db->where('kd_po', $kd);
+        return $this->db->get()->result();
+    }
     public function inputRevisi($data)
     {
         $this->db->insert('tb_po', $data);
@@ -444,15 +450,29 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_detail_po_nk', $data);
     }
+    function add_note_pembelian_nk($data)
+    {
+        $this->db->insert('tb_note_pembelian', $data);
+    }
     function add_tax_nk($id, $data)
     {
         $this->db->where('kd_po_nk', $id);
         return $this->db->update('tb_po_nk', $data);
     }
+    function edit_note_pembelian_nk($id, $data)
+    {
+        $this->db->where('id_nt_pembelian', $id);
+        return $this->db->update('tb_note_pembelian', $data);
+    }
     function editedponk($id, $data)
     {
         $this->db->where('kd_po_nk', $id);
         return $this->db->update('tb_po_nk', $data);
+    }
+    function hapus_note_pembelian_nk($kdpo)
+    {
+        $this->db->where('id_nt_pembelian', $kdpo);
+        return $this->db->delete('tb_note_pembelian');
     }
     function deletepodetnk($kdpo)
     {

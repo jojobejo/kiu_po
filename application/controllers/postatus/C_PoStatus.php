@@ -315,6 +315,7 @@ class C_PoStatus extends CI_Controller
         $data['CountItem'] = $this->M_Postatus->CountItem($kdpo)->result();
         $data['diskon'] = $this->M_Postatus->getDiskonnk($kdpo);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
+        $data['notepm'] = $this->M_Postatus->get_note_pembelian($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printordernk', $data);
@@ -641,6 +642,7 @@ class C_PoStatus extends CI_Controller
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
+        $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -701,6 +703,39 @@ class C_PoStatus extends CI_Controller
             'tax'   => $tax
         );
         $this->M_Postatus->add_tax_nk($kdponk, $data_tax);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function add_note_pembelian_nk()
+    {
+        $kdponk = $this->input->post('kdponk');
+        $ket    = $this->input->post('ket_isi');
+
+        $data_tax = array(
+            'kd_po' => $kdponk,
+            'keterangan' => $ket
+        );
+        $this->M_Postatus->add_note_pembelian_nk($data_tax);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function edit_note_pembelian_nk()
+    {
+        $id     = $this->input->post('id_isi');
+        $kdponk = $this->input->post('kdponk');
+        $ket    = $this->input->post('ket_isi');
+
+        $data_tax = array(
+            'keterangan' => $ket
+        );
+        $this->M_Postatus->edit_note_pembelian_nk($id, $data_tax);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function hapus_note_pembelian_nk()
+    {
+        $id     = $this->input->post('id_isi');
+        $kdponk = $this->input->post('kdponk');
+
+        $this->M_Postatus->hapus_note_pembelian_nk($id);
+
         redirect('detailponk/' . $kdponk);
     }
     public function add_diskon_nk()

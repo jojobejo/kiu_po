@@ -91,6 +91,7 @@ $route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komers
 $route['edittmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_edit_barang_komersil';
 $route['hapustmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_hapus_barang_komersil';
 $route['addtmpdiskonnk'] = 'purchaseorder/C_Order/tmp_add_diskon_komersil';
+$route['add_note_pembelian_tmp'] = 'purchaseorder/C_Order/add_note_pembelian_tmp';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
 
 //PurchaseOrderNonKomersil - STATUS
@@ -101,6 +102,9 @@ $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
 $route['add_tax_nk'] = 'postatus/C_PoStatus/add_tax_fk_nk';
 $route['add_diskon_nk'] = 'postatus/C_PoStatus/add_diskon_nk';
 $route['editedponk'] = 'postatus/C_PoStatus/edited_fk_nk';
+$route['add_note_pembelian_nk'] = 'postatus/C_PoStatus/add_note_pembelian_nk';
+$route['edit_note_pembelian_nk'] = 'postatus/C_PoStatus/edit_note_pembelian_nk';
+$route['hapus_note_pembelian_nk'] = 'postatus/C_PoStatus/hapus_note_pembelian_nk';
 
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';

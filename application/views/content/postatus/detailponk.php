@@ -155,6 +155,12 @@
                         Edit Data Po
                     </a>
                 </div>
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#add_note_pembelian">
+                        <i class="fas fa-vote-yea"> </i>
+                        Tambah Note Pembelian
+                    </a>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -206,89 +212,216 @@
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
-                <?php foreach ($total as $t) : ?>
-                    <tr>
-                        <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
-                </tr>
-                <?php foreach ($diskon as $d) : ?>
-                    <?php if ($diskon > 0) : ?>
+                <?php if ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                    <?php foreach ($total as $t) : ?>
                         <tr>
-                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
-                            <td colspan="2" style="font-weight: bold;">
-                                Rp. <?= number_format($d->nominal, 2) ?>
-                                <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
-                                <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
-                                <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
-                                    <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-                <tr>
-                    <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
-                </tr>
-                <?php foreach ($total as $t) :
-                                foreach ($totalDiskon as $d) :
-                                    $stlhDiskon = $t->total_harga - $d->total_diskon;
-                                    $tax = $s->tax / 100;
-                                    $hargaPajak = $stlhDiskon * $tax;
-                                    $hargaAll = $stlhDiskon + $hargaPajak; ?>
-                        <tr>
-                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
-                            <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
-                        </tr>
-
-                        <tr>
-                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                            <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
-                        </tr>
-
-                        <tr>
-                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
-                            <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                            <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                            <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
                         </tr>
                     <?php endforeach; ?>
-                <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+                    </tr>
+                    <?php foreach ($diskon as $d) : ?>
+                        <?php if ($diskon > 0) : ?>
+                            <tr>
+                                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
+                                <td colspan="2" style="font-weight: bold;">
+                                    Rp. <?= number_format($d->nominal, 2) ?>
+                                    <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+                                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+                                        <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+                    </tr>
+                    <?php foreach ($ntpembelian as $ntpm) : ?>
+                        <tr>
+                            <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
+                            <td colspan="1" style="font-weight: bold;">
+                                <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#edit_note_pembelian<?= $ntpm->id_nt_pembelian ?>">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#hapus_note_pembelian<?= $ntpm->id_nt_pembelian ?>">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                    </tr>
+                    <?php foreach ($total as $t) :
+                                    foreach ($totalDiskon as $d) :
+                                        $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                        $tax = $s->tax / 100;
+                                        $hargaPajak = $stlhDiskon * $tax;
+                                        $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                            <tr>
+                                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                            </tr>
 
+                            <tr>
+                                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                            </tr>
 
+                            <tr>
+                                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
+                                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
             </tbody>
         </table>
+    <?php elseif ($this->session->userdata('lv') == '3') : ?>
+        <?php foreach ($total as $t) : ?>
+            <tr>
+                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                <td colspan="1" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+        </tr>
+        <?php foreach ($diskon as $d) : ?>
+            <?php if ($diskon > 0) : ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
+                    <td colspan="1" style="font-weight: bold;">
+                        Rp. <?= number_format($d->nominal, 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+        </tr>
+        <?php foreach ($ntpembelian as $ntpm) : ?>
+            <tr>
+                <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+        </tr>
+        <?php foreach ($total as $t) :
+                                    foreach ($totalDiskon as $d) :
+                                        $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                        $tax = $s->tax / 100;
+                                        $hargaPajak = $stlhDiskon * $tax;
+                                        $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
+                    <td colspan="1" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                </tr>
 
-        <div class="row mr-2">
-            <div class="col-md-8">
-                <div class="noteDirektur">
-                    <table class="table table-bordered table-stripeds">
-                        <thead style="background-color: #212529; color:white;">
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                    <td colspan="1" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
+                    <td colspan="1" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+        </tbody>
+        </table>
+    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+        <?php foreach ($total as $t) : ?>
+            <tr>
+                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                <td colspan="1" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+        </tr>
+        <?php foreach ($diskon as $d) : ?>
+            <?php if ($diskon > 0) : ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
+                    <td colspan="1" style="font-weight: bold;">
+                        Rp. <?= number_format($d->nominal, 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+        </tr>
+        <?php foreach ($ntpembelian as $ntpm) : ?>
+            <tr>
+                <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="7" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+        </tr>
+        <?php foreach ($total as $t) :
+                                    foreach ($totalDiskon as $d) :
+                                        $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                        $tax = $s->tax / 100;
+                                        $hargaPajak = $stlhDiskon * $tax;
+                                        $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
+                    <td colspan="1" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                    <td colspan="1" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
+                    <td colspan="1" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+        </tbody>
+        </table>
+    <?php endif; ?>
+
+
+    <div class="row mr-2">
+        <div class="col-md-8">
+            <div class="noteDirektur">
+                <table class="table table-bordered table-stripeds">
+                    <thead style="background-color: #212529; color:white;">
+                        <tr>
+                            <td class="tdnote">ISI NOTE</td>
+                            <td class="tduser">USER</td>
+                            <td style="text-align: center;">TANGGAL</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($log as $l) : ?>
                             <tr>
-                                <td class="tdnote">ISI NOTE</td>
-                                <td class="tduser">USER</td>
-                                <td style="text-align: center;">TANGGAL</td>
+                                <td><?= $l->isi_note ?></td>
+                                <td><?= $l->nama_user ?></td>
+                                <td><?= $l->log_create ?></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($log as $l) : ?>
-                                <tr>
-                                    <td><?= $l->isi_note ?></td>
-                                    <td><?= $l->nama_user ?></td>
-                                    <td><?= $l->log_create ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
     </section>
     <!-- /.content-header -->
 

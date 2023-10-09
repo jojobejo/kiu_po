@@ -88,7 +88,14 @@
                                 <?php endif; ?>
 
                             <?php endforeach; ?>
-
+                            <?php foreach ($notepm as $np) : ?>
+                                <tr>
+                                    <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE PEMBELIAN</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8"><?= nl2br($np->keterangan) ?> </td>
+                                </tr>
+                            <?php endforeach; ?>
                             <?php foreach ($total as $t) :
                                 foreach ($totalDiskon as $d) :
                                     $stlhDiskon = $t->total_harga - $d->total_diskon;
@@ -112,6 +119,8 @@
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
+
+
                         </thead>
                     </table>
 
@@ -124,7 +133,7 @@
                 <div class="col">
                     <table class="table-bordered text-s listdb" width='100%' height=''>
                         <tr>
-                            <td align="center" style="width: 50%;">Pemesan,</br><img src=" <?= base_url('assets/images/qrcode/') . $s->acc_with ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nama_user ?> )</u></td>
+                            <td align="center" style="width: 50%;">Yang Menyetujui,</br><img src=" <?= base_url('assets/images/qrcode/') . $s->acc_with ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nama_user ?> )</u></td>
                             <td align="center">Yang Mengajukan,</br></br></br></br></br></br></br></br><u>( <?= $s->nm_user ?> )</u></td>
                         </tr>
                     </table>

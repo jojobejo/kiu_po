@@ -16,6 +16,9 @@
             <a href="#" class="btn btn-primary mb-2 mt-2" data-toggle="modal" data-target="#add_barang_nonkomersil">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang
             </a>
+            <a href="#" class="btn btn-primary mb-2 mt-2" data-toggle="modal" data-target="#add_nt_pembelian">
+                <i class="fas fa-folder-plus"></i> &nbsp; Note Pembelian
+            </a>
 
             <?php $this->load->view('content/po/modal/modalnonkomersil') ?>
             <form action="#">
@@ -128,15 +131,26 @@
                 <table id="" class="table table-striped mt-2">
                     <thead style="background-color: #212529; color:white;">
                         <tr>
-                            <td colspan="3" style="text-align: center;">LIST DISKON</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;">Deskripsi Diskon</td>
-                            <td style="text-align: center;">Nominal Diskon</td>
-                            <td style="text-align: center;"></td>
+                            <td colspan="2" style="text-align: center;">Note Pemebelian</td>
                         </tr>
                     </thead>
+                    <?php foreach ($tmpntpembelian as $np) : ?>
+                        <tbody>
+                            <tr>
+                                <td><?= $np->keterangan ?></td>
+                                <td style="text-align: center;">
+                                    <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#edititem<?= $np->id_tmp_nt_pembelian ?>">
+                                        <i class="fa fa-solid fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusitem<?= $np->id_tmp_nt_pembelian ?>">
+                                        <i class="fa fa-solid fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    <?php endforeach; ?>
                 </table>
+
                 <div class="btnBawah">
                     <button class="btn btn-warning mr-2" type="reset">Reset</button>
                     <button type="button" id="selesaink" class="btn btn-primary">
