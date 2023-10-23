@@ -1013,4 +1013,23 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->addNote($notedirektur);
         redirect('postatusnk');
     }
+    public function insert_note_setting()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $shipment_to    = $this->input->post('shipment_to');
+        $alamat_ship    = $this->input->post('alamat_ship');
+        $cp_shipment    = $this->input->post('cp_shipment');
+        $no_cp          = $this->input->post('no_cp');
+
+        $note_printout = array(
+            'shipment_to'   => $shipment_to,
+            'alamat_ship'   => $alamat_ship,
+            'cp_shipment'   => $cp_shipment,
+            'no_cp'         => $no_cp
+        );
+
+        $this->M_Postatus->insert_setting_note($kdpo, $note_printout);
+
+        redirect('detailPO/' . $kdpo);
+    }
 }

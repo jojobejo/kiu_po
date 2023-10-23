@@ -108,8 +108,8 @@
                                     <td><?= $d->nama_barang ?></td>
                                     <td style="text-align: center;"><?= $d->satuan ?></td>
                                     <td style="text-align: center;"><?= $d->qty ?></td>
-                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan,2) ?></td>
-                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total,2) ?></td>
+                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
+                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php
@@ -144,7 +144,7 @@
                                 <?php if ($diskon > 0) : ?>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal,2) ?></td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal, 2) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -222,15 +222,19 @@
                             <?php endforeach; ?>
                             <tr>
                                 <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
-                                    * Apabila ada perubahan kemasan, isi, ataupun logo, mohon di informasikan <br>
+                                    * SHIP TO : <br>
+                                    KARISMA INDOAGRO UNIVERSAL <br>
+                                    &nbsp;&nbsp;&nbsp;<?= $s->shipment_to ?><br>
+                                    &nbsp;&nbsp;&nbsp;<?= $s->alamat_ship ?> <br>
                                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
-                                    NANDANG ERNOKO (Kadep Logistik) <br>
-                                    081 131 361 66 / 081 252 151 314 <br>
+                                    &nbsp;&nbsp;&nbsp;<?= $s->cp_shipment ?> <br>
+                                    &nbsp;&nbsp;&nbsp;<?= $s->no_cp ?> <br>
+                                    * Apabila ada perubahan kemasan, isi, ataupun logo, mohon di informasikan <br>
                                     * Kedatangan barang maksimal: <br>
-                                    Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
+                                    &nbsp;&nbsp;&nbsp;Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
                                     * Maksimal terdiri dari 2 No. Batch <br>
                                     * Mohon info terlebih dahulu,<br>
-                                    jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
+                                    &nbsp;&nbsp;&nbsp;jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
                                 </td>
                                 <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>

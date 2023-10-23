@@ -494,4 +494,9 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->delete('tb_note_direktur');
     }
+    function insert_setting_note($id, $data)
+    {
+        $this->db->where('kd_po', $id);
+        return $this->db->update('tb_po', $data);
+    }
 }

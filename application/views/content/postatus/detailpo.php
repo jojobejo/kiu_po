@@ -183,7 +183,12 @@
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>
         <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
-
+            <div class="col-md mb-2">
+                <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
+                    <i class="fas fa-shipping-fast"> </i>
+                    Shipment Setting
+                </a>
+            </div>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
 
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
@@ -222,6 +227,12 @@
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalnotebarang<?= $s->kd_po ?>  ">
                         <i class="fas fa-notes-medical"> </i>
                         Tambah Note Barang
+                    </a>
+                </div>
+                <div class="col-md mb-2">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
+                        <i class="fas fa-shipping-fast"> </i>
+                        Shipment Setting
                     </a>
                 </div>
             </div>

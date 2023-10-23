@@ -153,6 +153,7 @@ $route['repost_po']  = 'postatus/C_PoStatus/repostpo';
 $route['edit_no_po']  = 'postatus/C_PoStatus/edit_no_po';
 $route['unpostpo/(:any)']  = 'postatus/C_PoStatus/unpostpo/$1';
 $route['hapuspo/(:any)']  = 'postatus/C_PoStatus/hapuspo/$1';
+$route['insert_note_setting']  = 'postatus/C_PoStatus/insert_note_setting';
 
 $route['NoteUpdateKeuangan'] = 'postatus/C_PoStatus/addNote';
 $route['tambahTax'] = 'postatus/C_PoStatus/tambahTax';
