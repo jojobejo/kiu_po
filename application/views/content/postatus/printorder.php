@@ -229,12 +229,7 @@
                                     * Sebelum kirim barang mohon konfirmasi terlebih dahulu <br>
                                     &nbsp;&nbsp;&nbsp;<?= $s->cp_shipment ?> <br>
                                     &nbsp;&nbsp;&nbsp;<?= $s->no_cp ?> <br>
-                                    * Apabila ada perubahan kemasan, isi, ataupun logo, mohon di informasikan <br>
-                                    * Kedatangan barang maksimal: <br>
-                                    &nbsp;&nbsp;&nbsp;Senin s/d Jumat maksimal Jam 14:00 ,Sabtu maksimal Jam 11:00 <br>
-                                    * Maksimal terdiri dari 2 No. Batch <br>
-                                    * Mohon info terlebih dahulu,<br>
-                                    &nbsp;&nbsp;&nbsp;jika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks <br>
+                                    <?= nl2br($s->ket_1) ?><br>
                                 </td>
                                 <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>

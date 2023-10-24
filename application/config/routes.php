@@ -136,6 +136,8 @@ $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder
 $route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
+$route['update_printout_po'] = 'postatus/C_PoStatus/update_printout_po';
+
 $route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrdernk/(:any)'] = 'postatus/C_PoStatus/printOrdernk/$1';
 $route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
@@ -165,9 +167,6 @@ $route['hapusDiskon/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
 $route['add_diskon_barang'] = 'postatus/C_PoStatus/add_diskon_barang';
 $route['add_diskon_barangs'] = 'postatus/C_PoStatus/add_diskon_barangs';
 
-
-
-
 //settings-tax
 $route['taxseting'] = 'settings/C_TaxSetting';
 $route['addSatuanPajak'] = 'settings/C_TaxSetting/addPajak';
@@ -182,3 +181,6 @@ $route['hapusSatuan/(:num)'] = 'settings/C_SatuanSetting/hapusSatuan/$1';
 
 //setting-template
 $route['notetemplate'] = 'settings/C_NoteSetting';
+$route['addnotetemplate'] = 'settings/C_NoteSetting/add_note_template';
+$route['notetemplate/(:any)'] = 'settings/C_NoteSetting/detail_note_template/$1';
+$route['updateisinote'] = 'settings/C_NoteSetting/update_note_template';

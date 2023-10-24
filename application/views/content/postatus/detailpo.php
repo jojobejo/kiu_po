@@ -45,10 +45,13 @@
                                 <div class="col-lg">
                                     <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
                                     <?php if ($s->status == 'DONE') : ?>
-                                        <div>
-                                            <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
-                                        </div>
-
+                                        <?php if ($s->status == 'DONE' && $s->kd_printout_note != '') : ?>
+                                            <div>
+                                                <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
+                                            </div>
+                                        <?php elseif ($s->status == 'DONE' && $s->kd_printout_note == '') : ?>
+                                            <a class="btn btn-success btn-block" onclick='alert("Format Printout Belum Terpilih")'><i class="fas fa-print"></i> Cetak Form Order</a>
+                                        <?php endif; ?>
                                     <?php elseif ($s->status == 'ON PROGRESS') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>

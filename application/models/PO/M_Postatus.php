@@ -18,6 +18,10 @@ class M_PoStatus extends CI_Model
         $this->db->order_by('a.id_po', 'DESC');
         return $this->db->get()->result();
     }
+    public function ntformat()
+    {
+        return $this->db->get('tb_notetemplate')->result();
+    }
     public function getpotoday()
     {
         return $this->db->query("SELECT *,
@@ -145,6 +149,7 @@ class M_PoStatus extends CI_Model
         $this->db->from('tb_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         $this->db->join('tb_user c', 'c.kode_user = a.acc_with');
+        $this->db->join('tb_notetemplate d', 'd.kd_nt_template = a.kd_printout_note');
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
@@ -498,5 +503,13 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_po', $data);
+    }
+    function update_pr_po($id, $data)
+    {
+        $this->db->where('kd_po', $id);
+        return $this->db->update('tb_po', $data);
+    }
+    function get_format($kdpo)
+    {
     }
 }

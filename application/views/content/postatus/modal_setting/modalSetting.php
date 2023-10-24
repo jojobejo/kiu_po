@@ -427,39 +427,30 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Print Note Setting</h4>
+                        <h4 class="modal-title">Print Note Setting Format</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <?php echo form_open_multipart('insert_note_setting'); ?>
+                        <?php echo form_open_multipart('update_printout_po'); ?>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Tujuan Penerima<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="shipment_to" name="shipment_to" value="<?= $s->shipment_to ?>" />
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Pilih Format Printout<span class="required">*</span></label>
+                                <div class="col-sm-8">
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po ?>" readonly hidden />
+                                    <select name="frmt_option" id="frmt_option" class="form-control">
+                                        <option value="-">-- Pilih Format Note --</option>
+                                        <?php foreach ($ntformat as $nf) :
+                                            $selected = $s->kd_printout_note != '' ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $nf->kd_nt_template ?>" <?= $selected ?>><?= $nf->nama_note ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Alamat Penerima<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="alamat_ship" name="alamat_ship" value="<?= $s->alamat_ship ?>" /></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Koordinator Penerima<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="cp_shipment" name="cp_shipment" value="<?= $s->cp_shipment ?>" /></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">No Telpon Koordinator<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="no_cp" name="no_cp" value="<?= $s->no_cp ?>" /></div>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>

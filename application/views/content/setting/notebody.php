@@ -6,37 +6,32 @@
                     <h1 class="m-0">Note Setting</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
-            <?php $this->load->view('content/setting/modal/modalsatuan') ?>
+
+            <?php $this->load->view('content/setting/modal/modalnotetemplate') ?>
+
             <div class=" m-2">
                 <a class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#modalAddItem">
                     <i class="fas fa-check-double"></i>
-                    Tambah Data Note Penerima
+                    Tambah Template Note
                 </a>
             </div>
             <table class="table table-bordered table-striped" id="list_suplier">
                 <thead>
                     <tr>
-                        <td>Nama Penerima (Penanggung Jawab)</td>
-                        <td>Telefon</td>
-                        <td>Aksi</td>
+                        <td>Nama Format Template</td>
+                        <td style="text-align: center;">Aksi</td>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <?php foreach ($note as $n) : ?>
-                            <td></td>
+                            <td><?= $n->nama_note ?></td>
                             <td>
                                 <div class="row">
                                     <div class="col-md">
-                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit">
-                                            <i class="fas fa-check-double"></i>
-                                            Edit Satuan Barang
-                                        </a>
-                                    </div>
-                                    <div class="col-md">
-                                        <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#hapusBarang">
-                                            <i class="fas fa-check-double"></i>
-                                            Hapus Satuan Barang
+                                        <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('notetemplate/') . $n->kd_nt_template ?>">
+                                            <i class="fas fa-eye-alt"></i>
+                                            Detail Template
                                         </a>
                                     </div>
                                 </div>

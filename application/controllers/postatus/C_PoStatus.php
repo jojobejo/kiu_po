@@ -143,12 +143,26 @@ class C_PoStatus extends CI_Controller
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kdpo);
         $data['notebarang'] = $this->M_Postatus->get_note_barang($kdpo);
         $data['kdpo'] = $this->M_Postatus->kdpo($kdpo);
+        $data['ntformat'] = $this->M_Postatus->ntformat();
+
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailpo', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/ajaxstatus');
+    }
+    public function update_printout_po()
+    {
+        $kdpo   = $this->input->post('kdpo');
+        $kdnt   = $this->input->post('frmt_option');
+
+        $datanote = array(
+            'kd_printout_note' => $kdnt
+        );
+        $this->M_Postatus->update_pr_po($kdpo, $datanote);
+
+        redirect('detailPO/' . $kdpo);
     }
     public function unpostpo($kdpo)
     {
