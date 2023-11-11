@@ -142,6 +142,7 @@ $route['printOrder/(:any)'] = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrdernk/(:any)'] = 'postatus/C_PoStatus/printOrdernk/$1';
 $route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
 $route['tolakOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrder/$1/$2';
+$route['cancel_po'] = 'postatus/C_PoStatus/cancel_po';
 $route['NoteDirektur'] = 'postatus/C_PoStatus/addNote';
 $route['addBarangRevisi/(:any)/(:any)'] = 'postatus/C_PoStatus/listBarangRevisi/$1/$2';
 $route['tambahBarangRevisi'] = 'postatus/C_PoStatus/tambahBarangRevisi';

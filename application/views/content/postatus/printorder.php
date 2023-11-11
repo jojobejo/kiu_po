@@ -35,7 +35,9 @@
                         Telp 1: (0331) 4833 33 / 4877 88<br>
                         Email: karismaindoagro@gmail.com
                     </address>
+
                 </div>
+
                 <!-- /.col -->
                 <div class="col-sm-4 invoice-col text-s">
                     <br>
@@ -43,7 +45,17 @@
                     <b>Tanggal Order:</b> <?= $s->tgl_transaksi ?><br>
                     <img src="<?= base_url('assets/images/logoPT/') . $s->gbr_logo ?>" style="margin-top: 2px;margin-bottom: 5px; width: 200px; height: 75px;" alt="">
                 </div>
+                <?php if ($s->status == 'CANCEL') : ?>
+                    <button class="btn btn-lg btn-block bg-danger m-2">
+                        <i class="fas fa-times"></i>
+                        &nbsp;
+                        <b>PO CANCEL</b>
+                        &nbsp;
+                        <i class="fas fa-times"></i>
+                    </button>
+                <?php endif; ?>
                 <!-- /.col -->
+
             </div>
             <?php foreach ($CountItem as $c) :
                 if ($c->total_item == '15') {

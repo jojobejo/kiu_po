@@ -80,6 +80,11 @@
                                             <i class="fas fa-thumbs-up"></i>&nbsp;
                                             <?= $p->status ?>
                                         </a>
+                                    <?php elseif ($p->status == 'CANCEL') : ?>
+                                        <a class="btn btn-block btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
                                     <?php elseif ($p->status == 'REJECT') : ?>
                                         <a class="btn btn-block btn-danger btn-sm">
                                             <i class="fas fa-times"></i>&nbsp;

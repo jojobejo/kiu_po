@@ -399,6 +399,32 @@ class C_PoStatus extends CI_Controller
         redirect('postatus');
     }
 
+    public function cancel_po()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $kddirektur     = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+        $nt_cancel      = $this->input->post('nt_cancel');
+
+        $dataKonfirm = array(
+            'kd_po' => $kdpo,
+            'acc_with' => $kddirektur,
+            'status' => 'CANCEL'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO CANCEL - ' . $nt_cancel,
+            'kd_user'   => $kddirektur,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->tolakPo($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatus');
+    }
+
     public function addNote()
     {
         $kdpo           = $this->input->post('kdpo');

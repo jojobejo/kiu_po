@@ -52,6 +52,14 @@
                                         <?php elseif ($s->status == 'DONE' && $s->kd_printout_note == '') : ?>
                                             <a class="btn btn-success btn-block" onclick='alert("Format Printout Belum Terpilih")'><i class="fas fa-print"></i> Cetak Form Order</a>
                                         <?php endif; ?>
+                                    <?php elseif ($s->status == 'CANCEL') : ?>
+                                        <?php if ($s->status == 'CANCEL' && $s->kd_printout_note != '') : ?>
+                                            <div>
+                                                <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
+                                            </div>
+                                        <?php elseif ($s->status == 'CANCEL' && $s->kd_printout_note == '') : ?>
+                                            <a class="btn btn-success btn-block" onclick='alert("Format Printout Belum Terpilih")'><i class="fas fa-print"></i> Cetak Form Order</a>
+                                        <?php endif; ?>
                                     <?php elseif ($s->status == 'ON PROGRESS') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
@@ -105,6 +113,10 @@
                                 <div class="col">
                                     <label for="tgTrans" class="">Status Order :</label>
                                     <a class="btn btn-success btn-block"><i class="fas fa-thumbs-up"></i> PO - DONE</a>
+                                </div>
+                                <div class="col">
+                                    <label for="tgTrans" class="">Status Order :</label hidden>
+                                    <a class="btn btn-danger btn-block" data-toggle="modal" data-target="#modalcancelpo<?= $s->id_po ?>"><i class="fas fa-times"></i> PO - CANCEL</a>
                                 </div>
 
                             <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'REJECT') : ?>
@@ -193,7 +205,13 @@
                 </a>
             </div>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
-
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
+            <div class="col-md mb-2">
+                <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
+                    <i class="fas fa-shipping-fast"> </i>
+                    Shipment Setting
+                </a>
+            </div>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
             <div class="row">
                 <div class="col-md mb-2">
@@ -252,6 +270,7 @@
                     <td>Total Harga</td>
                     <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                         <td>#</td>
                     <?php endif; ?>
@@ -270,6 +289,7 @@
                         <td>Rp. <?= number_format($d->hrg_total, 2) ?></td>
                         <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                             <td>
                                 <div class="row">
@@ -321,6 +341,7 @@
                                     Rp. <?= number_format($d->nominal) ?>
                                     <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
                                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                         <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
                                             <i class="fas fa-pencil-alt"></i>
@@ -524,6 +545,7 @@
                     <td>Note Untuk Suplier</td>
                     <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                         <td>#</td>
                     <?php endif; ?>
@@ -537,6 +559,7 @@
                         </td>
                         <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                             <td>
                                 <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">
