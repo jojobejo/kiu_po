@@ -485,9 +485,9 @@
                 <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
                     <tr>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
-                        <td colspan="1" style="font-weight: bold;"> 30 Hari </td>
+                        <td colspan="1" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
                         <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
-                        <td colspan="1" style="font-weight: bold;"> Gudang Jember </td>
+                        <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                         <td colspan="2" style="font-weight: bold;"></td>
                     </tr>
                     <tr>
