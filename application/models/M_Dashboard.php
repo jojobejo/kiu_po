@@ -10,31 +10,35 @@ class M_Dashboard extends CI_Model
         parent::__construct();
     }
 
-    function totalAll()
+    function totalAll($kduser)
     {
-        return $this->db->query("SELECT COUNT(a.id_po)AS total
-        FROM tb_po a 
+        return $this->db->query("SELECT COUNT(a.id_po_nk)AS total
+        FROM tb_po_nk a 
+        WHERE a.kd_user = '$kduser'
         ");
     }
-    function totalDone()
+    function totalDone($kduser)
     {
-        return $this->db->query("SELECT COUNT(a.id_po)as tdone
-        FROM tb_po a
+        return $this->db->query("SELECT COUNT(a.id_po_nk)as tdone
+        FROM tb_po_nk a
         WHERE a.status = 'DONE'
+        AND a.kd_user = '$kduser'
         ");
     }
-    function totalOnProgress()
+    function totalOnProgress($kduser)
     {
-        return $this->db->query("SELECT COUNT(a.id_po) as tprogress
-        FROM tb_po a
+        return $this->db->query("SELECT COUNT(a.id_po_nk) as tprogress
+        FROM tb_po_nk a
         WHERE a.status = 'ON PROGRESS'
+        AND a.kd_user = '$kduser'
         ");
     }
-    function totalReject()
+    function totalReject($kduser)
     {
-        return $this->db->query("SELECT COUNT(a.id_po) as treject
-        FROM tb_po a
+        return $this->db->query("SELECT COUNT(a.id_po_nk) as treject
+        FROM tb_po_nk a
         WHERE a.status = 'REJECT'
+        AND a.kd_user = '$kduser'
         ");
     }
 }

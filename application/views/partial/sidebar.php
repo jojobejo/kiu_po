@@ -106,6 +106,74 @@
             </a>
           </li>
 
+        <?php elseif ($this->session->userdata('lv') == '4') : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                Purchase Order
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                Purchase Order Status
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Account Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>
+                Log Out
+              </p>
+            </a>
+          </li>
+
+          <?php elseif ($this->session->userdata('lv') == '5') : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                Purchase Order
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                Purchase Order Status
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Account Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>
+                Log Out
+              </p>
+            </a>
+          </li>
+
         <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'HRD') : ?>
           <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">

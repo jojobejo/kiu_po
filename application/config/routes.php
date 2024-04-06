@@ -93,6 +93,8 @@ $route['hapustmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_hapus_barang_ko
 $route['addtmpdiskonnk'] = 'purchaseorder/C_Order/tmp_add_diskon_komersil';
 $route['add_note_pembelian_tmp'] = 'purchaseorder/C_Order/add_note_pembelian_tmp';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
+$route['edit_note_pembelian_tmp'] = 'purchaseorder/C_Order/edit_note_pembelian_tmp';
+$route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pembelian_tmp/$1';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
@@ -105,6 +107,8 @@ $route['editedponk'] = 'postatus/C_PoStatus/edited_fk_nk';
 $route['add_note_pembelian_nk'] = 'postatus/C_PoStatus/add_note_pembelian_nk';
 $route['edit_note_pembelian_nk'] = 'postatus/C_PoStatus/edit_note_pembelian_nk';
 $route['hapus_note_pembelian_nk'] = 'postatus/C_PoStatus/hapus_note_pembelian_nk';
+
+$route['addnopo'] = 'postatus/C_PoStatus/addnopo';
 
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
@@ -133,6 +137,7 @@ $route['postatus/today/done'] = 'postatus/C_PoStatus/getDoneToday';
 $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
 $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
+$route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
 $route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';

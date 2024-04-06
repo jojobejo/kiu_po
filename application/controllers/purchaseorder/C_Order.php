@@ -319,7 +319,12 @@ class C_Order extends CI_Controller
     public function pononkomersil()
     {
         $data['title'] = 'Purchase Order Non Komersil';
+        $data['depuser'] = $this->session->userdata('departemen');
+        $data['nmuser'] = $this->session->userdata('nama_user');
         $user = $this->session->userdata('kode');
+        $dep  = $this->session->userdata('departemen');
+        $data['nopk'] = $user . $dep;
+
         $data['kdbarang'] = $this->M_Purchase->kdnonkomersial();
         $data['tmp']    = $this->M_Purchase->get_tmp_non_komersil($user);
         $data['total'] = $this->M_Purchase->sumtransaksink();
@@ -404,6 +409,27 @@ class C_Order extends CI_Controller
         $this->M_Purchase->input_note_pembelian_nt($datanote);
         redirect('pononkomersil');
     }
+
+    public function edit_note_pembelian_tmp()
+    {
+        $idisi = $this->input->post('id_isi');
+        $ket    = $this->input->post('ket_isi');
+
+        $datanote = array(
+            'keterangan'   => $ket,
+        );
+
+        $this->M_Purchase->editNoteNk($idisi, $datanote);
+        redirect('pononkomersil');
+    }
+
+    public function hapus_note_pembelian_tmp($id)
+    {
+
+        $this->M_Purchase->hapus_tmp_nk_nt_pembelian($id);
+        redirect('pononkomersil');
+    }
+
     public function rekam_po_nk()
     {
         date_default_timezone_set("Asia/Jakarta");

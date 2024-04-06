@@ -133,8 +133,10 @@
                 <div class="col">
                     <table class="table-bordered text-s listdb" width='100%' height=''>
                         <tr>
-                            <td align="center" style="width: 50%;">Yang Menyetujui,</br><img src=" <?= base_url('assets/images/qrcode/') . $s->acc_with ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nama_user ?> )</u></td>
-                            <td align="center">Yang Mengajukan,</br></br></br></br></br></br></br></br><u>( <?= $s->nm_user ?> )</u></td>
+                            <td align="center" style="width: 25%;">Yang Mengajukan,</br><img src=" <?= base_url('assets/images/qrcode/') ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nm_karyawan ?> )</u></td>
+                            <td align="center" style="width: 25%;">Mengetahui,</br><img src=" <?= base_url('assets/images/qrcode/')  ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nm_kadep ?> )</u></td>
+                            <td align="center" style="width: 25%;">Menyetujui,</br><img src=" <?= base_url('assets/images/qrcode/') . $s->acc_with ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $s->nm_direktur ?> )</u></td>
+                            <td align="center" style="width: 25%;">Pelaksana,</br><img src=" <?= base_url('assets/images/qrcode/') ?>.png" style="width: 170px; height: 170px;"></br><u>( <?= $this->session->userdata('nama_user') ?> )</u></td>
                         </tr>
                     </table>
                 </div>

@@ -51,6 +51,11 @@
                                                 <i class="fas fa-clock"></i>&nbsp;
                                                 ON PROGRESS
                                             </a>
+                                        <?php elseif ($p->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '2') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                MENUNGGU ACC KADEP
+                                            </a>
                                         <?php elseif ($p->status == 'DONE') : ?>
                                             <a class="btn btn-block btn-success btn-sm">
                                                 <i class="fas fa-thumbs-up"></i>&nbsp;
@@ -65,6 +70,31 @@
                                             <a class="btn btn-block btn-warning btn-sm">
                                                 <i class="fas fa-undo"></i>&nbsp;
                                                 <?= $p->status ?>
+                                            </a>
+                                        <?php elseif ($p->status == 'ACC-KADEP') : ?>
+                                            <a class="btn btn-block btn-primary btn-sm">
+                                                <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                <?= $p->status ?>
+                                            </a>
+                                        <?php elseif ($p->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '5') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                MENUNGGU ACC KADEP
+                                            </a>
+                                        <?php elseif ($p->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '4') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                MENUNGGU ACC KADEP
+                                            </a>
+                                        <?php elseif ($p->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') != '3') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                <?= $p->status ?>
+                                            </a>
+                                        <?php elseif ($p->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') == '3') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-clock"></i>&nbsp;
+                                                PENGAJUAN PEMBELIAN BARU
                                             </a>
                                         <?php endif; ?>
                                     </div>

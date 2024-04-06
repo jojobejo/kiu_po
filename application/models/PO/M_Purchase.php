@@ -271,7 +271,7 @@ class M_Purchase extends CI_Model
     }
     public function hapus_tmp_nk_nt_pembelian($id)
     {
-        $this->db->where('kd_user', $id);
+        $this->db->where('id_tmp_nt_pembelian ', $id);
         return $this->db->delete('tb_nt_tmp_pembelian');
     }
 
@@ -303,6 +303,11 @@ class M_Purchase extends CI_Model
     function addNote($data)
     {
         $this->db->insert('tb_note_direktur', $data);
+    }
+    function editNoteNk($kd, $data)
+    {
+        $this->db->where('id_tmp_nt_pembelian ', $kd);
+        return $this->db->update('tb_nt_tmp_pembelian', $data);
     }
     function getTmpDiskonOrder($kd)
     {

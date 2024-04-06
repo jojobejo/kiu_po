@@ -155,11 +155,13 @@ class M_PoStatus extends CI_Model
     }
     function getDataStatussnk($kdpo)
     {
-        $this->db->select('*');
-        $this->db->from('tb_po_nk a');
-        $this->db->join('tb_user c', 'c.kode_user = a.acc_with');
-        $this->db->where('kd_po_nk', $kdpo);
-        return $this->db->get()->result();
+        return $this->db->query("SELECT a.* , b.nama_user AS nm_karyawan , c.nama_user AS nm_kadep , d.nama_user AS nm_direktur
+        FROM tb_po_nk a 
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        JOIN tb_user c ON c.kode_user = a.acc_with_kadep
+        JOIN tb_user d ON d.kode_user = a.acc_with
+        WHERE a.kd_po_nk = '$kdpo'        
+        ");
     }
     function CountItem($kdpo)
     {
@@ -308,11 +310,64 @@ class M_PoStatus extends CI_Model
         return $this->db->delete('tb_po');
     }
 
-    public function getAllNK()
+    public function getAllNK_keu()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP'
+            ");
+    }
+    public function getAllNK_kar($kduser)
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.kd_user = '$kduser'
+            ");
+    }
+    public function getAllNK_kadep($kddep)
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.departemen = '$kddep'  AND a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN'
+            ");
+    }
+    public function getAllNK_direktur()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' 
+            ");
+    }
+    public function getNKpch($sts)
     {
         $this->db->select('*');
         $this->db->from('tb_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.status', $sts);
+        return $this->db->get()->result();
+    }
+    public function getNKdep($dep)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.departemen', $dep);
+        return $this->db->get()->result();
+    }
+    public function getNKdirektur($sts)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.departemen', $sts);
         return $this->db->get()->result();
     }
     public function getDetailnk($kd)
@@ -470,6 +525,11 @@ class M_PoStatus extends CI_Model
         return $this->db->update('tb_note_pembelian', $data);
     }
     function editedponk($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
+    function addnopo($id, $data)
     {
         $this->db->where('kd_po_nk', $id);
         return $this->db->update('tb_po_nk', $data);

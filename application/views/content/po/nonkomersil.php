@@ -7,6 +7,7 @@
                     </h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
+
             <div style="display: flex; text-align: center;">
                 <a href="<?= base_url('dashboard') ?>">
                     <i class="fa fa-arrow-left  ml-4 mr-4 mt-2"></i>
@@ -36,7 +37,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Nomor Po" value="" name="no_po_isi" id="no_po_isi">
+                            <input type="text" class="form-control" placeholder="Nomor Po" value="<?= $nopk ?>" name="no_po_isi" id="no_po_isi" readonly>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -44,7 +45,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Nama Pengaju" value="" name="nm_user" id="nm_user">
+                            <input type="text" class="form-control" placeholder="Nama Pengaju" value="<?= $nmuser ?>" name="nm_user" id="nm_user" readonly>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -52,7 +53,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-landmark"></i></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Departemen" value="" name="dep_isi" id="dep_isi">
+                            <input type="text" class="form-control" placeholder="Departemen" value="<?= $depuser ?>" name="dep_isi" id="dep_isi" readonly>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -142,7 +143,7 @@
                                     <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#edititem<?= $np->id_tmp_nt_pembelian ?>">
                                         <i class="fa fa-solid fa-pencil-alt"></i>
                                     </a>
-                                    <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusitem<?= $np->id_tmp_nt_pembelian ?>">
+                                    <a href="<?= base_url("hapus_note_pembelian_tmp/" . $np->id_tmp_nt_pembelian) ?>" class="btn btn-danger btn-sm ">
                                         <i class="fa fa-solid fa-trash-alt"></i>
                                     </a>
                                 </td>

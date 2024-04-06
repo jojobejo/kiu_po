@@ -211,3 +211,36 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+<?php foreach ($tmpntpembelian as $np) : ?>
+    <div class="modal fade" id="edititem<?= $np->id_tmp_nt_pembelian ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Note Pembelian</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('edit_note_pembelian_tmp'); ?>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $np->id_tmp_nt_pembelian  ?>" readonly hidden />
+                                <textarea name="ket_isi" id="ket_isi" cols="30" rows="10" class="form-control"><?= $np->keterangan ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+<?php endforeach; ?>

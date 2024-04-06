@@ -75,6 +75,11 @@
                                             <i class="fas fa-clock"></i>&nbsp;
                                             ON PROGRESS
                                         </a>
+                                    <?php elseif ($p->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '2') : ?>
+                                        <a class="btn btn-block btn-warning btn-sm">
+                                            <i class="fas fa-clock"></i>&nbsp;
+                                            ON PROGRESS
+                                        </a>
                                     <?php elseif ($p->status == 'DONE') : ?>
                                         <a class="btn btn-block btn-success btn-sm">
                                             <i class="fas fa-thumbs-up"></i>&nbsp;

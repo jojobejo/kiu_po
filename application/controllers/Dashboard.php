@@ -18,10 +18,12 @@ class Dashboard extends CI_Controller
     {
 
         $data['title']  = 'Dashboard';
-        $data['all']    = $this->M_Dashboard->totalAll()->result();
-        $data['done']   = $this->M_Dashboard->totalDone()->result();
-        $data['progress'] = $this->M_Dashboard->totalOnProgress()->result();
-        $data['reject'] = $this->M_Dashboard->totalReject()->result();
+        $kduser = $this->session->userdata("kode");
+
+        $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
+        $data['done']   = $this->M_Dashboard->totalDone($kduser)->result();
+        $data['progress'] = $this->M_Dashboard->totalOnProgress($kduser)->result();
+        $data['reject'] = $this->M_Dashboard->totalReject($kduser)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
