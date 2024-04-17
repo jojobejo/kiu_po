@@ -71,6 +71,11 @@
                                                 <i class="fas fa-undo"></i>&nbsp;
                                                 <?= $p->status ?>
                                             </a>
+                                        <?php elseif ($p->status == 'PENDING') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm">
+                                                <i class="fas fa-undo"></i>&nbsp;
+                                                <?= $p->status ?>
+                                            </a>
                                         <?php elseif ($p->status == 'ACC-KADEP') : ?>
                                             <a class="btn btn-block btn-primary btn-sm">
                                                 <i class="fas fa-thumbs-up"></i>&nbsp;

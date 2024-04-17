@@ -248,7 +248,12 @@ class M_Purchase extends CI_Model
     }
     function input_detail_nt_pembelian($data)
     {
-        $this->db->insert('tb_note_pembelian', $data);
+        $this->db->insert('tb_note_pem  belian', $data);
+    }
+    function delete_detail_nt_pembelian($kduser)
+    {
+        $this->db->where('kd_user', $kduser);
+        return $this->db->delete('tb_nt_tmp_pembelian');
     }
     function gettmp_note_pembelian($kd)
     {

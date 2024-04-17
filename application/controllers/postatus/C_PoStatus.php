@@ -658,6 +658,11 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->hapusDiskon($id);
         redirect('detailPO/' . $kdpo);
     }
+    public function hapusDiskonNK($id, $kdponk)
+    {
+        $this->M_Postatus->hapusDiskonNK($id);
+        redirect('detailponk/' . $kdponk);
+    }
 
     public function postatusnk()
     {
@@ -946,7 +951,6 @@ class C_PoStatus extends CI_Controller
             );
             $this->M_Postatus->addNote($addnoteDirektur);
             $this->M_Postatus->updateStatusnk($kdpo, $noteUpdateDirektur);
-            
         } else if ($stslogin == '4') {
             $addnoteuser = array(
                 'kd_po'     => $kdpo,
@@ -1139,19 +1143,20 @@ class C_PoStatus extends CI_Controller
         redirect('postatusnk');
     }
 
-    public function tolakOrderNK($kdpo, $kddirektur)
+    public function tolakOrderNK()
     {
+        $kdpo           = $this->input->post('kdpo');
+        $note           = $this->input->post('noteDitektur');
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
         $dataKonfirm = array(
             'kd_po_nk' => $kdpo,
-            'acc_with' => $kddirektur,
             'status' => 'REJECT'
         );
         $notedirektur = array(
             'kd_po'     => $kdpo,
-            'isi_note'  => 'PO REJECT',
+            'isi_note'  => 'PO REJECT - ' . $note,
             'kd_user'   => $departement,
             'nama_user'   => $namauser,
             'note_for'  => '1',
@@ -1160,8 +1165,34 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->tolakPonk($kdpo, $dataKonfirm);
         $this->M_Postatus->addNote($notedirektur);
-        redirect('postatusnk');
+        redirect('detailponk/' . $kdpo);
     }
+
+    public function pendingordernk()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $note           = $this->input->post('noteDitektur');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpo,
+            'status' => 'PENDING'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO PENDING - ' . $note,
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->pendingordernk($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('detailponk/' . $kdpo);
+    }
+
     public function insert_note_setting()
     {
         $kdpo           = $this->input->post('kdpo');

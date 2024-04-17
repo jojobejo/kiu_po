@@ -20,19 +20,19 @@
                 <div class="">
                     <div class="row">
                         <?php foreach ($status as $s) : ?>
-                            <div class="col">
+                            <div class="col-2">
                                 <label for="naSupp" class="">NOMOR PO : </label>
                                 <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nopo ?>" class="form-control" readonly>
                             </div>
-                            <div class="col">
+                            <div class="col-2">
                                 <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
                                 <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                             </div>
-                            <div class="col">
+                            <div class="col-2">
                                 <label for="naSupp" class="">Nama Pengaju: </label>
                                 <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
                             </div>
-                            <div class="col">
+                            <div class="col-2">
                                 <label for="noInv" class="">Departemen</label>
                                 <input type="text" id="noInv" name="noInv" value="<?= $s->departemen ?>" class="form-control" readonly>
                             </div>
@@ -67,6 +67,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO REVISI</a>
                                         </div>
+                                    <?php elseif ($s->status == 'PENDING') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                        </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
                                         <div>
                                             <a href="#" class="btn btn-primary btn-block"><i class="fas fa-thumbs-up"></i> PO ACCEPT KADEP</a>
@@ -75,6 +79,7 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> SEDANG DIAJUKAN</a>
                                         </div>
+
                                     <?php elseif ($s->status == 'ON PROGRESS - KADEP') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> MENGGU ACC KADEP</a>
@@ -112,6 +117,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO REVISI</a>
                                         </div>
+                                    <?php elseif ($s->status == 'PENDING') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                        </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
                                         <div>
                                             <a href="#" class="btn btn-primary btn-block"><i class="fas fa-thumbs-up"></i> PO ACCEPT KADEP</a>
@@ -148,6 +157,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO REVISI</a>
                                         </div>
+                                    <?php elseif ($s->status == 'PENDING') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                        </div>
                                     <?php elseif ($s->status == 'ON PROGRESS' || $s->status == 'ON PROGRESS - KADEP') : ?>
                                         <div class="row">
                                             <div class="col">
@@ -157,20 +170,20 @@
                                                 </a>
                                             </div>
                                             <div class="col">
-                                                <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrderNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                <a class="btn btn-block btn-danger btn-md" data-toggle="modal" data-target="#modalReject">
                                                     <i class="fas fa-times"></i> &nbsp;
                                                     Reject
+                                                </a>
+                                            </div>
+                                            <div class="col">
+                                                <a class="btn btn-block btn-warning btn-md" data-toggle="modal" data-target="#modalPending">
+                                                    <i class="fas fa-clock"></i> &nbsp;
+                                                    Pending
                                                 </a>
                                             </div>
                                         </div>
                                     <?php elseif ($s->status == 'SEDANG DIAJUKAN') : ?>
                                         <div class="row">
-                                            <div class="col">
-                                                <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrderNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
-                                                    <i class="fas fa-clipboard-check"></i>
-                                                    Accept
-                                                </a>
-                                            </div>
                                             <div class="col">
                                                 <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrderNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
                                                     <i class="fas fa-times"></i> &nbsp;
@@ -297,7 +310,7 @@
                 </div>
             </div>
             <!-- ELSEIF == 4 -->
-        <?php elseif ($this->session->userdata('lv') == '4' && $s->status != 'DONE' && $s->status != 'ON PROGRESS - KADEP' ) : ?>
+        <?php elseif ($this->session->userdata('lv') == '4' && $s->status != 'DONE' && $s->status != 'ON PROGRESS - KADEP') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addmodalbarang">
@@ -404,7 +417,7 @@
                                     </a>
                                 </div>
                             </td>
-                        <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'DONE' ) : ?>
+                        <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'REJECT') : ?>
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
@@ -445,7 +458,7 @@
                                         <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
                                             <i class="fas fa-pencil-alt"></i>
                                         </a>
-                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskonNk/') . $d->id_diskon . '/' . $d->kd_po ?>">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     <?php endif; ?>
@@ -510,7 +523,7 @@
                             <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                            <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskonNk/') . $d->id_diskon . '/' . $d->kd_po ?>">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         <?php endif; ?>
@@ -583,7 +596,7 @@
                             <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                            <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskonNk/') . $d->id_diskon . '/' . $d->kd_po ?>">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         <?php endif; ?>

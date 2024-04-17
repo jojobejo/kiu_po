@@ -138,7 +138,8 @@ $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
 $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
-$route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
+$route['tolakOrderNK'] = 'postatus/C_PoStatus/tolakOrderNK';
+$route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
 $route['update_printout_po'] = 'postatus/C_PoStatus/update_printout_po';
@@ -170,6 +171,7 @@ $route['frankoPengiriman'] = 'postatus/C_PoStatus/frankoPengiriman';
 $route['addDiskon'] = 'postatus/C_PoStatus/tambahDiskon';
 $route['diskonEdit'] = 'postatus/C_PoStatus/editDiskon';
 $route['hapusDiskon/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
+$route['hapusDiskonNk/(:any)/(:any)'] = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
 $route['add_diskon_barang'] = 'postatus/C_PoStatus/add_diskon_barang';
 $route['add_diskon_barangs'] = 'postatus/C_PoStatus/add_diskon_barangs';
 

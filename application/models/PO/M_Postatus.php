@@ -202,6 +202,11 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->update('tb_po_nk', $data);
     }
+    function pendingordernk($kdpo, $data)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->update('tb_po_nk', $data);
+    }
 
     function addNote($data)
     {
@@ -252,6 +257,12 @@ class M_PoStatus extends CI_Model
     }
 
     function hapusDiskon($id)
+    {
+        $this->db->where('id_diskon', $id);
+        return $this->db->delete('tb_diskon');
+    }
+
+    function hapusDiskonNK($id)
     {
         $this->db->where('id_diskon', $id);
         return $this->db->delete('tb_diskon');
@@ -316,7 +327,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP'
+        WHERE a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
             ");
     }
     public function getAllNK_kar($kduser)
@@ -334,7 +345,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.departemen = '$kddep'  AND a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN'
+        WHERE a.departemen = '$kddep'  AND a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN' AND a.status != 'REJECT'
             ");
     }
     public function getAllNK_direktur()
@@ -343,7 +354,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' 
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
             ");
     }
     public function getNKpch($sts)

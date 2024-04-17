@@ -485,8 +485,8 @@ class C_Order extends CI_Controller
                     'keterangan'    => $pm->keterangan,
                     'kd_user'       => $kduser
                 );
-
                 $this->M_Purchase->input_detail_nt_pembelian($notepemeblian);
+                $this->M_Purchase->delete_detail_nt_pembelian($kduser);
             }
 
             $updatenote = array(
