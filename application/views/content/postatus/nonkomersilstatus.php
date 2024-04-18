@@ -73,7 +73,7 @@
                                             </a>
                                         <?php elseif ($p->status == 'PENDING') : ?>
                                             <a class="btn btn-block btn-warning btn-sm">
-                                                <i class="fas fa-undo"></i>&nbsp;
+                                                <i class="fas fa-pause"></i>&nbsp;
                                                 <?= $p->status ?>
                                             </a>
                                         <?php elseif ($p->status == 'ACC-KADEP') : ?>

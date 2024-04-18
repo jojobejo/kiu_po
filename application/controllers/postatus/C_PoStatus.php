@@ -1094,6 +1094,29 @@ class C_PoStatus extends CI_Controller
         );
         echo json_encode($output);
     }
+    public function repostponk($kdpo)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpo,
+            'status' => 'ON PROGRESS'
+        );
+
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'REPOST PO',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->konfirmPonk($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
     public function konfirmasiOrderNK($kdpo, $kddirektur)
     {
         $departement    = $this->session->userdata('kode');

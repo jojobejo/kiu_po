@@ -140,6 +140,7 @@ $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
 $route['tolakOrderNK'] = 'postatus/C_PoStatus/tolakOrderNK';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
+$route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
 $route['update_printout_po'] = 'postatus/C_PoStatus/update_printout_po';

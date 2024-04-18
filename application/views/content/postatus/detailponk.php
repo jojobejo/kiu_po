@@ -68,8 +68,13 @@
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO REVISI</a>
                                         </div>
                                     <?php elseif ($s->status == 'PENDING') : ?>
-                                        <div>
-                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                        <div class="row">
+                                            <div class="col">
+                                                <a href="#" class="btn btn-warning btn-block"><i class="fas fa-pause"></i> PO PENDING</a>
+                                            </div>
+                                            <div class="col">
+                                                <a href="<?= base_url('repostponk/') . $s->kd_po_nk ?>" class="btn btn-success btn-block"><i class="fas fa-undo"></i> REPOST PO </a>
+                                            </div>
                                         </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
                                         <div>
@@ -119,7 +124,7 @@
                                         </div>
                                     <?php elseif ($s->status == 'PENDING') : ?>
                                         <div>
-                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-pause"></i> PO PENDING</a>
                                         </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
                                         <div>
@@ -142,8 +147,13 @@
                                             <a href="<?= base_url('printOrdernk/') . $s->kd_po_nk ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
                                         </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
-                                        <div>
-                                            <a href="#" class="btn btn-primary thumbs-up"><i class="fas fa-clock"></i> ACC - KADEP</a>
+                                        <div class="row">
+                                            <div class="col">
+                                                <a href="#" class="btn btn-block btn-primary thumbs-up"><i class="fas fa-thumbs-up"></i> ACC - KADEP</a>
+                                            </div>
+                                            <div class="col">
+                                                <a href="#" class="btn btn-block btn-danger" data-toggle="modal" data-target="#modalReject"><i class="fas fa-times"></i> REJECT PO</a>
+                                            </div>
                                         </div>
                                     <?php elseif ($s->status == 'UPDATE DIREKTUR') : ?>
                                         <div>
@@ -159,7 +169,7 @@
                                         </div>
                                     <?php elseif ($s->status == 'PENDING') : ?>
                                         <div>
-                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO PENDING</a>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-pause"></i> PO PENDING</a>
                                         </div>
                                     <?php elseif ($s->status == 'ON PROGRESS' || $s->status == 'ON PROGRESS - KADEP') : ?>
                                         <div class="row">
