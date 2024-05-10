@@ -88,8 +88,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($tmp as $tmp) :
-                            $no = 1; ?>
+                        <?php
+                        $no = 1;
+                        foreach ($tmp as $tmp) :
+                        ?>
                             <tr>
                                 <td><?= $no++; ?></td>
                                 <td><?= $tmp->nama_barang ?></td>
