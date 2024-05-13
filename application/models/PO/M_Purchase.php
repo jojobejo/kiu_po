@@ -242,6 +242,11 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_item_nk', $data);
     }
+    function editimgbarang($kdbarang, $data)
+    {
+        $this->db->where('id_tmp_nk', $kdbarang);
+        return $this->db->update('tb_tmp_item_nk', $data);
+    }
     function input_note_pembelian_nt($data)
     {
         $this->db->insert('tb_nt_tmp_pembelian', $data);

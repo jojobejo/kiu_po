@@ -365,8 +365,10 @@
                     <td>Qty</td>
                     <td>Harga</td>
                     <td>Total Harga</td>
+                    <td>File Pendukung</td>
                     <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
+                        <td>#</td>
                     <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'ON PROGRESS') : ?>
                         <td>#</td>
                     <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
@@ -378,16 +380,17 @@
             </thead>
             <tbody>
                 <?php $no = 1;
-                            foreach ($detail as $d) : ?>
+                            foreach ($detail as $d) :
+                                $imagePath = "../images/" . $d->gbr_produk; ?>
                     <tr>
                         <td><?= $no++; ?></td>
                         <td><?= $d->nama_barang ?></td>
                         <td><?= $d->deskripsi ?></td>
                         <td><?= $d->keterangan ?></td>
                         <td><?= $d->qty ?></td>
-                        <td style="display: none;"></td>
                         <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
                         <td>Rp. <?= number_format($d->total_harga) ?></td>
+                        <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td>
                         <?php if ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                             <td>
                                 <div class="row">
@@ -402,6 +405,7 @@
                                 </div>
                             </td>
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ON PROGRESS') : ?>
+                            <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td>
                             <td>
                                 <div class="row">
                                     <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
@@ -415,6 +419,7 @@
                                 </div>
                             </td>
                         <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
+
                             <td>
                                 <div class="row">
                                     <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
@@ -431,6 +436,7 @@
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'REJECT') : ?>
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+                            <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td>
                             <td>
                                 <div class="row">
                                     <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
@@ -450,17 +456,17 @@
                     <?php foreach ($total as $t) : ?>
                         <tr>
                             <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                            <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                            <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+                        <td colspan="9" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
                     </tr>
                     <?php foreach ($diskon as $d) : ?>
                         <?php if ($diskon > 0) : ?>
                             <tr>
                                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
-                                <td colspan="2" style="font-weight: bold;">
+                                <td colspan="3" style="font-weight: bold;">
                                     Rp. <?= number_format($d->nominal, 2) ?>
                                     <?php if ($this->session->userdata('lv') < '5' && $s->status == 'DONE') : ?>
                                     <?php elseif ($this->session->userdata('lv') < '5' && $s->status == 'REJECT') : ?>
@@ -477,15 +483,15 @@
                         <?php endif; ?>
                     <?php endforeach; ?>
                     <tr>
-                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+                        <td colspan="9" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
                     </tr>
                     <?php foreach ($ntpembelian as $ntpm) : ?>
                         <tr>
-                            <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
+                            <td colspan="9" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+                        <td colspan="9" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
                     </tr>
                     <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
@@ -495,17 +501,17 @@
                                         $hargaAll = $stlhDiskon + $hargaPajak; ?>
                             <tr>
                                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                                <td colspan="3" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
                             </tr>
 
                             <tr>
                                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                                <td colspan="3" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
                             </tr>
 
                             <tr>
                                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
-                                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                                <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
@@ -515,17 +521,17 @@
         <?php foreach ($total as $t) : ?>
             <tr>
                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
             </tr>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
         </tr>
         <?php foreach ($diskon as $d) : ?>
             <?php if ($diskon > 0) : ?>
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
-                    <td colspan="2" style="font-weight: bold;">
+                    <td colspan="3" style="font-weight: bold;">
                         Rp. <?= number_format($d->nominal, 2) ?>
                         <?php if ($this->session->userdata('lv') < '5' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '5' && $s->status == 'REJECT') : ?>
@@ -542,12 +548,12 @@
             <?php endif; ?>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
         </tr>
         <?php foreach ($ntpembelian as $ntpm) : ?>
             <tr>
                 <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
-                <td colspan="1" style="font-weight: bold;">
+                <td colspan="2" style="font-weight: bold;">
                     <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#edit_note_pembelian<?= $ntpm->id_nt_pembelian ?>">
                         <i class="fas fa-pencil-alt"></i>
                     </a>
@@ -558,7 +564,7 @@
             </tr>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
         </tr>
         <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
@@ -568,17 +574,17 @@
                                         $hargaAll = $stlhDiskon + $hargaPajak; ?>
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
-                    <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                    <td colspan="3" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
                 </tr>
 
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                    <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                    <td colspan="3" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
                 </tr>
 
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
-                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                    <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>
@@ -588,17 +594,17 @@
         <?php foreach ($total as $t) : ?>
             <tr>
                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
             </tr>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
         </tr>
         <?php foreach ($diskon as $d) : ?>
             <?php if ($diskon > 0) : ?>
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
-                    <td colspan="2" style="font-weight: bold;">
+                    <td colspan="3" style="font-weight: bold;">
                         Rp. <?= number_format($d->nominal, 2) ?>
                         <?php if ($this->session->userdata('lv') < '5' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '5' && $s->status == 'REJECT') : ?>
@@ -615,12 +621,12 @@
             <?php endif; ?>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
         </tr>
         <?php foreach ($ntpembelian as $ntpm) : ?>
             <tr>
                 <td colspan="7" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
-                <td colspan="1" style="font-weight: bold;">
+                <td colspan="2" style="font-weight: bold;">
                     <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#edit_note_pembelian<?= $ntpm->id_nt_pembelian ?>">
                         <i class="fas fa-pencil-alt"></i>
                     </a>
@@ -631,7 +637,7 @@
             </tr>
         <?php endforeach; ?>
         <tr>
-            <td colspan="8" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
         </tr>
         <?php foreach ($total as $t) :
                                     foreach ($totalDiskon as $d) :
@@ -641,17 +647,17 @@
                                         $hargaAll = $stlhDiskon + $hargaPajak; ?>
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
-                    <td colspan="2" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                    <td colspan="3" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
                 </tr>
 
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                    <td colspan="2" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                    <td colspan="3" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
                 </tr>
 
                 <tr>
                     <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
-                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                    <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>

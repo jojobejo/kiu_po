@@ -358,13 +358,58 @@ class C_Order extends CI_Controller
             'hrg_satuan'    => $hrgsatuan,
             'total_harga'   => $totalharga,
             'kd_barang'     => $kdbarang,
-            'kd_user'       => $kduser
+            'kd_user'       => $kduser,
         );
         $kdgenerate = array(
             'kd_barang' => $kdbarang
         );
+
         $this->M_Purchase->generatekd($kdgenerate);
         $this->M_Purchase->input_tmp_nk($dataBarang);
+
+        redirect('pononkomersil');
+    }
+
+    public function uploadfilegambaredit()
+    {
+        $kdbarang   = $this->input->post('kd_isi');
+        $idisi      = $this->input->post('id_isi');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '10000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U') .   '_' . $_FILES['gambar_1']['name'];
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'id_tmp_nk'   => $idisi,
+            'gbr_produk'    => $image_data1['file_name']
+        );
+
+        $kdgenerate = array(
+            'kd_barang' => $kdbarang
+        );
+
+        $this->M_Purchase->generatekd($kdgenerate);
+        $this->M_Purchase->editimgbarang($idisi, $dataBarang);
 
         redirect('pononkomersil');
     }
@@ -473,7 +518,8 @@ class C_Order extends CI_Controller
                     'keterangan'        => $chart->keterangan,
                     'qty'               => $chart->qty,
                     'hrg_satuan'        => $chart->hrg_satuan,
-                    'total_harga'         => $chart->total_harga,
+                    'total_harga'       => $chart->total_harga,
+                    'gbr_produk'        => $chart->gbr_produk,
                 );
 
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);

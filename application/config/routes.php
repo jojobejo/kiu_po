@@ -87,10 +87,12 @@ $route['update_tax_tmp'] = 'purchaseorder/C_Order/update_tax_tmp';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
+$route['uploadfilegambaredit'] = 'purchaseorder/C_Order/uploadfilegambaredit';
 $route['addtmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_add_barang_komersil';
 $route['edittmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_edit_barang_komersil';
 $route['hapustmpbarangnonkomersil'] = 'purchaseorder/C_Order/tmp_hapus_barang_komersil';
 $route['addtmpdiskonnk'] = 'purchaseorder/C_Order/tmp_add_diskon_komersil';
+$route['imgedit'] = 'purchaseorder/C_Order/imgedit';
 $route['add_note_pembelian_tmp'] = 'purchaseorder/C_Order/add_note_pembelian_tmp';
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
 $route['edit_note_pembelian_tmp'] = 'purchaseorder/C_Order/edit_note_pembelian_tmp';
