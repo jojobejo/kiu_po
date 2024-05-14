@@ -365,7 +365,7 @@
                     <td>Qty</td>
                     <td>Harga</td>
                     <td>Total Harga</td>
-                    <td>File Pendukung</td>
+                    <!-- <td>File Pendukung</td> -->
                     <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                         <td>#</td>
@@ -390,7 +390,7 @@
                         <td><?= $d->qty ?></td>
                         <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
                         <td>Rp. <?= number_format($d->total_harga) ?></td>
-                        <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td>
+                        <!-- <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td> -->
                         <?php if ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                             <td>
                                 <div class="row">

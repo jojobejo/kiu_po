@@ -10,6 +10,7 @@
                 <thead>
                     <tr>
                         <td>No</td>
+                        <td>Nomor PO</td>
                         <td>Status Order</td>
                         <td>Tanggal PO</td>
                         <td>Nama Pembuat</td>
@@ -23,6 +24,7 @@
                     foreach ($po as $p) : ?>
                         <tr>
                             <td><?= $no++; ?></td>
+                            <td><?= $p->nopo ?></td>
                             <td>
                                 <div class="row">
                                     <div class="col-md">
