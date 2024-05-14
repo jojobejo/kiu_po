@@ -519,7 +519,7 @@ class C_Order extends CI_Controller
                     'qty'               => $chart->qty,
                     'hrg_satuan'        => $chart->hrg_satuan,
                     'total_harga'       => $chart->total_harga,
-                    // 'gbr_produk'        => $chart->gbr_produk,
+                    'gbr_produk'        => $chart->gbr_produk,
                 );
 
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);

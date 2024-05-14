@@ -84,7 +84,7 @@
                             <td>Qty</td>
                             <td>Harga Satuan</td>
                             <td>Total Harga</td>
-                            <!-- <td>img</td> -->
+                            <td>img</td>
                             <td>#</td>
                         </tr>
                     </thead>
@@ -102,12 +102,12 @@
                                 <td><?= $tmp->qty ?></td>
                                 <td><?= $tmp->hrg_satuan ?></td>
                                 <td><?= $tmp->total_harga ?></td>
-                                <!-- <td>
+                                <td>
                                     <a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a>
                                     <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-pencil-alt"></i>
                                     </a>
-                                </td> -->
+                                </td>
                                 <td>
                                     <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#edititem<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-pencil-alt"></i>
