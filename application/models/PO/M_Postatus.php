@@ -8,6 +8,8 @@ class M_PoStatus extends CI_Model
     function __construct()
     {
         parent::__construct();
+        $this->load->database();
+        $this->db->reconnect();
     }
 
     public function getAll()
@@ -160,7 +162,7 @@ class M_PoStatus extends CI_Model
         JOIN tb_user b ON b.kode_user = a.kd_user
         JOIN tb_user c ON c.kode_user = a.acc_with_kadep
         JOIN tb_user d ON d.kode_user = a.acc_with
-        WHERE a.kd_po_nk = '$kdpo'        
+        WHERE a.kd_po_nk = '$kdpo' 
         ");
     }
     function CountItem($kdpo)
@@ -321,13 +323,20 @@ class M_PoStatus extends CI_Model
         return $this->db->delete('tb_po');
     }
 
+    public function getAllNk()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user");
+    }
+
     public function getAllNK_keu()
     {
         return $this->db->query("SELECT *,
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
             ");
     }
     public function getAllNK_kar($kduser)
@@ -345,7 +354,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.departemen = '$kddep'  AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN' AND a.status != 'REJECT'
+        WHERE a.departemen = '$kddep'  AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN'
             ");
     }
     public function getAllNK_direktur()

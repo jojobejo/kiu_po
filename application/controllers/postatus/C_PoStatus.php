@@ -664,6 +664,18 @@ class C_PoStatus extends CI_Controller
         redirect('detailponk/' . $kdponk);
     }
 
+    public function postatusallnk()
+    {
+        $data['title'] = 'PO Status';
+        $data['po']    = $this->M_Postatus->getAllNk()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/nonkomersilstatusall', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
     public function postatusnk()
     {
         //VIEW-PURCHASING
@@ -720,6 +732,7 @@ class C_PoStatus extends CI_Controller
             $lv = $this->session->userdata('level');
 
             $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');

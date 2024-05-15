@@ -100,6 +100,7 @@ $route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pe
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
+$route['postatusallnk'] = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
 $route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';

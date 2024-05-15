@@ -126,6 +126,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-pause"></i> PO PENDING</a>
                                         </div>
+                                    <?php elseif ($s->status == 'ON PROGRESS - KADEP') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-pause"></i> ON PROGRESS - KADEP</a>
+                                        </div>
                                     <?php elseif ($s->status == 'ACC-KADEP') : ?>
                                         <div>
                                             <a href="#" class="btn btn-primary btn-block"><i class="fas fa-thumbs-up"></i> PO ACCEPT KADEP</a>
@@ -269,7 +273,7 @@
         <?php if ($this->session->userdata('lv') == '4' && $s->status == 'DONE') : ?>
 
         <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'REJECT') : ?>
-            \
+
         <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'DONE') : ?>
 
         <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'REJECT') : ?>
@@ -279,8 +283,10 @@
         <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
 
         <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
+        <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ON PROGRESS - KADEP') : ?>
         <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'SEDANG DIAJUKAN') : ?>
-        <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
+        <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
+        <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'ON PROGRESS') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addnopo<?= $s->kd_po_nk ?>">
@@ -368,7 +374,7 @@
                     <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                         <td>#</td>
-                    <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'ON PROGRESS') : ?>
+                    <?php elseif ($this->session->userdata('lv') == '4') : ?>
                         <td>#</td>
                     <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
                     <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'REJECT') : ?>
@@ -402,19 +408,6 @@
                                     </a>
                                 </div>
                             </td>
-                        <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ON PROGRESS') : ?>
-                            <td>
-                                <div class="row">
-                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
-                                        <i class="fas fa-pencil-alt"></i>
-                                        Edit
-                                    </a>
-                                    <a class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#hapusitem<?= $d->id_det_po_nk ?>">
-                                        <i class="fas fa-trash-alt"></i>
-                                        Hapus
-                                    </a>
-                                </div>
-                            </td>
                         <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
 
                             <td>
@@ -432,20 +425,7 @@
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'REJECT') : ?>
                         <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
-                        <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
-                            <td><a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a></td>
-                            <td>
-                                <div class="row">
-                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
-                                        <i class="fas fa-pencil-alt"></i>
-                                        Edit
-                                    </a>
-                                    <a class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#hapusitem<?= $d->id_det_po_nk ?>">
-                                        <i class="fas fa-trash-alt"></i>
-                                        Hapus
-                                    </a>
-                                </div>
-                            </td>
+
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
