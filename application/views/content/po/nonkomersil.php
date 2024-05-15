@@ -84,7 +84,6 @@
                             <td>Qty</td>
                             <td>Harga Satuan</td>
                             <td>Total Harga</td>
-                            <td>img</td>
                             <td>#</td>
                         </tr>
                     </thead>
@@ -102,12 +101,6 @@
                                 <td><?= $tmp->qty ?></td>
                                 <td><?= $tmp->hrg_satuan ?></td>
                                 <td><?= $tmp->total_harga ?></td>
-                                <td>
-                                    <a href="<?= $imagePath ?>" target="_blank"><img src="<?= $imagePath ?>" style="width:50px; height:50px"></a>
-                                    <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $tmp->id_tmp_nk ?>">
-                                        <i class="fa fa-solid fa-pencil-alt"></i>
-                                    </a>
-                                </td>
                                 <td>
                                     <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#edititem<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-pencil-alt"></i>
@@ -127,12 +120,11 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
                         </tr>
                         <?php foreach ($total as $tot) : ?>
                             <tr>
                                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                                <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
+                                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga) ?>
                                     <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                                     <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
                                 </td>
