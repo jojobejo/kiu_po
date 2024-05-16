@@ -128,6 +128,13 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function counhrgnyata($kdpo)
+    {
+        $this->db->select("SUM(hrg_nyata) as total_hrg");
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
     function totalnote($kdpo)
     {
         $this->db->select("SUM(id_nt_barang) as total_note");
@@ -363,7 +370,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
             ");
     }
     public function getNKpch($sts)
@@ -471,6 +478,12 @@ class M_PoStatus extends CI_Model
     {
         $this->db->from('tb_detail_po');
         $this->db->where('kd_po', $id_tmp);
+        return $this->db->get()->result();
+    }
+    public function get_ori_nk($id_tmp)
+    {
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $id_tmp);
         return $this->db->get()->result();
     }
     public function get_note_pembelian($kd)

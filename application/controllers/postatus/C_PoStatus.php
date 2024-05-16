@@ -686,6 +686,7 @@ class C_PoStatus extends CI_Controller
             $lv = $this->session->userdata('level');
 
             $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -724,9 +725,24 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
-        //VIEW-KADEP
-        elseif ($this->session->userdata('lv') == '5') {
+        //VIEW-KADEP-KEUANGAN
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') {
 
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+        // VIEW KADEP != KEUANGAN
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') != 'KEUANGAN') {
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
@@ -752,6 +768,7 @@ class C_PoStatus extends CI_Controller
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
+        $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
 
         $this->load->view('partial/header', $data);
@@ -911,6 +928,49 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->hapus_faktur_item_nk($id);
 
         redirect('detailponk/' . $kd);
+    }
+    public function notepembelian()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $namauser       = $this->session->userdata('nama_user');
+        $departement    = $this->session->userdata('kode');
+
+        $addnoteuser = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PROSES PEMBELIAN',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteupdateuser = array(
+            'status'    => 'PROSES PEMBELIAN'
+        );
+        $this->M_Postatus->addNote($addnoteuser);
+        $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+    }
+    public function konfirm_penerimaan()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $namauser       = $this->session->userdata('nama_user');
+        $departement    = $this->session->userdata('kode');
+
+        $addnoteuser = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'BARANG DI TERIMA',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteupdateuser = array(
+            'status'    => 'DONE'
+        );
+        $this->M_Postatus->addNote($addnoteuser);
+        $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+        redirect('postatusnk');
     }
     public function addnotenk()
     {
@@ -1162,7 +1222,7 @@ class C_PoStatus extends CI_Controller
         $dataKonfirm = array(
             'kd_po_nk' => $kdpo,
             'acc_with' => $kddirektur,
-            'status' => 'DONE'
+            'status' => 'ACC DIREKTUR'
         );
 
         $notedirektur = array(

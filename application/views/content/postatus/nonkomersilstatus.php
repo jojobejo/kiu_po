@@ -7,8 +7,7 @@
                 </div><!-- /.col -->
             </div><!-- /.row -->
             <!-- KADEP VIEW -->
-            <?php
-            if ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
+            <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
                 <table class="table table-bordered table-striped" id="tballstatus">
                     <thead>
                         <tr>
@@ -87,6 +86,11 @@
                                                     <i class="fas fa-thumbs-up"></i>&nbsp;
                                                     <?= $p->status ?>
                                                 </a>
+                                            <?php elseif ($p->status == 'PROSES PEMBELIAN') : ?>
+                                                <a class="btn btn-block btn-primary btn-sm">
+                                                    <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                    <?= $p->status ?>
+                                                </a>
                                             <?php elseif ($p->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '5') : ?>
                                                 <a class="btn btn-block btn-warning btn-sm">
                                                     <i class="fas fa-clock"></i>&nbsp;
@@ -106,6 +110,16 @@
                                                 <a class="btn btn-block btn-warning btn-sm">
                                                     <i class="fas fa-clock"></i>&nbsp;
                                                     PENGAJUAN PEMBELIAN BARU
+                                                </a>
+                                            <?php elseif ($p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
+                                                <a class="btn btn-block btn-primary btn-sm">
+                                                    <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                    ACC DIREKTUR
+                                                </a>
+                                            <?php elseif ($p->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '2' || $p->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '4' || $p->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '5') : ?>
+                                                <a class="btn btn-block btn-primary btn-sm">
+                                                    <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                    PROSES PEMBELIAN
                                                 </a>
                                             <?php endif; ?>
                                         </div>
@@ -155,7 +169,7 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            <?php else : ?>
+            <?php elseif ($this->session->userdata('lv') == '5' || $this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '3') : ?>
                 <table class="table table-bordered table-striped" id="tballstatus">
                     <thead>
                         <tr>
@@ -254,6 +268,16 @@
                                                     <i class="fas fa-clock"></i>&nbsp;
                                                     PENGAJUAN PEMBELIAN BARU
                                                 </a>
+                                            <?php elseif ($p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
+                                                <a class="btn btn-block btn-primary btn-sm">
+                                                    <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                    ACC DIREKTUR
+                                                </a>
+                                            <?php elseif ($p1->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '2' || $p1->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '4' || $p1->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '5') : ?>
+                                                <a class="btn btn-block btn-primary btn-sm">
+                                                    <i class="fas fa-truck-moving"></i>&nbsp;
+                                                    PROSES PEMBELIAN
+                                                </a>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -302,9 +326,8 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-
-            <?php endif; ?>
         </div><!-- /.container-fluid -->
+    <?php endif; ?>
     </div>
     <!-- /.content-header -->
 </div>
