@@ -373,12 +373,20 @@ class M_PoStatus extends CI_Model
         WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
             ");
     }
+
     public function getNKpch($sts)
     {
         $this->db->select('*');
         $this->db->from('tb_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('a.status', $sts);
+        return $this->db->get()->result();
+    }
+    public function getstatusRevisi($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->where('a.kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
     public function getNKdep($dep)
@@ -518,6 +526,16 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_detail_po', $kdpo);
     }
+    function editharganyatadetail($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_detail_po_nk', $data);
+    }
+    function editharganyata($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
     function generatekd()
     {
         $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
@@ -602,7 +620,13 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_po', $data);
     }
-    function get_format($kdpo)
+    function get_total($kdpo)
     {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
+            ");
     }
 }

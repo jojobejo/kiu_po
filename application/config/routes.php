@@ -106,6 +106,7 @@ $route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
 $route['noteupdatenk_pembelian'] = 'postatus/C_PoStatus/notepembelian';
 $route['konfirm_penerimaan'] = 'postatus/C_PoStatus/konfirm_penerimaan';
+$route['edit_harganyata'] = 'postatus/C_PoStatus/edit_harganyata';
 $route['add_tax_nk'] = 'postatus/C_PoStatus/add_tax_fk_nk';
 $route['add_diskon_nk'] = 'postatus/C_PoStatus/add_diskon_nk';
 $route['editedponk'] = 'postatus/C_PoStatus/edited_fk_nk';
@@ -145,6 +146,7 @@ $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
 $route['tolakOrderNK'] = 'postatus/C_PoStatus/tolakOrderNK';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
+$route['porevisi'] = 'postatus/C_PoStatus/porevisi';
 $route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';

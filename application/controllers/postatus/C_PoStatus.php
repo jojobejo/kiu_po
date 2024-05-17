@@ -949,7 +949,9 @@ class C_PoStatus extends CI_Controller
         );
         $this->M_Postatus->addNote($addnoteuser);
         $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+        redirect('detailponk/' . $kdpo);
     }
+
     public function konfirm_penerimaan()
     {
         $kdpo           = $this->input->post('kdpo');
@@ -1174,7 +1176,7 @@ class C_PoStatus extends CI_Controller
 
         $dataKonfirm = array(
             'kd_po_nk' => $kdpo,
-            'status' => 'ON PROGRESS'
+            'status' => 'ON PROGRESS - KADEP'
         );
 
         $notedirektur = array(
@@ -1288,6 +1290,30 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->addNote($notedirektur);
         redirect('detailponk/' . $kdpo);
     }
+    public function porevisi()
+    {
+        $kdpoid         = $this->input->post('kdpo');
+        $notes         = $this->input->post('noteisi');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpoid,
+            'status' => 'PO REVISI'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpoid,
+            'isi_note'  => 'PO REVISI - ' . $notes,
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->pendingordernk($kdpoid, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
 
     public function insert_note_setting()
     {
@@ -1306,6 +1332,28 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->insert_setting_note($kdpo, $note_printout);
 
+        redirect('detailPO/' . $kdpo);
+    }
+
+    public function edit_harganyata()
+    {
+        $idpo = $this->input->post('idisi');
+        $kdpo = $this->input->post('kdponk');
+        $hrgnyata = $this->input->post('hrg_nyata');
+        $qty    = $this->input->post('qty_isi');
+        $total_harga = $qty * $hrgnyata;
+
+        $dataedited = array(
+            'hrg_nyata' => $hrgnyata,
+            'total_nyata' => $total_harga
+        );
+
+        $dataedited = array(
+            'total_harga' => $hrgnyata
+        );
+
+        $this->M_Postatus->editharganyatadetail($idpo, $dataedited);
+        $this->M_Postatus->editharganyata($kdpo, $dataedited);
         redirect('detailPO/' . $kdpo);
     }
 }

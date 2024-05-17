@@ -359,6 +359,7 @@ class C_Order extends CI_Controller
             'total_harga'   => $totalharga,
             'kd_barang'     => $kdbarang,
             'kd_user'       => $kduser,
+            'gbr_produk'    => 'Karisma.png'
         );
         $kdgenerate = array(
             'kd_barang' => $kdbarang
@@ -518,7 +519,9 @@ class C_Order extends CI_Controller
                     'keterangan'        => $chart->keterangan,
                     'qty'               => $chart->qty,
                     'hrg_satuan'        => $chart->hrg_satuan,
+                    'hrg_nyata'        => $chart->hrg_satuan,
                     'total_harga'       => $chart->total_harga,
+                    'total_nyata'       => $chart->total_harga,
                     'gbr_produk'        => $chart->gbr_produk,
                 );
 

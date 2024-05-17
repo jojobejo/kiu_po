@@ -96,11 +96,6 @@
                                                     <i class="fas fa-clock"></i>&nbsp;
                                                     MENUNGGU ACC KADEP
                                                 </a>
-                                            <?php elseif ($p->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '4') : ?>
-                                                <a class="btn btn-block btn-warning btn-sm">
-                                                    <i class="fas fa-clock"></i>&nbsp;
-                                                    MENUNGGU ACC KADEP
-                                                </a>
                                             <?php elseif ($p->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') != '3') : ?>
                                                 <a class="btn btn-block btn-warning btn-sm">
                                                     <i class="fas fa-clock"></i>&nbsp;
