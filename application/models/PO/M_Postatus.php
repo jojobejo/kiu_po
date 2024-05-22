@@ -421,9 +421,25 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
+    function flupload($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_file_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
     function sumTransaksiPenjualannk($kdpo)
     {
         $this->db->select("SUM(total_harga) as total_harga");
+        $this->db->select("COUNT(id_det_po_nk) as total_item");
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function sumharganyata($kdpo)
+    {
+        $this->db->select("SUM(total_nyata) as total_nyata");
         $this->db->select("COUNT(id_det_po_nk) as total_item");
         $this->db->from('tb_detail_po_nk');
         $this->db->where('kd_po_nk', $kdpo);
@@ -528,7 +544,7 @@ class M_PoStatus extends CI_Model
     }
     function editharganyatadetail($id, $data)
     {
-        $this->db->where('kd_po_nk', $id);
+        $this->db->where('id_det_po_nk', $id);
         return $this->db->update('tb_detail_po_nk', $data);
     }
     function editharganyata($id, $data)
@@ -564,6 +580,10 @@ class M_PoStatus extends CI_Model
     function add_note_pembelian_nk($data)
     {
         $this->db->insert('tb_note_pembelian', $data);
+    }
+    function add_file_po_nk($data)
+    {
+        $this->db->insert('tb_file_nk', $data);
     }
     function add_tax_nk($id, $data)
     {
@@ -628,5 +648,16 @@ class M_PoStatus extends CI_Model
         JOIN tb_user b ON b.kode_user = a.kd_user
         WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
             ");
+    }
+
+    function uploadgbr_edited($kdpo, $data)
+    {
+        $this->db->where('id_det_po_nk', $kdpo);
+        return $this->db->update('tb_detail_po_nk', $data);
+    }
+    function changestatusnyata($kdponk, $data)
+    {
+        $this->db->where('kd_po_nk', $kdponk);
+        return $this->db->update('tb_po_nk', $data);
     }
 }

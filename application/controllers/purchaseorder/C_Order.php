@@ -519,9 +519,9 @@ class C_Order extends CI_Controller
                     'keterangan'        => $chart->keterangan,
                     'qty'               => $chart->qty,
                     'hrg_satuan'        => $chart->hrg_satuan,
-                    'hrg_nyata'        => $chart->hrg_satuan,
+                    'hrg_nyata'         => '0',
                     'total_harga'       => $chart->total_harga,
-                    'total_nyata'       => $chart->total_harga,
+                    'total_nyata'       => '0',
                     'gbr_produk'        => $chart->gbr_produk,
                 );
 

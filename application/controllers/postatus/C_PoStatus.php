@@ -764,7 +764,9 @@ class C_PoStatus extends CI_Controller
         $data['status'] = $this->M_Postatus->getdataStatusnk($kd);
         $data['log']    = $this->M_Postatus->getNoted($kd);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kd);
+        $data['totalnyata']  = $this->M_Postatus->sumharganyata($kd);
         $data['kdbarang']  = $this->M_Postatus->generatekd();
+        $data['flupload']  = $this->M_Postatus->flupload($kd);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
@@ -1332,7 +1334,7 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->insert_setting_note($kdpo, $note_printout);
 
-        redirect('detailPO/' . $kdpo);
+        redirect('detailponk/' . $kdpo);
     }
 
     public function edit_harganyata()
@@ -1348,12 +1350,104 @@ class C_PoStatus extends CI_Controller
             'total_nyata' => $total_harga
         );
 
-        $dataedited = array(
-            'total_harga' => $hrgnyata
+        $this->M_Postatus->editharganyatadetail($idpo, $dataedited);
+        redirect('detailponk/' . $kdpo);
+    }
+
+    public function gbruploadpic()
+    {
+        $idisi      = $this->input->post('id_isi');
+        $kdponk       = $this->input->post('kd_po');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '10000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U') .   '_' . $_FILES['gambar_1']['name'];
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'id_det_po_nk'   => $idisi,
+            'gbr_produk'    => $image_data1['file_name']
         );
 
-        $this->M_Postatus->editharganyatadetail($idpo, $dataedited);
-        $this->M_Postatus->editharganyata($kdpo, $dataedited);
-        redirect('detailPO/' . $kdpo);
+        $this->M_Postatus->uploadgbr_edited($idisi, $dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+    public function uploadfileponk()
+    {
+        $kdponk       = $this->input->post('kdisi');
+        $keterangan   = $this->input->post('desc_isi');
+        $userup       = $this->session->userdata('kode');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '10000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U') .   '_' . $_FILES['gambar_1']['name'];
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'kd_po_nk'      => $kdponk,
+            'keterangan'    => $keterangan,
+            'user_upload'   => $userup,
+            'file_uploaded'    => $image_data1['file_name']
+        );
+
+        $this->M_Postatus->add_file_po_nk($dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function hrgnyataon($kdponk)
+    {
+        $hrgnyataon = array(
+            'status_hrg_nyata' => '1'
+        );
+        $this->M_Postatus->changestatusnyata($kdponk, $hrgnyataon);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function hrgnyataoff($kdponk)
+    {
+        $hrgnyataoff = array(
+            'status_hrg_nyata' => '0'
+        );
+        $this->M_Postatus->changestatusnyata($kdponk, $hrgnyataoff);
+        redirect('detailponk/' . $kdponk);
     }
 }
