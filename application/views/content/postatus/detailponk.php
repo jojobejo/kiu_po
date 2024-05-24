@@ -86,7 +86,7 @@
 
                                     <?php elseif ($s->status == 'ON PROGRESS - KADEP') : ?>
                                         <div>
-                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> MENGGU ACC KADEP</a>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> MENUNGGU ACC KADEP</a>
                                         </div>
                                     <?php elseif ($s->status == 'ACC DIREKTUR') : ?>
                                         <div>
@@ -460,6 +460,8 @@
                                 <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $d->id_det_po_nk ?>">
                                     <i class="fa fa-solid fa-file-image"></i>
                                 </a>
+                            <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS - KADEP') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                                 <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $d->id_det_po_nk ?>">
@@ -488,6 +490,20 @@
                                     </a>
                                 </div>
                             </td>
+                        <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
+                            <td>
+                                <div class="row">
+                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
+                                        <i class="fas fa-pencil-alt"></i>
+                                        Edit
+                                    </a>
+                                    <a class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#hapusitem<?= $d->id_det_po_nk ?>">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Hapus
+                                    </a>
+                                </div>
+                            </td>
+
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                             <td>
                                 <div class="row">
@@ -653,6 +669,72 @@
         <?php endforeach; ?>
         </tbody>
         </table>
+    <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS - KADEP') : ?>
+        <?php foreach ($total as $t) : ?>
+            <tr>
+                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                <td colspan="4" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="10" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
+        </tr>
+        <?php foreach ($diskon as $d) : ?>
+            <?php if ($diskon > 0) : ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;"><?= $d->keterangan ?> : </td>
+                    <td colspan="4" style="font-weight: bold;">
+                        Rp. <?= number_format($d->nominal, 2) ?>
+                        <?php if ($this->session->userdata('lv') < '5' && $s->status == 'DONE') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '5' && $s->status == 'REJECT') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '5' && $s->status != 'DONE') : ?>
+                            <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d->id_diskon ?>">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskonNk/') . $d->id_diskon . '/' . $d->kd_po ?>">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">Note Pembelian</td>
+        </tr>
+        <?php foreach ($ntpembelian as $ntpm) : ?>
+            <tr>
+                <td colspan="9" style="padding-right:3%; font-weight: bold;"><?= $ntpm->keterangan ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">TOTAL HARGA</td>
+        </tr>
+        <?php foreach ($total as $t) :
+                                    foreach ($totalDiskon as $d) :
+                                        $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                        $tax = $s->tax / 100;
+                                        $hargaPajak = $stlhDiskon * $tax;
+                                        $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon :</td>
+                    <td colspan="4" style="font-weight: bold;"> Rp.<?= number_format($stlhDiskon, 2) ?> </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                    <td colspan="4" style="font-weight: bold;"> Rp. <?= number_format($hargaPajak, 2) ?> </td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
+                    <td colspan="4" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endforeach; ?>
+        </tbody>
+        </table>
+
     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
         <!-- TOTAL HARGA || status_hrg_nyata 1 -->
         <?php if ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP' && $s->status_hrg_nyata == '1') : ?>

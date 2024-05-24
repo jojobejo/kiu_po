@@ -91,6 +91,7 @@
                     cache: false,
                     success: function(data) {
                         if (data.msg == "success") {
+                            alert('PO telah di simpan');
                             location.reload(true);
                         } else {
                             alert('ada kesalahan data')
