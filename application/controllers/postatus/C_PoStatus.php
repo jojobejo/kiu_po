@@ -1360,7 +1360,7 @@ class C_PoStatus extends CI_Controller
         $kdponk       = $this->input->post('kd_po');
 
         if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/';
+            $config['upload_path'] = './images/gbrbarang/';
             $config['allowed_types'] = 'jpg|png|gif';
             $config['max_size'] = '10000';
             $config['max_width'] = '6000';
@@ -1399,7 +1399,7 @@ class C_PoStatus extends CI_Controller
         $userup       = $this->session->userdata('kode');
 
         if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/';
+            $config['upload_path'] = './images/filepndukung/';
             $config['allowed_types'] = 'jpg|png|gif';
             $config['max_size'] = '10000';
             $config['max_width'] = '6000';

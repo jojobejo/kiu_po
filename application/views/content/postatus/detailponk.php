@@ -404,6 +404,12 @@
                         Tambah Note Pembelian
                     </a>
                 </div>
+                <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addfileupload<?= $s->kd_po_nk ?>">
+                        <i class="fa fa-solid fa-file-image"></i>
+                        Add file pendukung
+                    </a>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -437,7 +443,7 @@
             <tbody>
                 <?php $no = 1;
                             foreach ($detail as $d) :
-                                $imagePath = "../images/" . $d->gbr_produk;
+                                $imagePath = "../images/gbrbarang/" . $d->gbr_produk;
                 ?>
                     <tr>
                         <td><?= $no++; ?></td>
@@ -596,6 +602,7 @@
                     <?php endforeach; ?>
             </tbody>
         </table>
+        <!-- AKSES LV 4 || PIC  -->
     <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
         <?php foreach ($total as $t) : ?>
             <tr>
@@ -639,6 +646,34 @@
                     <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#hapus_note_pembelian<?= $ntpm->id_nt_pembelian ?>">
                         <i class="fas fa-trash-alt"></i>
                     </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
+        </tr>
+        <?php foreach ($flupload as $f) :
+                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+        ?>
+            <tr>
+                <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
+                <td colspan="3" style="padding-right:3%; font-weight: bold;">
+                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
+                    </a>
+                </td>
+                <td colspan="3" style="font-weight: bold;">
+                    <div class="row">
+                        <div class="col">
+                            <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_note_pembelian<?= $f->id_file_nk ?>">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#hapus_note_pembelian<?= $f->id_file_nk ?>">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

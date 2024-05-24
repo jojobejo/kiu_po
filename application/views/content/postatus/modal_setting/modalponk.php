@@ -824,8 +824,7 @@
     </div>
 <?php endforeach; ?>
 <?php foreach ($flupload as $f) :
-    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
-?>
+    $imagePath = "../images/filepndukung/" . $f->file_uploaded;?>
     <div class="modal fade" id="openflnk<?= $f->id_file_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
