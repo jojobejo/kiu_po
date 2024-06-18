@@ -106,6 +106,7 @@
                                 <td><?= $tmp->total_harga ?></td>
                                 <td>
                                     <img src="<?php echo $imagePath ?>" style="width:50px; height:50px">
+                                    <input type="text" class="form-control" placeholder="imageupload" value="<?= $tmp->gbr_produk ?>" name="img_upload" id="img_upload" hidden>
                                     <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-file-image"></i>
                                     </a>
