@@ -140,7 +140,7 @@ $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
 $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
-$route['tolakOrderNK'] = 'postatus/C_PoStatus/tolakOrderNK';
+$route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
 $route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 

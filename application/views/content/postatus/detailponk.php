@@ -225,6 +225,15 @@
                                         </div>
                                     </div>
                                 </div>
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'REJECT') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Status Order : </label>
+                                            <a href="#" class="btn btn-danger btn-block"><i class="fas fa-times"></i> Order Ditolak</a>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php endif; ?>
 
                             <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>

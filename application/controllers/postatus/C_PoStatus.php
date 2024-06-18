@@ -1166,11 +1166,8 @@ class C_PoStatus extends CI_Controller
         redirect('postatusnk');
     }
 
-    public function tolakOrderNK()
+    public function tolakOrderNK($kdpo, $kddirektur)
     {
-        $kdpo           = $this->input->post('kdpo');
-        $note           = $this->input->post('noteDitektur');
-        $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
         $dataKonfirm = array(
@@ -1179,8 +1176,8 @@ class C_PoStatus extends CI_Controller
         );
         $notedirektur = array(
             'kd_po'     => $kdpo,
-            'isi_note'  => 'PO REJECT - ' . $note,
-            'kd_user'   => $departement,
+            'isi_note'  => 'PO REJECT',
+            'kd_user'   => $kddirektur,
             'nama_user'   => $namauser,
             'note_for'  => '1',
             'update_status' => '1'
