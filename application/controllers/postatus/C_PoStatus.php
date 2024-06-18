@@ -1243,29 +1243,27 @@ class C_PoStatus extends CI_Controller
         redirect('postatusnk');
     }
 
-    public function tolakOrderNK()
+    public function tolakOrderNK($kdponk, $kduser)
     {
-        $kdpo           = $this->input->post('kdpo');
-        $note           = $this->input->post('noteDitektur');
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
         $dataKonfirm = array(
-            'kd_po_nk' => $kdpo,
+            'kd_po_nk' => $kdponk,
             'status' => 'REJECT'
         );
         $notedirektur = array(
-            'kd_po'     => $kdpo,
-            'isi_note'  => 'PO REJECT - ' . $note,
-            'kd_user'   => $departement,
+            'kd_po'     => $kdponk,
+            'isi_note'  => 'PO REJECT',
+            'kd_user'   => $kduser,
             'nama_user'   => $namauser,
             'note_for'  => '1',
             'update_status' => '1'
         );
 
-        $this->M_Postatus->tolakPonk($kdpo, $dataKonfirm);
+        $this->M_Postatus->tolakPonk($kdponk, $dataKonfirm);
         $this->M_Postatus->addNote($notedirektur);
-        redirect('detailponk/' . $kdpo);
+        redirect('detailponk/' . $kdponk);
     }
 
     public function pendingordernk()
