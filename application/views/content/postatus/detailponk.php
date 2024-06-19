@@ -452,7 +452,12 @@
             <tbody>
                 <?php $no = 1;
                             foreach ($detail as $d) :
-                                $imagePath = "../images/gbrbarang/" . $d->gbr_produk;
+                                if ($d->gbr_produk == 'Karisma.png') {
+                                    $imagePath = "../images/gbrbarang/Karisma.png";
+                                } else {
+                                    $imagePath = "../images/gbrbarang/" . $d->gbr_produk;
+                                }
+
                 ?>
                     <tr>
                         <td><?= $no++; ?></td>
@@ -472,24 +477,33 @@
 
                             <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $d->id_det_po_nk ?>">
+                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
                                     <i class="fa fa-solid fa-file-image"></i>
                                 </a>
+                            <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
+                            <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS - KADEP') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS - KADEP') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $d->id_det_po_nk ?>">
+                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
                                     <i class="fa fa-solid fa-file-image"></i>
                                 </a>
                             <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#upload<?= $d->id_det_po_nk ?>">
+                                <a href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
                                     <i class="fa fa-solid fa-file-image"></i>
                                 </a>
-
+                            <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'ON PROGRESS - KADEP') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'PO REVISI') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'ON PROGRESS') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
+                            <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'ACC-KADEP') : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php endif; ?>
                         </td>
                         <?php if ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
@@ -551,6 +565,20 @@
                         <tr>
                             <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                             <td colspan="3" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
+                    </tr>
+                    <?php foreach ($flupload as $f) :
+                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                    ?>
+                        <tr>
+                            <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
+                            <td colspan="4" style="padding-right:3%; font-weight: bold;">
+                                <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
@@ -658,6 +686,7 @@
                 </td>
             </tr>
         <?php endforeach; ?>
+        <!-- UPLOAD FILE PENDUKUNG -->
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
@@ -673,12 +702,12 @@
                 <td colspan="3" style="font-weight: bold;">
                     <div class="row">
                         <div class="col">
-                            <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_note_pembelian<?= $f->id_file_nk ?>">
+                            <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_gbr_pndukung<?= $f->id_file_nk ?>">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
                         </div>
                         <div class="col">
-                            <a class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#hapus_note_pembelian<?= $f->id_file_nk ?>">
+                            <a class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#delete_gbr_pendukung<?= $f->id_file_nk ?>">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </div>
@@ -718,6 +747,20 @@
             <tr>
                 <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                 <td colspan="4" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
+        </tr>
+        <?php foreach ($flupload as $f) :
+                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+        ?>
+            <tr>
+                <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
+                <td colspan="4" style="padding-right:3%; font-weight: bold;">
+                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
+                    </a>
+                </td>
             </tr>
         <?php endforeach; ?>
         <tr>
@@ -939,12 +982,12 @@
                     <td colspan="3" style="font-weight: bold;">
                         <div class="row">
                             <div class="col">
-                                <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_note_pembelian<?= $f->id_file_nk ?>">
+                                <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_gbr_pndukung<?= $f->id_file_nk ?>">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
                             </div>
                             <div class="col">
-                                <a class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#hapus_note_pembelian<?= $f->id_file_nk ?>">
+                                <a class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#delete_gbr_pendukung<?= $f->id_file_nk ?>">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
@@ -1093,8 +1136,22 @@
     <?php elseif ($this->session->userdata('lv') == '5') : ?>
         <?php foreach ($total as $t) : ?>
             <tr>
-                <td colspan="7" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                <td colspan="1" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+                <td colspan="6" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($t->total_harga) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
+        </tr>
+        <?php foreach ($flupload as $f) :
+                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+        ?>
+            <tr>
+                <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
+                <td colspan="4" style="padding-right:3%; font-weight: bold;">
+                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
+                    </a>
+                </td>
             </tr>
         <?php endforeach; ?>
         <tr>

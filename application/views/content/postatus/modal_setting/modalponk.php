@@ -249,6 +249,7 @@
                         <div class="row">
                             <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $s->kd_po_nk ?>" readonly hidden />
                             <input class="form-control" type="text" id="idisi" name="idisi" value="<?= $s->id_det_po_nk ?>" readonly hidden />
+                            <input class="form-control" type="text" id="nmfile" name="nmfile" value="<?= $s->gbr_produk ?>" readonly hidden />
                         </div>
                     </div>
                     <div class="form-group">
@@ -735,7 +736,7 @@
 <?php endforeach; ?>
 
 <?php foreach ($detail as $t) : ?>
-    <div class="modal fade" id="upload<?= $t->id_det_po_nk ?>">
+    <div class="modal fade" id="uploadgbritem<?= $t->id_det_po_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -752,6 +753,7 @@
                             <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $t->nama_barang ?>" />
                                 <input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $t->id_det_po_nk ?>" readonly hidden />
                                 <input class="form-control" type="text" id="kd_po" name="kd_po" value="<?= $t->kd_po_nk ?>">
+                                <input class="form-control" type="text" id="nm_file" name="nm_file" value="<?= $t->gbr_produk ?>">
                             </div>
                         </div>
                     </div>
@@ -824,7 +826,7 @@
     </div>
 <?php endforeach; ?>
 <?php foreach ($flupload as $f) :
-    $imagePath = "../images/filepndukung/" . $f->file_uploaded;?>
+    $imagePath = "../images/filepndukung/" . $f->file_uploaded; ?>
     <div class="modal fade" id="openflnk<?= $f->id_file_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -848,5 +850,93 @@
             <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
+    </div>
+<?php endforeach; ?>
+
+
+<?php foreach ($flupload as $f) : ?>
+    <div class="modal fade" id="edit_gbr_pndukung<?= $f->id_file_nk ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit File</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('edit_gbr_pndukung'); ?>
+                    <div class="form-group" hidden>
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
+                            <input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $f->id_file_nk ?>" readonly hidden />
+                            <input class="form-control" type="text" id="kd_po" name="kd_po" value="<?= $f->kd_po_nk ?>">
+                            <input class="form-control" type="text" id="file_nm" name="file_nm" value="<?= $f->file_uploaded ?>">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan<span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea name="desc_isi" id="desc_isi" class="form-control"><?= $f->keterangan ?></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Upload Gambar<span class="required">*</span></label>
+                        <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept="img/*">
+                            <label class="custom-file-label" for="customFile">Pilih Gambar</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+<?php endforeach; ?>
+
+<?php foreach ($flupload as $f) : ?>
+    <div class="modal fade" id="delete_gbr_pendukung<?= $f->id_file_nk ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Hapus File - <?= $f->keterangan ?></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('delete_gbr_pendukung'); ?>
+                    <div class="form-group" hidden>
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
+                            <input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $f->id_file_nk ?>" readonly />
+                            <input class="form-control" type="text" id="kd_po" name="kd_po" value="<?= $f->kd_po_nk ?>">
+                            <input class="form-control" type="text" id="file_nm" name="file_nm" value="<?= $f->file_uploaded ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <h3>item akan terhapus secara permanen !</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
     </div>
 <?php endforeach; ?>

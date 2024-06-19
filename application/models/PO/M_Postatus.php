@@ -429,6 +429,23 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
+    function editflupload($id, $data)
+    {
+        $this->db->where('id_file_nk', $id);
+        return $this->db->update('tb_file_nk', $data);
+    }
+    function deletegbrfilependukung($id)
+    {
+        $this->db->where('id_file_nk', $id);
+        return $this->db->delete('tb_file_nk');
+    }
+    function gtflnmfilependukung($id)
+    {
+        $this->db->select("*");
+        $this->db->from('tb_file_nk');
+        $this->db->where('id_file_nk', $id);
+        return $this->db->get()->result();
+    }
     function sumTransaksiPenjualannk($kdpo)
     {
         $this->db->select("SUM(total_harga) as total_harga");
@@ -462,6 +479,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+
     function editnotesuplier($id, $data)
     {
         $this->db->where('id_nt_barang', $id);

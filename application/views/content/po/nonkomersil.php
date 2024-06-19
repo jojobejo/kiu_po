@@ -84,7 +84,7 @@
                             <td>Qty</td>
                             <td>Harga Satuan</td>
                             <td>Total Harga</td>
-                            <td>Gambar Pendukung</td>
+                            <!-- <td>Gambar Pendukung</td> -->
                             <td>#</td>
                         </tr>
                     </thead>
@@ -92,7 +92,7 @@
                         <?php
                         $no = 1;
                         foreach ($tmp as $tmp) :
-                            $imagePath = "images/" . $tmp->gbr_produk;
+                            $imagePath = "images/imgtmp/" . $tmp->gbr_produk;
                             if (!file_exists($imagePath))
                                 $imagePath = "../images/Karisma.png";
                         ?>
@@ -104,13 +104,13 @@
                                 <td><?= $tmp->qty ?></td>
                                 <td><?= $tmp->hrg_satuan ?></td>
                                 <td><?= $tmp->total_harga ?></td>
-                                <td>
+                                <!-- <td>
                                     <img src="<?php echo $imagePath ?>" style="width:50px; height:50px">
                                     <input type="text" class="form-control" placeholder="imageupload" value="<?= $tmp->gbr_produk ?>" name="img_upload" id="img_upload" hidden>
                                     <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#upload<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-file-image"></i>
                                     </a>
-                                </td>
+                                </td> -->
                                 <td>
                                     <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#edititem<?= $tmp->id_tmp_nk ?>">
                                         <i class="fa fa-solid fa-pencil-alt"></i>
@@ -122,7 +122,6 @@
                             </tr>
                         <?php endforeach; ?>
                         <tr>
-                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
