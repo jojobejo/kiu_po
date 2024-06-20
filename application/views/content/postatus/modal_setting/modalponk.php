@@ -903,6 +903,48 @@
     </div>
 <?php endforeach; ?>
 
+<?php foreach ($status as $s) : ?>
+    <div class="modal fade" id="ajukanpembelian<?= $s->kd_po_nk ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload Bukti Pembelian</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('upbuktipembelian'); ?>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan<span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="custom-file-input" id="kdponk" name="kdponk" value="<?= $s->kd_po_nk ?>" hidden readonly>
+                            <textarea name="desc_isi" id="desc_isi" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Upload Gambar<span class="required">*</span></label>
+                        <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept="img/*">
+                            <label class="custom-file-label" for="customFile">Pilih Gambar</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+<?php endforeach; ?>
+
 <?php foreach ($flupload as $f) : ?>
     <div class="modal fade" id="delete_gbr_pendukung<?= $f->id_file_nk ?>">
         <div class="modal-dialog modal-lg">

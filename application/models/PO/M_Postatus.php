@@ -429,6 +429,18 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
+    function fluploadbukti($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_file_bukti_beli a');
+        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function upbuktibeli($data)
+    {
+        $this->db->insert('tb_file_bukti_beli', $data);
+    }
     function editflupload($id, $data)
     {
         $this->db->where('id_file_nk', $id);
@@ -587,6 +599,7 @@ class M_PoStatus extends CI_Model
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+
     function insertkd($data)
     {
         $this->db->insert('tb_generate_kd', $data);

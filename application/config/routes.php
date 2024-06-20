@@ -118,6 +118,7 @@ $route['hapus_note_pembelian_nk'] = 'postatus/C_PoStatus/hapus_note_pembelian_nk
 $route['gbruploadpic'] = 'postatus/C_PoStatus/gbruploadpic';
 $route['edit_gbr_pndukung'] = 'postatus/C_PoStatus/edit_gbr_pndukung';
 $route['delete_gbr_pendukung'] = 'postatus/C_PoStatus/delete_gbr_pendukung';
+$route['upbuktipembelian'] = 'postatus/C_PoStatus/upbuktipembelian';
 
 $route['addnopo'] = 'postatus/C_PoStatus/addnopo';
 

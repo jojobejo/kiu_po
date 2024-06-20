@@ -767,6 +767,7 @@ class C_PoStatus extends CI_Controller
         $data['totalnyata']  = $this->M_Postatus->sumharganyata($kd);
         $data['kdbarang']  = $this->M_Postatus->generatekd();
         $data['flupload']  = $this->M_Postatus->flupload($kd);
+        $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
@@ -1401,6 +1402,64 @@ class C_PoStatus extends CI_Controller
 
         unlink(FCPATH . "/images/filepndukung/" . $flnm);
         $this->M_Postatus->editflupload($idisi, $dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function upbuktipembelian()
+    {
+        $kdponk       = $this->input->post('kdponk');
+        $keterangan   = $this->input->post('desc_isi');
+        $userup       = $this->session->userdata('kode');
+        $namauser     = $this->session->userdata('nama_user');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/upbukti/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '2000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U');
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataupload = array(
+            'kd_po_nk'      => $kdponk,
+            'keterangan'    => $keterangan,
+            'user_upload'   => $userup,
+            'file_name'   => $config['file_name'],
+            'file_uploaded'    => $image_data1['file_name']
+        );
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdponk,
+            'status' => 'PROSES PEMBELIAN'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdponk,
+            'isi_note'  => 'PROSES PEMBELIAN',
+            'kd_user'   => $userup,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->konfirmPonk($kdponk, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        $this->M_Postatus->upbuktibeli($dataupload);
 
         redirect('detailponk/' . $kdponk);
     }
