@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 19, 2024 at 10:33 AM
+-- Generation Time: Jun 20, 2024 at 10:45 AM
 -- Server version: 10.4.17-MariaDB
 -- PHP Version: 8.0.1
 
@@ -4222,8 +4222,8 @@ INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_trans
 (187, 'NKPO1506240001', 'KARYAWAN4', '2024-06-15', 'PONK1506240010', 'Cling', 'Cling pembersih kaca', 'Untuk kebersihan KIU', 3, 0, 0, 0, 0, '', '2024-06-15 03:03:10'),
 (188, 'NKPO1506240002', 'KARYAWAN4', '2024-06-15', 'PONK1506240011', 'Form NCR Checklist Kendaraan Distribusi', 'Form NCR 1 lembar (putih saja)', 'Untuk memudahkan pengarsipan checklist kendaraan distribusi.', 0, 0, 0, 0, 0, '', '2024-06-15 04:35:30'),
 (189, 'NKPO1906240001', 'KARYAWAN2', '2024-06-19', 'PONK1906240003', 'd', 'd', 'd', 2, 5, 10, 10, 20, '2024061718778393.png', '2024-06-19 08:13:37'),
-(191, 'NKPO1906240001', 'KARYAWAN2', '2024-06-19', 'PONK1906240005', 'f', 'f', 'f', 50, 30, 0, 1500, 0, 'Karisma.png', '2024-06-19 06:34:23'),
-(193, 'NKPO1906240001', 'KARYAWAN2', '2024-06-19', 'PONK1906240005', 'c', 'c', 'c', 10, 25, 0, 250, 0, '2024061718779096.png', '2024-06-19 06:38:16');
+(191, 'NKPO1906240001', 'KARYAWAN2', '2024-06-19', 'PONK1906240005', 'f', 'f', 'f', 50, 30, 15, 1500, 750, 'Karisma.png', '2024-06-20 01:51:50'),
+(193, 'NKPO1906240001', 'KARYAWAN2', '2024-06-19', 'PONK1906240005', 'c', 'c', 'c', 10, 25, 10, 250, 100, '2024061718779096.png', '2024-06-20 01:51:58');
 
 -- --------------------------------------------------------
 
@@ -4718,6 +4718,29 @@ INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nomi
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tb_file_bukti_beli`
+--
+
+CREATE TABLE `tb_file_bukti_beli` (
+  `id_fk_bukti` int(11) NOT NULL,
+  `kd_po_nk` varchar(255) NOT NULL,
+  `keterangan` text NOT NULL,
+  `user_upload` varchar(255) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_uploaded` varchar(255) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_file_bukti_beli`
+--
+
+INSERT INTO `tb_file_bukti_beli` (`id_fk_bukti`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
+(1, 'NKPO1906240001', '1', 'KEU01', '2024061718860405', '2024061718860405.png', '2024-06-20 05:13:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tb_file_nk`
 --
 
@@ -4736,7 +4759,8 @@ CREATE TABLE `tb_file_nk` (
 --
 
 INSERT INTO `tb_file_nk` (`id_file_nk`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
-(21, 'NKPO1906240001', '3', 'KARYAWAN2', '2024061718776971', '2024061718777425.png', '2024-06-19 06:10:25');
+(21, 'NKPO1906240001', '3', 'KARYAWAN2', '2024061718776971', '2024061718777425.png', '2024-06-19 06:10:25'),
+(22, 'NKPO1906240001', '4', 'KEU01', '2024061718847804', '2024061718847818.jpg', '2024-06-20 01:43:38');
 
 -- --------------------------------------------------------
 
@@ -6089,7 +6113,13 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (821, 'NKPO1306240002', 'PO REJECT', 'KEU05', 'Supriyanto', 1, 1, '2024-06-18 02:35:03'),
 (822, 'NKPO1906240001', 'Purchase Order Baru', 'KARYAWAN2', 'Bram', 1, 1, '2024-06-19 03:59:03'),
 (823, 'NKPO1906240001', 'SEDANG DIAJUKAN - KADEP', 'KARYAWAN2', 'Bram', 1, 1, '2024-06-19 06:39:06'),
-(824, 'NKPO1906240001', 'PO ACCEPT KADEP', 'KADEP01', 'Diana Wulandari', 1, 1, '2024-06-19 07:36:04');
+(824, 'NKPO1906240001', 'PO ACCEPT KADEP', 'KADEP01', 'Diana Wulandari', 1, 1, '2024-06-19 07:36:04'),
+(825, 'NKPO1906240001', 'SEDANG DIAJUKAN', 'KEU01', 'Supriyanto', 1, 1, '2024-06-20 01:44:26'),
+(826, 'NKPO1906240001', 'SEDANG DIAJUKAN', 'KEU01', 'Supriyanto', 1, 1, '2024-06-20 01:50:16'),
+(827, 'NKPO1906240001', 'SEDANG DIAJUKAN', 'KEU01', 'Supriyanto', 1, 1, '2024-06-20 01:52:15'),
+(828, 'NKPO1906240001', 'PO ACCEPT DIREKTUR', 'KIUDIREKTUR05', 'Annelia Kartika', 1, 1, '2024-06-20 03:00:48'),
+(829, 'NKPO1906240001', 'PROSES PEMBELIAN', 'KEU01', 'Supriyanto', 1, 1, '2024-06-20 05:13:25'),
+(830, 'NKPO1906240001', 'BARANG DI TERIMA', 'KARYAWAN2', 'Bram', 1, 1, '2024-06-20 05:26:43');
 
 -- --------------------------------------------------------
 
@@ -6141,7 +6171,7 @@ INSERT INTO `tb_note_pembelian` (`id_nt_pembelian`, `kd_po`, `keterangan`, `kd_u
 (29, 'NKPO1306240001', 'Pembelian di bitcom (Transfer) kebutuhan hadiah Extravaganza 2024\r\n(Pk.Supri)', '', '2024-06-13 01:50:33'),
 (30, 'NKPO1006240002', 'Harga di shopee inc ', '', '2024-06-13 04:02:22'),
 (31, 'NKPO1006240003', 'Thiner A offline di serba jaya\r\n\r\nkuas online shopee inc\r\n\r\nselang online shopee inc', '', '2024-06-13 04:04:09'),
-(32, 'NKPO1906240001', 'Pembelian via tokopedia', '', '2024-06-19 06:38:37');
+(33, 'NKPO1906240001', 'Pembelian Tokopedia', '', '2024-06-20 01:43:08');
 
 -- --------------------------------------------------------
 
@@ -6532,7 +6562,7 @@ INSERT INTO `tb_po_nk` (`id_po_nk`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `t
 (61, 'NKPO1406240001', '001/14/06/2024', 'KARYAWAN1', 'Ika', '2024-06-14', 9, 367500, 'DONE', 'KEAUANGAN', 'Untuk Kebutuhan Keuangan JUNI', 0, 0, 0, 0, 'KIUDIREKTUR02', 'KADEP01', '2024-06-15 01:44:10'),
 (62, 'NKPO1506240001', '001/15/06/2024', 'KARYAWAN4', 'Arif', '2024-06-15', 10, 190500, 'DONE', 'GA', 'Belanja Bulanan GA Juni 24', 0, 0, 0, 0, 'KIUDIREKTUR02', 'KADEP05', '2024-06-18 01:50:20'),
 (63, 'NKPO1506240002', 'KARYAWAN4GA', 'KARYAWAN4', 'Arif', '2024-06-15', 1, 0, 'ACC-KADEP', 'GA', 'Form NCR Kendaraan Distribusi', 0, 0, 0, 0, '', 'KADEP05', '2024-06-15 04:44:58'),
-(64, 'NKPO1906240001', 'KARYAWAN2KEAUANGAN', 'KARYAWAN2', 'Bram', '2024-06-19', 2, 110, 'ACC-KADEP', 'KEAUANGAN', 'Progress - Nambah Fitur', 0, 0, 0, 0, '', 'KADEP01', '2024-06-19 08:14:22');
+(64, 'NKPO1906240001', 'KARYAWAN2KEAUANGAN', 'KARYAWAN2', 'Bram', '2024-06-19', 2, 110, 'PROSES PEMBELIAN', 'KEAUANGAN', 'Progress - Nambah Fitur', 0, 0, 0, 1, 'KIUDIREKTUR05', 'KADEP01', '2024-06-20 06:21:06');
 
 -- --------------------------------------------------------
 
@@ -7030,7 +7060,7 @@ INSERT INTO `tb_user` (`id_user`, `kode_user`, `nama_user`, `username`, `passwor
 (5, 'KIUDIREKTUR01', 'Agoes Santoso', 'direktur1', '$2y$10$fKtWlc8KmnuSxrq7p98k8.WCGk7vS38md0A1AY5gyskiMrE8z5zIK', 3, 'DIREKTUR'),
 (6, 'KIUDIREKTUR02', 'Annelia Kartika', 'direktur2', '$2y$10$CrrNDht4fm8DGUun1FDIMuRdLRTHTQiv81TgI0GPnMS/b.jiPzOxS', 3, 'DIREKTUR'),
 (7, 'KIUDIREKTUR03', 'Yuanita Setiawati', 'direktur3', '$2y$10$S/H/EG8zEBkxX7eZezmdGOOGLEY39//2YLwd5dRamq46NIYUpDeju', 3, 'DIREKTUR'),
-(8, 'KEU02', 'Arini', 'keuangan2', '$2y$10$ih.vh42jdAfIRNSZAV4GzODg8SzRD.mM3e/JMZyF837y64cKjtHpW', 2, 'KEUANGAN'),
+(8, 'KEU02', 'Arini', 'keuangan2', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
 (9, 'KEU03', 'Nadia', 'keuangan3', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
 (10, 'KEU05', 'Supriyanto', 'direktur4', '$2y$10$b/iG5dgP9dafpoG.vbdjUO6US2ZZb0uKFqy7N3pjAWaUprYQhQGaC', 3, 'DIREKTUR'),
 (11, 'KEU04', 'Tarizqa', 'keuangan4', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
@@ -7075,6 +7105,12 @@ ALTER TABLE `tb_detail_po_nk`
 --
 ALTER TABLE `tb_diskon`
   ADD PRIMARY KEY (`id_diskon`);
+
+--
+-- Indexes for table `tb_file_bukti_beli`
+--
+ALTER TABLE `tb_file_bukti_beli`
+  ADD PRIMARY KEY (`id_fk_bukti`);
 
 --
 -- Indexes for table `tb_file_nk`
@@ -7231,10 +7267,16 @@ ALTER TABLE `tb_diskon`
   MODIFY `id_diskon` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=526;
 
 --
+-- AUTO_INCREMENT for table `tb_file_bukti_beli`
+--
+ALTER TABLE `tb_file_bukti_beli`
+  MODIFY `id_fk_bukti` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `tb_file_nk`
 --
 ALTER TABLE `tb_file_nk`
-  MODIFY `id_file_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_file_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `tb_generate_kd`
@@ -7258,13 +7300,13 @@ ALTER TABLE `tb_note_barang`
 -- AUTO_INCREMENT for table `tb_note_direktur`
 --
 ALTER TABLE `tb_note_direktur`
-  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=825;
+  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=831;
 
 --
 -- AUTO_INCREMENT for table `tb_note_pembelian`
 --
 ALTER TABLE `tb_note_pembelian`
-  MODIFY `id_nt_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id_nt_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `tb_nt_tmp_pembelian`
