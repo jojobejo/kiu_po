@@ -157,7 +157,7 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("Rekap Laporan Pembelian Non Komersil");
+        $excel->getActiveSheet(0)->setTitle("lap_" . $vartgl1 . "_" . $vartgl2);
         $excel->setActiveSheetIndex(0);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xlsx"');
