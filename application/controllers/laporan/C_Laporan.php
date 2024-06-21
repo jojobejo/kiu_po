@@ -160,11 +160,12 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet(0)->setTitle("Rekap Laporan Pembelian Non Komersil");
         $excel->setActiveSheetIndex(0);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xls"');
+        header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xlsx"');
         header('Cache-Control: max-age=0');
 
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        ob_end_clean();
         $write->save('php://output');
     }
 }
