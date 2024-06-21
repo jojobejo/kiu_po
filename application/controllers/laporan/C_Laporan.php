@@ -147,12 +147,12 @@ class C_Laporan extends CI_Controller
         }
 
         $excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
-        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(10);
-        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(85);
-        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(35);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
-        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
-        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(70);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(10);
         $excel->getActiveSheet()->getColumnDimension('H')->setWidth(15);
         $excel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
