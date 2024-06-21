@@ -211,3 +211,4 @@ $route['updateisinote'] = 'settings/C_NoteSetting/update_note_template';
 //LAPORAN PEMBELIAN NON KOMERSIL
 $route['lap_nonkomersil'] = 'laporan/C_Laporan';
 $route['srclapbeli'] = 'laporan/C_Laporan/srclapbeli';
+$route['export_laporan_pembelian_nk'] = 'laporan/C_Laporan/export_laporan_pembelian_nk';
