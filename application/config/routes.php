@@ -100,6 +100,7 @@ $route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pe
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
+$route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk'] = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
 $route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
@@ -119,8 +120,11 @@ $route['gbruploadpic'] = 'postatus/C_PoStatus/gbruploadpic';
 $route['edit_gbr_pndukung'] = 'postatus/C_PoStatus/edit_gbr_pndukung';
 $route['delete_gbr_pendukung'] = 'postatus/C_PoStatus/delete_gbr_pendukung';
 $route['upbuktipembelian'] = 'postatus/C_PoStatus/upbuktipembelian';
-
 $route['addnopo'] = 'postatus/C_PoStatus/addnopo';
+$route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
+$route['historidone/(:any)/(:any)'] = 'postatus/C_PoStatus/historidone/$1/$2';
+$route['srcexpdone'] = 'postatus/C_PoStatus/srcexpdone';
+
 
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';

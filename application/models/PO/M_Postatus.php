@@ -370,7 +370,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'AND a.status != 'REJECT'
             ");
     }
 
@@ -691,4 +691,84 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdponk);
         return $this->db->update('tb_po_nk', $data);
     }
+    function getdaterangelap($tgl1, $tgl2)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.tgl_transaksi >=', $tgl1);
+        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    function getdatapodone($lv, $kd)
+    {
+        if ($lv == '3') {
+            return $this->db->query("SELECT *
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status = 'DONE'
+        ORDER BY a.tgl_transaksi ASC
+            ");
+        } elseif ($lv == '5') {
+            if ($kd == 'KADEP05') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE' 
+                AND a.departemen = 'GA'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP01') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'KEAUANGAN'
+                OR a.departemen = 'HRD'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP02') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'SALES'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP03') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'LOGISTIK'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            }
+        } elseif ($lv == '2') {
+            return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                ORDER BY a.tgl_transaksi ASC
+            ");
+        }
+    }
+    function srcgetdateponk($lv, $dep, $vartgl1, $vartgl2)
+    {
+        if ($lv == '4') {
+            $this->db->select('*');
+            $this->db->from('tb_po_nk a');
+            $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+            $this->db->where('a.tgl_transaksi >=', $vartgl1);
+            $this->db->where('a.tgl_transaksi <=', $vartgl2);
+            $this->db->where('a.status','DONE');
+            $this->db->where('a.departemen',$dep);
+            $query = $this->db->get();
+            return $query;
+        }
+    }
+
+    // BRACKET END MODEL
 }

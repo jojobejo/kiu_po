@@ -684,6 +684,10 @@ class C_PoStatus extends CI_Controller
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
+            $tglstart   = $this->input->post('tglstart');
+            $tglend     = $this->input->post('tglend');
+            $_SESSION['vartgl1'] = $tglstart;
+            $_SESSION['vartgl2'] = $tglend;
 
             $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
             $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
@@ -694,6 +698,7 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+
         //VIEW-DIREKTUR
         elseif ($this->session->userdata('lv') == '3') {
 
@@ -1609,5 +1614,70 @@ class C_PoStatus extends CI_Controller
         );
         $this->M_Postatus->changestatusnyata($kdponk, $hrgnyataoff);
         redirect('detailponk/' . $kdponk);
+    }
+    public function srcponkbytgl()
+    {
+        $data['title'] = 'PO Status';
+        $dp = $this->session->userdata('departemen');
+        $lv = $this->session->userdata('level');
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+
+        $vartgl1           = $_SESSION['vartgl1'];
+        $vartgl2            = $_SESSION['vartgl2'];
+        $data['vartgl1']    = $vartgl1;
+        $data['vartgl2']    = $vartgl2;
+
+        $data['vcari']      = $this->M_Postatus->getdaterangelap($vartgl1, $vartgl2)->result();
+        $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
+        $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/srcnonkomersilstatus', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
+    public function historidone($lv, $user)
+    {
+        $data['title'] = 'PO Status';
+        $data['hdone'] = $this->M_Postatus->getdatapodone($lv, $user)->result();
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/historidone', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+    public function srcexpdone()
+    {
+
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+        $dep            = $this->session->userdata('departemen');
+        $lv             = $this->session->userdata('lv');
+        $vartgl1            = $_SESSION['vartgl1'];
+        $vartgl2            = $_SESSION['vartgl2'];
+        $data['vartgl1']    = $vartgl1;
+        $data['vartgl2']    = $vartgl2;
+        $data['title']      = 'PO Status';
+
+        $data['vcari']      = $this->M_Postatus->srcgetdateponk($lv, $dep, $vartgl1, $vartgl2);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/srcgetdateponk', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 }
