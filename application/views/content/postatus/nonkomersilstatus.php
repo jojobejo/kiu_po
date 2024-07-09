@@ -367,5 +367,6 @@
         </div><!-- /.container-fluid -->
     <?php endif; ?>
     </div>
-    <!-- /.content-header -->
+</div>
+<!-- /.content-header -->
 </div>

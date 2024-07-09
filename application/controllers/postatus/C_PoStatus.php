@@ -689,8 +689,8 @@ class C_PoStatus extends CI_Controller
             $_SESSION['vartgl1'] = $tglstart;
             $_SESSION['vartgl2'] = $tglend;
 
-            $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
-            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+            $data['po']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -1258,9 +1258,8 @@ class C_PoStatus extends CI_Controller
         redirect('postatusnk');
     }
 
-    public function tolakOrderNK($kdponk, $kduser)
+    public function tolakordernk($kdponk, $kduser)
     {
-        $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
         $dataKonfirm = array(
@@ -1369,43 +1368,14 @@ class C_PoStatus extends CI_Controller
 
     public function edit_gbr_pndukung()
     {
-        $this->load->helper("file");
         $idisi      = $this->input->post('id_isi');
         $kdponk     = $this->input->post('kd_po');
         $keterangan = $this->input->post('desc_isi');
-        $flnm  = $this->input->post('file_nm');
-
-
-        if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/filepndukung/';
-            $config['allowed_types'] = 'jpg|png|gif';
-            $config['max_size'] = '2000';
-            $config['max_width'] = '6000';
-            $config['max_height'] = '6000';
-            $config['overwrite'] = TRUE;
-            $config['file_name'] = date('Y') . date('m') . date('U');
-            $this->load->library('upload', $config);
-            $this->upload->initialize($config);;
-
-            if (!$this->upload->do_upload('gambar_1')) {
-                $error = array('error' => $this->upload->display_errors());
-                print_r($error);
-                die;
-            } else {
-                if ($this->upload->do_upload('gambar_1')) {
-                    $image_data1 = $this->upload->data();
-                    $full_path1 = $config['file_name'];
-                    $data["gbr_produk"] = $full_path1;
-                }
-            }
-        }
 
         $dataBarang = array(
             'keterangan'       => $keterangan,
-            'file_uploaded'    => $image_data1['file_name']
         );
 
-        unlink(FCPATH . "/images/filepndukung/" . $flnm);
         $this->M_Postatus->editflupload($idisi, $dataBarang);
 
         redirect('detailponk/' . $kdponk);
@@ -1478,6 +1448,48 @@ class C_PoStatus extends CI_Controller
         unlink(FCPATH . "/images/filepndukung/" . $flnm);
         $this->M_Postatus->deletegbrfilependukung($idgbr);
         redirect('detailponk/' . $kdpo);
+    }
+
+    public function reuploadgbrflpndukung()
+    {
+        $this->load->helper("file");
+        $idisi      = $this->input->post('id_isi');
+        $kdponk     = $this->input->post('kd_po');
+        $flnm  = $this->input->post('file_nm');
+
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/filepndukung/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '2000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U');
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'file_uploaded'    => $image_data1['file_name']
+        );
+
+        unlink(FCPATH . "/images/filepndukung/" . $flnm);
+        $this->M_Postatus->editflupload($idisi, $dataBarang);
+
+        redirect('detailponk/' . $kdponk);
     }
 
     public function gbruploadpic()
@@ -1665,14 +1677,13 @@ class C_PoStatus extends CI_Controller
         $_SESSION['vartgl1'] = $tglstart;
         $_SESSION['vartgl2'] = $tglend;
         $dep            = $this->session->userdata('departemen');
-        $lv             = $this->session->userdata('lv');
         $vartgl1            = $_SESSION['vartgl1'];
         $vartgl2            = $_SESSION['vartgl2'];
         $data['vartgl1']    = $vartgl1;
         $data['vartgl2']    = $vartgl2;
         $data['title']      = 'PO Status';
 
-        $data['vcari']      = $this->M_Postatus->srcgetdateponk($lv, $dep, $vartgl1, $vartgl2);
+        $data['vcari']      = $this->M_Postatus->srcgetdateponk($dep, $vartgl1, $vartgl2);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

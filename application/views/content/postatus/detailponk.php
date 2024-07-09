@@ -199,7 +199,7 @@
                                                 </a>
                                             </div>
                                             <div class="col">
-                                                <a class="btn btn-block btn-danger btn-md" data-toggle="modal" data-target="#modalReject">
+                                                <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakordernk/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
                                                     <i class="fas fa-times"></i> &nbsp;
                                                     Reject
                                                 </a>
@@ -211,7 +211,7 @@
                                                 </a>
                                             </div>
                                             <div class="col">
-                                                <a class="btn btn-block btn-warning btn-md" data-toggle="modal" data-target="#modalPending">
+                                                <a class="btn btn-block btn-warning btn-md" data-toggle="modal" data-target="#modalPending<?= $s->kd_po_nk ?>">
                                                     <i class="fas fa-clock"></i> &nbsp;
                                                     Pending
                                                 </a>
@@ -246,7 +246,7 @@
                                         </div>
                                         <div class="col">
                                             <label for="tgTrans" class=""> &nbsp;&nbsp; </label>
-                                            <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrderNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                            <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakordernk/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
                                                 <i class="fas fa-times"></i> &nbsp;
                                                 Reject
                                             </a>
@@ -800,6 +800,11 @@
                         <div class="col">
                             <a class="btn  btn-success btn-sm btn-block" data-toggle="modal" data-target="#edit_gbr_pndukung<?= $f->id_file_nk ?>">
                                 <i class="fas fa-pencil-alt"></i>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-warning btn-sm btn-block" data-toggle="modal" data-target="#reuoploadimg_pndukung<?= $f->id_file_nk ?>">
+                                <i class="fas fa-cloud-upload-alt"></i>
                             </a>
                         </div>
                         <div class="col">

@@ -57,17 +57,17 @@
                     ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= shortdate_indo($h->tgl_transaksi) ?></td>
-                            <td><?= $h->departemen ?></td>
-                            <td><?= $h->tj_pembelian ?></td>
+                            <td><?= $h->tgl ?></td>
+                            <td><?= $h->dep ?></td>
+                            <td><?= $h->ket ?></td>
                             <td>
                                 <a class="btn btn-block btn-success btn-sm">
                                     <i class="fas fa-thumbs-up"></i>&nbsp;
-                                    <?= $h->status ?>
+                                    <?= $h->sts ?>
                                 </a>
                             </td>
                             <td>
-                                <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('detailponk/') . $h->kd_po_nk ?>">
+                                <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('detailponk/') . $h->kdponk ?>">
                                     <i class="fas fa-eye"></i>
                                     Detail
                                 </a>

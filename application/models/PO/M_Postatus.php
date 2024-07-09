@@ -344,6 +344,16 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'DONE' AND a.status != 'ACC-KADEP' AND a.departemen = 'KEUANGAN'
+            ");
+    }
+    public function getAllNK_keu_purchasing()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'DONE' AND a.status != 'REJECT' AND a.status != 'PENDING' AND a.status != 'REVISI' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'ON PROGRESS'
             ");
     }
     public function getAllNK_kar($kduser)
@@ -755,19 +765,16 @@ class M_PoStatus extends CI_Model
             ");
         }
     }
-    function srcgetdateponk($lv, $dep, $vartgl1, $vartgl2)
+    function srcgetdateponk($dep, $vartgl1, $vartgl2)
     {
-        if ($lv == '4') {
-            $this->db->select('*');
-            $this->db->from('tb_po_nk a');
-            $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
-            $this->db->where('a.tgl_transaksi >=', $vartgl1);
-            $this->db->where('a.tgl_transaksi <=', $vartgl2);
-            $this->db->where('a.status','DONE');
-            $this->db->where('a.departemen',$dep);
-            $query = $this->db->get();
-            return $query;
-        }
+        $this->db->select('a.tgl_transaksi AS tgl , a.departemen AS dep , a.tj_pembelian as ket , a.status AS sts , a.kd_po_nk as kdponk');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.tgl_transaksi >=', $vartgl1);
+        $this->db->where('a.tgl_transaksi <=', $vartgl2);
+        $this->db->where('a.departemen', $dep);
+        $query = $this->db->get();
+        return $query->result();
     }
 
     // BRACKET END MODEL

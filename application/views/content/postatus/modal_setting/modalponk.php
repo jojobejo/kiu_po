@@ -519,7 +519,7 @@
 <?php endforeach; ?>
 
 <?php foreach ($status as $s) : ?>
-    <div class="modal fade" id="modalPending">
+    <div class="modal fade" id="modalPending<?= $s->kd_po_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -660,6 +660,42 @@
     </div>
 <?php endforeach; ?>
 
+<?php foreach ($status as $s) : ?>
+    <div class="modal fade" id="modalrev<?= $s->kd_po_nk ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">REVISI ORDER PEMBELIAN</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('porevisi'); ?>
+                    <div class="form-group" hidden>
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right" for="kd_user">Kd<span class="required">*</span></label>
+                            <div class="col-sm-9"><input type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po_nk ?>" readonly></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right" for="kd_user">Catatan<span class="required">*</span></label>
+                            <div class="col-sm-9"><textarea class="form-control" type="text" id="noteisi" name="noteisi" value=""> </textarea></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+<?php endforeach; ?>
 <?php foreach ($status as $s) : ?>
     <div class="modal fade" id="modalrev<?= $s->kd_po_nk ?>">
         <div class="modal-dialog modal-lg">
@@ -883,6 +919,40 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+<?php endforeach; ?>
+
+<?php foreach ($flupload as $f) : ?>
+    <div class="modal fade" id="reuoploadimg_pndukung<?= $f->id_file_nk ?>">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload File Pendukung</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <?php echo form_open_multipart('reuploadgbrflpndukung'); ?>
+                    <div class="form-group" hidden>
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
+                            <input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $f->id_file_nk ?>" readonly hidden />
+                            <input class="form-control" type="text" id="kd_po" name="kd_po" value="<?= $f->kd_po_nk ?>">
+                            <input class="form-control" type="text" id="file_nm" name="file_nm" value="<?= $f->file_uploaded ?>">
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">Upload Gambar<span class="required">*</span></label>
@@ -891,6 +961,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
