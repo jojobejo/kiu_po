@@ -155,6 +155,7 @@ $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
 $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
+
 $route['tolakordernk/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakordernk/$1/$2';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
 $route['porevisi'] = 'postatus/C_PoStatus/porevisi';
