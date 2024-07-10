@@ -359,6 +359,7 @@ class C_Order extends CI_Controller
             'total_harga'   => $totalharga,
             'kd_barang'     => $kdbarang,
             'kd_user'       => $kduser,
+            'gbr_produk'    => 'Karisma.png'
         );
         $kdgenerate = array(
             'kd_barang' => $kdbarang
@@ -376,7 +377,7 @@ class C_Order extends CI_Controller
         $idisi      = $this->input->post('id_isi');
 
         if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/';
+            $config['upload_path'] = './images/imgtmp/';
             $config['allowed_types'] = 'jpg|png|gif';
             $config['max_size'] = '10000';
             $config['max_width'] = '6000';
@@ -384,7 +385,7 @@ class C_Order extends CI_Controller
             $config['overwrite'] = TRUE;
             $config['file_name'] = date('Y') . date('m') . date('U') .   '_' . $_FILES['gambar_1']['name'];
             $this->load->library('upload', $config);
-            $this->upload->initialize($config);;
+            $this->upload->initialize($config);
 
             if (!$this->upload->do_upload('gambar_1')) {
                 $error = array('error' => $this->upload->display_errors());
@@ -486,6 +487,7 @@ class C_Order extends CI_Controller
         $tjuan      = $this->input->post('tujuan');
         $jml        = $this->input->post('jml');
         $hrg        = $this->input->post('harga');
+        $tmpimg     = $this->input->post('tmpimg');
         $kduser     = $this->session->userdata('kode');
         $nmuser1    = $this->session->userdata('nama_user');
         $tmp        = $this->M_Purchase->get_tmp_non_komersil($kduser);
@@ -518,7 +520,9 @@ class C_Order extends CI_Controller
                     'keterangan'        => $chart->keterangan,
                     'qty'               => $chart->qty,
                     'hrg_satuan'        => $chart->hrg_satuan,
+                    'hrg_nyata'         => '0',
                     'total_harga'       => $chart->total_harga,
+                    'total_nyata'       => '0',
                     'gbr_produk'        => $chart->gbr_produk,
                 );
 

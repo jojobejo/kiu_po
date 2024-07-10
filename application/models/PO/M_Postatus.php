@@ -8,6 +8,8 @@ class M_PoStatus extends CI_Model
     function __construct()
     {
         parent::__construct();
+        $this->load->database();
+        $this->db->reconnect();
     }
 
     public function getAll()
@@ -126,6 +128,13 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function counhrgnyata($kdpo)
+    {
+        $this->db->select("SUM(hrg_nyata) as total_hrg");
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
     function totalnote($kdpo)
     {
         $this->db->select("SUM(id_nt_barang) as total_note");
@@ -160,7 +169,7 @@ class M_PoStatus extends CI_Model
         JOIN tb_user b ON b.kode_user = a.kd_user
         JOIN tb_user c ON c.kode_user = a.acc_with_kadep
         JOIN tb_user d ON d.kode_user = a.acc_with
-        WHERE a.kd_po_nk = '$kdpo'        
+        WHERE a.kd_po_nk = '$kdpo' 
         ");
     }
     function CountItem($kdpo)
@@ -321,13 +330,30 @@ class M_PoStatus extends CI_Model
         return $this->db->delete('tb_po');
     }
 
+    public function getAllNk()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user");
+    }
+
     public function getAllNK_keu()
     {
         return $this->db->query("SELECT *,
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
+        WHERE a.status != 'DONE' AND a.status != 'ACC-KADEP' AND a.departemen = 'KEUANGAN'
+            ");
+    }
+    public function getAllNK_keu_purchasing()
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'DONE' AND a.status != 'REJECT' AND a.status != 'PENDING' AND a.status != 'REVISI' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'ON PROGRESS'
             ");
     }
     public function getAllNK_kar($kduser)
@@ -345,7 +371,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.departemen = '$kddep'  AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN' AND a.status != 'REJECT'
+        WHERE a.departemen = '$kddep'  AND a.status != 'ON PROGRESS' AND a.status != 'SEDANG DIAJUKAN'
             ");
     }
     public function getAllNK_direktur()
@@ -354,15 +380,23 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING'
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'AND a.status != 'REJECT'
             ");
     }
+
     public function getNKpch($sts)
     {
         $this->db->select('*');
         $this->db->from('tb_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('a.status', $sts);
+        return $this->db->get()->result();
+    }
+    public function getstatusRevisi($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->where('a.kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
     public function getNKdep($dep)
@@ -397,9 +431,54 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
+    function flupload($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_file_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function fluploadbukti($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_file_bukti_beli a');
+        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function upbuktibeli($data)
+    {
+        $this->db->insert('tb_file_bukti_beli', $data);
+    }
+    function editflupload($id, $data)
+    {
+        $this->db->where('id_file_nk', $id);
+        return $this->db->update('tb_file_nk', $data);
+    }
+    function deletegbrfilependukung($id)
+    {
+        $this->db->where('id_file_nk', $id);
+        return $this->db->delete('tb_file_nk');
+    }
+    function gtflnmfilependukung($id)
+    {
+        $this->db->select("*");
+        $this->db->from('tb_file_nk');
+        $this->db->where('id_file_nk', $id);
+        return $this->db->get()->result();
+    }
     function sumTransaksiPenjualannk($kdpo)
     {
         $this->db->select("SUM(total_harga) as total_harga");
+        $this->db->select("COUNT(id_det_po_nk) as total_item");
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $kdpo);
+        return $this->db->get()->result();
+    }
+    function sumharganyata($kdpo)
+    {
+        $this->db->select("SUM(total_nyata) as total_nyata");
         $this->db->select("COUNT(id_det_po_nk) as total_item");
         $this->db->from('tb_detail_po_nk');
         $this->db->where('kd_po_nk', $kdpo);
@@ -422,6 +501,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+
     function editnotesuplier($id, $data)
     {
         $this->db->where('id_nt_barang', $id);
@@ -464,6 +544,12 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id_tmp);
         return $this->db->get()->result();
     }
+    public function get_ori_nk($id_tmp)
+    {
+        $this->db->from('tb_detail_po_nk');
+        $this->db->where('kd_po_nk', $id_tmp);
+        return $this->db->get()->result();
+    }
     public function get_note_pembelian($kd)
     {
         $this->db->from('tb_note_pembelian');
@@ -496,6 +582,16 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_detail_po', $kdpo);
     }
+    function editharganyatadetail($id, $data)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->update('tb_detail_po_nk', $data);
+    }
+    function editharganyata($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
     function generatekd()
     {
         $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
@@ -513,6 +609,7 @@ class M_PoStatus extends CI_Model
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+
     function insertkd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
@@ -524,6 +621,10 @@ class M_PoStatus extends CI_Model
     function add_note_pembelian_nk($data)
     {
         $this->db->insert('tb_note_pembelian', $data);
+    }
+    function add_file_po_nk($data)
+    {
+        $this->db->insert('tb_file_nk', $data);
     }
     function add_tax_nk($id, $data)
     {
@@ -580,7 +681,101 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $id);
         return $this->db->update('tb_po', $data);
     }
-    function get_format($kdpo)
+    function get_total($kdpo)
     {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'
+            ");
     }
+
+    function uploadgbr_edited($kdpo, $data)
+    {
+        $this->db->where('id_det_po_nk', $kdpo);
+        return $this->db->update('tb_detail_po_nk', $data);
+    }
+    function changestatusnyata($kdponk, $data)
+    {
+        $this->db->where('kd_po_nk', $kdponk);
+        return $this->db->update('tb_po_nk', $data);
+    }
+    function getdaterangelap($tgl1, $tgl2)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.tgl_transaksi >=', $tgl1);
+        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $query = $this->db->get();
+        return $query;
+    }
+
+    function getdatapodone($lv, $kd)
+    {
+        if ($lv == '3') {
+            return $this->db->query("SELECT *
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status = 'DONE'
+        ORDER BY a.tgl_transaksi ASC
+            ");
+        } elseif ($lv == '5') {
+            if ($kd == 'KADEP05') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE' 
+                AND a.departemen = 'GA'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP01') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'KEAUANGAN'
+                OR a.departemen = 'HRD'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP02') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'SALES'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            } elseif ($kd == 'KADEP03') {
+                return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                AND a.departemen = 'LOGISTIK'
+                ORDER BY a.tgl_transaksi ASC
+                    ");
+            }
+        } elseif ($lv == '2') {
+            return $this->db->query("SELECT *
+                FROM tb_po_nk a
+                JOIN tb_user b ON b.kode_user = a.kd_user
+                WHERE a.status = 'DONE'
+                ORDER BY a.tgl_transaksi ASC
+            ");
+        }
+    }
+    function srcgetdateponk($dep, $vartgl1, $vartgl2)
+    {
+        $this->db->select('a.tgl_transaksi AS tgl , a.departemen AS dep , a.tj_pembelian as ket , a.status AS sts , a.kd_po_nk as kdponk');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.tgl_transaksi >=', $vartgl1);
+        $this->db->where('a.tgl_transaksi <=', $vartgl2);
+        $this->db->where('a.departemen', $dep);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    // BRACKET END MODEL
 }

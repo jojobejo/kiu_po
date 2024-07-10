@@ -65,6 +65,7 @@
         var tujuan = $("#tujuan_isi").val();
         var jml = $("#jmlitem").val();
         var harga = $("#jmlharga").val();
+        var tmpimg = $("#img_upload").val();
 
         if (jml == 0) {
             alert('tidak ada transaksi');
@@ -91,6 +92,7 @@
                     cache: false,
                     success: function(data) {
                         if (data.msg == "success") {
+                            alert('PO telah di simpan');
                             location.reload(true);
                         } else {
                             alert('ada kesalahan data')

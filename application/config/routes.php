@@ -100,17 +100,32 @@ $route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pe
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
+$route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
+$route['postatusallnk'] = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
 $route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
+$route['noteupdatenk_pembelian'] = 'postatus/C_PoStatus/notepembelian';
+$route['konfirm_penerimaan'] = 'postatus/C_PoStatus/konfirm_penerimaan';
+$route['edit_harganyata'] = 'postatus/C_PoStatus/edit_harganyata';
+$route['hrgnyataoff/(:any)'] = 'postatus/C_PoStatus/hrgnyataoff/$1';
+$route['hrgnyataon/(:any)'] = 'postatus/C_PoStatus/hrgnyataon/$1';
 $route['add_tax_nk'] = 'postatus/C_PoStatus/add_tax_fk_nk';
 $route['add_diskon_nk'] = 'postatus/C_PoStatus/add_diskon_nk';
 $route['editedponk'] = 'postatus/C_PoStatus/edited_fk_nk';
 $route['add_note_pembelian_nk'] = 'postatus/C_PoStatus/add_note_pembelian_nk';
 $route['edit_note_pembelian_nk'] = 'postatus/C_PoStatus/edit_note_pembelian_nk';
 $route['hapus_note_pembelian_nk'] = 'postatus/C_PoStatus/hapus_note_pembelian_nk';
-
+$route['gbruploadpic'] = 'postatus/C_PoStatus/gbruploadpic';
+$route['reuploadgbrflpndukung'] = 'postatus/C_PoStatus/reuploadgbrflpndukung';
+$route['edit_gbr_pndukung'] = 'postatus/C_PoStatus/edit_gbr_pndukung';
+$route['delete_gbr_pendukung'] = 'postatus/C_PoStatus/delete_gbr_pendukung';
+$route['upbuktipembelian'] = 'postatus/C_PoStatus/upbuktipembelian';
 $route['addnopo'] = 'postatus/C_PoStatus/addnopo';
+$route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
+$route['historidone/(:any)/(:any)'] = 'postatus/C_PoStatus/historidone/$1/$2';
+$route['srcexpdone'] = 'postatus/C_PoStatus/srcexpdone';
+
 
 $route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
 $route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
@@ -140,8 +155,11 @@ $route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
 $route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
 $route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
 $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
-$route['tolakOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakOrderNK/$1/$2';
+
+$route['tolakordernk/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakordernk/$1/$2';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
+$route['porevisi'] = 'postatus/C_PoStatus/porevisi';
+$route['uploadfileponk'] = 'postatus/C_PoStatus/uploadfileponk';
 $route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 
 $route['detailPO/(:any)'] = 'postatus/C_PoStatus/detailPO/$1';
@@ -195,3 +213,8 @@ $route['notetemplate'] = 'settings/C_NoteSetting';
 $route['addnotetemplate'] = 'settings/C_NoteSetting/add_note_template';
 $route['notetemplate/(:any)'] = 'settings/C_NoteSetting/detail_note_template/$1';
 $route['updateisinote'] = 'settings/C_NoteSetting/update_note_template';
+
+//LAPORAN PEMBELIAN NON KOMERSIL
+$route['lap_nonkomersil'] = 'laporan/C_Laporan';
+$route['srclapbeli'] = 'laporan/C_Laporan/srclapbeli';
+$route['export_laporan_pembelian_nk'] = 'laporan/C_Laporan/export_laporan_pembelian_nk';

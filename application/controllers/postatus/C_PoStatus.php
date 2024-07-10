@@ -664,6 +664,18 @@ class C_PoStatus extends CI_Controller
         redirect('detailponk/' . $kdponk);
     }
 
+    public function postatusallnk()
+    {
+        $data['title'] = 'PO Status';
+        $data['po']    = $this->M_Postatus->getAllNk()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/nonkomersilstatusall', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
     public function postatusnk()
     {
         //VIEW-PURCHASING
@@ -672,8 +684,13 @@ class C_PoStatus extends CI_Controller
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
+            $tglstart   = $this->input->post('tglstart');
+            $tglend     = $this->input->post('tglend');
+            $_SESSION['vartgl1'] = $tglstart;
+            $_SESSION['vartgl2'] = $tglend;
 
-            $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
+            $data['po']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -681,6 +698,7 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+
         //VIEW-DIREKTUR
         elseif ($this->session->userdata('lv') == '3') {
 
@@ -712,14 +730,30 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
-        //VIEW-KADEP
-        elseif ($this->session->userdata('lv') == '5') {
+        //VIEW-KADEP-KEUANGAN
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') {
 
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
 
             $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+        // VIEW KADEP != KEUANGAN
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') != 'KEUANGAN') {
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -735,10 +769,14 @@ class C_PoStatus extends CI_Controller
         $data['status'] = $this->M_Postatus->getdataStatusnk($kd);
         $data['log']    = $this->M_Postatus->getNoted($kd);
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kd);
+        $data['totalnyata']  = $this->M_Postatus->sumharganyata($kd);
         $data['kdbarang']  = $this->M_Postatus->generatekd();
+        $data['flupload']  = $this->M_Postatus->flupload($kd);
+        $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
+        $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
 
         $this->load->view('partial/header', $data);
@@ -785,7 +823,8 @@ class C_PoStatus extends CI_Controller
             'keterangan'    => $ketbarang,
             'qty'           => $qtybr,
             'hrg_satuan'    => $hrgsatuan,
-            'total_harga'   => $totalhrg
+            'total_harga'   => $totalhrg,
+            'gbr_produk'   => "Karisma.png"
         );
 
         $this->M_Postatus->add_faktur_nk($addbarang);
@@ -880,6 +919,7 @@ class C_PoStatus extends CI_Controller
         $kdponk = $this->input->post('kdponk');
         $nopo   = $this->input->post('nopo');
 
+
         $dataedit = array(
             'nopo'  => $nopo
         );
@@ -892,12 +932,64 @@ class C_PoStatus extends CI_Controller
 
     public function hapus_faktur_item_nk()
     {
+        $this->load->helper("file");
         $id         = $this->input->post('idisi');
         $kd         = $this->input->post('kdponk');
+        $flnm   = $this->input->post('nmfile');
 
-        $this->M_Postatus->hapus_faktur_item_nk($id);
+        if ($flnm == "Karisma.png") {
+            $this->M_Postatus->hapus_faktur_item_nk($id);
+            redirect('detailponk/' . $kd);
+        } else {
+            unlink(FCPATH . "/images/gbrbarang/" . $flnm);
+            $this->M_Postatus->hapus_faktur_item_nk($id);
+            redirect('detailponk/' . $kd);
+        }
+    }
+    public function notepembelian()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $namauser       = $this->session->userdata('nama_user');
+        $departement    = $this->session->userdata('kode');
 
-        redirect('detailponk/' . $kd);
+        $addnoteuser = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PROSES PEMBELIAN',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteupdateuser = array(
+            'status'    => 'PROSES PEMBELIAN'
+        );
+        $this->M_Postatus->addNote($addnoteuser);
+        $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+        redirect('detailponk/' . $kdpo);
+    }
+
+    public function konfirm_penerimaan()
+    {
+        $kdpo           = $this->input->post('kdpo');
+        $namauser       = $this->session->userdata('nama_user');
+        $departement    = $this->session->userdata('kode');
+
+        $addnoteuser = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'BARANG DI TERIMA',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $noteupdateuser = array(
+            'status'    => 'DONE'
+        );
+        $this->M_Postatus->addNote($addnoteuser);
+        $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+        redirect('postatusnk');
     }
     public function addnotenk()
     {
@@ -1101,7 +1193,7 @@ class C_PoStatus extends CI_Controller
 
         $dataKonfirm = array(
             'kd_po_nk' => $kdpo,
-            'status' => 'ON PROGRESS'
+            'status' => 'ON PROGRESS - KADEP'
         );
 
         $notedirektur = array(
@@ -1149,7 +1241,7 @@ class C_PoStatus extends CI_Controller
         $dataKonfirm = array(
             'kd_po_nk' => $kdpo,
             'acc_with' => $kddirektur,
-            'status' => 'DONE'
+            'status' => 'ACC DIREKTUR'
         );
 
         $notedirektur = array(
@@ -1166,26 +1258,27 @@ class C_PoStatus extends CI_Controller
         redirect('postatusnk');
     }
 
-    public function tolakOrderNK($kdpo, $kddirektur)
+    public function tolakordernk($kdponk, $kduser)
+
     {
         $namauser       = $this->session->userdata('nama_user');
 
         $dataKonfirm = array(
-            'kd_po_nk' => $kdpo,
+            'kd_po_nk' => $kdponk,
             'status' => 'REJECT'
         );
         $notedirektur = array(
-            'kd_po'     => $kdpo,
+            'kd_po'     => $kdponk,
             'isi_note'  => 'PO REJECT',
-            'kd_user'   => $kddirektur,
+            'kd_user'   => $kduser,
             'nama_user'   => $namauser,
             'note_for'  => '1',
             'update_status' => '1'
         );
 
-        $this->M_Postatus->tolakPonk($kdpo, $dataKonfirm);
+        $this->M_Postatus->tolakPonk($kdponk, $dataKonfirm);
         $this->M_Postatus->addNote($notedirektur);
-        redirect('detailponk/' . $kdpo);
+        redirect('detailponk/' . $kdponk);
     }
 
     public function pendingordernk()
@@ -1212,6 +1305,30 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->addNote($notedirektur);
         redirect('detailponk/' . $kdpo);
     }
+    public function porevisi()
+    {
+        $kdpoid         = $this->input->post('kdpo');
+        $notes         = $this->input->post('noteisi');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpoid,
+            'status' => 'PO REVISI'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpoid,
+            'isi_note'  => 'PO REVISI - ' . $notes,
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->pendingordernk($kdpoid, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
 
     public function insert_note_setting()
     {
@@ -1230,6 +1347,349 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->insert_setting_note($kdpo, $note_printout);
 
-        redirect('detailPO/' . $kdpo);
+        redirect('detailponk/' . $kdpo);
+    }
+
+    public function edit_harganyata()
+    {
+        $idpo = $this->input->post('idisi');
+        $kdpo = $this->input->post('kdponk');
+        $hrgnyata = $this->input->post('hrg_nyata');
+        $qty    = $this->input->post('qty_isi');
+        $total_harga = $qty * $hrgnyata;
+
+        $dataedited = array(
+            'hrg_nyata' => $hrgnyata,
+            'total_nyata' => $total_harga
+        );
+
+        $this->M_Postatus->editharganyatadetail($idpo, $dataedited);
+        redirect('detailponk/' . $kdpo);
+    }
+
+    public function edit_gbr_pndukung()
+    {
+        $idisi      = $this->input->post('id_isi');
+        $kdponk     = $this->input->post('kd_po');
+        $keterangan = $this->input->post('desc_isi');
+
+        $dataBarang = array(
+            'keterangan'       => $keterangan,
+        );
+
+        $this->M_Postatus->editflupload($idisi, $dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function upbuktipembelian()
+    {
+        $kdponk       = $this->input->post('kdponk');
+        $keterangan   = $this->input->post('desc_isi');
+        $userup       = $this->session->userdata('kode');
+        $namauser     = $this->session->userdata('nama_user');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/upbukti/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '2000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U');
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataupload = array(
+            'kd_po_nk'      => $kdponk,
+            'keterangan'    => $keterangan,
+            'user_upload'   => $userup,
+            'file_name'   => $config['file_name'],
+            'file_uploaded'    => $image_data1['file_name']
+        );
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdponk,
+            'status' => 'PROSES PEMBELIAN'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdponk,
+            'isi_note'  => 'PROSES PEMBELIAN',
+            'kd_user'   => $userup,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->konfirmPonk($kdponk, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        $this->M_Postatus->upbuktibeli($dataupload);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function delete_gbr_pendukung()
+    {
+        $this->load->helper("file");
+        $kdpo   = $this->input->post('kd_po');
+        $idgbr  = $this->input->post('id_isi');
+        $flnm  = $this->input->post('file_nm');
+        unlink(FCPATH . "/images/filepndukung/" . $flnm);
+        $this->M_Postatus->deletegbrfilependukung($idgbr);
+        redirect('detailponk/' . $kdpo);
+    }
+
+    public function reuploadgbrflpndukung()
+    {
+        $this->load->helper("file");
+        $idisi      = $this->input->post('id_isi');
+        $kdponk     = $this->input->post('kd_po');
+        $flnm  = $this->input->post('file_nm');
+
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/filepndukung/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '2000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U');
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'file_uploaded'    => $image_data1['file_name']
+        );
+
+        unlink(FCPATH . "/images/filepndukung/" . $flnm);
+        $this->M_Postatus->editflupload($idisi, $dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function gbruploadpic()
+    {
+        $this->load->helper("file");
+        $idisi      = $this->input->post('id_isi');
+        $kdponk     = $this->input->post('kd_po');
+        $nmfile     = $this->input->post('nm_file');
+
+        if ($nmfile == 'Karisma.png') {
+            if (!empty($_FILES['gambar_1'])) {
+                $config['upload_path'] = './images/gbrbarang/';
+                $config['allowed_types'] = 'jpg|png|gif';
+                $config['max_size'] = '2000';
+                $config['max_width'] = '6000';
+                $config['max_height'] = '6000';
+                $config['overwrite'] = TRUE;
+                $config['file_name'] = date('Y') . date('m') . date('U');
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+
+                if (!$this->upload->do_upload('gambar_1')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    print_r($error);
+                    die;
+                } else {
+                    if ($this->upload->do_upload('gambar_1')) {
+                        $image_data1 = $this->upload->data();
+                        $full_path1 = $config['file_name'];
+                        $data["gbr_produk"] = $full_path1;
+                    }
+                }
+            }
+
+            $dataBarang = array(
+                'id_det_po_nk'   => $idisi,
+                'gbr_produk'    => $image_data1['file_name']
+            );
+
+            $this->M_Postatus->uploadgbr_edited($idisi, $dataBarang);
+
+            redirect('detailponk/' . $kdponk);
+        } else {
+            if (!empty($_FILES['gambar_1'])) {
+                $config['upload_path'] = './images/gbrbarang/';
+                $config['allowed_types'] = 'jpg|png|gif';
+                $config['max_size'] = '2000';
+                $config['max_width'] = '6000';
+                $config['max_height'] = '6000';
+                $config['overwrite'] = TRUE;
+                $config['file_name'] = date('Y') . date('m') . date('U');
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+
+                if (!$this->upload->do_upload('gambar_1')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    print_r($error);
+                    die;
+                } else {
+                    if ($this->upload->do_upload('gambar_1')) {
+                        $image_data1 = $this->upload->data();
+                        $full_path1 = $config['file_name'];
+                        $data["gbr_produk"] = $full_path1;
+                    }
+                }
+            }
+
+            $dataBarang = array(
+                'id_det_po_nk'   => $idisi,
+                'gbr_produk'    => $image_data1['file_name']
+            );
+
+            unlink(FCPATH . "/images/gbrbarang/" . $nmfile);
+            $this->M_Postatus->uploadgbr_edited($idisi, $dataBarang);
+
+            redirect('detailponk/' . $kdponk);
+        }
+    }
+    public function uploadfileponk()
+    {
+        $kdponk       = $this->input->post('kdisi');
+        $keterangan   = $this->input->post('desc_isi');
+        $userup       = $this->session->userdata('kode');
+
+        if (!empty($_FILES['gambar_1'])) {
+            $config['upload_path'] = './images/filepndukung/';
+            $config['allowed_types'] = 'jpg|png|gif';
+            $config['max_size'] = '2000';
+            $config['max_width'] = '6000';
+            $config['max_height'] = '6000';
+            $config['overwrite'] = TRUE;
+            $config['file_name'] = date('Y') . date('m') . date('U');
+            $this->load->library('upload', $config);
+            $this->upload->initialize($config);;
+
+            if (!$this->upload->do_upload('gambar_1')) {
+                $error = array('error' => $this->upload->display_errors());
+                print_r($error);
+                die;
+            } else {
+                if ($this->upload->do_upload('gambar_1')) {
+                    $image_data1 = $this->upload->data();
+                    $full_path1 = $config['file_name'];
+                    $data["gbr_produk"] = $full_path1;
+                }
+            }
+        }
+
+        $dataBarang = array(
+            'kd_po_nk'      => $kdponk,
+            'keterangan'    => $keterangan,
+            'user_upload'   => $userup,
+            'file_name'   => $config['file_name'],
+            'file_uploaded'    => $image_data1['file_name']
+        );
+
+        $this->M_Postatus->add_file_po_nk($dataBarang);
+
+        redirect('detailponk/' . $kdponk);
+    }
+
+    public function hrgnyataon($kdponk)
+    {
+        $hrgnyataon = array(
+            'status_hrg_nyata' => '1'
+        );
+        $this->M_Postatus->changestatusnyata($kdponk, $hrgnyataon);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function hrgnyataoff($kdponk)
+    {
+        $hrgnyataoff = array(
+            'status_hrg_nyata' => '0'
+        );
+        $this->M_Postatus->changestatusnyata($kdponk, $hrgnyataoff);
+        redirect('detailponk/' . $kdponk);
+    }
+    public function srcponkbytgl()
+    {
+        $data['title'] = 'PO Status';
+        $dp = $this->session->userdata('departemen');
+        $lv = $this->session->userdata('level');
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+
+        $vartgl1           = $_SESSION['vartgl1'];
+        $vartgl2            = $_SESSION['vartgl2'];
+        $data['vartgl1']    = $vartgl1;
+        $data['vartgl2']    = $vartgl2;
+
+        $data['vcari']      = $this->M_Postatus->getdaterangelap($vartgl1, $vartgl2)->result();
+        $data['po']    = $this->M_Postatus->getAllNK_keu()->result();
+        $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/srcnonkomersilstatus', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+
+    public function historidone($lv, $user)
+    {
+        $data['title'] = 'PO Status';
+        $data['hdone'] = $this->M_Postatus->getdatapodone($lv, $user)->result();
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/historidone', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
+    }
+    public function srcexpdone()
+    {
+
+        $tglstart   = $this->input->post('tglstart');
+        $tglend     = $this->input->post('tglend');
+        $_SESSION['vartgl1'] = $tglstart;
+        $_SESSION['vartgl2'] = $tglend;
+        $dep            = $this->session->userdata('departemen');
+        $vartgl1            = $_SESSION['vartgl1'];
+        $vartgl2            = $_SESSION['vartgl2'];
+        $data['vartgl1']    = $vartgl1;
+        $data['vartgl2']    = $vartgl2;
+        $data['title']      = 'PO Status';
+
+        $data['vcari']      = $this->M_Postatus->srcgetdateponk($dep, $vartgl1, $vartgl2);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/srcgetdateponk', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 }
