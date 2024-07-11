@@ -124,6 +124,7 @@ $route['upbuktipembelian'] = 'postatus/C_PoStatus/upbuktipembelian';
 $route['addnopo'] = 'postatus/C_PoStatus/addnopo';
 $route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
 $route['historidone/(:any)/(:any)'] = 'postatus/C_PoStatus/historidone/$1/$2';
+$route['stsviewpo/(:any)']    = 'postatus/C_PoStatus/stsviewpo/$1';
 $route['srcexpdone'] = 'postatus/C_PoStatus/srcexpdone';
 
 

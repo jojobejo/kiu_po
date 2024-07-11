@@ -280,12 +280,18 @@
                                 </div>
                             <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                                 <div class="col">
+                                    <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
                                     <div class="row">
                                         <div class="col">
-                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
                                             <a class="btn btn-block btn-primary btn-md" data-toggle="modal" data-target="#modalAddNote">
-                                                <i class="fas fa-clipboard-check"></i> &nbsp;
-                                                AJUKAN PEMBELIAN
+                                                <i class="fas fa-clipboard-check"></i>
+                                                PEMBELIAN
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-warning btn-md" data-toggle="modal" data-target="#modalrev<?= $s->kd_po_nk ?>">
+                                                <i class="fab fa-rev"></i>
+                                                PO REVISI
                                             </a>
                                         </div>
                                     </div>
@@ -577,6 +583,7 @@
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
+                <!-- VIEW PIC  -->
                 <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP' || $s->status == 'PO REVISI') : ?>
                     <?php foreach ($total as $t) : ?>
                         <tr>
@@ -1182,6 +1189,22 @@
         <?php endif; ?>
         </tbody>
         </table>
+        <!-- FILE PENDUKUNG || VIEW ADMIN || SEDANG DIAJUKAN -->
+    <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
+        <tr>
+            <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
+        </tr>
+        <?php foreach ($flupload as $f) :
+                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+        ?>
+            <tr>
+                <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
+                <td colspan="6" style="padding-right:3%; font-weight: bold;">
+                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
 
         <!-- PROSES PEMBELIAN || LV 2 ADMIN -->
     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PROSES PEMBELIAN') : ?>
@@ -1401,6 +1424,7 @@
                     <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Grand Total Harga</td>
                     <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($hargaAll, 2) ?></td>
                 </tr>
+
             <?php endforeach; ?>
         <?php endforeach; ?>
         </tbody>

@@ -363,7 +363,30 @@ class M_PoStatus extends CI_Model
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
         WHERE a.kd_user = '$kduser'
+        AND a.status != 'DONE'
+        AND a.status != 'REJECT'
             ");
+    }
+
+    public function getuserdone($kd, $sts)
+    {
+        if ($sts == '1') {
+            return $this->db->query("SELECT *,
+            a.status
+            FROM tb_po_nk a
+            JOIN tb_user b ON b.kode_user = a.kd_user
+            WHERE a.kd_user = '$kd'
+            AND a.status = 'DONE'
+                ");
+        } else {
+            return $this->db->query("SELECT *,
+            a.status
+            FROM tb_po_nk a
+            JOIN tb_user b ON b.kode_user = a.kd_user
+            WHERE a.kd_user = '$kd'
+            AND a.status = 'REJECT'
+                ");
+        }
     }
     public function getAllNK_kadep($kddep)
     {

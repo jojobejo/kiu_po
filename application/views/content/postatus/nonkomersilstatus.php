@@ -18,6 +18,18 @@
                 </div>
             <?php else : ?>
             <?php endif; ?>
+            <?php if ($this->session->userdata('lv') == '4') : ?>
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <a href="<?= base_url('stsviewpo/1') ?>" class="btn btn-success btn-block"><i class="fas fa-history"></i> Data DONE </a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="<?= base_url('stsviewpo/2') ?>" class="btn btn-danger btn-block"><i class="fas fa-times"></i> Data REJECT </a>
+                    </div>
+                </div>
+            <?php else : ?>
+            <?php endif; ?>
+
             <!-- NEW LINE -->
             <?php if ($this->session->userdata('lv') == '2') : ?>
                 <div class="card">

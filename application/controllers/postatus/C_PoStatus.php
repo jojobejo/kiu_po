@@ -762,6 +762,31 @@ class C_PoStatus extends CI_Controller
             $this->load->view('content/postatus/datatables');
         }
     }
+
+    public function stsviewpo($stsget)
+    {
+        $data['title'] = 'PO Status';
+
+        $sts  = $stsget;
+        $dp = $this->session->userdata('kode');
+
+        if ($sts == '1') {
+            $data['po']    = $this->M_Postatus->getuserdone($dp, $sts)->result();
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/viewhistoryponk', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        } else if ($sts == '2') {
+            $data['po']    = $this->M_Postatus->getuserdone($dp, $sts)->result();
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/viewhistoryponk', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+    }
+
     public function detailponk($kd)
     {
         $data['title'] = 'PO Status';
