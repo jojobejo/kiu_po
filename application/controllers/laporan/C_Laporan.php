@@ -89,7 +89,7 @@ class C_Laporan extends CI_Controller
         );
 
         $excel->setActiveSheetIndex(0)->setCellValue('A1', "Rekap Laporan Pembelian Non Komersil");
-        $excel->getActiveSheet()->mergeCells('A1:I1');
+        $excel->getActiveSheet()->mergeCells('A1:J1');
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15);
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -100,8 +100,8 @@ class C_Laporan extends CI_Controller
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "PIC");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Departemen");
         $excel->setActiveSheetIndex(0)->setCellValue('F3', "Nama Barang");
-        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Nama Barang");
-        $excel->setActiveSheetIndex(0)->setCellValue('H3', "qty");
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Deskripsi");
+        $excel->setActiveSheetIndex(0)->setCellValue('H3', "QTY");
         $excel->setActiveSheetIndex(0)->setCellValue('I3', "Harga Satuan");
         $excel->setActiveSheetIndex(0)->setCellValue('J3', "Total Harga");
 
@@ -114,6 +114,7 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('H3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('I3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('J3')->applyFromArray($style_col);
 
         $vartgl1           = $_SESSION['vartgl1'];
         $vartgl2            = $_SESSION['vartgl2'];
@@ -121,6 +122,9 @@ class C_Laporan extends CI_Controller
         $data['vartgl2']    = $vartgl2;
 
         $export = $this->M_Laporanp->getdaterangelap($vartgl1, $vartgl2)->result();
+        $vartglexcel1 = date_indo($vartgl1);
+        $vartglexcel2 = date_indo($vartgl2);
+
 
         $no = 1;
         $numrow = 4;
@@ -161,7 +165,7 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("lap_" . $vartgl1 . "_" . $vartgl2);
+        $excel->getActiveSheet(0)->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
         $excel->setActiveSheetIndex(0);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xlsx"');
