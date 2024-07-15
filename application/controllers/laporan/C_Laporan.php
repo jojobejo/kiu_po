@@ -122,8 +122,8 @@ class C_Laporan extends CI_Controller
         $data['vartgl2']    = $vartgl2;
 
         $export = $this->M_Laporanp->getdaterangelap($vartgl1, $vartgl2)->result();
-        $vartglexcel1 = shortdate_indo($vartgl1);
-        $vartglexcel2 = shortdate_indo($vartgl2);
+        $vartglexcel1 = date_indo($vartgl1);
+        $vartglexcel2 = date_indo($vartgl2);
 
 
         $no = 1;

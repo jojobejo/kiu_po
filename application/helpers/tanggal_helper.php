@@ -193,7 +193,7 @@ function date_indo($tgl)
     $tanggal = $pecah[2];
     $bulan = bulan($pecah[1]);
     $tahun = $pecah[0];
-    return $tanggal . ' ' . $bulan . ' ' . $tahun;
+    return $tanggal . '-' . $bulan . '-' . $tahun;
 }
 
 // if (!function_exists('bulan')) {
