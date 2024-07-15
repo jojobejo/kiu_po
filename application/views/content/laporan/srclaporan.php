@@ -60,6 +60,7 @@
                                     <td>PIC</td>
                                     <td>Departemen</td>
                                     <td>Nama Barang</td>
+                                    <td>Deskripsi</td>
                                     <td>Qty</td>
                                     <td>Harga Satuan</td>
                                     <td>Total Harga</td>
@@ -75,6 +76,7 @@
                                         <td><?= $v->nama_user ?></td>
                                         <td><?= $v->departement ?></td>
                                         <td><?= $v->nama_barang ?></td>
+                                        <td><?= $v->deskripsi ?></td>
                                         <td><?= $v->qty ?></td>
                                         <td>Rp. <?= number_format($v->hrg_satuan) ?></td>
                                         <td>Rp. <?= number_format($v->total_harga) ?></td>

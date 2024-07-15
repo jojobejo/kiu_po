@@ -403,8 +403,9 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' AND a.status != 'PROSES PEMBELIAN'AND a.status != 'REJECT'
-            ");
+        WHERE a.status != 'ACC-KADEP' AND a.status != 'DONE' AND a.status != 'ON PROGRESS'
+        AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'PENDING' AND a.status != 'ACC DIREKTUR' 
+        AND a.status != 'PROSES PEMBELIAN'AND a.status != 'REJECT' AND a.status != 'PO REVISI'");
     }
 
     public function getNKpch($sts)
@@ -796,6 +797,19 @@ class M_PoStatus extends CI_Model
         $this->db->where('a.tgl_transaksi >=', $vartgl1);
         $this->db->where('a.tgl_transaksi <=', $vartgl2);
         $this->db->where('a.departemen', $dep);
+        $this->db->where('a.status', 'DONE');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function srchistoriadmpurchasing($vartgl1, $vartgl2)
+    {
+        $this->db->select('a.tgl_transaksi AS tgl , a.departemen AS dep , a.tj_pembelian as ket , a.status AS sts , a.kd_po_nk as kdponk');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->where('a.tgl_transaksi >=', $vartgl1);
+        $this->db->where('a.tgl_transaksi <=', $vartgl2);
+        $this->db->where('a.status', 'DONE');
         $query = $this->db->get();
         return $query->result();
     }

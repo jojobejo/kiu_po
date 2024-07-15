@@ -100,9 +100,10 @@ class C_Laporan extends CI_Controller
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "PIC");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Departemen");
         $excel->setActiveSheetIndex(0)->setCellValue('F3', "Nama Barang");
-        $excel->setActiveSheetIndex(0)->setCellValue('G3', "qty");
-        $excel->setActiveSheetIndex(0)->setCellValue('H3', "Harga Satuan");
-        $excel->setActiveSheetIndex(0)->setCellValue('I3', "Total Harga");
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Nama Barang");
+        $excel->setActiveSheetIndex(0)->setCellValue('H3', "qty");
+        $excel->setActiveSheetIndex(0)->setCellValue('I3', "Harga Satuan");
+        $excel->setActiveSheetIndex(0)->setCellValue('J3', "Total Harga");
 
         $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
@@ -130,9 +131,10 @@ class C_Laporan extends CI_Controller
             $excel->setActiveSheetIndex(0)->setCellValue('D' . $numrow, $data->nama_user);
             $excel->setActiveSheetIndex(0)->setCellValue('E' . $numrow, $data->departement);
             $excel->setActiveSheetIndex(0)->setCellValue('F' . $numrow, $data->nama_barang);
-            $excel->setActiveSheetIndex(0)->setCellValue('G' . $numrow, $data->qty);
-            $excel->setActiveSheetIndex(0)->setCellValue('H' . $numrow, $data->hrg_satuan);
-            $excel->setActiveSheetIndex(0)->setCellValue('I' . $numrow, $data->total_harga);
+            $excel->setActiveSheetIndex(0)->setCellValue('G' . $numrow, $data->deskripsi);
+            $excel->setActiveSheetIndex(0)->setCellValue('H' . $numrow, $data->qty);
+            $excel->setActiveSheetIndex(0)->setCellValue('I' . $numrow, $data->hrg_satuan);
+            $excel->setActiveSheetIndex(0)->setCellValue('J' . $numrow, $data->total_harga);
             $excel->getActiveSheet()->getStyle('A' . $numrow)->applyFromArray($style_row);
             $excel->getActiveSheet()->getStyle('B' . $numrow)->applyFromArray($style_row);
             $excel->getActiveSheet()->getStyle('C' . $numrow)->applyFromArray($style_row);
@@ -142,6 +144,7 @@ class C_Laporan extends CI_Controller
             $excel->getActiveSheet()->getStyle('G' . $numrow)->applyFromArray($style_row);
             $excel->getActiveSheet()->getStyle('H' . $numrow)->applyFromArray($style_row);
             $excel->getActiveSheet()->getStyle('I' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('J' . $numrow)->applyFromArray($style_row);
             $no++;
             $numrow++;
         }
@@ -152,9 +155,10 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
         $excel->getActiveSheet()->getColumnDimension('F')->setWidth(70);
-        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(10);
-        $excel->getActiveSheet()->getColumnDimension('H')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(70);
+        $excel->getActiveSheet()->getColumnDimension('H')->setWidth(10);
         $excel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
         $excel->getActiveSheet(0)->setTitle("lap_" . $vartgl1 . "_" . $vartgl2);
