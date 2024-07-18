@@ -73,12 +73,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+// HOST DOMAIN
+
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
 	'username' => 'kiucoid_po',
 	'password' => 'kiupokarisma',
-	'database' => 'kiucoid_po',
+	'database' => 'E{=VxW&;K$l7',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -94,6 +96,8 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+// OFLINE - LOCAL
 
 // $db['default'] = array(
 // 	'dsn'	=> '',
