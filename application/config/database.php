@@ -78,9 +78,9 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'kiucoid_kiu_po',
-	'password' => 'kiupokarisma',
-	'database' => 'E{=VxW&;K$l7',
+	'username' => 'kiucoid_po',
+	'password' => 'E{=VxW&;K$l7',
+	'database' => 'kiucoid_kiu_po',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
