@@ -13,7 +13,6 @@
             </div><!-- /.row -->
         </div>
     </div>
-
     <section class="content">
         <div class="card">
             <div class="m-2">
