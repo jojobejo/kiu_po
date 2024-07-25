@@ -78,6 +78,14 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-box"></i>
+              <p>
+                Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('lap_nonkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-file-excel"></i>
               <p>
