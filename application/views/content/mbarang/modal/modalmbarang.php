@@ -45,9 +45,7 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi<span class="required">*</span></label>
-                            <div class="col-sm-8">
-                                <textarea name="descisi" id="descisi" class="form-control"></textarea>
-                            </div>
+                            <div class="col-sm-8"><textarea name="descisi" id="descisi" class="form-control"></textarea></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -119,10 +117,7 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi<span class="required">*</span></label>
-                            <div class="col-sm-8">
-                                <textarea name="descisi" id="descisi" class="form-control">
-                                <?= $brnk->descnk ?>
-                                </textarea>
+                            <div class="col-sm-8"><textarea name="descisi" id="descisi" class="form-control"><?= $brnk->descnk ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -205,10 +200,13 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Upload Gambar<span class="required">*</span></label>
-                            <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept="img/*">
-                                <label class="custom-file-label" for="customFile">Pilih Gambar</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="exampleInputFile">
+                                <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                            </div>
+                            <div class="input-group-append">
+                                <span class="input-group-text">Upload</span>
                             </div>
                         </div>
                     </div>

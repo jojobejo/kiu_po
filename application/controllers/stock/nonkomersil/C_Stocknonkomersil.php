@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 /**
  *
  */
-class nama_controler extends CI_Controller
+class C_Stocknonkomersil extends CI_Controller
 
 {
 

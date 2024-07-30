@@ -103,41 +103,68 @@ class C_MasterBarang extends CI_Controller
         $flnm       = $this->input->post('file_nm');
 
         if ($flnm == 'Karisma.png') {
-        } elseif ($flnm != 'Karisma.png') {
-        }
+            if (!empty($_FILES['gambar_1'])) {
+                $config['upload_path'] = './images/gbrbarang/masterbr/';
+                $config['allowed_types'] = 'jpg|png|gif';
+                $config['max_size'] = '2000';
+                $config['max_width'] = '6000';
+                $config['max_height'] = '6000';
+                $config['overwrite'] = TRUE;
+                $config['file_name'] = date('Y') . date('m') . date('U');
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);;
 
-
-        if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/gbrbarang/masterbr/';
-            $config['allowed_types'] = 'jpg|png|gif';
-            $config['max_size'] = '2000';
-            $config['max_width'] = '6000';
-            $config['max_height'] = '6000';
-            $config['overwrite'] = TRUE;
-            $config['file_name'] = date('Y') . date('m') . date('U');
-            $this->load->library('upload', $config);
-            $this->upload->initialize($config);;
-
-            if (!$this->upload->do_upload('gambar_1')) {
-                $error = array('error' => $this->upload->display_errors());
-                print_r($error);
-                die;
-            } else {
-                if ($this->upload->do_upload('gambar_1')) {
-                    $image_data1 = $this->upload->data();
-                    $full_path1 = $config['file_name'];
-                    $data["gbr_produk"] = $full_path1;
+                if (!$this->upload->do_upload('gambar_1')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    print_r($error);
+                    die;
+                } else {
+                    if ($this->upload->do_upload('gambar_1')) {
+                        $image_data1 = $this->upload->data();
+                        $full_path1 = $config['file_name'];
+                        $data["gbr_produk"] = $full_path1;
+                    }
                 }
             }
+
+            $dataBarang = array(
+                'gbr_barang'    => $image_data1['file_name']
+            );
+
+            $this->M_MasterBarang->uploadfile($idisi, $dataBarang);
+            redirect('masterbarangnk');
+        } elseif ($flnm != 'Karisma.png') {
+            if (!empty($_FILES['gambar_1'])) {
+                $config['upload_path'] = './images/gbrbarang/masterbr/';
+                $config['allowed_types'] = 'jpg|png|gif';
+                $config['max_size'] = '2000';
+                $config['max_width'] = '6000';
+                $config['max_height'] = '6000';
+                $config['overwrite'] = TRUE;
+                $config['file_name'] = date('Y') . date('m') . date('U');
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);;
+
+                if (!$this->upload->do_upload('gambar_1')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    print_r($error);
+                    die;
+                } else {
+                    if ($this->upload->do_upload('gambar_1')) {
+                        $image_data1 = $this->upload->data();
+                        $full_path1 = $config['file_name'];
+                        $data["gbr_produk"] = $full_path1;
+                    }
+                }
+            }
+
+            $dataBarang = array(
+                'gbr_barang'    => $image_data1['file_name']
+            );
+
+            unlink(FCPATH . "/images/gbrbarang/masterbr/" . $flnm);
+            $this->M_MasterBarang->uploadfile($idisi, $dataBarang);
+            redirect('masterbarangnk');
         }
-
-        $dataBarang = array(
-            'file_uploaded'    => $image_data1['file_name']
-        );
-
-        unlink(FCPATH . "/images/gbrbarang/masterbr/" . $flnm);
-        $this->M_MasterBarang->uploadfile($idisi, $dataBarang);
-
-        redirect('masterbarangnk');
     }
 }

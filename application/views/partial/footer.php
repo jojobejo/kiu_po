@@ -32,6 +32,9 @@
 <script src="<?= base_url('assets/plugins/ekko-lightbox/ekko-lightbox.min.js') ?>"></script>
 <!-- date-range-picker -->
 <script src="<?= base_url('assets/plugins/daterangepicker/daterangepicker.js') ?>"></script>
+<!-- bs-custom-file-input -->
+<script src="<?= base_url('assets/plugins/bs-custom-file-input/bs-custom-file-input.min.js') ?>"></script>
+
 
 
 </body>
@@ -50,7 +53,7 @@
     });
 
     $(function() {
-
+        bsCustomFileInput.init();
         $('#reservation').daterangepicker()
 
         $(document).on('click', '[data-toggle="lightbox"]', function(event) {
@@ -60,9 +63,6 @@
             });
         });
 
-        $('.filter-container').filterizr({
-            gutterPixels: 3
-        });
         $('.btn[data-filter]').on('click', function() {
             $('.btn[data-filter]').removeClass('active');
             $(this).addClass('active');

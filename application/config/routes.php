@@ -92,6 +92,9 @@ $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
 
+// PO-Non-Komersil - PO JASA
+$route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
+
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
 $route['uploadfilegambaredit'] = 'purchaseorder/C_Order/uploadfilegambaredit';
