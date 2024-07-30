@@ -40,7 +40,7 @@ class M_MasterBarang extends CI_Model
 
     public function get_all_masterbarang()
     {
-        return $this->db->query("SELECT * FROM tb_barang_nk a JOIN tb_satuan b ON b.id_satuan = a.satuan");
+        return $this->db->query("SELECT * FROM tb_barang_nk a JOIN tb_satuan b ON b.id_satuan = a.satuan JOIN tb_kat_br c ON c.kd_kat = a.kat_barang");
     }
 
     public function getTax()
@@ -52,7 +52,15 @@ class M_MasterBarang extends CI_Model
     {
         return $this->db->get('tb_satuan')->result();
     }
-    function kdnonkomersial()
+    public function getkatbarang()
+    {
+        return $this->db->get('tb_kat_br')->result();
+    }
+    public function getsatuanbr()
+    {
+        return $this->db->get('tb_satuan')->result();
+    }
+    function generatekdbrnk()
     {
         $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
         $kd1 = "";
@@ -72,5 +80,24 @@ class M_MasterBarang extends CI_Model
     function generatekd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
+    }
+    function inputmbarangnk($data)
+    {
+        $this->db->insert('tb_barang_nk', $data);
+    }
+    function edit_mbarangnk($id, $data)
+    {
+        $this->db->where('id_brg_nk', $id);
+        return $this->db->update('tb_barang_nk', $data);
+    }
+    public function hapus_mbarangnk($id)
+    {
+        $this->db->where('id_brg_nk', $id);
+        return $this->db->delete('tb_barang_nk');
+    }
+    function uploadfile($id, $data)
+    {
+        $this->db->where('id_brg_nk', $id);
+        return $this->db->update('tb_barang_nk', $data);
     }
 }

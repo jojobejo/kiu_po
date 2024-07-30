@@ -22,18 +22,35 @@
                             </a>
                         </div>
                         <tr>
+                            <td>No</td>
+                            <td>Kode Barang</td>
                             <td>Nama Barang</td>
                             <td>Deskripsi / Spesifikasi</td>
                             <td>Satuan</td>
+                            <td>gbr_item</td>
                             <td>Aksi</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($barangnk as $brnk) : ?>
+                        <?php
+                        $no = 1;
+                        foreach ($barangnk as $brnk) :
+                            if ($brnk->gbr_barang == 'Karisma.png') {
+                                $imagePath = "images/gbrbarang/masterbr/Karisma.png";
+                            } else {
+                                $imagePath = "images/gbrbarang/masterbr/" . $brnk->gbr_barang;
+                            }
+                        ?>
                             <tr>
+                                <td><?= $no++; ?></td>
+                                <td><?= $brnk->kd_br_adm ?></td>
                                 <td><?= $brnk->nama_barang ?></td>
                                 <td><?= $brnk->descnk ?></td>
                                 <td><?= $brnk->nm_satuan ?></td>
+                                <td>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $brnk->nama_barang ?>">Buka File
+                                    </a>
+                                </td>
                                 <td>
                                     <div class="row">
                                         <div class="col">
@@ -42,8 +59,13 @@
                                             </a>
                                         </div>
                                         <div class="col-md">
-                                            <a href="#" class="btn btn-block btn-danger btn-sm " data-toggle="modal" data-target="#editbarang<?= $brnk->id_brg_nk ?>">
+                                            <a href="#" class="btn btn-block btn-danger btn-sm " data-toggle="modal" data-target="#hapusbarang<?= $brnk->id_brg_nk ?>">
                                                 <i class="fa fa-solid fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                        <div class="col-md">
+                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#uploadmbrang<?= $brnk->id_brg_nk ?>">
+                                                <i class="fas fa-camera"></i>
                                             </a>
                                         </div>
                                     </div>
