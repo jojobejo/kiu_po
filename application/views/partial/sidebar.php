@@ -129,6 +129,14 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('stockcontrollernk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-clipboard-check"></i>
+              <p>
+                Stock Controller
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('lap_nonkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-file-excel"></i>
               <p>

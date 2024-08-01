@@ -100,6 +100,7 @@ $route['stocknonkomersil'] = 'stock/C_Stocknonkomersil';
 $route['pononkomersil/list_stocknkpo'] = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 
 // Stock PO Komersil
+$route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';

@@ -18,26 +18,39 @@
                             <td>Nama Barang</td>
                             <td>Deskripsi / Spesifikasi</td>
                             <td>Stock Tersedia</td>
+                            <td>Satuan</td>
                             <td>Gambar Produk</td>
                             <td>Aksi</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <div class="row">
-                                    <div class="col">
-                                        <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#editbarang">
-                                            <i class="fa fa-solid fa-cart-plus"></i>
-                                        </a>
+                        <?php foreach ($stocknk as $s) :
+                            if ($s->gbr_barang == 'Karisma.png') {
+                                $imagePath = "../images/gbrbarang/masterbr/Karisma.png";
+                            } else {
+                                $imagePath = "../images/gbrbarang/masterbr/" . $s->gbr_barang;
+                            }
+                        ?>
+                            <tr>
+                                <td><?= $s->nama_barang ?></td>
+                                <td><?= $s->descnk ?></td>
+                                <td>10</td>
+                                <td><?= $s->nm_satuan ?></td>
+                                <td>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col">
+                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartponk<?= $s->kd_barang ?>">
+                                                <i class="fa fa-solid fa-cart-plus"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php elseif ($this->session->userdata('lv') != '2' || $this->session->userdata('lv') != '1') : ?>
