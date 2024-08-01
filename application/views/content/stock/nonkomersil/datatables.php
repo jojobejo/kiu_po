@@ -1,6 +1,6 @@
 <script>
     $(function() {
-        $("#list_mbarangnk").DataTable({
+        $("#list_stocknonkomersil").DataTable({
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,

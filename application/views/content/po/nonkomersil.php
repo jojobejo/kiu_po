@@ -14,7 +14,7 @@
                 </a>
                 <h3 class="">Purchase Order Non Kompersial</h3>
             </div>
-            <a href="#" class="btn btn-primary mb-2 mt-2" data-toggle="modal" data-target="#add_barang_nonkomersil">
+            <a href="<?= base_url('pononkomersil/list_stocknkpo') ?> " class="btn btn-primary mb-2 mt-2">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang
             </a>
             <a href="#" class="btn btn-primary mb-2 mt-2" data-toggle="modal" data-target="#add_nt_pembelian">
