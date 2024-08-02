@@ -32,6 +32,7 @@ class C_Stocknonkomersil extends CI_Controller
     {
         $data['title'] = 'list stock tersedia';
         $data['stocknk'] = $this->M_Stocknonkomersil->getAllstocknk()->result();
+        $data['satuan'] = $this->M_Stocknonkomersil->getSatuan();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

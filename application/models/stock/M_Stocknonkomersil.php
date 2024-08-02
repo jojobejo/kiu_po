@@ -22,6 +22,11 @@ class M_Stocknonkomersil  extends CI_Model
         ");
     }
 
+    public function getSatuan()
+    {
+        return $this->db->get('tb_satuan')->result();
+    }
+
     function kdnonkomersial()
     {
         $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");

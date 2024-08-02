@@ -29,6 +29,39 @@ class C_MasterBarang extends CI_Controller
         $this->load->view('content/mbarang/datatables');
     }
 
+    public function addrequestmasterbarang()
+    {
+        $inputby    = $this->session->userdata('kode');
+        $nmbarang   = $this->input->post('nmbarang');
+        $descnk     = $this->input->post('descisi');
+        $satuan     = $this->input->post('stuanbr');
+
+        $tmpreqbarang = array(
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descnk,
+            'satuan'        => $satuan,
+            'req_by'        => $inputby
+        );
+
+        $this->M_MasterBarang->insertTmpmbarang($tmpreqbarang);
+        redirect('pononkomersil/list_stocknkpo');
+    }
+
+    public function vrequestmbarang()
+    {
+        $data['title']          = 'list request add master barang';
+        $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
+        $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
+        $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
+        $data['kdbarang']   = $this->M_MasterBarang->generatekdbrnk();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('conten/mbarang/reponkbody', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/mbarang/datatables');
+    }
+
     public function add_mbarang()
     {
         date_default_timezone_set("Asia/Jakarta");

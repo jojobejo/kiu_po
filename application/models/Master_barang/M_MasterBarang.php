@@ -42,6 +42,10 @@ class M_MasterBarang extends CI_Model
     {
         return $this->db->query("SELECT * FROM tb_barang_nk a JOIN tb_satuan b ON b.id_satuan = a.satuan JOIN tb_kat_br c ON c.kd_kat = a.kat_barang");
     }
+    public function get_all_req_barang()
+    {
+        return $this->db->query("SELECT * FROM tb_req_masterbarang a JOIN tb_satuan b ON b.id_satuan = a.satuan");
+    }
 
     public function getTax()
     {
@@ -80,6 +84,10 @@ class M_MasterBarang extends CI_Model
     function generatekd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
+    }
+    function insertTmpmbarang($data)
+    {
+        $this->db->insert('tb_req_masterbarang', $data);
     }
     function inputmbarangnk($data)
     {

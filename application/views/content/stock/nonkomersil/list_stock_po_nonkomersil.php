@@ -1,14 +1,14 @@
+<?php $this->load->view('content/stock/nonkomersil/modal/mlist_stok_ponk.php'); ?>
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">
-                    </h1>
+                    <a href="<?= base_url('pononkomersil') ?>" class="btn btn-success"><i class="fas fa-home"></i> BACK</a>
+                    <a href="#" class="btn btn-success " data-toggle="modal" data-target="#addmbarangnk"><i class="fas fa-folder-plus"></i> Req Add Master Barang</a>
                 </div><!-- /.col -->
             </div><!-- /.row -->
-            <a href="<?= base_url('pononkomersil') ?>" class="btn btn-success"><i class="fas fa-home"></i></a>
-            <?php $this->load->view('content/stock/nonkomersil/modal/mlist_stok_ponk.php'); ?>
+
 
             <!-- VIEW ADMIN PURCHASING -->
             <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '1') : ?>

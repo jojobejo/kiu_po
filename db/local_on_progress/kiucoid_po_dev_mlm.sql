@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 01 Agu 2024 pada 17.26
+-- Waktu pembuatan: 02 Agu 2024 pada 17.46
 -- Versi server: 10.4.27-MariaDB
 -- Versi PHP: 7.4.33
 
@@ -215,6 +215,13 @@ CREATE TABLE `tb_nt_tmp_pembelian` (
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `tb_nt_tmp_pembelian`
+--
+
+INSERT INTO `tb_nt_tmp_pembelian` (`id_tmp_nt_pembelian`, `keterangan`, `kd_user`, `create_at`) VALUES
+(8, 'contoh', 'KEU02', '2024-08-02 12:33:40');
+
 -- --------------------------------------------------------
 
 --
@@ -249,6 +256,27 @@ CREATE TABLE `tb_po_nk` (
 
 INSERT INTO `tb_po_nk` (`id_po_nk`, `jns_po`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `tax`, `hrg_pajak`, `hrg_nyata`, `status_hrg_nyata`, `acc_with`, `acc_with_kadep`, `create_at`) VALUES
 (1, 1, 'NKPO1005240003', '004/10/05/2024', 'KARYAWAN2', 'Bram', '2024-05-10', 3, 50000, 'DONE', 'KEUANGAN', 'Kebutuhan ATK', 0, 0, 0, 0, 'KIUDIREKTUR03', 'KADEP01', '2024-08-01 13:22:34');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tb_req_masterbarang`
+--
+
+CREATE TABLE `tb_req_masterbarang` (
+  `id_reqmbarang` int(11) NOT NULL,
+  `nama_barang` text NOT NULL,
+  `deskripsi` text NOT NULL,
+  `satuan` int(2) NOT NULL,
+  `req_by` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tb_req_masterbarang`
+--
+
+INSERT INTO `tb_req_masterbarang` (`id_reqmbarang`, `nama_barang`, `deskripsi`, `satuan`, `req_by`) VALUES
+(1, 'asd', 'asd', 5, 'KEU02');
 
 -- --------------------------------------------------------
 
@@ -315,10 +343,18 @@ CREATE TABLE `tb_tmp_item_nk` (
   `hrg_satuan` int(25) NOT NULL,
   `total_harga` int(25) NOT NULL,
   `kd_barang` varchar(25) NOT NULL,
+  `kat_barang` varchar(25) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
-  `gbr_produk` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tb_tmp_item_nk`
+--
+
+INSERT INTO `tb_tmp_item_nk` (`id_tmp_nk`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `total_harga`, `kd_barang`, `kat_barang`, `kd_user`, `create_at`) VALUES
+(228, 'kresek plastik', 'Besar Uk 40-50 Cm Merah', 'coba1', 5, 50000, 250000, 'QKREBES1', 'KATBR002', 'KEU02', '2024-08-02 07:36:06'),
+(229, 'kresek plastik', 'Sedang Uk 30-35 Cm', 'coba', 1, 20000, 20000, 'QKREBES3', 'KATBR002', 'KEU02', '2024-08-02 12:13:08');
 
 -- --------------------------------------------------------
 
@@ -506,6 +542,12 @@ ALTER TABLE `tb_po_nk`
   ADD PRIMARY KEY (`id_po_nk`);
 
 --
+-- Indeks untuk tabel `tb_req_masterbarang`
+--
+ALTER TABLE `tb_req_masterbarang`
+  ADD PRIMARY KEY (`id_reqmbarang`);
+
+--
 -- Indeks untuk tabel `tb_satuan`
 --
 ALTER TABLE `tb_satuan`
@@ -609,13 +651,19 @@ ALTER TABLE `tb_note_pembelian`
 -- AUTO_INCREMENT untuk tabel `tb_nt_tmp_pembelian`
 --
 ALTER TABLE `tb_nt_tmp_pembelian`
-  MODIFY `id_tmp_nt_pembelian` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_tmp_nt_pembelian` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_po_nk`
 --
 ALTER TABLE `tb_po_nk`
   MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `tb_req_masterbarang`
+--
+ALTER TABLE `tb_req_masterbarang`
+  MODIFY `id_reqmbarang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_satuan`
@@ -633,7 +681,7 @@ ALTER TABLE `tb_set_tax`
 -- AUTO_INCREMENT untuk tabel `tb_tmp_item_nk`
 --
 ALTER TABLE `tb_tmp_item_nk`
-  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=228;
+  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=230;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_tmp_note_barang`

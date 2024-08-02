@@ -106,6 +106,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('vreqmasterponk') ?>" class="nav-link">
+              <i class="nav-icon fas fa-box"></i>
+              <p>
+                Request Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cubes"></i>
               <p>

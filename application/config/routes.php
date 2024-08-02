@@ -91,6 +91,13 @@ $route['add_mbarang'] = 'master_barang/C_MasterBarang/add_mbarang';
 $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
+$route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
+
+// REQUEST PENAMBAHAN MASTER BARANG
+$route['vreqmasterponk'] = '';
+
+// PIC REQUEST PENGAMBILAN BARANG
+$route[''] = '';
 
 // PO-Non-Komersil - PO JASA
 $route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
