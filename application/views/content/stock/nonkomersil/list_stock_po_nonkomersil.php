@@ -7,9 +7,10 @@
                     </h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
+            <a href="<?= base_url('pononkomersil') ?>" class="btn btn-success"><i class="fas fa-home"></i></a>
+            <?php $this->load->view('content/stock/nonkomersil/modal/mlist_stok_ponk.php'); ?>
 
             <!-- VIEW ADMIN PURCHASING -->
-
             <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '1') : ?>
 
                 <table class="table table-bordered table-striped" id="list_stocknonkomersil">
@@ -43,7 +44,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col">
-                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartponk<?= $s->kd_barang ?>">
+                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartponk<?= $s->id_brg_nk ?>">
                                                 <i class="fa fa-solid fa-cart-plus"></i>
                                             </a>
                                         </div>

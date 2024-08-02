@@ -114,6 +114,7 @@ $route['add_note_pembelian_tmp'] = 'purchaseorder/C_Order/add_note_pembelian_tmp
 $route['rekam_po_nk'] = 'purchaseorder/C_Order/rekam_po_nk';
 $route['edit_note_pembelian_tmp'] = 'purchaseorder/C_Order/edit_note_pembelian_tmp';
 $route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pembelian_tmp/$1';
+$route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/addtmpponk';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';

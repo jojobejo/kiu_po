@@ -370,6 +370,34 @@ class C_Order extends CI_Controller
 
         redirect('pononkomersil');
     }
+    public function addtmpponk()
+    {
+        $kdbarang   = $this->input->post('kd_adm');
+        $katbarang  = $this->input->post('katbrg');
+        $namabarang = $this->input->post('nmbarang');
+        $descbarang = $this->input->post('descisi');
+        $ketbarang  = $this->input->post('ketbarang');
+        $qtybarang  = $this->input->post('qtyisi');
+        $hrgsatuan  = $this->input->post('hrgisi');
+        $kduser     = $this->session->userdata('kode');
+        $totalharga = $qtybarang * $hrgsatuan;
+
+        $dataBarang = array(
+            'nama_barang'   => $namabarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybarang,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalharga,
+            'kd_barang'     => $kdbarang,
+            'kat_barang'    => $katbarang,
+            'kd_user'       => $kduser
+        );
+
+        $this->M_Purchase->input_tmp_nk($dataBarang);
+
+        redirect('pononkomersil/list_stocknkpo');
+    }
 
     public function uploadfilegambaredit()
     {

@@ -39,4 +39,36 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }
+
+    public function tmp_add_barang_komersil()
+    {
+        $kdbarang   = $this->input->post('kd_isi');
+        $namabarang = $this->input->post('nama_isi');
+        $descbarang  = $this->input->post('desc_isi');
+        $ketbarang  = $this->input->post('ket_isi');
+        $qtybarang  = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
+        $kduser     = $this->session->userdata('kode');
+        $totalharga = $qtybarang * $hrgsatuan;
+
+        $dataBarang = array(
+            'nama_barang'   => $namabarang,
+            'deskripsi'     => $descbarang,
+            'keterangan'    => $ketbarang,
+            'qty'           => $qtybarang,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $totalharga,
+            'kd_barang'     => $kdbarang,
+            'kd_user'       => $kduser,
+            'gbr_produk'    => 'Karisma.png'
+        );
+        $kdgenerate = array(
+            'kd_barang' => $kdbarang
+        );
+
+        $this->M_Purchase->generatekd($kdgenerate);
+        $this->M_Purchase->input_tmp_nk($dataBarang);
+
+        redirect('pononkomersil');
+    }
 }
