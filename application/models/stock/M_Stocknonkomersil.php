@@ -9,6 +9,7 @@ class M_Stocknonkomersil  extends CI_Model
     {
         parent::__construct();
     }
+    
     public function getAllstockbaran()
     {
         return $this->db->get('')->result();

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 02 Agu 2024 pada 17.46
+-- Waktu pembuatan: 04 Agu 2024 pada 17.12
 -- Versi server: 10.4.27-MariaDB
 -- Versi PHP: 7.4.33
 
@@ -61,6 +61,8 @@ CREATE TABLE `tb_barang_nk` (
   `descnk` text NOT NULL,
   `satuan` int(5) NOT NULL,
   `gbr_barang` text NOT NULL,
+  `qrcode_path` text NOT NULL,
+  `qrcode_data` varchar(50) NOT NULL,
   `inputer` varchar(25) NOT NULL,
   `create_at` datetime NOT NULL,
   `last_updated` varchar(25) NOT NULL,
@@ -71,17 +73,17 @@ CREATE TABLE `tb_barang_nk` (
 -- Dumping data untuk tabel `tb_barang_nk`
 --
 
-INSERT INTO `tb_barang_nk` (`id_brg_nk`, `kd_barang`, `kd_br_adm`, `kat_barang`, `nama_barang`, `descnk`, `satuan`, `gbr_barang`, `inputer`, `create_at`, `last_updated`, `update_at`) VALUES
-(1, 'PONK3007240001', 'QKREBES1', 'KATBR002', 'kresek plastik', 'Besar Uk 40-50 Cm Merah', 11, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(2, 'PONK3007240002', 'QKREBES2', 'KATBR002', 'kresek plastik', 'Sedang Uk 36-40 cm', 11, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(3, 'PONK3007240003', 'QKREBES3', 'KATBR002', 'kresek plastik', 'Sedang Uk 30-35 Cm', 11, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(4, 'PONK3007240004', 'QKREBES4', 'KATBR002', 'kresek plastik', 'Kecil Uk 28 Cm', 11, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(5, 'PONK3007240005', 'QTINMER1', 'KATBR001', 'Tinta Epson 664', 'Warna Merah', 2, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(6, 'PONK3007240006', 'QTINMER2', 'KATBR001', 'Tinta Epson 664', 'Warna Kuning', 2, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(7, 'PONK3007240007', 'QTINMER3', 'KATBR001', 'Tinta Epson 664', 'Warna Hitam', 2, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(8, 'PONK3007240008', 'QTINMER4', 'KATBR001', 'Tinta Epson 664', 'Warna Biru', 2, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(9, 'PONK3007240009', 'QAIRKEM1', 'KATBR002', 'Air Mineral Cleo', 'Kemasan gelas 230 ml', 3, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
-(10, 'PONK3007240010', 'QAIRGAL1', 'KATBR002', 'Air Galon Cleo', 'Galon Cleo 18 Liter', 2, 'Karisma.png', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00');
+INSERT INTO `tb_barang_nk` (`id_brg_nk`, `kd_barang`, `kd_br_adm`, `kat_barang`, `nama_barang`, `descnk`, `satuan`, `gbr_barang`, `qrcode_path`, `qrcode_data`, `inputer`, `create_at`, `last_updated`, `update_at`) VALUES
+(1, 'PONK3007240001', 'QKREBES1', 'KATBR002', 'kresek plastik', 'Besar Uk 40-50 Cm Merah', 11, 'Karisma.png', 'kresekplastik645.png', 'QRC0408240010', 'KIUADMIN', '2024-07-30 00:00:00', 'KEU02', '2024-08-04 14:33:21'),
+(2, 'PONK3007240002', 'QKREBES2', 'KATBR002', 'kresek plastik', 'Sedang Uk 36-40 cm', 11, 'Karisma.png', 'kresekplastik584.png', 'QRC0408240011', 'KIUADMIN', '2024-07-30 00:00:00', 'KEU02', '2024-08-04 14:34:05'),
+(3, 'PONK3007240003', 'QKREBES3', 'KATBR002', 'kresek plastik', 'Sedang Uk 30-35 Cm', 11, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(4, 'PONK3007240004', 'QKREBES4', 'KATBR002', 'kresek plastik', 'Kecil Uk 28 Cm', 11, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(5, 'PONK3007240005', 'QTINMER1', 'KATBR001', 'Tinta Epson 664', 'Warna Merah', 2, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(6, 'PONK3007240006', 'QTINMER2', 'KATBR001', 'Tinta Epson 664', 'Warna Kuning', 2, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(7, 'PONK3007240007', 'QTINMER3', 'KATBR001', 'Tinta Epson 664', 'Warna Hitam', 2, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(8, 'PONK3007240008', 'QTINMER4', 'KATBR001', 'Tinta Epson 664', 'Warna Biru', 2, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(9, 'PONK3007240009', 'QAIRKEM1', 'KATBR002', 'Air Mineral Cleo', 'Kemasan gelas 230 ml', 3, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00'),
+(10, 'PONK3007240010', 'QAIRGAL1', 'KATBR002', 'Air Galon Cleo', 'Galon Cleo 18 Liter', 2, 'Karisma.png', '', '', 'KIUADMIN', '2024-07-30 00:00:00', 'KIUADMIN', '2024-07-29 17:00:00');
 
 -- --------------------------------------------------------
 
@@ -126,6 +128,36 @@ CREATE TABLE `tb_file_nk` (
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `tb_generateqrcode`
+--
+
+CREATE TABLE `tb_generateqrcode` (
+  `id_gqrcode` int(11) NOT NULL,
+  `kd_qrcode` varchar(25) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tb_generateqrcode`
+--
+
+INSERT INTO `tb_generateqrcode` (`id_gqrcode`, `kd_qrcode`, `create_at`) VALUES
+(1, 'QRC0408240001', '2024-08-04 13:05:28'),
+(2, 'QRC0408240002', '2024-08-04 13:21:27'),
+(3, 'QRC0408240003', '2024-08-04 13:24:23'),
+(4, 'QRC0408240004', '2024-08-04 13:25:49'),
+(5, 'QRC0408240005', '2024-08-04 13:26:08'),
+(6, 'QRC0408240006', '2024-08-04 13:36:39'),
+(7, 'QRC0408240007', '2024-08-04 14:29:54'),
+(8, 'QRC0408240008', '2024-08-04 14:31:30'),
+(9, 'QRC0408240009', '2024-08-04 14:31:36'),
+(10, 'QRC0408240010', '2024-08-04 14:33:21'),
+(11, 'QRC0408240011', '2024-08-04 14:34:05'),
+(12, 'QRC0408240012', '2024-08-04 14:54:01');
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `tb_generate_kd`
 --
 
@@ -134,6 +166,19 @@ CREATE TABLE `tb_generate_kd` (
   `kd_barang` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tb_generate_kd`
+--
+
+INSERT INTO `tb_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
+(1, 'PONK0408240001', '2024-08-04 13:05:28'),
+(2, 'PONK0408240002', '2024-08-04 13:21:27'),
+(3, 'PONK0408240003', '2024-08-04 13:24:23'),
+(4, 'PONK0408240004', '2024-08-04 13:25:49'),
+(5, 'PONK0408240005', '2024-08-04 13:26:08'),
+(6, 'PONK0408240006', '2024-08-04 13:36:39'),
+(7, 'PONK0408240007', '2024-08-04 14:54:01');
 
 -- --------------------------------------------------------
 
@@ -500,6 +545,12 @@ ALTER TABLE `tb_file_nk`
   ADD PRIMARY KEY (`id_file_nk`);
 
 --
+-- Indeks untuk tabel `tb_generateqrcode`
+--
+ALTER TABLE `tb_generateqrcode`
+  ADD PRIMARY KEY (`id_gqrcode`);
+
+--
 -- Indeks untuk tabel `tb_generate_kd`
 --
 ALTER TABLE `tb_generate_kd`
@@ -603,7 +654,7 @@ ALTER TABLE `tb_akun_tr`
 -- AUTO_INCREMENT untuk tabel `tb_barang_nk`
 --
 ALTER TABLE `tb_barang_nk`
-  MODIFY `id_brg_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_brg_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_detail_po_nk`
@@ -618,10 +669,16 @@ ALTER TABLE `tb_file_nk`
   MODIFY `id_file_nk` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT untuk tabel `tb_generateqrcode`
+--
+ALTER TABLE `tb_generateqrcode`
+  MODIFY `id_gqrcode` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT untuk tabel `tb_generate_kd`
 --
 ALTER TABLE `tb_generate_kd`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_kat_br`

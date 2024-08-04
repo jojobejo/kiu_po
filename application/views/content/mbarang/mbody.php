@@ -27,7 +27,8 @@
                             <td>Nama Barang</td>
                             <td>Deskripsi / Spesifikasi</td>
                             <td>Satuan</td>
-                            <td>gbr_item</td>
+                            <td>Gambar Produk</td>
+                            <td>QR CODE</td>
                             <td>Aksi</td>
                         </tr>
                     </thead>
@@ -40,6 +41,11 @@
                             } else {
                                 $imagePath = "images/gbrbarang/masterbr/" . $brnk->gbr_barang;
                             }
+                            $nullimg    = "./images/qrcodebr/";
+                            $imgqrcode  = "./images/qrcodebr/" . $brnk->qrcode_path;
+
+                            $str    = $brnk->nama_barang;
+                            $strnew = str_replace(' ', '', $str);
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
@@ -51,6 +57,11 @@
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $brnk->nama_barang ?>">Buka File
                                     </a>
                                 </td>
+                                <?php if ($imgqrcode == $nullimg) : ?>
+                                    <td><a href="#" class="btn btn-danger btn-sm btn-block"><i class="fas fa-times-circle"></i></a></td>
+                                <?php else : ?>
+                                    <td><a href="<?= $imgqrcode ?>" class="btn btn-success btn-sm btn-block" data-toggle="lightbox" data-title="<?= $brnk->nama_barang . '(' . $brnk->kd_br_adm . ')' ?>">Buka File</a></td>
+                                <?php endif; ?>
                                 <td>
                                     <div class="row">
                                         <div class="col">
@@ -68,6 +79,13 @@
                                                 <i class="fas fa-camera"></i>
                                             </a>
                                         </div>
+                                        <?php if ($imgqrcode == $nullimg) : ?>
+                                            <div class="col-md">
+                                                <a href="<?= base_url('genqrcode/') . $brnk->id_brg_nk . "/" . $kdqrcode . "/" . $strnew ?>" class="btn btn-block btn-info btn-sm ">
+                                                    <i class="fas fa-qrcode"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
 
                                 </td>

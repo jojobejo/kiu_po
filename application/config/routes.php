@@ -92,6 +92,7 @@ $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
+$route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
 
 // REQUEST PENAMBAHAN MASTER BARANG
 $route['vreqmasterponk'] = '';

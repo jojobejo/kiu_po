@@ -19,6 +19,7 @@ class C_MasterBarang extends CI_Controller
         $data['title']      = 'Master Barang';
         $data['barangnk']   = $this->M_MasterBarang->get_all_masterbarang()->result();
         $data['kdbarang']   = $this->M_MasterBarang->generatekdbrnk();
+        $data['kdqrcode']   = $this->M_MasterBarang->generate_qrcode();
         $data['katbarang']   = $this->M_MasterBarang->getkatbarang();
         $data['satuan']   = $this->M_MasterBarang->getsatuanbr();
 
@@ -28,6 +29,8 @@ class C_MasterBarang extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/mbarang/datatables');
     }
+
+
 
     public function addrequestmasterbarang()
     {
@@ -44,6 +47,7 @@ class C_MasterBarang extends CI_Controller
         );
 
         $this->M_MasterBarang->insertTmpmbarang($tmpreqbarang);
+
         redirect('pononkomersil/list_stocknkpo');
     }
 
@@ -64,14 +68,20 @@ class C_MasterBarang extends CI_Controller
 
     public function add_mbarang()
     {
+
         date_default_timezone_set("Asia/Jakarta");
+
         $kdbarang   = $this->input->post('kd_isi');
-        $kdbarang1   = $this->input->post('kd_adm');
+        $kdbarang1  = $this->input->post('kd_adm');
+        $kdqrcode   = $this->input->post('qrc_isi');
         $katbarang  = $this->input->post('skatbr');
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
         $inputer    = $this->session->userdata('kode');
+
+        $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
+
         $now = date('Y-m-d H:i:s');
 
         $dtinputbr = array(
@@ -82,6 +92,8 @@ class C_MasterBarang extends CI_Controller
             'descnk'        => $descnk,
             'satuan'        => $satuan,
             'gbr_barang'    => "Karisma.png",
+            'qrcode_data'   => $kdqrcode,
+            'qrcode_path'   => $qrcpath,
             'inputer'       => $inputer,
             'create_at'     => $now,
             'last_updated'  => $inputer
@@ -90,12 +102,37 @@ class C_MasterBarang extends CI_Controller
         $kdgenerate = array(
             'kd_barang'     => $kdbarang
         );
+        $qrcgeneratekd = array(
+            'kd_qrcode'     => $kdqrcode
+        );
 
         $this->M_MasterBarang->inputmbarangnk($dtinputbr);
         $this->M_MasterBarang->generatekd($kdgenerate);
+        $this->M_MasterBarang->generate_qrc($qrcgeneratekd);
+
 
         redirect('masterbarangnk');
     }
+
+    public function inputqrcbrnk($id, $kdqrcode, $nmbarang)
+    {
+        $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
+        $actionby   = $this->session->userdata('kode');
+
+        $upqrcode = array(
+            'qrcode_path'   => $qrcpath,
+            'qrcode_data'   => $kdqrcode,
+            'last_updated'  => $actionby
+        );
+        $qrcgeneratekd = array(
+            'kd_qrcode'     => $kdqrcode
+        );
+        $this->M_MasterBarang->input_qrcode($id, $upqrcode);
+        $this->M_MasterBarang->generate_qrc($qrcgeneratekd);
+
+        redirect('masterbarangnk');
+    }
+
 
     public function edit_mbarangnk()
     {
@@ -107,7 +144,6 @@ class C_MasterBarang extends CI_Controller
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
         $inputer    = $this->session->userdata('kode');
-        $now = date('Y-m-d H:i:s');
         $dtinputbr = array(
             'kd_br_adm'     => $kdbarang1,
             'kat_barang'    => $katbarang,

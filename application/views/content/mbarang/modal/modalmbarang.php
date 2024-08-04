@@ -17,6 +17,7 @@
                             <label class="col-sm-3 control-label text-right" for="kd_user">Kode Barang<span class="required">*</span></label>
                             <div class="col-sm-8">
                                 <input class="form-control" type="text" id="kd_isi" name="kd_isi" value="<?= $kdbarang ?>" hidden />
+                                <input class="form-control" type="text" id="qrc_isi" name="qrc_isi" value="<?= $kdqrcode ?>" hidden />
                                 <input class="form-control" type="text" id="kd_adm" name="kd_adm" value="" />
                             </div>
                         </div>
@@ -221,6 +222,4 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
-
-
 <?php endforeach; ?>

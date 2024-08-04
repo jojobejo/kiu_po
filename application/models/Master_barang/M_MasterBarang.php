@@ -26,6 +26,7 @@ class M_MasterBarang extends CI_Model
         return $this->db->update('tb_barang', $data);
     }
 
+
     public function hapusBarang($id)
     {
         $this->db->where('id_barang', $id);
@@ -81,9 +82,35 @@ class M_MasterBarang extends CI_Model
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+    function generate_qrcode()
+    {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_qrcode,4)) AS kd_max FROM tb_generateqrcode WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd1 = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd1 = "0001";
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'QRC' . date('dmy') . $kd1;
+        return $kdnk1;
+    }
+    public function input_qrcode($id, $data)
+    {
+        $this->db->where('id_brg_nk', $id);
+        return $this->db->update('tb_barang_nk', $data);
+    }
     function generatekd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
+    }
+    function generate_qrc($data)
+    {
+        $this->db->insert('tb_generateqrcode', $data);
     }
     function insertTmpmbarang($data)
     {
@@ -107,5 +134,36 @@ class M_MasterBarang extends CI_Model
     {
         $this->db->where('id_brg_nk', $id);
         return $this->db->update('tb_barang_nk', $data);
+    }
+
+    // Generate - QRCode
+
+    public function _generate_qrcode($fullname, $data_code)
+    {
+        $this->load->library('ciqrcode');
+        $directory = "./images/qrcodebr";
+        $file_name = str_replace(" ", "", strtolower($fullname)) . rand(pow(10, 2), pow(10, 3) - 1);
+
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, TRUE);
+        }
+
+        $config['cacheable']    = true;
+        $config['quality']      = true;
+        $config['size']         = '1024';
+        $config['black']        = array(224, 255, 255);
+        $config['white']        = array(70, 130, 180);
+        $this->ciqrcode->initialize($config);
+
+        $image_name = $file_name . '.png';
+
+        $params['data'] = $data_code;
+        $params['level'] = 'H';
+        $params['size'] = 10;
+        $params['savename'] = $directory . '/' . $image_name;
+
+        $this->ciqrcode->generate($params);
+
+        return  $image_name;
     }
 }
