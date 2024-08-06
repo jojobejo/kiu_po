@@ -30,8 +30,6 @@ class C_MasterBarang extends CI_Controller
         $this->load->view('content/mbarang/datatables');
     }
 
-
-
     public function addrequestmasterbarang()
     {
         $inputby    = $this->session->userdata('kode');
@@ -57,11 +55,11 @@ class C_MasterBarang extends CI_Controller
         $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
         $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
         $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
-        $data['kdbarang']   = $this->M_MasterBarang->generatekdbrnk();
+        $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
-        $this->load->view('conten/mbarang/reponkbody', $data);
+        $this->load->view('conten/mbarang/vreqmbarang', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/mbarang/datatables');
     }

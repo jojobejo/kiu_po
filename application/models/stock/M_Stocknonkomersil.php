@@ -9,7 +9,7 @@ class M_Stocknonkomersil  extends CI_Model
     {
         parent::__construct();
     }
-    
+
     public function getAllstockbaran()
     {
         return $this->db->get('')->result();
@@ -20,6 +20,15 @@ class M_Stocknonkomersil  extends CI_Model
         return $this->db->query("SELECT * FROM tb_barang_nk a
         JOIN tb_kat_br b ON b.kd_kat = a.kat_barang
         JOIN tb_satuan c ON c.id_satuan = a.satuan   
+        ");
+    }
+    public function getreqpic($lv)
+    {
+        return $this->db->query("SELECT * 
+FROM tb_req_masterbarang a
+JOIN tb_satuan b ON b.id_satuan = a.satuan
+JOIN tb_user c ON c.kode_user = a.req_by
+WHERE a.req_by = '$lv'
         ");
     }
 

@@ -211,6 +211,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('vrequestmbarang') ?>" class="nav-link">
+              <i class="nav-icon fas fa-box"></i>
+              <p>
+                Request Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('usersetting') ?>" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>
               <p>
@@ -228,14 +236,6 @@
           </li>
           <!-- MENU KADEP -->
         <?php elseif ($this->session->userdata('lv') == '5') : ?>
-          <li class="nav-item">
-            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
-              <i class="nav-icon fas fa-cash-register"></i>
-              <p>
-                Purchase Order
-              </p>
-            </a>
-          </li>
           <li class="nav-item">
             <a href="<?= base_url('postatusnk') ?>" class="nav-link">
               <i class="nav-icon fas fa-money-check"></i>

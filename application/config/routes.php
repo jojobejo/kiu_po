@@ -93,9 +93,8 @@ $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
 $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
-
-// REQUEST PENAMBAHAN MASTER BARANG
-$route['vreqmasterponk'] = '';
+$route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/';
+$route['vrequestmbarang'] = 'master_barang/C_MasterBarang/vrequestmbarang';
 
 // PIC REQUEST PENGAMBILAN BARANG
 $route[''] = '';
@@ -106,9 +105,10 @@ $route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
 // Stock PO Non Komersil
 $route['stocknonkomersil'] = 'stock/C_Stocknonkomersil';
 $route['pononkomersil/list_stocknkpo'] = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
+$route['stockcontrollernk'] = 'stock/C_Stockcontroller';
+
 
 // Stock PO Komersil
-$route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
