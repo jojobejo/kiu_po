@@ -207,3 +207,7 @@ $route['notetemplate'] = 'settings/C_NoteSetting';
 $route['addnotetemplate'] = 'settings/C_NoteSetting/add_note_template';
 $route['notetemplate/(:any)'] = 'settings/C_NoteSetting/detail_note_template/$1';
 $route['updateisinote'] = 'settings/C_NoteSetting/update_note_template';
+
+//LAPORAN PEMBELIAN NON KOMERSIL
+$route['lap_nonkomersil'] = 'laporan/C_Laporan';
+$route['srclapbeli'] = 'laporan/C_Laporan/srclapbeli';

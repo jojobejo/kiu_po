@@ -78,6 +78,14 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('lap_nonkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-file-excel"></i>
+              <p>
+                Laporan Pembelian
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('taxseting') ?>" class="nav-link">
               <i class="nav-icon fas fa-percent"></i>
               <p>
@@ -151,7 +159,7 @@
               </p>
             </a>
           </li>
-
+          <!-- MENU KADEP -->
         <?php elseif ($this->session->userdata('lv') == '5') : ?>
           <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
@@ -219,7 +227,7 @@
               </p>
             </a>
           </li>
-          <!-- MENU KADEP -->
+          <!-- MENU DIREKTUR -->
         <?php elseif ($this->session->userdata('lv') == '3' && $this->session->userdata('departemen') == 'KEUANGAN' || $this->session->userdata('departemen') == 'SALES' || $this->session->userdata('departemen') == 'LOGISTIK' || $this->session->userdata('departemen') == 'HRD') : ?>
           <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
