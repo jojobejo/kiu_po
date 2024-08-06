@@ -45,9 +45,10 @@ class M_MasterBarang extends CI_Model
     }
     public function get_all_req_barang()
     {
-        return $this->db->query("SELECT * FROM tb_req_masterbarang a JOIN tb_satuan b ON b.id_satuan = a.satuan");
+        return $this->db->query("SELECT * FROM tb_req_masterbarang a 
+        JOIN tb_satuan b ON b.id_satuan = a.satuan 
+        JOIN tb_user c ON c.kode_user = a.req_by");
     }
-
     public function getTax()
     {
         return $this->db->get('tb_set_tax')->result();
@@ -98,6 +99,11 @@ class M_MasterBarang extends CI_Model
         date_default_timezone_set('Asia/Jakarta');
         $kdnk1 = 'QRC' . date('dmy') . $kd1;
         return $kdnk1;
+    }
+    public function delreqbarangnk($id)
+    {
+        $this->db->where('id_reqmbarang', $id);
+        return $this->db->delete('tb_req_masterbarang');
     }
     public function input_qrcode($id, $data)
     {

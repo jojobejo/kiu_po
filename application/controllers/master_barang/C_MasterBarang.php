@@ -51,17 +51,69 @@ class C_MasterBarang extends CI_Controller
 
     public function vrequestmbarang()
     {
-        $data['title']          = 'list request add master barang';
-        $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
-        $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
-        $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
+        $data['title']          = 'Request - Master Barang';
+        // $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
+        // $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
+        // $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
+        // $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
+
+        $data['listreqbr']      = $this->M_MasterBarang->get_all_req_barang()->result();
         $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
+        $data['kdqrcode']       = $this->M_MasterBarang->generate_qrcode();
+        $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
-        $this->load->view('conten/mbarang/vreqmbarang', $data);
+        $this->load->view('content/mbarang/vreqmbarang', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/mbarang/datatables');
+    }
+    public function aprovedmasterbarang()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+
+        $id         = $this->input->post('idreq');
+        $kdbarang   = $this->input->post('syskdbarang');
+        $kdbarang1  = $this->input->post('kdbarang');
+        $kdqrcode   = $this->input->post('admkd');
+        $katbarang  = $this->input->post('katbr');
+        $nmbarang   = $this->input->post('nmbarang');
+        $descnk     = $this->input->post('descnk');
+        $satuan     = $this->input->post('satuanisi');
+        $inputer    = $this->input->post('reqby');
+
+        $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
+
+        $now = date('Y-m-d H:i:s');
+
+        $dtinputbr = array(
+            'kd_barang'     => $kdbarang,
+            'kd_br_adm'     => $kdbarang1,
+            'kat_barang'    => $katbarang,
+            'nama_barang'   => $nmbarang,
+            'descnk'        => $descnk,
+            'satuan'        => $satuan,
+            'gbr_barang'    => "Karisma.png",
+            'qrcode_data'   => $kdqrcode,
+            'qrcode_path'   => $qrcpath,
+            'inputer'       => $inputer,
+            'create_at'     => $now,
+            'last_updated'  => $inputer
+        );
+
+        $kdgenerate = array(
+            'kd_barang'     => $kdbarang
+        );
+        $qrcgeneratekd = array(
+            'kd_qrcode'     => $kdqrcode
+        );
+
+        $this->M_MasterBarang->inputmbarangnk($dtinputbr);
+        $this->M_MasterBarang->generatekd($kdgenerate);
+        $this->M_MasterBarang->generate_qrc($qrcgeneratekd);
+        $this->M_MasterBarang->delreqbarangnk($id);
+
+        redirect('vrequestmbarang');
     }
 
     public function add_mbarang()

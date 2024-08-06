@@ -93,7 +93,7 @@ $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
 $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
-$route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/';
+$route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/aprovedmasterbarang';
 $route['vrequestmbarang'] = 'master_barang/C_MasterBarang/vrequestmbarang';
 
 // PIC REQUEST PENGAMBILAN BARANG
