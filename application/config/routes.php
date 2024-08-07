@@ -60,7 +60,7 @@ $route['usersetting'] = 'user/C_User/usersetting';
 $route['editPass'] = 'user/C_User/editPassword';
 
 //auth
-$route['login']     = 'auth/process';
+$route['login']     = 'Auth/process';
 $route['logout']   = 'auth/logout';
 $route['dashboard'] = 'dashboard';
 
