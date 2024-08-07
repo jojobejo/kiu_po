@@ -586,14 +586,11 @@
                     </tr>
                     <?php foreach ($flupload as $f) :
                                     $imagePath = "../images/filepndukung/" . $f->file_uploaded;
-
                     ?>
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                                <?php if ($f->kdfile != 'jpg') ?>
-                                <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                                </a>
+                                <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block">Download File</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -791,8 +788,11 @@
             <tr>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($f->kdfile == 'csv') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block">Download File</a>
+                    <?php elseif ($f->kdfile == 'png') : ?>
+                        <a href="" class="btn btn-secondary btn-sm btn-block">Buka Files</a>
+                    <?php endif; ?>
                 </td>
                 <td colspan="3" style="font-weight: bold;">
                     <div class="row">

@@ -14,6 +14,7 @@ class C_PoStatus extends CI_Controller
         parent::__construct();
         $this->load->model('PO/M_Postatus');
         $this->load->model('PO/M_Purchase');
+        $this->load->helper('download');
         $this->load->library('form_validation');
     }
 
@@ -796,13 +797,15 @@ class C_PoStatus extends CI_Controller
         $data['total']  = $this->M_Postatus->sumTransaksiPenjualannk($kd);
         $data['totalnyata']  = $this->M_Postatus->sumharganyata($kd);
         $data['kdbarang']  = $this->M_Postatus->generatekd();
-        $data['flupload']  = $this->M_Postatus->flupload($kd);
+        $data['flupload']  = $this->M_Postatus->flupload($kd)->result();
         $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
         $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
+
+
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -1800,5 +1803,10 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+    }
+
+    public function downloadfile($path)
+    {
+        force_download();
     }
 }
