@@ -829,19 +829,21 @@ class C_PoStatus extends CI_Controller
     {
         $kdponk     = $this->input->post('kdponk');
         $kduser     = $this->session->userdata('kode');
-        $tgltrsk    = $this->input->post('tgltr');
-        $kdbarang   = $this->input->post('kdbrponk');
-        $nmbarang   = $this->input->post('nama_isi');
-        $descbarang = $this->input->post('desc_isi');
-        $ketbarang  = $this->input->post('ket_isi');
-        $qtybr      = $this->input->post('qty_isi');
-        $hrgsatuan  = $this->input->post('hrg_isi');
+        $tgltrsk    = $this->input->post('tgltransaksi');
+        $kdbarang   = $this->input->post('kd_adm');
+        $kdsys      = $this->input->post('kd_system');
+        $nmbarang   = $this->input->post('nmbarang');
+        $descbarang = $this->input->post('descisi');
+        $ketbarang  = $this->input->post('ketbarang');
+        $qtybr      = $this->input->post('qtyisi');
+        $hrgsatuan  = $this->input->post('hrgisi');
         $totalhrg   = $qtybr * $hrgsatuan;
 
         $addbarang = array(
             'kd_po_nk'      => $kdponk,
             'kd_user'       => $kduser,
             'tgl_transaksi' => $tgltrsk,
+            'kd_bsys'       => $kdsys,
             'kd_barang'     => $kdbarang,
             'nama_barang'   => $nmbarang,
             'deskripsi'     => $descbarang,
@@ -849,7 +851,6 @@ class C_PoStatus extends CI_Controller
             'qty'           => $qtybr,
             'hrg_satuan'    => $hrgsatuan,
             'total_harga'   => $totalhrg,
-            'gbr_produk'   => "Karisma.png"
         );
 
         $this->M_Postatus->add_faktur_nk($addbarang);
@@ -1602,7 +1603,7 @@ class C_PoStatus extends CI_Controller
 
         if (!empty($_FILES['gambar_1'])) {
             $config['upload_path'] = './images/filepndukung/';
-            $config['allowed_types'] = 'jpg|png|gif';
+            $config['allowed_types'] = '*';
             $config['max_size'] = '2000';
             $config['max_width'] = '6000';
             $config['max_height'] = '6000';

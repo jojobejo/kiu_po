@@ -238,6 +238,14 @@ class M_Purchase extends CI_Model
         $query = $this->db->get()->result();
         return $query;
     }
+    function get_gbrbarang($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_barang_nk');
+        $this->db->where('', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
     function input_tmp_nk($data)
     {
         $this->db->insert('tb_tmp_item_nk', $data);

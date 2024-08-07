@@ -12,6 +12,8 @@ class C_Stocknonkomersil extends CI_Controller
     {
         parent::__construct();
         $this->load->model('stock/M_Stocknonkomersil');
+        $this->load->model('PO/M_Postatus');
+        $this->load->model('PO/M_Purchase');
         $this->load->library('form_validation');
     }
 

@@ -130,6 +130,7 @@ $route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk'] = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)'] = 'postatus/C_PoStatus/detailponk/$1';
 $route['add_faktur_item_nk'] = 'postatus/C_PoStatus/add_item_faktur_nk';
+$route['listbarangnk/1/2/3/(:any)'] = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['noteupdatenk'] = 'postatus/C_PoStatus/addnotenk';
 $route['noteupdatenk_pembelian'] = 'postatus/C_PoStatus/notepembelian';
 $route['konfirm_penerimaan'] = 'postatus/C_PoStatus/konfirm_penerimaan';

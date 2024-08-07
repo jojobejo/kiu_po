@@ -65,7 +65,6 @@
         var tujuan = $("#tujuan_isi").val();
         var jml = $("#jmlitem").val();
         var harga = $("#jmlharga").val();
-        var tmpimg = $("#img_upload").val();
 
         if (jml == 0) {
             alert('tidak ada transaksi');

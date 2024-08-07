@@ -444,6 +444,15 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_detail_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
+        $this->db->join('tb_barang_nk c', 'c.kd_barang = a.kd_bsys');
+        $this->db->where('kd_po_nk', $kd);
+        return $this->db->get()->result();
+    }
+    public function getDetailnktgl($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk a');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('kd_po_nk', $kd);
         return $this->db->get()->result();
     }
@@ -455,6 +464,15 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
     }
+
+    function vfileuploaded($kdpo)
+    {
+        return $this->db->query("SELECT RIGHT(a.file_uploaded,3) AS kd_max 
+    FROM tb_file_nk a
+    JOIN tb_user b ON b.kode_user = a.user_upload
+    WHERE a.kd_po_nk = '$kdpo'");
+    }
+
     function flupload($kdpo)
     {
         $this->db->select('*');

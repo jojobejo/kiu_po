@@ -394,7 +394,7 @@
         <?php elseif ($this->session->userdata('lv') == '4' && $s->status != 'DONE' && $s->status != 'ON PROGRESS - KADEP') : ?>
             <div class="row">
                 <div class="col-md mb-2">
-                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addmodalbarang">
+                    <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('listbarangnk/1/2/3/' . $s->kd_po_nk) ?>">
                         <i class="fas fa-plus"> </i>
                         Tambah Barang
                     </a>
@@ -456,10 +456,10 @@
             <tbody>
                 <?php $no = 1;
                             foreach ($detail as $d) :
-                                if ($d->gbr_produk == 'Karisma.png') {
+                                if ($d->gbr_barang == 'Karisma.png') {
                                     $imagePath = "../images/gbrbarang/Karisma.png";
                                 } else {
-                                    $imagePath = "../images/gbrbarang/" . $d->gbr_produk;
+                                    $imagePath = "../images/gbrbarang/masterbr/" . $d->gbr_barang;
                                 }
 
                 ?>
@@ -483,9 +483,6 @@
 
                             <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
-                                    <i class="fa fa-solid fa-file-image"></i>
-                                </a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC DIREKTUR') : ?>
@@ -500,9 +497,6 @@
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm " data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
-                                    <i class="fa fa-solid fa-file-image"></i>
-                                </a>
                             <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'SEDANG DIAJUKAN') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
@@ -513,9 +507,6 @@
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
-                                <a href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadgbritem<?= $d->id_det_po_nk ?>">
-                                    <i class="fa fa-solid fa-file-image"></i>
-                                </a>
                             <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'SEDANG DIAJUKAN') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '5' && $s->status == 'ON PROGRESS - KADEP') : ?>
@@ -595,10 +586,12 @@
                     </tr>
                     <?php foreach ($flupload as $f) :
                                     $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+
                     ?>
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
+                                <?php if ($f->kdfile != 'jpg') ?>
                                 <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
                                 </a>
                             </td>

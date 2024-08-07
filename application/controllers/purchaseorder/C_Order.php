@@ -373,6 +373,7 @@ class C_Order extends CI_Controller
     public function addtmpponk()
     {
         $kdbarang   = $this->input->post('kd_adm');
+        $kdbrsys    = $this->input->post('kd_system');
         $katbarang  = $this->input->post('katbrg');
         $namabarang = $this->input->post('nmbarang');
         $descbarang = $this->input->post('descisi');
@@ -389,6 +390,7 @@ class C_Order extends CI_Controller
             'qty'           => $qtybarang,
             'hrg_satuan'    => $hrgsatuan,
             'total_harga'   => $totalharga,
+            'kd_bsys'       => $kdbrsys,
             'kd_barang'     => $kdbarang,
             'kat_barang'    => $katbarang,
             'kd_user'       => $kduser
@@ -506,6 +508,10 @@ class C_Order extends CI_Controller
 
     public function rekam_po_nk()
     {
+        // Status jenis po  
+        // 1. PO Pembelian Barang
+        // 2. PO Pembelian Jasa 
+
         date_default_timezone_set("Asia/Jakarta");
         $kdnk       = $this->input->post('kdpo');
         $nopo       = $this->input->post('nopo');
@@ -515,13 +521,13 @@ class C_Order extends CI_Controller
         $tjuan      = $this->input->post('tujuan');
         $jml        = $this->input->post('jml');
         $hrg        = $this->input->post('harga');
-        $tmpimg     = $this->input->post('tmpimg');
         $kduser     = $this->session->userdata('kode');
         $nmuser1    = $this->session->userdata('nama_user');
         $tmp        = $this->M_Purchase->get_tmp_non_komersil($kduser);
         $tmpntpmbln = $this->M_Purchase->gettmp_note_pembelian($kduser);
 
         $rekamData = array(
+            'jns_po'        => '1',
             'kd_po_nk'      => $kdnk,
             'nopo'          => $nopo,
             'kd_user'       => $kduser,
@@ -542,6 +548,7 @@ class C_Order extends CI_Controller
                     'kd_po_nk'          => $kdnk,
                     'kd_user'           => $kduser,
                     'tgl_transaksi'     => $tgl,
+                    'kd_bsys'           => $chart->kd_bsys,
                     'kd_barang'         => $chart->kd_barang,
                     'nama_barang'       => $chart->nama_barang,
                     'deskripsi'         => $chart->deskripsi,
@@ -551,7 +558,6 @@ class C_Order extends CI_Controller
                     'hrg_nyata'         => '0',
                     'total_harga'       => $chart->total_harga,
                     'total_nyata'       => '0',
-                    'gbr_produk'        => $chart->gbr_produk,
                 );
 
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);
