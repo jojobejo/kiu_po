@@ -78,8 +78,8 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'kiucoid_po',
-	'password' => 'E{=VxW&;K$l7',
+	'username' => 'kiucoid_admin',
+	'password' => 'kRT!Qtx@w}?G',
 	'database' => 'kiucoid_kiu_po',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
