@@ -161,7 +161,7 @@
                                                     PENGAJUAN PEMBELIAN BARU
                                                 </a>
                                             <?php elseif ($p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $p->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
-                                                <a class="btn btn-block btn-primary btn-sm">
+                                                <a class="btn btn-block btn-success btn-sm">
                                                     <i class="fas fa-thumbs-up"></i>&nbsp;
                                                     ACC DIREKTUR
                                                 </a>
@@ -319,7 +319,7 @@
                                                     PENGAJUAN PEMBELIAN BARU
                                                 </a>
                                             <?php elseif ($p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $p1->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
-                                                <a class="btn btn-block btn-primary btn-sm">
+                                                <a class="btn btn-block btn-success btn-sm">
                                                     <i class="fas fa-thumbs-up"></i>&nbsp;
                                                     ACC DIREKTUR
                                                 </a>
