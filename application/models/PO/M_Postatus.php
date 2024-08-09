@@ -474,24 +474,33 @@ class M_PoStatus extends CI_Model
         JOIN tb_user b ON b.kode_user = a.user_upload
         WHERE a.kd_po_nk = '$kdpo'");
     }
-
-    function fluploads($kdpo)
-    {
-        $this->db->select('*');
-        $this->db->select('RIGHT');
-        $this->db->from('tb_file_nk a');
-        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
-        $this->db->where('kd_po_nk', $kdpo);
-        return $this->db->get()->result();
-    }
     function fluploadbukti($kdpo)
     {
-        $this->db->select('*');
-        $this->db->from('tb_file_bukti_beli a');
-        $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
-        $this->db->where('kd_po_nk', $kdpo);
-        return $this->db->get()->result();
+        return $this->db->query("SELECT 
+        a.*,
+        RIGHT(a.file_uploaded,3) AS kdfile 
+        FROM tb_file_bukti_beli a
+        JOIN tb_user b ON b.kode_user = a.user_upload
+        WHERE a.kd_po_nk = '$kdpo'");
     }
+
+    // function fluploads($kdpo)
+    // {
+    //     $this->db->select('*');
+    //     $this->db->select('RIGHT');
+    //     $this->db->from('tb_file_nk a');
+    //     $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+    //     $this->db->where('kd_po_nk', $kdpo);
+    //     return $this->db->get()->result();
+    // }
+    // function fluploadbuktis($kdpo)
+    // {
+    //     $this->db->select('*');
+    //     $this->db->from('tb_file_bukti_beli a');
+    //     $this->db->join('tb_user b', 'b.kode_user = a.user_upload');
+    //     $this->db->where('kd_po_nk', $kdpo);
+    //     return $this->db->get()->result();
+    // }
     function upbuktibeli($data)
     {
         $this->db->insert('tb_file_bukti_beli', $data);

@@ -715,6 +715,7 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+
         //VIEW-KARYAWAN 
         elseif ($this->session->userdata('lv') == '4') {
 
@@ -798,7 +799,7 @@ class C_PoStatus extends CI_Controller
         $data['totalnyata']  = $this->M_Postatus->sumharganyata($kd);
         $data['kdbarang']  = $this->M_Postatus->generatekd();
         $data['flupload']  = $this->M_Postatus->flupload($kd)->result();
-        $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd);
+        $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd)->result();
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
@@ -1420,7 +1421,7 @@ class C_PoStatus extends CI_Controller
 
         if (!empty($_FILES['gambar_1'])) {
             $config['upload_path'] = './images/upbukti/';
-            $config['allowed_types'] = 'jpg|png|gif';
+            $config['allowed_types'] = '*';
             $config['max_size'] = '2000';
             $config['max_width'] = '6000';
             $config['max_height'] = '6000';
@@ -1490,7 +1491,7 @@ class C_PoStatus extends CI_Controller
 
         if (!empty($_FILES['gambar_1'])) {
             $config['upload_path'] = './images/filepndukung/';
-            $config['allowed_types'] = 'jpg|png|gif';
+            $config['allowed_types'] = '*';
             $config['max_size'] = '2000';
             $config['max_width'] = '6000';
             $config['max_height'] = '6000';
@@ -1532,7 +1533,7 @@ class C_PoStatus extends CI_Controller
         if ($nmfile == 'Karisma.png') {
             if (!empty($_FILES['gambar_1'])) {
                 $config['upload_path'] = './images/gbrbarang/';
-                $config['allowed_types'] = 'jpg|png|gif';
+                $config['allowed_types'] = '*';
                 $config['max_size'] = '2000';
                 $config['max_width'] = '6000';
                 $config['max_height'] = '6000';
@@ -1565,7 +1566,7 @@ class C_PoStatus extends CI_Controller
         } else {
             if (!empty($_FILES['gambar_1'])) {
                 $config['upload_path'] = './images/gbrbarang/';
-                $config['allowed_types'] = 'jpg|png|gif';
+                $config['allowed_types'] = '*';
                 $config['max_size'] = '2000';
                 $config['max_width'] = '6000';
                 $config['max_height'] = '6000';
@@ -1807,6 +1808,6 @@ class C_PoStatus extends CI_Controller
 
     public function downloadfile($path)
     {
-        force_download();
+        force_download($path);
     }
 }

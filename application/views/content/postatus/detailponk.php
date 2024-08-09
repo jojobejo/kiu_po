@@ -295,7 +295,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'PROSES PEMBELIAN') : ?>
+                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PROSES PEMBELIAN') : ?>
                                 <div class="col">
                                     <div class="row">
                                         <div class="col">
@@ -590,7 +590,11 @@
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                                <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block">Download File</a>
+                                <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                                    <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                                <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -667,8 +671,11 @@
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                                <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                                </a>
+                                <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                                    <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                                <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -788,10 +795,10 @@
             <tr>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;">
-                    <?php if ($f->kdfile == 'csv') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block">Download File</a>
-                    <?php elseif ($f->kdfile == 'png') : ?>
-                        <a href="" class="btn btn-secondary btn-sm btn-block">Buka Files</a>
+                    <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
                 <td colspan="3" style="font-weight: bold;">
@@ -858,8 +865,11 @@
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1134,8 +1144,11 @@
                 <tr>
                     <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                     <td colspan="3" style="padding-right:3%; font-weight: bold;">
-                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                        </a>
+                        <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                            <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                            <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                        <?php endif; ?>
                     </td>
                     <td colspan="3" style="font-weight: bold;">
                         <div class="row">
@@ -1192,8 +1205,11 @@
             <tr>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="6" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1209,8 +1225,11 @@
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1239,8 +1258,11 @@
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1291,8 +1313,11 @@
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1316,8 +1341,11 @@
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1439,8 +1467,11 @@
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -1509,8 +1540,11 @@
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
-                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File
-                    </a>
+                    <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
+                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
