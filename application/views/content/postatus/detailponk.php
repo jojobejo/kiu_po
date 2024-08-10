@@ -300,7 +300,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
-                                            <a class="btn btn-block btn-success btn-md" data-toggle="modal" data-target="#modalonhand">
+                                            <a class="btn btn-block btn-success btn-md" data-toggle="modal" data-target="#modalonhand<?= $s->kd_po_nk ?>">
                                                 <i class="fas fa-check-circle"></i> &nbsp;
                                                 ON HAND
                                             </a>

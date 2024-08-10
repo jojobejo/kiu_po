@@ -501,6 +501,7 @@ class M_PoStatus extends CI_Model
     //     $this->db->where('kd_po_nk', $kdpo);
     //     return $this->db->get()->result();
     // }
+
     function upbuktibeli($data)
     {
         $this->db->insert('tb_file_bukti_beli', $data);
@@ -842,6 +843,21 @@ class M_PoStatus extends CI_Model
         $this->db->where('a.status', 'DONE');
         $query = $this->db->get();
         return $query->result();
+    }
+
+    function get_br_nk_det($kd)
+    {
+        $this->db->select('a.* , b.kat_barang , b.satuan , c.nm_satuan');
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_barang_nk b', 'b.kd_br_adm = a.kd_barang');
+        $this->db->join('tb_satuan c', 'c.id_satuan = b.satuan');
+        $this->db->where('kd_po_nk', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    function input_transaksi($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
     }
 
     // BRACKET END MODEL

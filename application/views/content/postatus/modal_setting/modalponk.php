@@ -627,7 +627,7 @@
 <?php endforeach; ?>
 
 <?php foreach ($status as $s) : ?>
-    <div class="modal fade" id="modalonhand">
+    <div class="modal fade" id="modalonhand<?= $s->kd_po_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

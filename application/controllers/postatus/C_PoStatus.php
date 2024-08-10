@@ -1001,25 +1001,47 @@ class C_PoStatus extends CI_Controller
 
     public function konfirm_penerimaan()
     {
+        date_default_timezone_set("Asia/Jakarta");
+
         $kdpo           = $this->input->post('kdpo');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
+        $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
 
-        $addnoteuser = array(
-            'kd_po'     => $kdpo,
-            'isi_note'  => 'BARANG DI TERIMA',
-            'kd_user'   => $departement,
-            'nama_user'   => $namauser,
-            'note_for'  => '1',
-            'update_status' => '1'
-        );
+        $now = date('Y-m-d H:i:s');
 
-        $noteupdateuser = array(
-            'status'    => 'DONE'
-        );
-        $this->M_Postatus->addNote($addnoteuser);
-        $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
-        redirect('postatusnk');
+        if ($tmp) {
+            foreach ($tmp as $t) {
+                $databelink = array(
+                    'kd_akun'           => '11511',
+                    'kd_po_nk'          => $t->kd_po_nk,
+                    'kd_barang'         => $t->kd_barang,
+                    'kd_barangsys'      => $t->kd_bsys,
+                    'kat_barang'        => $t->kat_barang,
+                    'tr_qty'            => $t->qty,
+                    'satuan'            => $t->satuan,
+                    'inputer'           => $t->kd_user,
+                    'create_at'         => $now,
+                    'last_updated_by'   => $t->kd_user
+                );
+                $this->M_Postatus->input_transaksi($databelink);
+            }
+            $addnoteuser = array(
+                'kd_po'     => $kdpo,
+                'isi_note'  => 'BARANG DI TERIMA - ADMIN',
+                'kd_user'   => $departement,
+                'nama_user'   => $namauser,
+                'note_for'  => '1',
+                'update_status' => '1'
+            );
+
+            $noteupdateuser = array(
+                'status'    => 'DONE'
+            );
+            $this->M_Postatus->addNote($addnoteuser);
+            $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+            redirect('postatusnk');
+        }
     }
     public function addnotenk()
     {

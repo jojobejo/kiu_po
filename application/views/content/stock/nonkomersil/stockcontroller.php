@@ -14,16 +14,18 @@
                 <table class="table table-bordered table-striped" id="list_stocknonkomersil">
                     <thead>
                         <tr>
+                            <td>Kode Faktur</td>
                             <td>Kode Barang</td>
                             <td>Nama Barang</td>
-                            <td>Deskripsi / Spesifikasi</td>
+                            <td>QTY</td>
                             <td>Satuan</td>
-                            <td>gbr_item</td>
+                            <td>Tanggal Transaksi</td>
                             <td>Aksi</td>
-                        </tr> 
+                        </tr>
                     </thead>
                     <tbody>
                         <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

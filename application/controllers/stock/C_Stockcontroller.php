@@ -23,7 +23,7 @@ class C_Stockcontroller extends CI_Controller
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
-        $this->load->view('content/stock/nonkomersil/body.php', $data);
+        $this->load->view('content/stock/nonkomersil/stockcontroller.php', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }
