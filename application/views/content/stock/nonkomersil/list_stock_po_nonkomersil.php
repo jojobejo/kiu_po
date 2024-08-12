@@ -25,7 +25,6 @@
                             <tr>
                                 <td>Nama Barang</td>
                                 <td>Deskripsi / Spesifikasi</td>
-                                <td>Stock Tersedia</td>
                                 <td>Satuan</td>
                                 <td>Gambar Produk</td>
                                 <td>Aksi</td>
@@ -42,7 +41,6 @@
                                 <tr>
                                     <td><?= $s->nama_barang ?></td>
                                     <td><?= $s->descnk ?></td>
-                                    <td>10</td>
                                     <td><?= $s->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File
@@ -70,7 +68,6 @@
                             <tr>
                                 <td>Nama Barang</td>
                                 <td>Deskripsi / Spesifikasi</td>
-                                <td>Stock Tersedia</td>
                                 <td>Satuan</td>
                                 <td>Gambar Produk</td>
                                 <td>Aksi</td>
@@ -87,7 +84,6 @@
                                 <tr>
                                     <td><?= $s->nama_barang ?></td>
                                     <td><?= $s->descnk ?></td>
-                                    <td>10</td>
                                     <td><?= $s->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File
@@ -135,7 +131,6 @@
                             <tr>
                                 <td>Nama Barang</td>
                                 <td>Deskripsi / Spesifikasi</td>
-                                <td>Stock Tersedia</td>
                                 <td>Satuan</td>
                                 <td>Gambar Produk</td>
                                 <td>Aksi</td>
@@ -152,7 +147,6 @@
                                 <tr>
                                     <td><?= $s->nama_barang ?></td>
                                     <td><?= $s->descnk ?></td>
-                                    <td>10</td>
                                     <td><?= $s->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File
@@ -180,7 +174,6 @@
                             <tr>
                                 <td>Nama Barang</td>
                                 <td>Deskripsi / Spesifikasi</td>
-                                <td>Stock Tersedia</td>
                                 <td>Satuan</td>
                                 <td>Gambar Produk</td>
                                 <td>Aksi</td>
@@ -197,7 +190,6 @@
                                 <tr>
                                     <td><?= $s->nama_barang ?></td>
                                     <td><?= $s->descnk ?></td>
-                                    <td>10</td>
                                     <td><?= $s->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File

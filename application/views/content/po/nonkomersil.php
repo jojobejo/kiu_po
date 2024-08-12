@@ -12,7 +12,7 @@
                 <a href="<?= base_url('dashboard') ?>">
                     <i class="fa fa-arrow-left  ml-4 mr-4 mt-2"></i>
                 </a>
-                <h3 class="">Purchase Order Non Kompersial</h3>
+                <h3 class="">Purchase Order Non Komersial</h3>
             </div>
             <a href="<?= base_url('pononkomersil/list_stocknkpo') ?> " class="btn btn-primary mb-2 mt-2">
                 <i class="fas fa-folder-plus"></i> &nbsp; Tambah Barang

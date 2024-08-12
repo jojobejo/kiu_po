@@ -68,7 +68,10 @@
                     </a>
                   </li>
                   <li class="nav-item">
-
+                    <a href="<?= base_url('reqpic') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Request PIC</p>
+                    </a>
                   </li>
                 </ul>
               </li>
@@ -90,10 +93,33 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Non Komersil</p>
+                  <p>
+                    Non Komersil
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview" style="display: none;">
+                  <li class="nav-item">
+                    <a href="<?= base_url('pononkomersiljasa') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Jasa</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Pembelian</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="<?= base_url('reqpic') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Request PIC</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
@@ -198,7 +224,7 @@
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cash-register"></i>
               <p>
-                Purchase Order
+                Purchase Order Barang
               </p>
             </a>
           </li>
@@ -207,6 +233,14 @@
               <i class="nav-icon fas fa-money-check"></i>
               <p>
                 Purchase Order Status
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reqpic') ?>" class="nav-link">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>
+                PO Request Barang
               </p>
             </a>
           </li>
