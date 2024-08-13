@@ -124,6 +124,9 @@ $route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/a
 // PO REQUEST BY PIC
 $route['reqpic'] = 'purchaseorder/C_Reqpic';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
+$route['addtmpreqbarang'] = 'purchaseorder/C_Reqpic/addtmpreqbarang';
+$route['addnewreq/(:any)'] = 'purchaseorder/C_Reqpic/addnewreq/$1';
+
 
 
 //PurchaseOrderNonKomersil - STATUS

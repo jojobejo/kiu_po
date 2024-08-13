@@ -806,8 +806,6 @@ class C_PoStatus extends CI_Controller
         $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
 
-
-
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailponk', $data);

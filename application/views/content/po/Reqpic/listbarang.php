@@ -1,5 +1,6 @@
 <div class="content-wrapper">
     <div class="content-header">
+        <?php $this->load->view('content/po/Reqpic/modalreq.php') ?>
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">

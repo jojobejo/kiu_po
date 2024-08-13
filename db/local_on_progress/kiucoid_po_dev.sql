@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.0.4
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Agu 2024 pada 19.24
--- Versi server: 10.4.27-MariaDB
--- Versi PHP: 7.4.33
+-- Waktu pembuatan: 13 Agu 2024 pada 10.37
+-- Versi server: 10.4.17-MariaDB
+-- Versi PHP: 8.0.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -35,7 +35,7 @@ CREATE TABLE `tb_akun_tr` (
   `create_at` datetime NOT NULL,
   `update_by` varchar(25) NOT NULL,
   `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_akun_tr`
@@ -67,7 +67,7 @@ CREATE TABLE `tb_barang_nk` (
   `create_at` datetime NOT NULL,
   `last_updated` varchar(25) NOT NULL,
   `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_barang_nk`
@@ -109,7 +109,7 @@ CREATE TABLE `tb_detail_po_nk` (
   `total_nyata` int(25) NOT NULL,
   `gbr_produk` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_detail_po_nk`
@@ -123,7 +123,9 @@ INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_trans
 (5, 'NKPO0708240002', 'KARYAWAN2', '2024-08-07', 'PONK0608240001', 'QCONTO', 'asdasdasd', 'asdasdasd', 'dadadasd', 2, 50000, 0, 100000, 0, '', '2024-08-07 07:59:18'),
 (6, 'NKPO1208240001', 'KEU01', '2024-08-12', 'PONK3007240006', 'QTINMER2', 'Tinta Epson 664', 'Warna Kuning', '-', 5, 0, 0, 0, 0, '', '2024-08-12 12:44:23'),
 (7, 'NKPO1208240001', 'KEU01', '2024-08-12', 'PONK3007240005', 'QTINMER1', 'Tinta Epson 664', 'Warna Merah', '-', 3, 0, 0, 0, 0, '', '2024-08-12 12:42:46'),
-(8, 'NKPO1208240001', 'KEU01', '2024-08-12', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '-', 2, 0, 0, 0, 0, '', '2024-08-12 12:42:46');
+(8, 'NKPO1208240001', 'KEU01', '2024-08-12', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '-', 2, 0, 0, 0, 0, '', '2024-08-12 12:42:46'),
+(9, 'PONK1308240001', 'KARYAWAN2', '2024-08-13', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '1', 1, 0, 0, 0, 0, '', '2024-08-13 08:08:54'),
+(10, 'PONK1308240001', 'KARYAWAN2', '2024-08-13', 'PONK3007240010', 'QAIRGAL1', 'Air Galon Cleo', 'Galon Cleo 18 Liter', '2', 2, 0, 0, 0, 0, '', '2024-08-13 08:08:54');
 
 -- --------------------------------------------------------
 
@@ -137,7 +139,7 @@ CREATE TABLE `tb_diskon` (
   `kd_suplier` varchar(25) NOT NULL,
   `keterangan` varchar(255) NOT NULL,
   `nominal` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_diskon`
@@ -725,7 +727,7 @@ CREATE TABLE `tb_file_bukti_beli` (
   `file_name` varchar(255) NOT NULL,
   `file_uploaded` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_file_bukti_beli`
@@ -749,7 +751,7 @@ CREATE TABLE `tb_file_nk` (
   `file_name` varchar(255) NOT NULL,
   `file_uploaded` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_file_nk`
@@ -768,7 +770,7 @@ CREATE TABLE `tb_generateqrcode` (
   `id_gqrcode` int(11) NOT NULL,
   `kd_qrcode` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_generateqrcode`
@@ -801,7 +803,7 @@ CREATE TABLE `tb_generate_kd` (
   `id` int(11) NOT NULL,
   `kd_barang` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_generate_kd`
@@ -829,7 +831,7 @@ CREATE TABLE `tb_kat_br` (
   `kd_kat` varchar(25) NOT NULL,
   `nama_kategori` text NOT NULL,
   `keterangan` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_kat_br`
@@ -852,7 +854,7 @@ CREATE TABLE `tb_note_barang` (
   `isi_note` text NOT NULL,
   `color_box` text NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -869,7 +871,7 @@ CREATE TABLE `tb_note_direktur` (
   `note_for` int(5) NOT NULL,
   `update_status` int(5) NOT NULL,
   `log_create` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_note_direktur`
@@ -907,7 +909,7 @@ CREATE TABLE `tb_note_pembelian` (
   `keterangan` text NOT NULL,
   `kd_user` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -920,7 +922,7 @@ CREATE TABLE `tb_nt_tmp_pembelian` (
   `keterangan` text NOT NULL,
   `kd_user` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -948,7 +950,7 @@ CREATE TABLE `tb_po_nk` (
   `acc_with` varchar(25) NOT NULL,
   `acc_with_kadep` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_po_nk`
@@ -971,7 +973,7 @@ CREATE TABLE `tb_req_masterbarang` (
   `deskripsi` text NOT NULL,
   `satuan` int(2) NOT NULL,
   `req_by` varchar(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_req_masterbarang`
@@ -983,13 +985,48 @@ INSERT INTO `tb_req_masterbarang` (`id_reqmbarang`, `nama_barang`, `deskripsi`, 
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `tb_req_nk`
+--
+
+CREATE TABLE `tb_req_nk` (
+  `id_po_nk` int(12) NOT NULL,
+  `jns_po` int(5) NOT NULL,
+  `kd_po_nk` varchar(25) NOT NULL,
+  `nopo` text NOT NULL,
+  `kd_user` varchar(25) NOT NULL,
+  `nm_user` text NOT NULL,
+  `tgl_transaksi` text NOT NULL,
+  `jml_item` int(12) NOT NULL,
+  `total_harga` int(25) NOT NULL,
+  `status` varchar(25) NOT NULL,
+  `departemen` text NOT NULL,
+  `tj_pembelian` text NOT NULL,
+  `tax` int(3) NOT NULL,
+  `hrg_pajak` int(25) NOT NULL,
+  `hrg_nyata` int(25) NOT NULL,
+  `status_hrg_nyata` int(11) NOT NULL,
+  `acc_with` varchar(25) NOT NULL,
+  `acc_with_kadep` varchar(255) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `tb_req_nk`
+--
+
+INSERT INTO `tb_req_nk` (`id_po_nk`, `jns_po`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `tax`, `hrg_pajak`, `hrg_nyata`, `status_hrg_nyata`, `acc_with`, `acc_with_kadep`, `create_at`) VALUES
+(1, 2, 'PONK1308240001', 'KARYAWAN2NK', 'KARYAWAN2', 'Bram', '2024-08-13', 2, 0, 'ON PROGRESS', 'KEUANGAN', 'REQUEST PIC', 0, 0, 0, 0, '', '', '2024-08-13 08:08:54');
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `tb_satuan`
 --
 
 CREATE TABLE `tb_satuan` (
   `id_satuan` int(5) NOT NULL,
   `nm_satuan` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_satuan`
@@ -1019,7 +1056,7 @@ INSERT INTO `tb_satuan` (`id_satuan`, `nm_satuan`) VALUES
 CREATE TABLE `tb_set_tax` (
   `id_tax` int(5) NOT NULL,
   `nm_tax` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_set_tax`
@@ -1050,7 +1087,7 @@ CREATE TABLE `tb_tmp_item_nk` (
   `kat_barang` varchar(25) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -1063,7 +1100,7 @@ CREATE TABLE `tb_tmp_note_barang` (
   `kd_suplier` varchar(25) NOT NULL,
   `isi_note` text NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_tmp_note_barang`
@@ -1082,7 +1119,7 @@ CREATE TABLE `tb_tmp_tax` (
   `id_tmp_tax` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `tax` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `tb_tmp_tax`
@@ -1111,7 +1148,7 @@ CREATE TABLE `tb_transaksi` (
   `create_at` datetime NOT NULL,
   `last_updated_by` varchar(25) NOT NULL,
   `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_transaksi`
@@ -1140,7 +1177,7 @@ CREATE TABLE `tb_user` (
   `password` varchar(255) NOT NULL,
   `aksess_lv` int(5) NOT NULL,
   `departement` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `tb_user`
@@ -1266,6 +1303,12 @@ ALTER TABLE `tb_req_masterbarang`
   ADD PRIMARY KEY (`id_reqmbarang`);
 
 --
+-- Indeks untuk tabel `tb_req_nk`
+--
+ALTER TABLE `tb_req_nk`
+  ADD PRIMARY KEY (`id_po_nk`);
+
+--
 -- Indeks untuk tabel `tb_satuan`
 --
 ALTER TABLE `tb_satuan`
@@ -1327,7 +1370,7 @@ ALTER TABLE `tb_barang_nk`
 -- AUTO_INCREMENT untuk tabel `tb_detail_po_nk`
 --
 ALTER TABLE `tb_detail_po_nk`
-  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_diskon`
@@ -1402,6 +1445,12 @@ ALTER TABLE `tb_req_masterbarang`
   MODIFY `id_reqmbarang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT untuk tabel `tb_req_nk`
+--
+ALTER TABLE `tb_req_nk`
+  MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT untuk tabel `tb_satuan`
 --
 ALTER TABLE `tb_satuan`
@@ -1417,7 +1466,7 @@ ALTER TABLE `tb_set_tax`
 -- AUTO_INCREMENT untuk tabel `tb_tmp_item_nk`
 --
 ALTER TABLE `tb_tmp_item_nk`
-  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_tmp_note_barang`

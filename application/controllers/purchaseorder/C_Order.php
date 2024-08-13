@@ -510,7 +510,7 @@ class C_Order extends CI_Controller
     {
         // Status jenis po  
         // 1. PO Pembelian Barang
-        // 2. PO Pembelian Jasa 
+        // 2. PO request 
 
         date_default_timezone_set("Asia/Jakarta");
         $kdnk       = $this->input->post('kdpo');
