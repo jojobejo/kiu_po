@@ -126,6 +126,7 @@ $route['reqpic'] = 'purchaseorder/C_Reqpic';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
 $route['addtmpreqbarang'] = 'purchaseorder/C_Reqpic/addtmpreqbarang';
 $route['addnewreq/(:any)'] = 'purchaseorder/C_Reqpic/addnewreq/$1';
+$route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
 
 
 

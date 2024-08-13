@@ -15,7 +15,7 @@
                                 <td>Total Barang</td>
                                 <td>Keterangan</td>
                                 <td>Status</td>
-                                <td>#</td>
+                                <td></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -24,9 +24,21 @@
                                     <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
                                     <td><?= $g->jml_item ?></td>
                                     <td><?= $g->tj_pembelian ?></td>
-                                    <td><?= $g->status ?></td>
                                     <td>
-                                        <a class="btn btn-block btn-primary btn-sm" data-toggle="modal" data-target="#hapus<?= $g->id_po_nk ?>">
+                                        <div class="row">
+                                            <?php if ($g->status == 'ON PROGRESS') : ?>
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
+                                                </div>
+                                            <?php elseif ($g->status == 'ACC-ADM') : ?>
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('reqpic/detreqbarangpic/' . $g->kd_po_nk) ?>">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>

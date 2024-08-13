@@ -120,4 +120,14 @@ class C_Reqpic extends CI_Controller
             redirect('reqpic');
         }
     }
+
+    public function detreqbarangpic($kdpo)
+    {
+        $data['title']      = 'PO Detail Req PIC';
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/detreq', $data);
+        $this->load->view('partial/footer');
+    }
 }
