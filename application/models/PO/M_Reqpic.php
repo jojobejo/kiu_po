@@ -69,6 +69,55 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_user = '$kd'
         ");
     }
+    public function getrequestbypic($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_req_nk');
+        $this->db->where('kd_po_nk', $kd);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+
+    public function getdetailreqpic($usr, $kd)
+    {
+        $lv = $this->session->userdata('lv');
+
+        // FUNGSI PIC 
+        if ($lv == '4') {
+            return $this->db->query("SELECT 
+            a.id_det_po_nk AS id,
+            b.nama_barang AS nama_barang,
+            b.descnk AS deskripsi,
+            a.keterangan AS keterangan,
+            a.qty AS qty,
+            c.nm_satuan AS nm_satuan
+            FROM tb_detail_po_nk a
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
+            ");
+        }
+        // FUNGSI PIC
+        elseif ($lv == '2') {
+            return $this->db->query("SELECT 
+            a.id_det_po_nk AS id,
+            b.nama_barang AS nama_barang,
+            b.descnk AS deskripsi,
+            a.keterangan AS keterangan,
+            a.qty AS qty,
+            c.nm_satuan AS nm_satuan
+            FROM tb_detail_po_nk a
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            WHERE a.kd_po_nk = '$kd'
+            ");
+        }
+    }
+
+    public function getlistpic()
+    {
+        return $this->db->get('tb_req_nk')->result();
+    }
 
     public function countjmltmpbr($kd)
     {

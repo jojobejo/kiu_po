@@ -26,6 +26,7 @@ class C_Reqpic extends CI_Controller
         $data['countreq']   = $this->M_Reqpic->countRequser('2', $kduser);
         $data['generatekd'] = $this->M_Purchase->kdnonkomersial();
         $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
+        $data['getlistpic'] = $this->M_Reqpic->getlistpic();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -123,11 +124,30 @@ class C_Reqpic extends CI_Controller
 
     public function detreqbarangpic($kdpo)
     {
-        $data['title']      = 'PO Detail Req PIC';
+        $kduser = $this->session->userdata('kode');
 
-        $this->load->view('partial/header', $data);
-        $this->load->view('partial/sidebar');
-        $this->load->view('content/po/Reqpic/detreq', $data);
-        $this->load->view('partial/footer');
+        // FUNGSI PIC 
+        if ($this->session->userdata('lv') == '4') {
+            $data['title']      = 'PO Detail Req PIC';
+            $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
+            $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/po/Reqpic/detreq', $data);
+            $this->load->view('partial/footer');
+        }
+        
+        // FUNGSI ADM PURCHASING
+        elseif ($this->session->userdata('lv') == '2') {
+            $data['title']      = 'PO Detail Req PIC';
+            $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
+            $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/po/Reqpic/detreq', $data);
+            $this->load->view('partial/footer');
+        }
     }
 }
