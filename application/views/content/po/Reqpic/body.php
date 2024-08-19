@@ -101,7 +101,7 @@
                                 <tr>
                                     <td colspan="6">
                                         <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
-                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" hidden readonly />
+                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly />
                                         <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
                                         <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
                                         </form>

@@ -163,13 +163,18 @@ class M_Reqpic extends CI_Model
     }
     public function getitemreq($id)
     {
-        $this->db->select('a.*');
-        $this->db->select('b.*');
-        $this->db->from('tb_detail_po_nk a');
-        $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_bsys');
-        $this->db->where('id_det_po_nk', $id);
-        $query = $this->db->get()->result();
-        return $query;
+        return $this->db->query("SELECT 
+        a.kd_po_nk as kd_po_nk,
+        a.kd_barang as kd_barang,
+        a.kd_bsys as kd_bsys,
+        a.keterangan as ket,
+        b.kat_barang as kat_barang,
+        a.qty as qty,
+        b.satuan as satuan
+        FROM tb_detail_po_nk a
+        JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        WHERE a.id_det_po_nk = '$id'
+            ");
     }
     public function deletedetailponk($id)
     {
@@ -179,5 +184,22 @@ class M_Reqpic extends CI_Model
     public function insert_tmp_transaksi($data)
     {
         $this->db->insert('tb_transaksi_tmp', $data);
+    }
+    public function getlisttmptr($kd)
+    {
+        return $this->db->query("SELECT
+        a.kd_po_nk,
+        a.kd_barangsys,
+        b.nama_barang,
+        b.descnk,
+        a.keterangan,
+        a.tr_qty,
+        a.status,
+        c.nm_satuan
+        FROM tb_transaksi_tmp a
+        JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
+        JOIN tb_satuan c ON c.id_satuan = b.satuan
+        WHERE a.kd_po_nk = '$kd'
+        ");
     }
 }
