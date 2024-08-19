@@ -49,6 +49,15 @@ class M_MasterBarang extends CI_Model
         JOIN tb_satuan b ON b.id_satuan = a.satuan 
         JOIN tb_user c ON c.kode_user = a.req_by");
     }
+    public function get_all_req_barang_pic($kdu)
+    {
+        return $this->db->query("SELECT a.id_reqmbarang,c.nama_user , a.nama_barang , a.deskripsi , b.nm_satuan , c.departement
+        FROM tb_req_masterbarang a 
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        JOIN tb_user c ON c.kode_user = a.req_by
+        WHERE a.req_by = '$kdu'
+        ");
+    }
     public function getTax()
     {
         return $this->db->get('tb_set_tax')->result();

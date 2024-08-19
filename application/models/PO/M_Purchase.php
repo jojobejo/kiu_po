@@ -235,6 +235,7 @@ class M_Purchase extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_tmp_item_nk');
         $this->db->where('kd_user', $kd);
+        $this->db->where('jnis_po', '0');
         $query = $this->db->get()->result();
         return $query;
     }

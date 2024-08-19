@@ -70,6 +70,27 @@ class C_Reqpic extends CI_Controller
         $this->M_Reqpic->inputreqbr($inputtmp);
         redirect('reqpic');
     }
+    public function editedreqpic()
+    {
+        $idnk   = $this->input->post('id_isi');
+        $ket    = $this->input->post('ket_isi');
+        $qty    = $this->input->post('qty_isi');
+
+        $tmpedited = array(
+            'keterangan'    => $ket,
+            'qty'           => $qty
+        );
+
+        $this->M_Reqpic->editedreqpic($idnk, $tmpedited);
+        redirect('reqpic');
+    }
+    public function deletedtmpnkreq()
+    {
+        $idnk   = $this->input->post('id_isi');
+        $this->M_Reqpic->deletedtmpnkreq($idnk);
+
+        redirect('reqpic');
+    }
 
     public function addnewreq($kduser)
     {
@@ -98,6 +119,11 @@ class C_Reqpic extends CI_Controller
         );
         $this->M_Reqpic->inputreq($inpdataponk);
 
+        $generatekd = array(
+            'kd_barang' => $kdponk
+        );
+        $this->M_Purchase->generatekd($generatekd);
+
         if ($tmp) {
             foreach ($tmp as $t) {
                 $listdetreq = array(
@@ -117,6 +143,8 @@ class C_Reqpic extends CI_Controller
                 );
                 $this->M_Purchase->input_detail_po_nk($listdetreq);
             }
+
+
             $this->M_Purchase->hapus_tmp_nk($kduser);
             redirect('reqpic');
         }
@@ -137,7 +165,7 @@ class C_Reqpic extends CI_Controller
             $this->load->view('content/po/Reqpic/detreq', $data);
             $this->load->view('partial/footer');
         }
-        
+
         // FUNGSI ADM PURCHASING
         elseif ($this->session->userdata('lv') == '2') {
             $data['title']      = 'PO Detail Req PIC';
@@ -148,6 +176,36 @@ class C_Reqpic extends CI_Controller
             $this->load->view('partial/sidebar');
             $this->load->view('content/po/Reqpic/detreq', $data);
             $this->load->view('partial/footer');
+        }
+    }
+    public function confirmreq($kd)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $itemconfirm    = $this->M_Reqpic->getitemreq($kd);
+        $kduser         = $this->session->userdata('kode');
+        $now            = date('Y-m-d');
+
+
+        if ($itemconfirm) {
+            foreach ($itemconfirm as $i) {
+                $dataitm = array(
+                    'kd_akun'           => '1151',
+                    'kd_po_nk'          => $i->kd_po_nk,
+                    'kd_barang'         => $i->kd_barang,
+                    'kd_barangsys'      => $i->kd_bsys,
+                    'kat_barang'        => $i->kat_barang,
+                    'tr_qty'            => $i->qty,
+                    'satuan'            => $i->satuan,
+                    'inputer'           => $kduser,
+                    'create_at'         => $now,
+                    'last_updated_by'   => $kduser
+                );
+                $this->M_Reqpic->insert_tmp_transaksi($dataitm);
+                // DELETE DATA DETAIL
+                $this->M_Reqpic->deletedetailponk($kd);
+
+                redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
+            }
         }
     }
 }

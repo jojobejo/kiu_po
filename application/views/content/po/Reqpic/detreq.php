@@ -49,7 +49,7 @@
                                             <td><?= $d->nama_barang ?></td>
                                             <td><?= $d->deskripsi ?></td>
                                             <td><?= $d->keterangan ?></td>
-                                            <td><?= $d->qty ?></td>
+                                            <td><?= $d->qtykebutuhan ?></td>
                                             <td><?= $d->nm_satuan ?></td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -100,23 +100,82 @@
                                         <td>Deskripsi</td>
                                         <td>Keterangan</td>
                                         <td>QTY</td>
+                                        <td style="width: 10%;">Qty Tersedia</td>
                                         <td>Satuan</td>
+                                        <td>#</td>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($detreq as $d) : ?>
-                                        <tr>
-                                            <td><?= $d->nama_barang ?></td>
-                                            <td><?= $d->deskripsi ?></td>
-                                            <td><?= $d->keterangan ?></td>
-                                            <td><?= $d->qty ?></td>
-                                            <td><?= $d->nm_satuan ?></td>
-                                        </tr>
+                                    <?php foreach ($detreq as $d) :
+                                        $tot = ($d->qtyready) - ($d->qtykebutuhan); ?>
+                                        <?php if ($tot < 0) : ?>
+                                            <tr>
+                                                <td class="table-danger"><?= $d->nama_barang ?></td>
+                                                <td class="table-danger"><?= $d->deskripsi ?></td>
+                                                <td class="table-danger"><?= $d->keterangan ?></td>
+                                                <td class="table-danger"><?= $d->qtykebutuhan ?></td>
+                                                <td class="table-danger"><?= $d->qtyready ?></td>
+                                                <td class="table-danger"><?= $d->nm_satuan ?></td>
+                                                <td class="table-danger">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
+                                                        </div>
+                                                        <div class="col">
+                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-danger btn-sm"><i class="fas fa-times "></i></a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qtykebutuhan ?></td>
+                                                <td><?= $d->qtyready ?></td>
+                                                <td><?= $d->nm_satuan ?></td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
+                                                        </div>
+                                                        <div class="col">
+                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-danger btn-sm"><i class="fas fa-times "></i></a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     </div> <!-- END CARD -->
+
+                    <div class="card">
+                        <h1 class="ml-4 mt-3">List Aproved & Pending Barang</h1>
+                        <div class="card-body">
+                            <table class="table table-bordered table-striped mt-4 mb-2 ">
+                                <thead>
+                                    <tr>
+                                        <td>Nama Barang</td>
+                                        <td>Deskripsi</td>
+                                        <td>Keterangan</td>
+                                        <td>Satuan</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
                 </div><!-- /.container-fluid -->
             </div>

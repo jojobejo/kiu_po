@@ -48,19 +48,40 @@ class C_MasterBarang extends CI_Controller
 
         redirect('pononkomersil/list_stocknkpo');
     }
+    public function addrequestmasterbarangs()
+    {
+        $inputby    = $this->session->userdata('kode');
+        $nmbarang   = $this->input->post('nmbarang');
+        $descnk     = $this->input->post('descisi');
+        $satuan     = $this->input->post('stuanbr');
+
+        $tmpreqbarang = array(
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descnk,
+            'satuan'        => $satuan,
+            'req_by'        => $inputby
+        );
+
+        $this->M_MasterBarang->insertTmpmbarang($tmpreqbarang);
+
+        redirect('vrequestmbarang');
+    }
 
     public function vrequestmbarang()
     {
         $data['title']          = 'Request - Master Barang';
-        // $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
-        // $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
         // $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
         // $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
 
+        $kdu    = $this->session->userdata('kode');
+
+        $data['lreqmbarang']    = $this->M_MasterBarang->get_all_req_barang()->result();
+        $data['listrebrpic']    = $this->M_MasterBarang->get_all_req_barang_pic($kdu)->result();
         $data['listreqbr']      = $this->M_MasterBarang->get_all_req_barang()->result();
         $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
         $data['kdqrcode']       = $this->M_MasterBarang->generate_qrcode();
         $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
+        $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -220,16 +241,17 @@ class C_MasterBarang extends CI_Controller
         $this->load->helper("file");
         $idisi      = $this->input->post('id_isi');
         $flnm       = $this->input->post('file_nm');
+        $flnms      = $this->input->post('file_nms');
 
         if ($flnm == 'Karisma.png') {
             if (!empty($_FILES['gambar_1'])) {
                 $config['upload_path'] = './images/gbrbarang/masterbr/';
-                $config['allowed_types'] = 'jpg|png|gif';
+                $config['allowed_types'] = '*';
                 $config['max_size'] = '2000';
                 $config['max_width'] = '6000';
                 $config['max_height'] = '6000';
                 $config['overwrite'] = TRUE;
-                $config['file_name'] = date('Y') . date('m') . date('U');
+                $config['file_name'] = date('U') .   '-' . $flnms;  
                 $this->load->library('upload', $config);
                 $this->upload->initialize($config);;
 
@@ -255,14 +277,14 @@ class C_MasterBarang extends CI_Controller
         } elseif ($flnm != 'Karisma.png') {
             if (!empty($_FILES['gambar_1'])) {
                 $config['upload_path'] = './images/gbrbarang/masterbr/';
-                $config['allowed_types'] = 'jpg|png|gif';
-                $config['max_size'] = '2000';
+                $config['allowed_types'] = '*';
+                $config['max_size'] = '10000';
                 $config['max_width'] = '6000';
                 $config['max_height'] = '6000';
                 $config['overwrite'] = TRUE;
-                $config['file_name'] = date('Y') . date('m') . date('U');
+                $config['file_name'] = date('U') .   '-' . $flnms;
                 $this->load->library('upload', $config);
-                $this->upload->initialize($config);;
+                $this->upload->initialize($config);
 
                 if (!$this->upload->do_upload('gambar_1')) {
                     $error = array('error' => $this->upload->display_errors());
@@ -276,7 +298,6 @@ class C_MasterBarang extends CI_Controller
                     }
                 }
             }
-
             $dataBarang = array(
                 'gbr_barang'    => $image_data1['file_name']
             );

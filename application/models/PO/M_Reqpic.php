@@ -54,7 +54,7 @@ class M_Reqpic extends CI_Model
     public function getalltmpreq($kd)
     {
         return $this->db->query("SELECT 
-        a.id_tmp_nk , b.nama_barang , b.descnk , a.keterangan , a.qty , c.nm_satuan
+        a.id_tmp_nk , b.nama_barang , b.descnk , a.keterangan , a.qty , c.nm_satuan , a.kd_bsys
         FROM tb_tmp_item_nk a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
         JOIN tb_satuan c ON c.id_satuan = b.satuan 
@@ -89,7 +89,7 @@ class M_Reqpic extends CI_Model
             b.nama_barang AS nama_barang,
             b.descnk AS deskripsi,
             a.keterangan AS keterangan,
-            a.qty AS qty,
+            a.qty AS qtykebutuhan,
             c.nm_satuan AS nm_satuan
             FROM tb_detail_po_nk a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
@@ -97,19 +97,23 @@ class M_Reqpic extends CI_Model
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
             ");
         }
-        // FUNGSI PIC
+        // FUNGSI ADMIN
         elseif ($lv == '2') {
             return $this->db->query("SELECT 
             a.id_det_po_nk AS id,
             b.nama_barang AS nama_barang,
             b.descnk AS deskripsi,
             a.keterangan AS keterangan,
-            a.qty AS qty,
+            a.qty AS qtykebutuhan,
+            (COALESCE(SUM(e.tr_qty),0))+(COALESCE(SUM(d.tr_qty),0)) AS qtyready,
             c.nm_satuan AS nm_satuan
             FROM tb_detail_po_nk a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            LEFT JOIN tb_transaksi d ON d.kd_barangsys = a.kd_bsys
+            LEFT JOIN tb_transaksi_tmp e ON e.kd_barangsys = a.kd_bsys
             WHERE a.kd_po_nk = '$kd'
+            GROUP BY a.kd_bsys
             ");
         }
     }
@@ -146,5 +150,34 @@ class M_Reqpic extends CI_Model
     public function inputreq($data)
     {
         $this->db->insert('tb_req_nk', $data);
+    }
+    public function editedreqpic($id, $data)
+    {
+        $this->db->where('id_tmp_nk', $id);
+        return $this->db->update('tb_tmp_item_nk', $data);
+    }
+    public function deletedtmpnkreq($id)
+    {
+        $this->db->where('id_tmp_nk', $id);
+        return $this->db->delete('tb_tmp_item_nk');
+    }
+    public function getitemreq($id)
+    {
+        $this->db->select('a.*');
+        $this->db->select('b.*');
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_bsys');
+        $this->db->where('id_det_po_nk', $id);
+        $query = $this->db->get()->result();
+        return $query;
+    }
+    public function deletedetailponk($id)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->delete('tb_detail_po_nk');
+    }
+    public function insert_tmp_transaksi($data)
+    {
+        $this->db->insert('tb_transaksi_tmp', $data);
     }
 }

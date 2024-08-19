@@ -52,6 +52,7 @@
                 </div>
 
                 <?php if ($countreq == '1') : ?>
+                    <?php $this->load->view('content/po/Reqpic/modalreqedit.php') ?>
                     <div class="card">
                         <div class="card-body">
                             <h3>Draft Request Barang</h3>
@@ -82,7 +83,7 @@
                                             <td>
                                                 <div class="row">
                                                     <div class="col">
-                                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#hapus<?= $t->id_tmp_nk ?>">
+                                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#edit<?= $t->id_tmp_nk ?>">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </a>
                                                     </div>
@@ -100,7 +101,7 @@
                                 <tr>
                                     <td colspan="6">
                                         <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
-                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
+                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" hidden readonly />
                                         <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
                                         <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
                                         </form>

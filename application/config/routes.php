@@ -92,6 +92,7 @@ $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
+$route['add_mbarang_tmps'] = 'master_barang/C_MasterBarang/addrequestmasterbarangs';
 $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
 $route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/aprovedmasterbarang';
 $route['vrequestmbarang'] = 'master_barang/C_MasterBarang/vrequestmbarang';
@@ -126,7 +127,12 @@ $route['reqpic'] = 'purchaseorder/C_Reqpic';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
 $route['addtmpreqbarang'] = 'purchaseorder/C_Reqpic/addtmpreqbarang';
 $route['addnewreq/(:any)'] = 'purchaseorder/C_Reqpic/addnewreq/$1';
+$route['editedreqpic'] = 'purchaseorder/C_Reqpic/editedreqpic';
+$route['deletedtmpnkreq'] = 'purchaseorder/C_Reqpic/deletedtmpnkreq';
 $route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
+$route['confirmreq/(:any)'] = 'purchaseorder/C_Reqpic/confirmreq/$1';
+$route['pendingreq/(:any)'] = 'purchaseorder/C_Reqpic/pendingreq/$1';
+
 
 
 
