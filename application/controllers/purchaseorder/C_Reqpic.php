@@ -173,7 +173,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
-
+ 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
             $this->load->view('content/po/Reqpic/detreq', $data);

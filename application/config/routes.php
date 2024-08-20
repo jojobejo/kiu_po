@@ -133,9 +133,6 @@ $route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpi
 $route['confirmreq/(:any)'] = 'purchaseorder/C_Reqpic/confirmreq/$1';
 $route['pendingreq/(:any)'] = 'purchaseorder/C_Reqpic/pendingreq/$1';
 
-
-
-
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
 $route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
