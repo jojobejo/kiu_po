@@ -17,7 +17,6 @@ class M_Reqpic extends CI_Model
         a.kd_barang as kode_sys, 
         a.nama_barang, 
         a.descnk,
-        COALESCE(SUM(c.tr_qty),0) AS qty,
         b.nm_satuan,
         a.gbr_barang,
         a.id_brg_nk,
@@ -25,9 +24,6 @@ class M_Reqpic extends CI_Model
         a.gbr_barang
         FROM tb_barang_nk a
         JOIN tb_satuan b ON b.id_satuan = a.satuan
-        LEFT JOIN tb_transaksi c ON c.kd_barangsys = a.kd_barang
-        JOIN tb_po_nk d ON d.kd_po_nk = c.kd_po_nk
-        GROUP BY c.kd_barangsys
     ");
     }
 
@@ -105,7 +101,9 @@ class M_Reqpic extends CI_Model
             b.descnk AS deskripsi,
             a.keterangan AS keterangan,
             a.qty AS qtykebutuhan,
-            (COALESCE(SUM(e.tr_qty),0))+(COALESCE(SUM(d.tr_qty),0)) AS qtyready,
+            COALESCE(SUM(e.tr_qty),0) AS qty_tmp,
+            COALESCE(SUM(d.tr_qty),0) AS qty_transaksi,
+            (COALESCE(SUM(d.tr_qty),0))-(COALESCE(SUM(e.tr_qty),0)) AS qtyready,
             c.nm_satuan AS nm_satuan
             FROM tb_detail_po_nk a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys

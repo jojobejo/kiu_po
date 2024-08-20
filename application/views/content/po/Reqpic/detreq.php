@@ -57,6 +57,42 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card">
+                        <h1 class="ml-4 mt-3">List Aproved & Pending Barang</h1>
+
+                        <div class="card-body">
+                            <table class="table table-bordered table-striped mt-4 mb-2 ">
+                                <thead>
+                                    <tr>
+                                        <td>Nama Barang</td>
+                                        <td>Deskripsi</td>
+                                        <td>Keterangan</td>
+                                        <td>qty</td>
+                                        <td>Satuan</td>
+                                        <td>Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($listtr as $l) : ?>
+                                        <tr>
+                                            <td><?= $l->nama_barang ?></td>
+                                            <td><?= $l->descnk ?></td>
+                                            <td><?= $l->keterangan ?></td>
+                                            <td><?= $l->tr_qty ?></td>
+                                            <td><?= $l->nm_satuan ?></td>
+                                            <td>
+                                                <?php if ($l->status == 'confirm') : ?>
+                                                    <a class="btn btn-block btn-success btn-lg"></a>
+                                                <?php else : ?>
+                                                    <a class="btn btn-block btn-warning btn-lg"></a>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div><!-- /.container-fluid -->
             </div><!-- /.content-header -->
         </div>

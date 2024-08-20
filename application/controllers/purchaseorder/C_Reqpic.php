@@ -159,6 +159,7 @@ class C_Reqpic extends CI_Controller
             $data['title']      = 'PO Detail Req PIC';
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
+            $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -195,8 +196,9 @@ class C_Reqpic extends CI_Controller
                     'kd_barangsys'      => $i->kd_bsys,
                     'keterangan'        => $i->ket,
                     'kat_barang'        => $i->kat_barang,
-                    'tr_qty'            => '-' . $i->qty,
+                    'tr_qty'            => $i->qty,
                     'satuan'            => $i->satuan,
+                    'status'            => 'confirm',
                     'inputer'           => $kduser,
                     'create_at'         => $now,
                     'last_updated_by'   => $kduser
