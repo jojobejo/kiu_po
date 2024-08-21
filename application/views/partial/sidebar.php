@@ -114,10 +114,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="<?= base_url('reqpic') ?>" class="nav-link">
-                      <i class="far fa-dot-circle nav-icon"></i>
-                      <p>PO Request PIC</p>
-                    </a>
+
                   </li>
                 </ul>
               </li>
@@ -133,10 +130,16 @@
           </li>
           <li class="nav-item">
             <a href="<?= base_url('vrequestmbarang') ?>" class="nav-link">
-              <i class="nav-icon fas fa-box"></i>
+              <i class="nav-icon fas fa-box-open"></i>
               <p>
                 Request Master Barang
               </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reqpic') ?>" class="nav-link">
+              <i class="nav-icon fas fa-folder-minus"></i>
+              <p>PO Request PIC</p>
             </a>
           </li>
           <li class="nav-item">

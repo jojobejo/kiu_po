@@ -65,6 +65,10 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_user = '$kd'
         ");
     }
+    function input_detail_po_nk($data)
+    {
+        $this->db->insert('tb_detail_req', $data);
+    }
     public function getrequestbypic($kd)
     {
         $this->db->select('*');
@@ -87,10 +91,10 @@ class M_Reqpic extends CI_Model
             a.keterangan AS keterangan,
             a.qty AS qtykebutuhan,
             c.nm_satuan AS nm_satuan
-            FROM tb_detail_po_nk a
+            FROM tb_detail_req a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
-            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
+            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd' AND a.status = '0'
             ");
         }
         // FUNGSI ADMIN
@@ -105,7 +109,7 @@ class M_Reqpic extends CI_Model
             COALESCE(SUM(d.tr_qty),0) AS qty_transaksi,
             (COALESCE(SUM(d.tr_qty),0))-(COALESCE(SUM(e.tr_qty),0)) AS qtyready,
             c.nm_satuan AS nm_satuan
-            FROM tb_detail_po_nk a
+            FROM tb_detail_req a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
             LEFT JOIN tb_transaksi d ON d.kd_barangsys = a.kd_bsys
@@ -199,5 +203,11 @@ class M_Reqpic extends CI_Model
         JOIN tb_satuan c ON c.id_satuan = b.satuan
         WHERE a.kd_po_nk = '$kd'
         ");
+    }
+
+    function updatedetreqitm($kd, $data)
+    {
+        $this->db->where('id_det_po_nk', $kd);
+        return $this->db->update('tb_detail_req', $data);
     }
 }

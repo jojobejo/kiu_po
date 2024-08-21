@@ -17,10 +17,6 @@
                             <!-- FIELD DATA PENGAJUAN  -->
                             <div class="row">
                                 <div class="col">
-                                    <label for="naSupp" class="">Nomor PO : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nopo ?>" class="form-control" readonly>
-                                </div>
-                                <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
                                     <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
                                 </div>
@@ -111,11 +107,7 @@
                                 </div><!-- /.col -->
                             </div><!-- /.row -->
                             <!-- FIELD DATA PENGAJUAN  -->
-                            <div class="row">
-                                <div class="col">
-                                    <label for="naSupp" class="">Nomor PO : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nopo ?>" class="form-control" readonly>
-                                </div>
+                            <div class="row mt-3">
                                 <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
                                     <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
@@ -158,7 +150,7 @@
                                                             <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                         </div>
                                                         <div class="col">
-                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-danger btn-sm"><i class="fas fa-times "></i></a>
+                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -177,7 +169,7 @@
                                                             <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                         </div>
                                                         <div class="col">
-                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-danger btn-sm"><i class="fas fa-times "></i></a>
+                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -191,7 +183,6 @@
 
                     <div class="card">
                         <h1 class="ml-4 mt-3">List Aproved & Pending Barang</h1>
-
                         <div class="card-body">
                             <table class="table table-bordered table-striped mt-4 mb-2 ">
                                 <thead>
@@ -223,7 +214,14 @@
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            <a class="btn btn-block btn-primary  btn-lg"><i class="fas fa-cloud-upload-alt"></i></a>
+                            <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
+                            <!-- <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
+                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
+                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
+                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
+                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/> -->
+                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
+                            </form>
                         </div>
                     </div>
 

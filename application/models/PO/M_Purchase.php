@@ -204,7 +204,6 @@ class M_Purchase extends CI_Model
         } else {
             $kd1 = "0001";
         }
-
         date_default_timezone_set('Asia/Jakarta');
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
