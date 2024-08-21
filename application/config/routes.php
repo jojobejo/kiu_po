@@ -132,7 +132,7 @@ $route['deletedtmpnkreq'] = 'purchaseorder/C_Reqpic/deletedtmpnkreq';
 $route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
 $route['confirmreq/(:any)'] = 'purchaseorder/C_Reqpic/confirmreq/$1';
 $route['pendingreq/(:any)'] = 'purchaseorder/C_Reqpic/pendingreq/$1';
-$route['accreqpic/(:any)'] = 'purchaseorder/C_Reqpic/accreqpic/$1';
+$route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';

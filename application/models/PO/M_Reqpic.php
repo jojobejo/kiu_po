@@ -94,28 +94,41 @@ class M_Reqpic extends CI_Model
             FROM tb_detail_req a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
-            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd' AND a.status = '0'
+            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
             ");
         }
         // FUNGSI ADMIN
         elseif ($lv == '2') {
-            return $this->db->query("SELECT 
-            a.id_det_po_nk AS id,
-            b.nama_barang AS nama_barang,
-            b.descnk AS deskripsi,
-            a.keterangan AS keterangan,
-            a.qty AS qtykebutuhan,
-            COALESCE(SUM(e.tr_qty),0) AS qty_tmp,
-            COALESCE(SUM(d.tr_qty),0) AS qty_transaksi,
-            (COALESCE(SUM(d.tr_qty),0))-(COALESCE(SUM(e.tr_qty),0)) AS qtyready,
-            c.nm_satuan AS nm_satuan
-            FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
-            JOIN tb_satuan c ON c.id_satuan = b.satuan 
-            LEFT JOIN tb_transaksi d ON d.kd_barangsys = a.kd_bsys
-            LEFT JOIN tb_transaksi_tmp e ON e.kd_barangsys = a.kd_bsys
-            WHERE a.kd_po_nk = '$kd'
-            GROUP BY a.kd_bsys
+            return $this->db->query("SELECT
+            x.kd_po_nk AS kode_po,
+            x.kd_barang AS kode_barang,
+            x.nama_barang AS nama_barang,
+            x.deskripsi AS deskripsi,
+            x.keterangan AS keterangan,
+            x.status AS status,
+            x.nm_satuan as nm_satuan,
+            COALESCE(x.qty_minus,0) AS qty_minus,
+            COALESCE(x.qty_plus,0) AS qty_plus,
+            COALESCE(x.qty,0) AS qty_req,
+            COALESCE(x.qty_plus,0) - COALESCE(x.qty_minus,0) AS qty_ready
+            FROM
+            (   SELECT 
+                a.kd_po_nk,
+                a.kd_barang,
+                a.nama_barang,
+                a.deskripsi,
+                a.keterangan,
+                a.qty,
+                a.status,
+                f.nm_satuan,
+                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_minus,
+                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_plus
+                FROM tb_detail_req a 
+                JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
+                JOIN tb_satuan f ON f.id_satuan = e.satuan 
+                GROUP BY a.kd_barang
+            ) AS x 
+            WHERE x.kd_po_nk = '$kd'
             ");
         }
     }
@@ -173,7 +186,7 @@ class M_Reqpic extends CI_Model
         b.kat_barang as kat_barang,
         a.qty as qty,
         b.satuan as satuan
-        FROM tb_detail_po_nk a
+        FROM tb_detail_req a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
         WHERE a.id_det_po_nk = '$id'
             ");
@@ -187,16 +200,23 @@ class M_Reqpic extends CI_Model
     {
         $this->db->insert('tb_transaksi_tmp', $data);
     }
+    public function insert_transaksi($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
+    }
     public function getlisttmptr($kd)
     {
         return $this->db->query("SELECT
+        a.kd_akun,
         a.kd_po_nk,
+        a.kd_barang,
         a.kd_barangsys,
         b.nama_barang,
         b.descnk,
         a.keterangan,
         a.tr_qty,
         a.status,
+        a.satuan,
         c.nm_satuan
         FROM tb_transaksi_tmp a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
@@ -210,4 +230,43 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $kd);
         return $this->db->update('tb_detail_req', $data);
     }
+    function input_new_po_req($data)
+    {
+        $this->db->insert('tb_tmp_item_nk', $data);
+    }
+    public function deletedtmpnkreqkd($id)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->delete('tb_tmp_item_nk');
+    }
 }
+
+
+// QUERY SQL 
+
+// SELECT
+// x.kd_po_nk AS kode_po,
+// x.kd_barang AS kode_barang,
+// x.nama_barang AS nama_barang,
+// x.deskripsi AS deskripsi,
+// COALESCE(x.qty_minus,0) AS qty_minus,
+// COALESCE(x.qty_plus,0) AS qty_plus,
+// COALESCE(x.qty,0) AS qty_req,
+// COALESCE(x.qty_plus,0) - COALESCE(x.qty_minus,0) AS qty_ready
+// FROM
+// (
+//     SELECT 
+// 	a.kd_po_nk,
+//     a.kd_barang,
+//     a.nama_barang,
+//     a.deskripsi,
+//     a.keterangan,
+//     a.qty,
+//     a.status,
+//     (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_minus,
+//     (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_plus
+//     FROM tb_detail_req a 
+//     JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
+//     GROUP BY a.kd_barang
+// ) AS x 
+// WHERE x.kd_po_nk = 'PONK2108240002'

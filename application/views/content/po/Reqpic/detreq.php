@@ -135,24 +135,32 @@
                                 </thead>
                                 <tbody>
                                     <?php foreach ($detreq as $d) :
-                                        $tot = ($d->qtyready) - ($d->qtykebutuhan); ?>
+                                        $tot = ($d->qty_ready) - ($d->qty_req); ?>
                                         <?php if ($tot < 0) : ?>
                                             <tr>
                                                 <td class="table-danger"><?= $d->nama_barang ?></td>
                                                 <td class="table-danger"><?= $d->deskripsi ?></td>
                                                 <td class="table-danger"><?= $d->keterangan ?></td>
-                                                <td class="table-danger"><?= $d->qtykebutuhan ?></td>
-                                                <td class="table-danger"><?= $d->qtyready ?></td>
+                                                <td class="table-danger"><?= $d->qty_req ?></td>
+                                                <td class="table-danger"><?= $d->qty_ready ?></td>
                                                 <td class="table-danger"><?= $d->nm_satuan ?></td>
                                                 <td class="table-danger">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
+                                                    <?php if ($d->status == '0') : ?>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
+                                                            </div>
+                                                            <div class="col">
+                                                                <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
+                                                            </div>
                                                         </div>
-                                                        <div class="col">
-                                                            <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
+                                                    <?php else : ?>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <a href="#" class="btn btn-block btn-success btn-sm"><i class="fas fa-clipboard-check"></i></a>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php else : ?>
@@ -183,7 +191,19 @@
 
                     <div class="card">
                         <h1 class="ml-4 mt-3">List Aproved & Pending Barang</h1>
+                        <?php echo form_open_multipart('accreqpic'); ?>
+
                         <div class="card-body">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col-md-auto">
+                                        <label for="naSupp" class="">Tanggal Jadwal : </label>
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" id="tgljadwal" name="tgljadwal" style="max-width: 550px;" value="" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
                             <table class="table table-bordered table-striped mt-4 mb-2 ">
                                 <thead>
                                     <tr>
@@ -214,12 +234,8 @@
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
-                            <!-- <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
-                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
-                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
-                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/>
-                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="" readonly/> -->
+
+                            <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $s->kd_po_nk ?>" readonly />
                             <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
                             </form>
                         </div>

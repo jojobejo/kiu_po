@@ -199,16 +199,6 @@ class C_Reqpic extends CI_Controller
                     'create_at'         => $now,
                     'last_updated_by'   => $kduser
                 );
-
-                // update_status
-
-                // $updetitm = array(
-                //     'status'    => '1'
-                // );
-
-                // $this->M_Reqpic->updatedetreqitm($kd, $updetitm);
-
-
             }
             $this->M_Reqpic->insert_tmp_transaksi($dataitm);
             redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
@@ -245,7 +235,53 @@ class C_Reqpic extends CI_Controller
             }
         }
     }
-    public function accreqpic($kd)
+    public function accreqpic()
     {
+        $kdponk = $this->input->post('kdponk');
+        $kduser = $this->session->userdata('kode');
+        $trtmp  = $this->M_Reqpic->getlisttmptr($kdponk)->result();
+        $now    = date('Y-m-d');
+
+        $requpdate = array(
+            'status'
+        );
+
+        if ($trtmp) {
+            foreach ($trtmp as $t) {
+                if ($t->status == 'confirm') {
+                    $dtitm  = array(
+                        'kd_akun'           => $t->kd_akun,
+                        'kd_po_nk'          => $t->kd_po_nk,
+                        'kd_barang'         => $t->kd_barang,
+                        'kd_barangsys'      => $t->kd_barangsys,
+                        'keterangan'        => $t->keterangan,
+                        'kat_barang'        => $t->kat_barang,
+                        'tr_qty'            => $t->tr_qty,
+                        'satuan'            => $t->satuan,
+                        'inputer'           => $kduser,
+                        'create_at'         => $now,
+                        'last_updated_by'   => $kduser
+                    );
+                    $this->M_Reqpic->insert_transaksi($dtitm);
+                    $this->M_Reqpic->deletedtmpnkreqkd($kdponk);
+                } else {
+                    $dtitmpending = array(
+                        'jnis_po'       => '2',
+                        'nama_barang'   => $t->nama_barang,
+                        'deskripsi'     => $t->descnk,
+                        'keterangan'    => $t->keterangan,
+                        'qty'           => $t->tr_qty,
+                        'hrg_satuan'    => '0',
+                        'total_harga'   => '0',
+                        'kd_bsys'       => $t->kd_barangsys,
+                        'kd_barang'     => $t->kd_barang,
+                        'kat_barang'    => $t->kat_barang,
+                        'kd_user'       => $kduser
+                    );
+                    $this->M_Reqpic->input_tmp_nk($dtitmpending);
+                    $this->M_Reqpic->deletedtmpnkreqkd($kdponk);
+                }
+            }
+        }
     }
 }
