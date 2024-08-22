@@ -97,9 +97,10 @@ class C_Reqpic extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
         $nmuser = $this->session->userdata('nama_user');
         $dep    = $this->session->userdata('departemen');
+        $kdus   = $this->session->userdata('kode');
         $kdponk = $this->input->post('kdponk');
         $totbr  = $this->input->post('totbr');
-        $nopo   = $kduser . 'NK';
+        $tjuan  = $this->input->post('intj');
         $now    = date('Y-m-d');
 
         $tmp    = $this->M_Reqpic->get_tmp_non_komersil($kduser);
@@ -107,15 +108,13 @@ class C_Reqpic extends CI_Controller
         $inpdataponk = array(
             'jns_po'        => '2',
             'kd_po_nk'      => $kdponk,
-            'nopo'          => $nopo,
             'kd_user'       => $kduser,
             'nm_user'       => $nmuser,
             'tgl_transaksi' => $now,
             'jml_item'      => $totbr,
-            'total_harga'   => '0',
             'status'        => 'ON PROGRESS',
             'departemen'    => $dep,
-            'tj_pembelian'  => 'REQUEST PIC'
+            'tj_pembelian'  => $tjuan
         );
         $this->M_Reqpic->inputreq($inpdataponk);
 
@@ -123,6 +122,18 @@ class C_Reqpic extends CI_Controller
             'kd_barang' => $kdponk
         );
         $this->M_Purchase->generatekd($generatekd);
+        // NOTE FOR 2 == NOTE TRACKING REQUEST PIC
+
+        $inputnt    = array(
+            'kd_po'         => $kdponk,
+            'isi_note'      => 'REQUEST BARU',
+            'kd_user'       => $kdus,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+
+        );
+        $this->M_Purchase->addNote($inputnt);
 
         if ($tmp) {
             foreach ($tmp as $t) {
@@ -156,6 +167,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['log']        = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -169,6 +181,8 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
+            $data['log']        = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -200,6 +214,10 @@ class C_Reqpic extends CI_Controller
                     'last_updated_by'   => $kduser
                 );
             }
+            $detitmreq = array(
+                'status'    => '1'
+            );
+            $this->M_Reqpic->updatestsitem($kd, $detitmreq);
             $this->M_Reqpic->insert_tmp_transaksi($dataitm);
             redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
         }
@@ -229,6 +247,10 @@ class C_Reqpic extends CI_Controller
                 );
                 $this->M_Reqpic->insert_tmp_transaksi($dataitm);
                 // DELETE DATA DETAIL
+                $detitmreq = array(
+                    'status'    => '1'
+                );
+                $this->M_Reqpic->updatestsitem($kd, $detitmreq);
                 $this->M_Reqpic->deletedetailponk($kd);
 
                 redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
@@ -239,18 +261,32 @@ class C_Reqpic extends CI_Controller
     {
         $kdponk = $this->input->post('kdponk');
         $kduser = $this->session->userdata('kode');
+        $nmuser = $this->session->userdata('nama_user');
         $trtmp  = $this->M_Reqpic->getlisttmptr($kdponk)->result();
         $now    = date('Y-m-d');
 
-        $requpdate = array(
-            'status'
+        $updatests  = array(
+            'status'    => 'REQUEST ACC',
+            'acc_with'  => $kduser
         );
+        $this->M_Reqpic->updatereqnk($kdponk, $updatests);
+
+        $inputnt    = array(
+            'kd_po'         => $kdponk,
+            'isi_note'      => 'PENGAJUAN DITERIMA',
+            'kd_user'       => $kduser,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+        );
+
+        $this->M_Purchase->addNote($inputnt);
 
         if ($trtmp) {
             foreach ($trtmp as $t) {
                 if ($t->status == 'confirm') {
                     $dtitm  = array(
-                        'kd_akun'           => $t->kd_akun,
+                        'kd_akun'           => '11512',
                         'kd_po_nk'          => $t->kd_po_nk,
                         'kd_barang'         => $t->kd_barang,
                         'kd_barangsys'      => $t->kd_barangsys,
@@ -263,7 +299,7 @@ class C_Reqpic extends CI_Controller
                         'last_updated_by'   => $kduser
                     );
                     $this->M_Reqpic->insert_transaksi($dtitm);
-                    $this->M_Reqpic->deletedtmpnkreqkd($kdponk);
+                    $this->M_Reqpic->deletetmptrreq($kdponk);
                 } else {
                     $dtitmpending = array(
                         'jnis_po'       => '2',
@@ -278,10 +314,37 @@ class C_Reqpic extends CI_Controller
                         'kat_barang'    => $t->kat_barang,
                         'kd_user'       => $kduser
                     );
-                    $this->M_Reqpic->input_tmp_nk($dtitmpending);
-                    $this->M_Reqpic->deletedtmpnkreqkd($kdponk);
+                    $this->M_Reqpic->input_new_po_req($dtitmpending);
+                    $this->M_Reqpic->deletetmptrreq($kdponk);
                 }
             }
+            redirect('reqpic');
         }
+    }
+    public function reqpicdone()
+    {
+        $kdponk = $this->input->post('kdponk');
+        $pic = $this->input->post('pic');
+        $kduser = $this->session->userdata('kode');
+        $nmuser = $this->session->userdata('nama_user');
+
+        $updatests  = array(
+            'status'    => 'DONE',
+            'acc_with'  => $kduser
+        );
+
+        $inputnt    = array(
+            'kd_po'         => $kdponk,
+            'isi_note'      => 'ON HAND - ' . $pic,
+            'kd_user'       => $kduser,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+
+        );
+
+        $this->M_Purchase->addNote($inputnt);
+        $this->M_Reqpic->updatereqnk($kdponk, $updatests);
+        redirect('reqpic');
     }
 }

@@ -78,6 +78,17 @@ class M_Reqpic extends CI_Model
         return $query;
     }
 
+    public function count_acc_req($kd)
+    {
+        return $this->db->query("SELECT
+        COUNT(a.id_det_po_nk) AS total,
+        SUM(CASE WHEN a.status = '1' THEN 1 ELSE 0 END) tot_yes,
+        SUM(CASE WHEN a.status = '0' THEN 1 ELSE 0 END) tot_no
+        FROM tb_detail_req a
+        WHERE a.kd_po_nk = '$kd'
+        ");
+    }
+
     public function getdetailreqpic($usr, $kd)
     {
         $lv = $this->session->userdata('lv');
@@ -100,19 +111,21 @@ class M_Reqpic extends CI_Model
         // FUNGSI ADMIN
         elseif ($lv == '2') {
             return $this->db->query("SELECT
+              x.id_det_po_nk AS id,
             x.kd_po_nk AS kode_po,
             x.kd_barang AS kode_barang,
             x.nama_barang AS nama_barang,
             x.deskripsi AS deskripsi,
             x.keterangan AS keterangan,
-            x.status AS status,
+            x.status AS sts,
             x.nm_satuan as nm_satuan,
-            COALESCE(x.qty_minus,0) AS qty_minus,
-            COALESCE(x.qty_plus,0) AS qty_plus,
+            COALESCE(x.qty_tmp,0) AS qty_tmp,
+            COALESCE(x.qty_transaksi,0) AS qty_transaksi,
             COALESCE(x.qty,0) AS qty_req,
-            COALESCE(x.qty_plus,0) - COALESCE(x.qty_minus,0) AS qty_ready
+            IF(x.status = '1',COALESCE(x.qty_transaksi,0) - COALESCE(x.qty_tmp,0),COALESCE(x.qty_transaksi,0) - COALESCE(x.qty,0)) AS qty_ready
             FROM
             (   SELECT 
+                a.id_det_po_nk,
                 a.kd_po_nk,
                 a.kd_barang,
                 a.nama_barang,
@@ -121,8 +134,8 @@ class M_Reqpic extends CI_Model
                 a.qty,
                 a.status,
                 f.nm_satuan,
-                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_minus,
-                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_plus
+                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
+                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
@@ -171,6 +184,11 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_tmp_nk', $id);
         return $this->db->update('tb_tmp_item_nk', $data);
     }
+    public function updatestsitem($id, $data)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->update('tb_detail_req', $data);
+    }
     public function deletedtmpnkreq($id)
     {
         $this->db->where('id_tmp_nk', $id);
@@ -217,7 +235,8 @@ class M_Reqpic extends CI_Model
         a.tr_qty,
         a.status,
         a.satuan,
-        c.nm_satuan
+        c.nm_satuan,
+        b.kat_barang
         FROM tb_transaksi_tmp a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
         JOIN tb_satuan c ON c.id_satuan = b.satuan
@@ -230,6 +249,11 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $kd);
         return $this->db->update('tb_detail_req', $data);
     }
+    function updatereqnk($kd, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        return $this->db->update('tb_req_nk', $data);
+    }
     function input_new_po_req($data)
     {
         $this->db->insert('tb_tmp_item_nk', $data);
@@ -238,6 +262,19 @@ class M_Reqpic extends CI_Model
     {
         $this->db->where('kd_po_nk', $id);
         return $this->db->delete('tb_tmp_item_nk');
+    }
+    public function deletetmptrreq($id)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->delete('tb_transaksi_tmp');
+    }
+    function getNoted($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_note_direktur');
+        $this->db->where('kd_po', $kdpo);
+        $this->db->where('note_for', '2');
+        return $this->db->get()->result();
     }
 }
 

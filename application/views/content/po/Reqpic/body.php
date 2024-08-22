@@ -16,7 +16,7 @@
                                     <td>Total Barang</td>
                                     <td>Keterangan</td>
                                     <td>Status</td>
-                                    <td></td>
+                                    <td>#</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -31,9 +31,13 @@
                                                     <div class="col">
                                                         <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
                                                     </div>
-                                                <?php elseif ($g->status == 'ACC-ADM') : ?>
+                                                <?php elseif ($g->status == 'REQUEST ACC') : ?>
                                                     <div class="col">
-                                                        <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
+                                                        <a class="btn btn-block btn-info btn-sm"><?= $g->status ?></a>
+                                                    </div>
+                                                <?php elseif ($g->status == 'DONE') : ?>
+                                                    <div class="col">
+                                                        <a class="btn btn-block btn-success btn-sm"><?= $g->status ?></a>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
@@ -59,6 +63,17 @@
                             <div class="row mb-2">
                                 <div class="col">
                                     <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
+                                </div>
+                            </div>
+                            <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
+                            <div class="col mb-2 mt-5">
+                                <div class="row">
+                                    <div class="col-md-auto">
+                                        <label for="naSupp" class="">Tujuan Request : </label>
+                                    </div>
+                                    <div class="col-md">
+                                        <input type="text" id="intj" name="intj" style="max-width: 550px;" value="" class="form-control" placeholder="Input Tujuan Pengajuan">
+                                    </div>
                                 </div>
                             </div>
                             <table class="table table-bordered table-striped" id="">
@@ -100,7 +115,6 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="6">
-                                        <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
                                         <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
                                         <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
                                         <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
@@ -150,8 +164,8 @@
                                         <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
                                         <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'DAPAT DIAMBIL') : ?>
-                                            <td><a class="btn btn-block btn-primary btn-sm"><b><?= $g->status ?></b></a></td>
+                                        <?php elseif ($g->status == 'REQUEST ACC') : ?>
+                                            <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'DONE') : ?>
                                             <td><a class="btn btn-block btn-success btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php endif; ?>
@@ -159,9 +173,6 @@
                                             <div class="row">
                                                 <div class="col">
                                                     <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('reqpic/detreqbarangpic/' . $g->kd_po_nk) ?>"><i class="fas fa-eye"></i></a>
-                                                </div>
-                                                <div class="col">
-                                                    <a class="btn btn-block btn-danger btn-sm" href="<?= base_url('rejectreq/' . $g->id_po_nk) ?>"><i class="fas fa-times"></i></a>
                                                 </div>
                                             </div>
                                         </td>
