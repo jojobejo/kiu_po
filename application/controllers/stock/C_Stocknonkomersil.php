@@ -20,7 +20,7 @@ class C_Stocknonkomersil extends CI_Controller
     public function index()
     {
         $data['title'] = 'List Stock Non Komersil';
-        $data['stocknk'] = $this->M_Stocknonkomersil->getAllstocknk()->result();
+        $data['stocknk'] = $this->M_Stocknonkomersil->v_stock();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

@@ -226,7 +226,7 @@
                                         <?php if ($toty == $tot) : ?>
                                             <?php echo form_open_multipart('accreqpic'); ?>
                                             <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;ACC REQUEST&nbsp;<i class="fas fa-cloud-upload-alt"></i></button>
+                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;ACC REQUEST</button>
                                         <?php else : ?>
                                         <?php endif; ?>
                                     <?php endforeach; ?>

@@ -25,26 +25,26 @@
                     </thead>
                     <tbody>
                         <?php foreach ($stocknk as $s) : ?>
-                            <?php if ($s->qty == '0') : ?>
+                            <?php if ($s->qty_ready == '0' || $s->qty_ready < '0') : ?>
                                 <tr class="table-warning">
-                                    <td class="table-warning"><?= $s->kode_adm ?></td>
+                                    <td class="table-warning"><?= $s->kode_barang ?></td>
                                     <td class="table-warning"><?= $s->nama_barang ?></td>
-                                    <td class="table-warning"><?= $s->descnk ?></td>
-                                    <td class="table-warning"><?= $s->qty ?></td>
-                                    <td class="table-warning"><?= $s->nm_satuan ?></td>
+                                    <td class="table-warning"><?= $s->deskripsi ?></td>
+                                    <td class="table-warning"><?= $s->qty_ready ?></td>
+                                    <td class="table-warning"><?= $s->satuan ?></td>
                                     <td class="table-warning">
-                                        <a href="<?= base_url('detailtransaksi/') . $s->kode_sys ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
+                                        <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
                                     </td>
                                 </tr>
                             <?php else : ?>
                                 <tr>
-                                    <td><?= $s->kode_adm ?></td>
+                                    <td><?= $s->kode_barang ?></td>
                                     <td><?= $s->nama_barang ?></td>
-                                    <td><?= $s->descnk ?></td>
-                                    <td><?= $s->qty ?></td>
-                                    <td><?= $s->nm_satuan ?></td>
+                                    <td><?= $s->deskripsi ?></td>
+                                    <td><?= $s->qty_ready ?></td>
+                                    <td><?= $s->satuan ?></td>
                                     <td>
-                                        <a href="<?= base_url('detailtransaksi/') . $s->kode_sys ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
+                                        <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
                                     </td>
                                 </tr>
                             <?php endif; ?>
