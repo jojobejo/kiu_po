@@ -139,7 +139,6 @@ class M_Reqpic extends CI_Model
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
-                GROUP BY a.kd_barang
             ) AS x 
             WHERE x.kd_po_nk = '$kd'
             ");

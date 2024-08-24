@@ -80,6 +80,36 @@ class M_Stocknonkomersil  extends CI_Model
     {
         $this->db->insert('tb_generate_kd', $data);
     }
+    public function get_data_item($kd)
+    {
+        return $this->db->query("SELECT
+        a.kd_barang AS kode_sistem ,
+        a.kd_br_adm AS kode_barang,
+        a.nama_barang AS nama_barang,
+        a.descnk AS deskripsi,
+        d.qty_ready AS qty_ready,
+        b.nm_satuan AS satuan
+        FROM tb_barang_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        JOIN tb_kat_br c ON c.kd_kat = a.kat_barang
+        JOIN v_stockbarangnk d ON d.kode_barangs = a.kd_barang
+        WHERE a.kd_barang = '$kd'
+        ");
+    }
+    public function get_detail_transaksi_itm($kd)
+    {
+        return $this->db->query("SELECT * 
+            FROM tb_req_masterbarang a
+            JOIN tb_satuan b ON b.id_satuan = a.satuan
+            JOIN tb_user c ON c.kode_user = a.req_by
+            WHERE a.req_by = '$kd'
+        ");
+    }
+    public function qtyready($kd)
+    {
+        $cd1 = $this->db->query("SELECT a.qty_ready FROM v_stockbarangnk a WHERE a.kode_barangs = '$kd'");
+        return $cd1;
+    }
 }
 
 // CREATE VIEW STOCK

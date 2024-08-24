@@ -73,4 +73,16 @@ class C_Stocknonkomersil extends CI_Controller
 
         redirect('pononkomersil');
     }
+    public function detailtransaksi($kdbarang)
+    {
+        $data['title']  = 'Detail Stock Barang';
+        $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['stock'] = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/detail_itm_tr.php', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
 }

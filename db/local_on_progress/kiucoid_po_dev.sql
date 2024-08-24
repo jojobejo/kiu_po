@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 23 Agu 2024 pada 10.56
+-- Waktu pembuatan: 24 Agu 2024 pada 09.43
 -- Versi server: 10.4.17-MariaDB
 -- Versi PHP: 8.0.1
 
@@ -154,7 +154,8 @@ INSERT INTO `tb_detail_req` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transak
 (1, 'PONK2208240001', 'KARYAWAN2', '2024-08-22', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '-', 2, 1, '2024-08-22 11:48:35'),
 (2, 'PONK2208240001', 'KARYAWAN2', '2024-08-22', 'PONK3007240009', 'QAIRKEM1', 'Air Mineral Cleo', 'Kemasan gelas 230 ml', '-', 3, 1, '2024-08-22 13:04:28'),
 (3, 'PONK2208240001', 'KARYAWAN2', '2024-08-22', 'PONK3007240005', 'QTINMER1', 'Tinta Epson 664', 'Warna Merah', '-', 5, 1, '2024-08-22 16:14:47'),
-(4, 'PONK2208240002', 'KARYAWAN2', '2024-08-22', 'PONK2008240002', 'QSTAP01', 'Staples Besar', 'Staples Besar  pcs ', '-', 1, 1, '2024-08-23 07:47:50');
+(4, 'PONK2208240002', 'KARYAWAN2', '2024-08-22', 'PONK2008240002', 'QSTAP01', 'Staples Besar', 'Staples Besar  pcs ', '-', 1, 1, '2024-08-23 07:47:50'),
+(5, 'PONK2408240001', 'KARYAWAN2', '2024-08-24', 'PONK3007240009', 'QAIRKEM1', 'Air Mineral Cleo', 'Kemasan gelas 230 ml', 'Ruang Meeting', 1, 0, '2024-08-24 04:19:02');
 
 -- --------------------------------------------------------
 
@@ -868,7 +869,8 @@ INSERT INTO `tb_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
 (19, 'PONK2108240001', '2024-08-21 07:02:17'),
 (20, 'PONK2108240002', '2024-08-21 08:49:52'),
 (21, 'PONK2208240001', '2024-08-22 10:46:21'),
-(22, 'PONK2208240002', '2024-08-22 16:21:27');
+(22, 'PONK2208240002', '2024-08-22 16:21:27'),
+(23, 'PONK2408240001', '2024-08-24 04:19:02');
 
 -- --------------------------------------------------------
 
@@ -980,7 +982,8 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (50, 'PONK2208240002', 'REQUEST BARU', 'KARYAWAN2', 'Bram', 2, 2, '2024-08-22 16:21:27'),
 (51, 'PONK2208240002', 'PENGAJUAN DITERIMA', 'KEU02', 'Arini', 2, 2, '2024-08-23 07:39:42'),
 (52, 'PONK2208240002', 'PENGAJUAN DITERIMA', 'KEU02', 'Arini', 2, 2, '2024-08-23 07:49:10'),
-(53, 'PONK2208240002', 'ON HAND - Bram', 'KEU02', 'Arini', 2, 2, '2024-08-23 07:49:31');
+(53, 'PONK2208240002', 'ON HAND - Bram', 'KEU02', 'Arini', 2, 2, '2024-08-23 07:49:31'),
+(54, 'PONK2408240001', 'REQUEST BARU', 'KARYAWAN2', 'Bram', 2, 2, '2024-08-24 04:19:02');
 
 -- --------------------------------------------------------
 
@@ -1095,7 +1098,8 @@ CREATE TABLE `tb_req_nk` (
 
 INSERT INTO `tb_req_nk` (`id_po_nk`, `jns_po`, `kd_po_nk`, `kd_user`, `nm_user`, `tgl_transaksi`, `tgl_ambil`, `jml_item`, `status`, `departemen`, `tj_pembelian`, `acc_with`, `create_at`) VALUES
 (1, 2, 'PONK2208240001', 'KARYAWAN2', 'Bram', '2024-08-22', '', 3, 'DONE', 'KEUANGAN', 'Kebutuhan bulanan', 'KEU02', '2024-08-22 16:17:48'),
-(2, 2, 'PONK2208240002', 'KARYAWAN2', 'Bram', '2024-08-22', '', 1, 'DONE', 'KEUANGAN', 'Kebutuhan ATK SALES', 'KEU02', '2024-08-23 07:49:31');
+(2, 2, 'PONK2208240002', 'KARYAWAN2', 'Bram', '2024-08-22', '', 1, 'DONE', 'KEUANGAN', 'Kebutuhan ATK SALES', 'KEU02', '2024-08-23 07:49:31'),
+(3, 2, 'PONK2408240001', 'KARYAWAN2', 'Bram', '2024-08-24', '', 1, 'ON PROGRESS', 'KEUANGAN', 'Kebutuhan umum', '', '2024-08-24 04:19:02');
 
 -- --------------------------------------------------------
 
@@ -1525,7 +1529,7 @@ ALTER TABLE `tb_detail_po_nk`
 -- AUTO_INCREMENT untuk tabel `tb_detail_req`
 --
 ALTER TABLE `tb_detail_req`
-  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_diskon`
@@ -1555,7 +1559,7 @@ ALTER TABLE `tb_generateqrcode`
 -- AUTO_INCREMENT untuk tabel `tb_generate_kd`
 --
 ALTER TABLE `tb_generate_kd`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_kat_br`
@@ -1573,7 +1577,7 @@ ALTER TABLE `tb_note_barang`
 -- AUTO_INCREMENT untuk tabel `tb_note_direktur`
 --
 ALTER TABLE `tb_note_direktur`
-  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_note_pembelian`
@@ -1603,7 +1607,7 @@ ALTER TABLE `tb_req_masterbarang`
 -- AUTO_INCREMENT untuk tabel `tb_req_nk`
 --
 ALTER TABLE `tb_req_nk`
-  MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_satuan`
@@ -1621,7 +1625,7 @@ ALTER TABLE `tb_set_tax`
 -- AUTO_INCREMENT untuk tabel `tb_tmp_item_nk`
 --
 ALTER TABLE `tb_tmp_item_nk`
-  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_tmp_note_barang`
