@@ -98,17 +98,62 @@ class M_Stocknonkomersil  extends CI_Model
     }
     public function get_detail_transaksi_itm($kd)
     {
-        return $this->db->query("SELECT * 
-            FROM tb_req_masterbarang a
-            JOIN tb_satuan b ON b.id_satuan = a.satuan
-            JOIN tb_user c ON c.kode_user = a.req_by
-            WHERE a.req_by = '$kd'
+        return $this->db->query("SELECT
+        a.kd_po_nk AS kd_transaksi,
+        a.kd_akun AS kd_akun,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tr_qty AS qty,
+        b.nm_satuan AS nm_satuan,
+        a.kd_barangsys AS kd_barang,
+        COALESCE(c.nm_user,0) AS nm_1,
+        COALESCE(d.nm_user,0) AS nm_2,
+        COALESCE(e.departement,0) AS dep_1,
+        COALESCE(f.departement,0) AS dep_2
+        FROM tb_transaksi a 
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        LEFT JOIN tb_req_nk c ON c.kd_po_nk = a.kd_po_nk 
+        LEFT JOIN tb_po_nk d ON d.kd_po_nk = a.kd_po_nk
+        LEFT JOIN tb_user e ON e.kode_user = c.kd_user
+        LEFT JOIN tb_user f ON f.kode_user = d.kd_user
+        WHERE a.kd_barangsys = '$kd'
+
         ");
     }
     public function qtyready($kd)
     {
         $cd1 = $this->db->query("SELECT a.qty_ready FROM v_stockbarangnk a WHERE a.kode_barangs = '$kd'");
         return $cd1;
+    }
+    public function get_detail_br_rev_buy($kdponk, $kdbr)
+    {
+        return $this->db->query("SELECT
+        a.id_transnk AS id_tr,
+        b.id_det_po_nk AS id_po,
+        b.kd_po_nk AS kd_po,
+        b.kd_barang as kd_barang,
+        b.nama_barang AS nm_barang,
+        a.tr_qty AS qty_tr,
+        b.qty AS qty_det
+        FROM tb_transaksi a
+        JOIN tb_detail_po_nk b ON b.kd_po_nk = a.kd_po_nk
+        WHERE b.kd_po_nk = '$kdponk' AND b.kd_bsys = '$kdbr'
+        GROUP BY b.kd_po_nk
+        ");
+    }
+    public function get_detail_br_rev_req($kdponk, $kdbr)
+    {
+        return $this->db->query("SELECT
+        a.id_transnk AS id_tr,
+        b.id_det_po_nk AS id_po,
+        b.kd_po_nk AS kd_po,
+        b.kd_barang as kd_barang,
+        b.nama_barang AS nm_barang,
+        a.tr_qty AS qty_tr,
+        b.qty AS qty_det
+        FROM tb_transaksi a
+        JOIN tb_detail_req b ON b.kd_po_nk = a.kd_po_nk
+        WHERE b.kd_po_nk = '$kdponk' AND b.kd_bsys = '$kdbr'
+        ");
     }
 }
 

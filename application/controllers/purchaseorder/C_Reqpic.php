@@ -260,8 +260,10 @@ class C_Reqpic extends CI_Controller
     public function accreqpic()
     {
         $kdponk = $this->input->post('kdponk');
+        $tgl    = $this->input->post('tgl');
         $kduser = $this->session->userdata('kode');
         $nmuser = $this->session->userdata('nama_user');
+
         $trtmp  = $this->M_Reqpic->getlisttmptr($kdponk)->result();
         $now    = date('Y-m-d');
 
@@ -295,6 +297,7 @@ class C_Reqpic extends CI_Controller
                         'tr_qty'            => $t->tr_qty,
                         'satuan'            => $t->satuan,
                         'inputer'           => $kduser,
+                        'tgl_transaksi'     => $tgl,
                         'create_at'         => $now,
                         'last_updated_by'   => $kduser
                     );
@@ -323,12 +326,14 @@ class C_Reqpic extends CI_Controller
     }
     public function reqpicdone()
     {
-        $kdponk = $this->input->post('kdponk');
-        $pic = $this->input->post('pic');
-        $kduser = $this->session->userdata('kode');
-        $nmuser = $this->session->userdata('nama_user');
+        $kdponk     = $this->input->post('kdponk');
+        $tglambil   = $this->input->post('tgl');
+        $pic        = $this->input->post('pic');
+        $kduser     = $this->session->userdata('kode');
+        $nmuser     = $this->session->userdata('nama_user');
 
         $updatests  = array(
+            'tgl_ambil' => $tglambil,
             'status'    => 'DONE',
             'acc_with'  => $kduser
         );

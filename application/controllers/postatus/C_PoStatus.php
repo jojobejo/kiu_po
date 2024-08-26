@@ -1002,6 +1002,7 @@ class C_PoStatus extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
         $kdpo           = $this->input->post('kdpo');
+        $tgl            = $this->input->post('tgl');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
@@ -1019,6 +1020,7 @@ class C_PoStatus extends CI_Controller
                     'tr_qty'            => $t->qty,
                     'satuan'            => $t->satuan,
                     'inputer'           => $t->kd_user,
+                    'tgl_transaksi'     => $tgl,
                     'create_at'         => $now,
                     'last_updated_by'   => $t->kd_user
                 );

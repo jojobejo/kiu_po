@@ -76,12 +76,29 @@ class C_Stocknonkomersil extends CI_Controller
     public function detailtransaksi($kdbarang)
     {
         $data['title']  = 'Detail Stock Barang';
+        $data['note']   = 
         $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
         $data['stock'] = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/stock/nonkomersil/detail_itm_tr.php', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function revisitr($akun, $kdpo, $kdbr)
+    {
+        $data['title']      = 'Revisi Qty Persedian';
+        if ($akun == '11511') {
+            $data['stockdet']   = $this->M_Stocknonkomersil->get_detail_br_rev_buy($kdpo, $kdbr)->result();
+        } else {
+            $data['stockdet']   = $this->M_Stocknonkomersil->get_detail_br_rev_req($kdpo, $kdbr)->result();
+        }
+
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/revisitr', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }

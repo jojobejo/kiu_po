@@ -120,9 +120,9 @@ class M_Reqpic extends CI_Model
             x.status AS sts,
             x.nm_satuan as nm_satuan,
             COALESCE(x.qty_tmp,0) AS qty_tmp,
-            COALESCE(x.qty_transaksi,0) AS qty_transaksi,
+            (COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) AS qty_transaksi,
             COALESCE(x.qty,0) AS qty_req,
-            IF(x.status = '1',COALESCE(x.qty_transaksi,0) - COALESCE(x.qty_tmp,0),COALESCE(x.qty_transaksi,0) - COALESCE(x.qty,0)) AS qty_ready
+            IF(x.status = '1',(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0),(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0))) AS qty_ready
             FROM
             (   SELECT 
                 a.id_det_po_nk,
@@ -135,7 +135,9 @@ class M_Reqpic extends CI_Model
                 a.status,
                 f.nm_satuan,
                 (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
-                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi
+                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
+                (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
+                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 

@@ -145,8 +145,11 @@
                                     </tbody>
                                 </table>
                                 <?php echo form_open_multipart('reqpicdone'); ?>
+                                <?php $now = date("Y-m-d"); ?>
                                 <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
                                 <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+
                                 <button type="submit" class="btn btn-block btn-primary btn-sm">DONE</button>
                                 <!-- END REQUEST ACC  -->
 
@@ -226,6 +229,7 @@
                                         <?php if ($toty == $tot) : ?>
                                             <?php echo form_open_multipart('accreqpic'); ?>
                                             <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
                                             <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;ACC REQUEST</button>
                                         <?php else : ?>
                                         <?php endif; ?>

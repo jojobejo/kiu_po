@@ -104,6 +104,7 @@ $route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
 $route['stocknonkomersil'] = 'stock/C_Stocknonkomersil';
 $route['pononkomersil/list_stocknkpo'] = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['detailtransaksi/(:any)'] = 'stock/C_Stocknonkomersil/detailtransaksi/$1';
+$route['revisitr/(:any)/(:any)/(:any)'] = 'stock/C_Stocknonkomersil/revisitr/$1/$2/$3';
 
 $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
