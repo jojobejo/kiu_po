@@ -91,6 +91,7 @@ $route['add_mbarang'] = 'master_barang/C_MasterBarang/add_mbarang';
 $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
+
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
 $route['add_mbarang_tmps'] = 'master_barang/C_MasterBarang/addrequestmasterbarangs';
 $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
@@ -128,6 +129,7 @@ $route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/a
 // PO REQUEST BY PIC
 $route['reqpic'] = 'purchaseorder/C_Reqpic';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
+$route['add_mbarang_tmp'] = 'purchaseorder/C_Reqpic/addrequestmasterbarangready';
 $route['addtmpreqbarang'] = 'purchaseorder/C_Reqpic/addtmpreqbarang';
 $route['addnewreq/(:any)'] = 'purchaseorder/C_Reqpic/addnewreq/$1';
 $route['editedreqpic'] = 'purchaseorder/C_Reqpic/editedreqpic';

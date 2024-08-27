@@ -35,13 +35,33 @@ class C_Reqpic extends CI_Controller
     }
     public function list_barang_ready()
     {
-        $data['title']  = 'List Barang PO';
-        $data['lstock'] = $this->M_Reqpic->getlistnkreq()->result();
+        $data['title']      = 'List Barang PO';
+        $data['lstock']     = $this->M_Reqpic->getlistnkreq()->result();
+        $data['satuan']     = $this->M_Reqpic->getsatuan()->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/po/Reqpic/listbarang', $data);
         $this->load->view('partial/footer');
+        $this->load->view('content/po/datatables');
+    }
+    public function addrequestmasterbarangready()
+    {
+        $inputby    = $this->session->userdata('kode');
+        $nmbarang   = $this->input->post('nmbarang');
+        $descnk     = $this->input->post('descisi');
+        $satuan     = $this->input->post('stuanbr');
+
+        $tmpreqbarang = array(
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descnk,
+            'satuan'        => $satuan,
+            'req_by'        => $inputby
+        );
+
+        $this->M_Reqpic->insertTmpmbarang($tmpreqbarang);
+
+        redirect('listbarangready');
     }
     public function addtmpreqbarang()
     {
@@ -167,6 +187,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
@@ -181,6 +202,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
 
@@ -200,7 +222,7 @@ class C_Reqpic extends CI_Controller
         if ($itemconfirm) {
             foreach ($itemconfirm as $i) {
                 $dataitm = array(
-                    'kd_akun'           => '1151',
+                    'kd_akun'           => '11512',
                     'kd_po_nk'          => $i->kd_po_nk,
                     'kd_barang'         => $i->kd_barang,
                     'kd_barangsys'      => $i->kd_bsys,
@@ -232,7 +254,7 @@ class C_Reqpic extends CI_Controller
         if ($itemconfirm) {
             foreach ($itemconfirm as $i) {
                 $dataitm = array(
-                    'kd_akun'           => '1151',
+                    'kd_akun'           => '11512',
                     'kd_po_nk'          => $i->kd_po_nk,
                     'kd_barang'         => $i->kd_barang,
                     'kd_barangsys'      => $i->kd_bsys,
@@ -248,7 +270,7 @@ class C_Reqpic extends CI_Controller
                 $this->M_Reqpic->insert_tmp_transaksi($dataitm);
                 // DELETE DATA DETAIL
                 $detitmreq = array(
-                    'status'    => '1'
+                    'status'    => '3'
                 );
                 $this->M_Reqpic->updatestsitem($kd, $detitmreq);
                 $this->M_Reqpic->deletedetailponk($kd);

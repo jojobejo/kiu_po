@@ -26,6 +26,14 @@ class M_Reqpic extends CI_Model
         JOIN tb_satuan b ON b.id_satuan = a.satuan
     ");
     }
+    public function getsatuan()
+    {
+        return $this->db->query("SELECT
+        a.id_satuan AS id,
+        a.nm_satuan AS nm_satuan
+        FROM tb_satuan a
+    ");
+    }
 
     public function countRequser($lv, $kd)
     {
@@ -83,7 +91,7 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT
         COUNT(a.id_det_po_nk) AS total,
         SUM(CASE WHEN a.status = '1' THEN 1 ELSE 0 END) tot_yes,
-        SUM(CASE WHEN a.status = '0' THEN 1 ELSE 0 END) tot_no
+        SUM(CASE WHEN a.status = '3' THEN 1 ELSE 0 END) tot_no
         FROM tb_detail_req a
         WHERE a.kd_po_nk = '$kd'
         ");
@@ -276,6 +284,33 @@ class M_Reqpic extends CI_Model
         $this->db->where('kd_po', $kdpo);
         $this->db->where('note_for', '2');
         return $this->db->get()->result();
+    }
+    function insertTmpmbarang($data)
+    {
+        $this->db->insert('tb_req_masterbarang', $data);
+    }
+    public function gettotsts($kd)
+    {
+        return $this->db->query("SELECT
+        x.totalbr,
+        x.sts1,
+        x.sts2,
+        x.sts0,
+        x.sts3
+        FROM
+        (
+            SELECT
+            a.kd_po_nk,
+            (SELECT COUNT(b.id_det_po_nk) FROM tb_detail_req b WHERE b.kd_po_nk = a.kd_po_nk) as totalbr,
+            (SELECT COUNT(c.status) FROM tb_detail_req c WHERE c.kd_po_nk = a.kd_po_nk AND c.status = '1') AS sts1,
+            (SELECT COUNT(d.status) FROM tb_detail_req d WHERE d.kd_po_nk = a.kd_po_nk AND d.status = '2') AS sts2,
+            (SELECT COUNT(e.status) FROM tb_detail_req e WHERE e.kd_po_nk = a.kd_po_nk AND e.status = '0') AS sts0,
+            (SELECT COUNT(f.status) FROM tb_detail_req f WHERE f.kd_po_nk = a.kd_po_nk AND f.status = '3') AS sts3
+            FROM tb_detail_req a
+        ) AS x 
+        WHERE x.kd_po_nk = '$kd' 
+        GROUP BY x.kd_po_nk
+        ");
     }
 }
 

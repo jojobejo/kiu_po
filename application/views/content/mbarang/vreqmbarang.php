@@ -1,5 +1,3 @@
-<?php $this->load->view('content\mbarang\modal\modalreqmbarang.php') ?>
-<?php $this->load->view('content\mbarang\modal\mreqbarang.php') ?>
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
@@ -13,11 +11,8 @@
                             <i class="fas fa-plus"></i> Add Request Master Barang
                         </a>
                     <?php endif; ?>
-
                 </div><!-- /.col -->
             </div><!-- /.row -->
-
-
             <!-- VIEW ADMIN PURCHASING -->
             <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '1') : ?>
 
@@ -86,3 +81,5 @@
 
     <!-- /.content-header -->
 </div>
+
+<?php $this->load->view('content/mbarang/mreqbarang.php') ?>

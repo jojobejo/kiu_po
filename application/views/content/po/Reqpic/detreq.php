@@ -1,90 +1,92 @@
 <?php if ($this->session->userdata('lv') == '4') : ?>
-    <?php foreach ($status as $s) : ?>
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                    <div class="card">
-                        <?php if ($s->status == 'ON PROGRESS') : ?>
-                            <a class="btn btn-block btn-warning btn-sm" href=""><i class="fas fa-exclamation-triangle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
-                        <?php elseif ($s->status == 'REQUEST ACC') : ?>
-                            <a class="btn btn-block btn-info btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
-                        <?php elseif ($s->status == 'DONE') : ?>
-                            <a class="btn btn-block btn-success btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
-                        <?php endif; ?>
-                        <div class="card-body">
 
-                            <h1 class="m-0">Detail Request Barang - PIC - <a class="btn btn-primary btn-sm" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i></a></h1>
-                            <!-- FIELD DATA PENGAJUAN  -->
-                            <div class="row">
-                                <div class="col">
-                                    <label for="naSupp" class="">Tanggal Transaksi : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
-                                </div>
-                                <div class="col">
-                                    <label for="naSupp" class="">PIC : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
-                                </div>
-                                <div class="col">
-                                    <label for="naSupp" class="">Departement : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
-                                </div>
-                            </div>
-                            <table class="table table-bordered table-striped mt-4 mb-2 ">
-                                <thead style="background-color: #212529; color:white;">
-                                    <tr>
-                                        <td>Nama Barang</td>
-                                        <td>Deskripsi</td>
-                                        <td>Keterangan</td>
-                                        <td>QTY</td>
-                                        <td>Satuan</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($detreq as $d) : ?>
-                                        <tr>
-                                            <td><?= $d->nama_barang ?></td>
-                                            <td><?= $d->deskripsi ?></td>
-                                            <td><?= $d->keterangan ?></td>
-                                            <td><?= $d->qtykebutuhan ?></td>
-                                            <td><?= $d->nm_satuan ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
+    <?php foreach ($totsts as $tot) : ?>
+        <?php foreach ($status as $s) : ?>
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                        <div class="card">
+                            <?php if ($s->status == 'ON PROGRESS') : ?>
+                                <a class="btn btn-block btn-warning btn-sm" href=""><i class="fas fa-exclamation-triangle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
+                            <?php elseif ($s->status == 'REQUEST ACC') : ?>
+                                <a class="btn btn-block btn-info btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
+                            <?php elseif ($s->status == 'DONE') : ?>
+                                <a class="btn btn-block btn-success btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
+                            <?php endif; ?>
+                            <div class="card-body">
 
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row mr-2">
-                        <div class="col-md-8">
-                            <div class="noteDirektur">
-                                <table class="table table-bordered table-stripeds">
+                                <h1 class="m-0">Detail Request Barang - PIC - <a class="btn btn-primary btn-sm" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i></a></h1>
+                                <!-- FIELD DATA PENGAJUAN  -->
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="naSupp" class="">Tanggal Transaksi : </label>
+                                        <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
+                                    </div>
+                                    <div class="col">
+                                        <label for="naSupp" class="">PIC : </label>
+                                        <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
+                                    </div>
+                                    <div class="col">
+                                        <label for="naSupp" class="">Departement : </label>
+                                        <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered table-striped mt-4 mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
-                                            <td class="tdnote">ISI NOTE</td>
-                                            <td class="tduser">USER</td>
-                                            <td style="text-align: center;">TANGGAL</td>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td>Keterangan</td>
+                                            <td>QTY</td>
+                                            <td>Satuan</td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($log as $l) : ?>
+                                        <?php foreach ($detreq as $d) : ?>
                                             <tr>
-                                                <td><?= $l->isi_note ?></td>
-                                                <td><?= $l->nama_user ?></td>
-                                                <td><?= $l->log_create ?></td>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qtykebutuhan ?></td>
+                                                <td><?= $d->nm_satuan ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                    </div>
-                </div><!-- /.container-fluid -->
-            </div><!-- /.content-header -->
-        </div>
+                        <div class="row mr-2">
+                            <div class="col-md-8">
+                                <div class="noteDirektur">
+                                    <table class="table table-bordered table-stripeds">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td class="tdnote">ISI NOTE</td>
+                                                <td class="tduser">USER</td>
+                                                <td style="text-align: center;">TANGGAL</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($log as $l) : ?>
+                                                <tr>
+                                                    <td><?= $l->isi_note ?></td>
+                                                    <td><?= $l->nama_user ?></td>
+                                                    <td><?= $l->log_create ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.container-fluid -->
+                </div><!-- /.content-header -->
+            </div>
+        <?php endforeach; ?>
     <?php endforeach; ?>
 
 <?php elseif ($this->session->userdata('lv') == '2') : ?>
@@ -122,6 +124,7 @@
                             </div>
                             <!-- STATUS : REQUEST ACC  -->
                             <?php if ($s->status == 'REQUEST ACC') : ?>
+
                                 <table class="table table-bordered table-striped mt-4 mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
@@ -144,6 +147,7 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                
                                 <?php echo form_open_multipart('reqpicdone'); ?>
                                 <?php $now = date("Y-m-d"); ?>
                                 <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
@@ -224,13 +228,13 @@
                                 <div class="col">
                                     <?php foreach ($countitm as $c) :
                                         $tot    = $c->total;
-                                        $toty   = $c->tot_yes;
+                                        $toty   = $c->tot_yes + $c->tot_no;
                                     ?>
                                         <?php if ($toty == $tot) : ?>
                                             <?php echo form_open_multipart('accreqpic'); ?>
                                             <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
                                             <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;ACC REQUEST</button>
+                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;CONFIRM REQUEST</button>
                                         <?php else : ?>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
