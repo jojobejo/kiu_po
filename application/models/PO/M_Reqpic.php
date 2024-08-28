@@ -97,7 +97,23 @@ class M_Reqpic extends CI_Model
         ");
     }
 
-    public function getreqwhere($kd,$sts)
+    public function getreqwherepic($kduser, $kdpo, $sts1)
+    {
+        return $this->db->query("SELECT 
+            a.id_det_po_nk AS id,
+            b.nama_barang AS nama_barang,
+            b.descnk AS deskripsi,
+            a.keterangan AS keterangan,
+            a.qty AS qtykebutuhan,
+            c.nm_satuan AS nm_satuan,
+            a.status as sts
+            FROM tb_detail_req a
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            WHERE a.kd_user = '$kduser' AND a.kd_po_nk = '$kdpo' AND a.status = '$sts1'
+        ");
+    }
+    public function getreqwhere($kd, $sts)
     {
         return $this->db->query("SELECT
             x.id_det_po_nk AS id,
@@ -133,65 +149,6 @@ class M_Reqpic extends CI_Model
             ) AS x 
             WHERE x.kd_po_nk = '$kd' AND x.status = '$sts'
             ");
-    }
-
-    public function getdetailreqpic($usr, $kd)
-    {
-        $lv = $this->session->userdata('lv');
-
-        // FUNGSI PIC 
-        if ($lv == '4') {
-            return $this->db->query("SELECT 
-            a.id_det_po_nk AS id,
-            b.nama_barang AS nama_barang,
-            b.descnk AS deskripsi,
-            a.keterangan AS keterangan,
-            a.qty AS qtykebutuhan,
-            c.nm_satuan AS nm_satuan,
-            a.status as sts
-            FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
-            JOIN tb_satuan c ON c.id_satuan = b.satuan 
-            WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
-            ");
-        }
-        // FUNGSI ADMIN
-        elseif ($lv == '2') {
-            return $this->db->query("SELECT
-            x.id_det_po_nk AS id,
-            x.kd_po_nk AS kode_po,
-            x.kd_barang AS kode_barang,
-            x.nama_barang AS nama_barang,
-            x.deskripsi AS deskripsi,
-            x.keterangan AS keterangan,
-            x.status AS sts,
-            x.nm_satuan as nm_satuan,
-            COALESCE(x.qty_tmp,0) AS qty_tmp,
-            (COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) AS qty_transaksi,
-            COALESCE(x.qty,0) AS qty_req,
-            IF(x.status = '1',(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0),(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0))) AS qty_ready
-            FROM
-            (   SELECT 
-                a.id_det_po_nk,
-                a.kd_po_nk,
-                a.kd_barang,
-                a.nama_barang,
-                a.deskripsi,
-                a.keterangan,
-                a.qty,
-                a.status,
-                f.nm_satuan,
-                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
-                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
-                (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
-                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m
-                FROM tb_detail_req a 
-                JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
-                JOIN tb_satuan f ON f.id_satuan = e.satuan 
-            ) AS x 
-            WHERE x.kd_po_nk = '$kd'
-            ");
-        }
     }
 
     public function getlistpic()
@@ -349,6 +306,19 @@ class M_Reqpic extends CI_Model
         ) AS x 
         WHERE x.kd_po_nk = '$kd' 
         GROUP BY x.kd_po_nk
+        ");
+    }
+    public function del_itm_det_req_ponk($id)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->delete('tb_detail_req');
+    }
+    public function ls_del_itm_det_req_ponk($kd)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_detail_req a
+        WHERE a.kd_po_nk = '$kd' AND a.status = '3'
         ");
     }
 }

@@ -35,28 +35,125 @@
                                         <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
                                     </div>
                                 </div>
-                                <table class="table table-bordered table-striped mt-4 mb-2 ">
-                                    <thead style="background-color: #212529; color:white;">
-                                        <tr>
-                                            <td>Nama Barang</td>
-                                            <td>Deskripsi</td>
-                                            <td>Keterangan</td>
-                                            <td>QTY</td>
-                                            <td>Satuan</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($detreq as $d) : ?>
+                                <?php if ($s->status == 'ON PROGRESS') : ?>
+                                    <table class="table table-bordered table-striped mt-4 mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
                                             <tr>
-                                                <td><?= $d->nama_barang ?></td>
-                                                <td><?= $d->deskripsi ?></td>
-                                                <td><?= $d->keterangan ?></td>
-                                                <td><?= $d->qtykebutuhan ?></td>
-                                                <td><?= $d->nm_satuan ?></td>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreq as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                <?php elseif ($s->status == 'REQUEST ACC') : ?>
+                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG ACC</a>
+                                    <table class="table table-bordered table-striped mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreqpic as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                    <a href="#" class="btn btn-warning btn-block mt-4">BARANG PENDING</a>
+                                    <table class="table table-bordered table-striped mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreqpic1 as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                <?php elseif ($s->status == 'DONE') : ?>
+                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG ACC</a>
+                                    <table class="table table-bordered table-striped mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreqpic as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                    <a href="#" class="btn btn-warning btn-block mt-4">BARANG PENDING</a>
+                                    <table class="table table-bordered table-striped mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreqpic1 as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                <?php endif; ?>
+
                             </div>
                         </div>
                         <div class="row mr-2">

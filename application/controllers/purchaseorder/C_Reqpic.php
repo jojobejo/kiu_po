@@ -187,7 +187,8 @@ class C_Reqpic extends CI_Controller
         if ($this->session->userdata('lv') == '4') {
             $data['title']      = 'PO Detail Req PIC';
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
+            $data['detreqpic']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
+            $data['detreqpic1']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
@@ -329,20 +330,6 @@ class C_Reqpic extends CI_Controller
                     $this->M_Reqpic->insert_transaksi($dtitm);
                     $this->M_Reqpic->deletetmptrreq($kdponk);
                 } else {
-                    $dtitmpending = array(
-                        'jnis_po'       => '2',
-                        'nama_barang'   => $t->nama_barang,
-                        'deskripsi'     => $t->descnk,
-                        'keterangan'    => $t->keterangan,
-                        'qty'           => $t->tr_qty,
-                        'hrg_satuan'    => '0',
-                        'total_harga'   => '0',
-                        'kd_bsys'       => $t->kd_barangsys,
-                        'kd_barang'     => $t->kd_barang,
-                        'kat_barang'    => $t->kat_barang,
-                        'kd_user'       => $kduser
-                    );
-                    $this->M_Reqpic->input_new_po_req($dtitmpending);
                     $this->M_Reqpic->deletetmptrreq($kdponk);
                 }
             }
@@ -356,12 +343,15 @@ class C_Reqpic extends CI_Controller
         $pic        = $this->input->post('pic');
         $kduser     = $this->session->userdata('kode');
         $nmuser     = $this->session->userdata('nama_user');
+        $brpending  = $this->M_Reqpic->ls_del_itm_det_req_ponk($kdponk)->result();
+
 
         $updatests  = array(
             'tgl_ambil' => $tglambil,
             'status'    => 'DONE',
             'acc_with'  => $kduser
         );
+        $this->M_Reqpic->updatereqnk($kdponk, $updatests);
 
         $inputnt    = array(
             'kd_po'         => $kdponk,
@@ -370,11 +360,31 @@ class C_Reqpic extends CI_Controller
             'nama_user'     => $nmuser,
             'note_for'      => '2',
             'update_status' => '2',
-
         );
-
         $this->M_Purchase->addNote($inputnt);
-        $this->M_Reqpic->updatereqnk($kdponk, $updatests);
-        redirect('reqpic');
+
+        if ($brpending) {
+            foreach ($brpending as $b) {
+                $additm = array(
+                    'jnis_po'       => '2',
+                    'nama_barang'   => $b->nama_barang,
+                    'deskripsi'     => $b->descnk,
+                    'keterangan'    => $b->keterangan,
+                    'qty'           => $b->tr_qty,
+                    'hrg_satuan'    => '0',
+                    'total_harga'   => '0',
+                    'kd_bsys'       => $b->kd_barangsys,
+                    'kd_barang'     => $b->kd_barang,
+                    'kat_barang'    => $b->kat_barang,
+                    'kd_user'       => $kduser
+                );
+
+                $id = $b->id_det_po_nk;
+
+                $this->M_Reqpic->input_new_po_req($additm);
+                $this->M_Reqpic->del_itm_det_req_ponk($id);
+                redirect('reqpic');
+            }
+        }
     }
 }

@@ -76,6 +76,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <table class="table table-bordered table-striped" id="">
                                 <thead>
                                     <tr>
@@ -123,6 +124,7 @@
                                 </tr>
                             </tfoot>
                             </table>
+                            
                         </div>
                         <!-- END CARD CONTENT -->
                     </div>
