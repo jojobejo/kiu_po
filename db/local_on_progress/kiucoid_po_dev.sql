@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 27 Agu 2024 pada 10.46
+-- Waktu pembuatan: 28 Agu 2024 pada 10.49
 -- Versi server: 10.4.17-MariaDB
 -- Versi PHP: 8.0.1
 
@@ -114,14 +114,6 @@ CREATE TABLE `tb_detail_po_nk` (
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data untuk tabel `tb_detail_po_nk`
---
-
-INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_bsys`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `hrg_nyata`, `total_harga`, `total_nyata`, `gbr_produk`, `create_at`) VALUES
-(1, 'NKPO2608240001', 'KARYAWAN2', '2024-08-26', 'PONK3007240005', 'QTINMER1', 'Tinta Epson 664', 'Warna Merah', '-', 10, 0, 0, 0, 0, '', '2024-08-26 04:31:01'),
-(3, 'NKPO2608240001', 'KARYAWAN2', '2024-08-26', 'PONK3007240009', 'QAIRKEM1', 'Air Mineral Cleo', 'Kemasan gelas 230 ml', '-', 10, 0, 0, 0, 0, '', '2024-08-26 04:31:01');
-
 -- --------------------------------------------------------
 
 --
@@ -140,6 +132,7 @@ CREATE TABLE `tb_detail_req` (
   `keterangan` text NOT NULL,
   `qty` int(12) NOT NULL,
   `status` int(11) NOT NULL,
+  `sts_done` int(2) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -147,11 +140,11 @@ CREATE TABLE `tb_detail_req` (
 -- Dumping data untuk tabel `tb_detail_req`
 --
 
-INSERT INTO `tb_detail_req` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_bsys`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `status`, `create_at`) VALUES
-(1, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '-', 5, 0, '2024-08-27 08:45:23'),
-(2, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240010', 'QAIRGAL1', 'Air Galon Cleo', 'Galon Cleo 18 Liter', '-', 2, 0, '2024-08-27 08:45:23'),
-(3, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240002', 'QKREBES2', 'kresek plastik', 'Sedang Uk 36-40 cm', '-', 3, 0, '2024-08-27 08:45:23'),
-(4, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK1908240001', 'QHDM01', 'Kabel HDMI', 'HDMI Ugreen 2.1 - 3 Meter', '-', 2, 0, '2024-08-27 08:45:23');
+INSERT INTO `tb_detail_req` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_bsys`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `status`, `sts_done`, `create_at`) VALUES
+(1, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240007', 'QTINMER3', 'Tinta Epson 664', 'Warna Hitam', '-', 5, 3, 0, '2024-08-28 05:37:12'),
+(2, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240010', 'QAIRGAL1', 'Air Galon Cleo', 'Galon Cleo 18 Liter', '-', 2, 1, 0, '2024-08-28 05:40:23'),
+(3, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK3007240002', 'QKREBES2', 'kresek plastik', 'Sedang Uk 36-40 cm', '-', 3, 3, 0, '2024-08-28 05:40:21'),
+(4, 'PONK2708240008', 'KARYAWAN2', '2024-08-27', 'PONK1908240001', 'QHDM01', 'Kabel HDMI', 'HDMI Ugreen 2.1 - 3 Meter', '-', 2, 3, 0, '2024-08-28 05:37:10');
 
 -- --------------------------------------------------------
 
@@ -961,7 +954,8 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (18, 'PONK2708240007', 'PENGAJUAN DITERIMA', 'KEU01', 'Supriyanto', 2, 2, '2024-08-27 07:01:50'),
 (19, 'PONK2708240007', 'ON HAND - Bram', 'KEU01', 'Supriyanto', 2, 2, '2024-08-27 07:03:06'),
 (20, 'PONK2708240006', 'PENGAJUAN DITERIMA', 'KEU02', 'Arini', 2, 2, '2024-08-27 08:05:39'),
-(21, 'PONK2708240008', 'REQUEST BARU', 'KARYAWAN2', 'Bram', 2, 2, '2024-08-27 08:45:23');
+(21, 'PONK2708240008', 'REQUEST BARU', 'KARYAWAN2', 'Bram', 2, 2, '2024-08-27 08:45:23'),
+(22, 'PONK2708240008', 'PENGAJUAN DITERIMA', 'KEU02', 'Arini', 2, 2, '2024-08-28 08:05:28');
 
 -- --------------------------------------------------------
 
@@ -1076,7 +1070,7 @@ CREATE TABLE `tb_req_nk` (
 --
 
 INSERT INTO `tb_req_nk` (`id_po_nk`, `jns_po`, `kd_po_nk`, `kd_user`, `nm_user`, `tgl_transaksi`, `tgl_ambil`, `jml_item`, `status`, `departemen`, `tj_pembelian`, `acc_with`, `create_at`) VALUES
-(7, 2, 'PONK2708240008', 'KARYAWAN2', 'Bram', '2024-08-27', '', 4, 'ON PROGRESS', 'KEUANGAN', 'Test PO', '', '2024-08-27 08:45:23');
+(7, 2, 'PONK2708240008', 'KARYAWAN2', 'Bram', '2024-08-27', '', 4, 'REQUEST ACC', 'KEUANGAN', 'Test PO', 'KEU02', '2024-08-28 08:05:28');
 
 -- --------------------------------------------------------
 
@@ -1159,7 +1153,10 @@ INSERT INTO `tb_tmp_item_nk` (`id_tmp_nk`, `jnis_po`, `nama_barang`, `deskripsi`
 (16, 2, 'kresek plastik', 'Sedang Uk 30-35 Cm', '-', 2, 0, 0, 'PONK3007240003', 'QKREBES3', 'KATBR002', 'KEU02', '2024-08-27 06:22:59'),
 (17, 2, 'Air Galon Cleo', 'Galon Cleo 18 Liter', '-', 2, 0, 0, 'PONK3007240010', 'QAIRGAL1', 'KATBR002', 'KEU02', '2024-08-27 06:22:59'),
 (18, 2, 'Air Galon Cleo', 'Galon Cleo 18 Liter', '-', 2, 0, 0, 'PONK3007240010', 'QAIRGAL1', 'KATBR002', 'KEU02', '2024-08-27 06:22:59'),
-(22, 2, 'Kabel HDMI', 'HDMI Ugreen 2.1 - 3 Meter', '-', 2, 0, 0, 'PONK1908240001', 'QHDM01', 'KATBR001', 'KEU01', '2024-08-27 07:01:50');
+(22, 2, 'Kabel HDMI', 'HDMI Ugreen 2.1 - 3 Meter', '-', 2, 0, 0, 'PONK1908240001', 'QHDM01', 'KATBR001', 'KEU01', '2024-08-27 07:01:50'),
+(29, 2, 'kresek plastik', 'Sedang Uk 36-40 cm', '-', 3, 0, 0, 'PONK3007240002', 'QKREBES2', 'KATBR002', 'KEU02', '2024-08-28 08:05:28'),
+(30, 2, 'Tinta Epson 664', 'Warna Hitam', '-', 5, 0, 0, 'PONK3007240007', 'QTINMER3', 'KATBR001', 'KEU02', '2024-08-28 08:05:28'),
+(31, 2, 'Kabel HDMI', 'HDMI Ugreen 2.1 - 3 Meter', '-', 2, 0, 0, 'PONK1908240001', 'QHDM01', 'KATBR001', 'KEU02', '2024-08-28 08:05:28');
 
 -- --------------------------------------------------------
 
@@ -1225,7 +1222,8 @@ INSERT INTO `tb_transaksi` (`id_transnk`, `kd_akun`, `kd_po_nk`, `kd_barang`, `k
 (1, '11511', 'NKPO2608240001', 'QKREBES3', 'PONK3007240003', '', 'KATBR002', 15, 11, 'KARYAWAN2', '2024-08-26', '2024-08-26 11:47:16', 'KARYAWAN2', '2024-08-26 04:47:16'),
 (2, '11511', 'NKPO2608240001', 'QTINMER1', 'PONK3007240005', '', 'KATBR001', 10, 2, 'KARYAWAN2', '2024-08-26', '2024-08-26 11:47:16', 'KARYAWAN2', '2024-08-26 04:47:16'),
 (3, '11511', 'NKPO2608240001', 'QAIRKEM1', 'PONK3007240009', '', 'KATBR002', 10, 3, 'KARYAWAN2', '2024-08-26', '2024-08-26 11:47:16', 'KARYAWAN2', '2024-08-26 04:47:16'),
-(4, '11511', 'NKPO2608240001', 'QAIRGAL1', 'PONK3007240010', '', 'KATBR002', 10, 2, 'KARYAWAN2', '2024-08-26', '2024-08-26 11:47:16', 'KARYAWAN2', '2024-08-26 04:47:16');
+(4, '11511', 'NKPO2608240001', 'QAIRGAL1', 'PONK3007240010', '', 'KATBR002', 10, 2, 'KARYAWAN2', '2024-08-26', '2024-08-26 11:47:16', 'KARYAWAN2', '2024-08-26 04:47:16'),
+(11, '11512', 'PONK2708240008', 'QAIRGAL1', 'PONK3007240010', '-', 'KATBR002', 2, 2, 'KEU02', '2024-08-27', '2024-08-28 00:00:00', 'KEU02', '2024-08-28 08:05:28');
 
 -- --------------------------------------------------------
 
@@ -1549,7 +1547,7 @@ ALTER TABLE `tb_note_barang`
 -- AUTO_INCREMENT untuk tabel `tb_note_direktur`
 --
 ALTER TABLE `tb_note_direktur`
-  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_note_pembelian`
@@ -1597,7 +1595,7 @@ ALTER TABLE `tb_set_tax`
 -- AUTO_INCREMENT untuk tabel `tb_tmp_item_nk`
 --
 ALTER TABLE `tb_tmp_item_nk`
-  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_tmp_note_barang`
@@ -1615,13 +1613,13 @@ ALTER TABLE `tb_tmp_tax`
 -- AUTO_INCREMENT untuk tabel `tb_transaksi`
 --
 ALTER TABLE `tb_transaksi`
-  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_transaksi_tmp`
 --
 ALTER TABLE `tb_transaksi_tmp`
-  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_user`

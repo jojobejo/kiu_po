@@ -124,15 +124,15 @@
                             </div>
                             <!-- STATUS : REQUEST ACC  -->
                             <?php if ($s->status == 'REQUEST ACC') : ?>
-
-                                <table class="table table-bordered table-striped mt-4 mb-2 ">
+                                <h1 class="mt-3 mb-2">Barang Ready</h1>
+                                <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
                                             <td>Nama Barang</td>
                                             <td>Deskripsi</td>
-                                            <td>Keterangan</td>
-                                            <td>QTY</td>
-                                            <td>Satuan</td>
+                                            <td style="width:30%">Keterangan</td>
+                                            <td style="width:10%">QTY</td>
+                                            <td style="width:10%">Satuan</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -147,7 +147,30 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                
+                                <h1 class="mt-3 mb-2">Barang Pending</h1>
+                                <table class="table table-bordered table-striped mb-2 ">
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td style="width:30%">Keterangan</td>
+                                            <td>QTY</td>
+                                            <td>Satuan</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($detreq2 as $d) : ?>
+                                            <tr>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qty_req ?></td>
+                                                <td><?= $d->nm_satuan ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+
                                 <?php echo form_open_multipart('reqpicdone'); ?>
                                 <?php $now = date("Y-m-d"); ?>
                                 <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
@@ -243,18 +266,42 @@
 
                                 <!-- STATUS : DONE -->
                             <?php elseif ($s->status == 'DONE') : ?>
-                                <table class="table table-bordered table-striped mt-4 mb-2 ">
+                                <h1 class="mt-3 mb-2">Barang Ready</h1>
+                                <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
                                             <td>Nama Barang</td>
                                             <td>Deskripsi</td>
-                                            <td>Keterangan</td>
+                                            <td style="width:30%">Keterangan</td>
+                                            <td style="width:10%">QTY</td>
+                                            <td style="width:10%">Satuan</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($detreq as $d) : ?>
+                                            <tr>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qty_req ?></td>
+                                                <td><?= $d->nm_satuan ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <h1 class="mt-3 mb-2">Barang Pending</h1>
+                                <table class="table table-bordered table-striped mb-2 ">
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td style="width:30%">Keterangan</td>
                                             <td>QTY</td>
                                             <td>Satuan</td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq as $d) : ?>
+                                        <?php foreach ($detreq2 as $d) : ?>
                                             <tr>
                                                 <td><?= $d->nama_barang ?></td>
                                                 <td><?= $d->deskripsi ?></td>

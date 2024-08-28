@@ -180,6 +180,8 @@ class C_Reqpic extends CI_Controller
     public function detreqbarangpic($kdpo)
     {
         $kduser = $this->session->userdata('kode');
+        $sts1   = '1';
+        $sts2   = '3';
 
         // FUNGSI PIC 
         if ($this->session->userdata('lv') == '4') {
@@ -200,7 +202,8 @@ class C_Reqpic extends CI_Controller
         elseif ($this->session->userdata('lv') == '2') {
             $data['title']      = 'PO Detail Req PIC';
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['detreq']     = $this->M_Reqpic->getdetailreqpic($kduser, $kdpo)->result();
+            $data['detreq']     = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
+            $data['detreq2']     = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
