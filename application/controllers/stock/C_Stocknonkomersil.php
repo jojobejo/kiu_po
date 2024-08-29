@@ -76,8 +76,8 @@ class C_Stocknonkomersil extends CI_Controller
     public function detailtransaksi($kdbarang)
     {
         $data['title']  = 'Detail Stock Barang';
-        $data['note']   = 
-        $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['note']   =
+            $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
         $data['stock'] = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
 
         $this->load->view('partial/header', $data);

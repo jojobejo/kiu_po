@@ -13,17 +13,17 @@ class M_Reqpic extends CI_Model
     public function getlistnkreq()
     {
         return $this->db->query("SELECT 
-        a.kd_br_adm AS kode_adm, 
-        a.kd_barang as kode_sys, 
-        a.nama_barang, 
-        a.descnk,
+        a.kode_barang AS kode_adm,
+        a.kode_barangs AS kode_sys,
+        a.nama_barang,
+        a.deskripsi AS descnk,
         b.nm_satuan,
         a.gbr_barang,
         a.id_brg_nk,
         a.kat_barang,
-        a.gbr_barang
-        FROM tb_barang_nk a
-        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        a.qty_ready
+        FROM v_stockbarangnk a
+        JOIN tb_satuan b ON b.id_satuan = a.id_satuan
     ");
     }
     public function getsatuan()

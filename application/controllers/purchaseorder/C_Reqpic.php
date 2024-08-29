@@ -7,7 +7,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class C_Reqpic extends CI_Controller
 
 {
-
     function __construct()
     {
         parent::__construct();
@@ -15,7 +14,6 @@ class C_Reqpic extends CI_Controller
         $this->load->model('PO/M_Purchase');
         $this->load->library('form_validation');
     }
-
     public function index()
     {
         $kduser = $this->session->userdata('kode');
@@ -182,6 +180,7 @@ class C_Reqpic extends CI_Controller
         $kduser = $this->session->userdata('kode');
         $sts1   = '1';
         $sts2   = '3';
+        $sts0   = '0';
 
         // FUNGSI PIC 
         if ($this->session->userdata('lv') == '4') {
@@ -189,6 +188,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreqpic']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
             $data['detreqpic1']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
+            $data['detreqpic0']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
@@ -205,6 +205,7 @@ class C_Reqpic extends CI_Controller
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
             $data['detreq']     = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
             $data['detreq2']     = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
+            $data['detreq0']     = $this->M_Reqpic->getreqwhere($kdpo, $sts0)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();

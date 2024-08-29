@@ -18,7 +18,6 @@
                                 <a class="btn btn-block btn-success btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
                             <?php endif; ?>
                             <div class="card-body">
-
                                 <h1 class="m-0">Detail Request Barang - PIC - <a class="btn btn-primary btn-sm" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i></a></h1>
                                 <!-- FIELD DATA PENGAJUAN  -->
                                 <div class="row">
@@ -47,7 +46,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($detreq as $d) : ?>
+                                            <?php foreach ($detreqpic0 as $d) : ?>
                                                 <tr>
                                                     <td><?= $d->nama_barang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
@@ -292,7 +291,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq as $d) :
+                                        <?php foreach ($detreq0 as $d) :
                                             $tot = ($d->qty_ready) - ($d->qty_req); ?>
                                             <?php if ($tot < 0) : ?>
                                                 <tr>
@@ -344,7 +343,6 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-
                                 <div class="col">
                                     <?php foreach ($countitm as $c) :
                                         $tot    = $c->total;

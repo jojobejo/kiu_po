@@ -216,22 +216,6 @@
 
         <?php elseif ($this->session->userdata('lv') == '4') : ?>
           <li class="nav-item">
-            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
-              <i class="nav-icon fas fa-cash-register"></i>
-              <p>
-                Purchase Order Barang
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
-              <i class="nav-icon fas fa-money-check"></i>
-              <p>
-                Purchase Order Status
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
             <a href="<?= base_url('reqpic') ?>" class="nav-link">
               <i class="nav-icon fas fa-box-open"></i>
               <p>
@@ -244,6 +228,14 @@
               <i class="nav-icon fas fa-box"></i>
               <p>
                 Request Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('stocknonkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cubes"></i>
+              <p>
+                Stock Non Komersil
               </p>
             </a>
           </li>

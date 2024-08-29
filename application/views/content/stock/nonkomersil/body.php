@@ -57,6 +57,46 @@
                 </div>
 
             <?php elseif ($this->session->userdata('lv') != '2' || $this->session->userdata('lv') != '1') : ?>
+                <?php $this->load->view('content/stock/nonkomersil/modal_add_itm.php') ?>
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="m-0">
+                            <b style="text-transform:uppercase">Stock Barang Tersedia</b>
+                        </h1>
+                        <table class="table table-bordered" id="list_stocknonkomersil">
+                            <thead>
+                                <tr>
+                                    <td>Kode Barang</td>
+                                    <td>Nama Barang</td>
+                                    <td>Deskripsi</td>
+                                    <td>Stock</td>
+                                    <td>Satuan</td>
+                                    <td>#</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($stocknk as $s) : ?>
+                                    <tr>
+                                        <td><?= $s->kode_barang ?></td>
+                                        <td><?= $s->nama_barang ?></td>
+                                        <td><?= $s->deskripsi ?></td>
+                                        <?php if ($s->qty_ready == '0' || $s->qty_ready < '0') : ?>
+                                            <td class="table-warning"><?= $s->qty_ready ?></td>
+                                        <?php else : ?>
+                                            <td><?= $s->qty_ready ?></td>
+                                        <?php endif; ?>
+                                        <td><?= $s->satuan ?></td>
+                                        <td>
+                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartdetponk<?= $s->kode_barangs ?>">
+                                                <i class="fa fa-solid fa-cart-plus"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             <?php endif; ?>
         </div><!-- /.container-fluid -->
     </div>

@@ -155,6 +155,22 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE b.kd_po_nk = '$kdponk' AND b.kd_bsys = '$kdbr'
         ");
     }
+    public function getlistnkreq()
+    {
+        return $this->db->query("SELECT 
+        a.kode_barang AS kode_adm,
+        a.kode_barangs AS kode_sys,
+        a.nama_barang,
+        a.deskripsi AS descnk,
+        b.nm_satuan,
+        a.gbr_barang,
+        a.id_brg_nk,
+        a.kat_barang,
+        a.qty_ready
+        FROM v_stockbarangnk a
+        JOIN tb_satuan b ON b.id_satuan = a.id_satuan
+    ");
+    }
 }
 
 // CREATE VIEW STOCK
