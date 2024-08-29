@@ -186,9 +186,10 @@ class C_Reqpic extends CI_Controller
         if ($this->session->userdata('lv') == '4') {
             $data['title']      = 'PO Detail Req PIC';
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['detreqpic']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
-            $data['detreqpic1']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
-            $data['detreqpic0']  = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
+            $data['datereqpic'] = $this->M_Reqpic->getreqpicnosts($kduser, $kdpo)->result();
+            $data['detreqpic1'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
+            $data['detreqpic2'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
+            $data['detreqpic0'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
@@ -203,9 +204,10 @@ class C_Reqpic extends CI_Controller
         elseif ($this->session->userdata('lv') == '2') {
             $data['title']      = 'PO Detail Req PIC';
             $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['detreq']     = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
-            $data['detreq2']     = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
-            $data['detreq0']     = $this->M_Reqpic->getreqwhere($kdpo, $sts0)->result();
+            $data['detreq']     = $this->M_Reqpic->getreqwheres($kdpo)->result();
+            $data['detreq1']    = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
+            $data['detreq2']    = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
+            $data['detreq0']    = $this->M_Reqpic->getreqwhere($kdpo, $sts0)->result();
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
@@ -331,6 +333,20 @@ class C_Reqpic extends CI_Controller
                     $this->M_Reqpic->insert_transaksi($dtitm);
                     $this->M_Reqpic->deletetmptrreq($kdponk);
                 } else {
+                    $dtinsrtponk = array(
+                        'jnis_po'       => '2',
+                        'nama_barang'   => $t->nama_barang,
+                        'deskripsi'     => $t->descnk,
+                        'keterangan'    => $t->keterangan,
+                        'qty'           => $t->tr_qty,
+                        'hrg_satuan'    => '0',
+                        'total_harga'   => '0',
+                        'kd_bsys'       => $t->kd_barangsys,
+                        'kd_barang'     => $t->kd_barang,
+                        'kat_barang'    => $t->kat_barang,
+                        'kd_user'       => $t->kd_user
+                    );
+                    $this->M_Reqpic->insert_tmp_po_persediaan($dtinsrtponk);
                     $this->M_Reqpic->deletetmptrreq($kdponk);
                 }
             }

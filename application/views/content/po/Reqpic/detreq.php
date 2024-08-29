@@ -46,7 +46,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($detreqpic0 as $d) : ?>
+                                            <?php foreach ($datereqpic as $d) : ?>
                                                 <tr>
                                                     <td><?= $d->nama_barang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
@@ -117,7 +117,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($detreqpic as $d) : ?>
+                                            <?php foreach ($detreqpic1 as $d) : ?>
                                                 <tr>
                                                     <td><?= $d->nama_barang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
@@ -140,7 +140,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($detreqpic1 as $d) : ?>
+                                            <?php foreach ($detreqpic2 as $d) : ?>
                                                 <tr>
                                                     <td><?= $d->nama_barang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
@@ -184,7 +184,12 @@
             </div>
         <?php endforeach; ?>
     <?php endforeach; ?>
-
+    <!-- ============================================================================================================================================================================== -->
+    <!-- ============================================================================================================================================================================== -->
+    <!-- ============================================================================================================================================================================== -->
+    <!-- ============================================================================================================================================================================== -->
+    <!-- ============================================================================================================================================================================== -->
+    <!-- ============================================================================================================================================================================== -->
 <?php elseif ($this->session->userdata('lv') == '2') : ?>
     <?php foreach ($status as $s) : ?>
         <div class="content-wrapper">
@@ -220,7 +225,7 @@
                             </div>
                             <!-- STATUS : REQUEST ACC  -->
                             <?php if ($s->status == 'REQUEST ACC') : ?>
-                                <h1 class="mt-3 mb-2">Barang Ready</h1>
+                                <a href="#" class="btn btn-success btn-block mt-4"><b>BARANG ACC</b></a>
                                 <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
@@ -232,7 +237,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq as $d) : ?>
+                                        <?php foreach ($detreq1 as $d) : ?>
                                             <tr>
                                                 <td><?= $d->nama_barang ?></td>
                                                 <td><?= $d->deskripsi ?></td>
@@ -243,7 +248,7 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <h1 class="mt-3 mb-2">Barang Pending</h1>
+                                <a href="#" class="btn btn-warning btn-block mt-4"><b>BARANG PENDING</b></a>
                                 <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
@@ -291,9 +296,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq0 as $d) :
+                                        <?php foreach ($detreq as $d) :
                                             $tot = ($d->qty_ready) - ($d->qty_req); ?>
-                                            <?php if ($tot < 0) : ?>
+                                            <?php if ($tot <= '0') : ?>
                                                 <tr>
                                                     <td class="table-danger"><?= $d->nama_barang ?></td>
                                                     <td class="table-danger"><?= $d->deskripsi ?></td>
@@ -301,8 +306,8 @@
                                                     <td class="table-danger"><?= $d->qty_req ?></td>
                                                     <td class="table-danger"><?= $d->qty_ready ?></td>
                                                     <td class="table-danger"><?= $d->nm_satuan ?></td>
-                                                    <td class="table-danger">
-                                                        <?php if ($d->sts == '0') : ?>
+                                                    <?php if ($d->sts == "0") : ?>
+                                                        <td class="table-danger">
                                                             <div class="row">
                                                                 <div class="col">
                                                                     <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
@@ -311,10 +316,10 @@
                                                                     <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
                                                                 </div>
                                                             </div>
-                                                        <?php else : ?>
-                                                            <a href="#" class="btn btn-block btn-primary btn-sm"><i class="fas fa-clipboard-check "></i></a>
-                                                        <?php endif; ?>
-                                                    </td>
+                                                        </td>
+                                                    <?php else : ?>
+                                                        <td class="table-danger"><a href="#" class="btn btn-block btn-info btn-sm"><i class="fas fa-clipboard-check "></i></a></td>
+                                                    <?php endif; ?>
                                                 </tr>
                                             <?php else : ?>
                                                 <tr>
@@ -324,8 +329,8 @@
                                                     <td><?= $d->qty_req ?></td>
                                                     <td><?= $d->qty_ready ?></td>
                                                     <td><?= $d->nm_satuan ?></td>
-                                                    <td>
-                                                        <?php if ($d->sts == '0') : ?>
+                                                    <?php if ($d->sts == "0") : ?>
+                                                        <td>
                                                             <div class="row">
                                                                 <div class="col">
                                                                     <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
@@ -334,12 +339,13 @@
                                                                     <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
                                                                 </div>
                                                             </div>
-                                                        <?php else : ?>
-                                                            <a href="#" class="btn btn-block btn-primary btn-sm"><i class="fas fa-clipboard-check "></i></a>
-                                                        <?php endif; ?>
-                                                    </td>
+                                                        </td>
+                                                    <?php else : ?>
+                                                        <td><a href="#" class="btn btn-block btn-info btn-sm"><i class="fas fa-clipboard-check "></i></a></td>
+                                                    <?php endif; ?>
                                                 </tr>
                                             <?php endif; ?>
+
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
@@ -361,7 +367,7 @@
 
                                 <!-- STATUS : DONE -->
                             <?php elseif ($s->status == 'DONE') : ?>
-                                <h1 class="mt-3 mb-2">Barang Ready</h1>
+
                                 <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
