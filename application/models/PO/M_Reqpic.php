@@ -89,7 +89,6 @@ class M_Reqpic extends CI_Model
         $query = $this->db->get()->result();
         return $query;
     }
-
     public function count_acc_req($kd)
     {
         return $this->db->query("SELECT
@@ -305,6 +304,20 @@ class M_Reqpic extends CI_Model
     {
         $this->db->insert('tb_transaksi', $data);
     }
+    public function getbuystsponk($kd)
+    {
+        return $this->db->query("SELECT
+        a.nopo AS nopo,
+        a.status AS status,
+        a.tgl_transaksi AS tgltr,
+        a.nm_user AS nmuser,
+        a.departemen AS dep,
+        a.tj_pembelian AS tjbeli,
+        a.kd_po_nk AS kdpo
+        FROM tb_po_nk a
+        WHERE a.kd_po_req = '$kd'
+        ");
+    }
     public function getlisttmptr($kd)
     {
         return $this->db->query("SELECT
@@ -346,6 +359,10 @@ class M_Reqpic extends CI_Model
     function input_new_po_req($data)
     {
         $this->db->insert('tb_tmp_item_nk', $data);
+    }
+    function input_tr($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
     }
     public function deletedtmpnkreqkd($id)
     {
