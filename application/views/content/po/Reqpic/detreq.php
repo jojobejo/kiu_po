@@ -1,5 +1,4 @@
 <?php if ($this->session->userdata('lv') == '4') : ?>
-
     <?php foreach ($totsts as $tot) : ?>
         <?php foreach ($status as $s) : ?>
             <div class="content-wrapper">
@@ -58,30 +57,7 @@
                                         </tbody>
                                     </table>
                                 <?php elseif ($s->status == 'REQUEST ACC') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG ACC</a>
-                                    <table class="table table-bordered table-striped mb-2 ">
-                                        <thead style="background-color: #212529; color:white;">
-                                            <tr>
-                                                <td>Nama Barang</td>
-                                                <td>Deskripsi</td>
-                                                <td>Keterangan</td>
-                                                <td>QTY</td>
-                                                <td>Satuan</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($detreqpic as $d) : ?>
-                                                <tr>
-                                                    <td><?= $d->nama_barang ?></td>
-                                                    <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qtykebutuhan ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                    <a href="#" class="btn btn-warning btn-block mt-4">BARANG PENDING</a>
+                                    <a href="#" class="btn btn-success btn-block mt-4"><b>BARANG READY</b></a>
                                     <table class="table table-bordered table-striped mb-2 ">
                                         <thead style="background-color: #212529; color:white;">
                                             <tr>
@@ -104,8 +80,31 @@
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    <a href="#" class="btn btn-warning btn-block mt-4"><b>BARANG PENDING</b></a>
+                                    <table class="table table-bordered table-striped mb-2 ">
+                                        <thead style="background-color: #212529; color:white;">
+                                            <tr>
+                                                <td>Nama Barang</td>
+                                                <td>Deskripsi</td>
+                                                <td>Keterangan</td>
+                                                <td>QTY</td>
+                                                <td>Satuan</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($detreqpic2 as $d) : ?>
+                                                <tr>
+                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->deskripsi ?></td>
+                                                    <td><?= $d->keterangan ?></td>
+                                                    <td><?= $d->qtykebutuhan ?></td>
+                                                    <td><?= $d->nm_satuan ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 <?php elseif ($s->status == 'DONE') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG ACC</a>
+                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG READY</a>
                                     <table class="table table-bordered table-striped mb-2 ">
                                         <thead style="background-color: #212529; color:white;">
                                             <tr>
@@ -225,7 +224,7 @@
                             </div>
                             <!-- STATUS : REQUEST ACC  -->
                             <?php if ($s->status == 'REQUEST ACC') : ?>
-                                <a href="#" class="btn btn-success btn-block mt-4"><b>BARANG ACC</b></a>
+                                <a href="#" class="btn btn-success btn-block mt-4"><b>BARANG READY</b></a>
                                 <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
@@ -272,13 +271,13 @@
                                     </tbody>
                                 </table>
 
-                                <?php echo form_open_multipart('reqpicdone'); ?>
+                                <!-- <?php echo form_open_multipart('reqpicdone'); ?> -->
                                 <?php $now = date("Y-m-d"); ?>
                                 <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
                                 <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
                                 <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
 
-                                <button type="submit" class="btn btn-block btn-primary btn-sm">DONE</button>
+                                <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                 <!-- END REQUEST ACC  -->
 
                                 <!-- STATUS : ON PROGRESS -->
@@ -353,11 +352,14 @@
                                     <?php foreach ($countitm as $c) :
                                         $tot    = $c->total;
                                         $toty   = $c->tot_yes + $c->tot_no;
+                                        $totn   = $c->tot_no;
                                     ?>
                                         <?php if ($toty == $tot) : ?>
                                             <?php echo form_open_multipart('accreqpic'); ?>
-                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly>
+                                            <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly>
+                                            <input type="text" id="jmls" name="jmls" style="max-width: 550px;" value="<?= $totn ?>" class="form-control" readonly>
+                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                             <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;CONFIRM REQUEST</button>
                                         <?php else : ?>
                                         <?php endif; ?>

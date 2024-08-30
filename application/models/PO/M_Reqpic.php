@@ -62,7 +62,7 @@ class M_Reqpic extends CI_Model
         FROM tb_tmp_item_nk a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
         JOIN tb_satuan c ON c.id_satuan = b.satuan 
-        WHERE a.jnis_po = '2' AND a.kd_user = '$kd'
+        WHERE a.jnis_po = '1' AND a.kd_user = '$kd'
         ");
     }
     public function getallreq($kd)
@@ -76,6 +76,10 @@ class M_Reqpic extends CI_Model
     function input_detail_po_nk($data)
     {
         $this->db->insert('tb_detail_req', $data);
+    }
+    function inputponew($data)
+    {
+        $this->db->insert('tb_po_nk', $data);
     }
     public function getrequestbypic($kd)
     {
@@ -204,6 +208,12 @@ class M_Reqpic extends CI_Model
             ");
     }
 
+    function hapus_tmp_nk($id)
+    {
+        $this->db->where('kd_user', $id);
+        return $this->db->delete('tb_tmp_item_nk');
+    }
+
     public function getlistpic()
     {
         return $this->db->get('tb_req_nk')->result();
@@ -213,7 +223,16 @@ class M_Reqpic extends CI_Model
     {
         $this->db->select('id_tmp_nk');
         $this->db->from('tb_tmp_item_nk');
-        $this->db->where('jnis_po', '2');
+        $this->db->where('jnis_po', '1');
+        $this->db->where('kd_user', $kd);
+        $num_results = $this->db->count_all_results();
+        return $num_results;
+    }
+    public function countpend($kd)
+    {
+        $this->db->select('id_tmp_nk');
+        $this->db->from('tb_tmp_item_nk');
+        $this->db->where('jnis_po', '3');
         $this->db->where('kd_user', $kd);
         $num_results = $this->db->count_all_results();
         return $num_results;
@@ -223,7 +242,7 @@ class M_Reqpic extends CI_Model
     {
         $this->db->select('*');
         $this->db->from('tb_tmp_item_nk');
-        $this->db->where('jnis_po', '2');
+        $this->db->where('jnis_po', '1');
         $this->db->where('kd_user', $kd);
         $query = $this->db->get()->result();
         return $query;
@@ -251,6 +270,12 @@ class M_Reqpic extends CI_Model
     {
         $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_tmp_item_nk');
+    }
+    public function deletedet($id, $sts)
+    {
+        $this->db->where('id_tmp_nk', $id);
+        $this->db->where('id_tmp_nk', $id);
+        return $this->db->delete('tb_detail_req');
     }
     public function getitemreq($id)
     {
@@ -294,10 +319,16 @@ class M_Reqpic extends CI_Model
         a.status,
         a.satuan,
         c.nm_satuan,
-        b.kat_barang
+        b.kat_barang,
+        d.kd_user,
+        d.nm_user,
+        d.departemen,
+        d.tj_pembelian,
+        b.gbr_barang
         FROM tb_transaksi_tmp a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
         JOIN tb_satuan c ON c.id_satuan = b.satuan
+        JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
         WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -373,6 +404,26 @@ class M_Reqpic extends CI_Model
         FROM tb_detail_req a
         WHERE a.kd_po_nk = '$kd' AND a.status = '3'
         ");
+    }
+    public function insert_tmp_po_persediaan($kd)
+    {
+        $this->db->insert('tb_detail_po_nk', $kd);
+    }
+    function kdnonkomersial()
+    {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd1 = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd1 = "0001";
+        }
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'NPONK' . date('dmy') . $kd1;
+        return $kdnk1;
     }
 }
 

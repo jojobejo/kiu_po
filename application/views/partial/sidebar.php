@@ -215,6 +215,18 @@
           </li>
 
         <?php elseif ($this->session->userdata('lv') == '4') : ?>
+          <!-- <li class="nav-item">
+            <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+              <i class="far fa-circle nav-icon"></i>
+              <p>Non Komersil</p>
+            </a>
+          </li> -->
+          <li class="nav-item">
+            <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+              <i class="far fa-circle nav-icon"></i>
+              <p>Non Komersil</p>
+            </a>
+          </li>
           <li class="nav-item">
             <a href="<?= base_url('reqpic') ?>" class="nav-link">
               <i class="nav-icon fas fa-box-open"></i>

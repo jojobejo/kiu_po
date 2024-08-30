@@ -124,7 +124,7 @@
                                 </tr>
                             </tfoot>
                             </table>
-                            
+
                         </div>
                         <!-- END CARD CONTENT -->
                     </div>
