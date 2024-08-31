@@ -81,203 +81,184 @@
                                         </tbody>
                                     </table>
                                 <?php elseif ($s->status == 'REQUEST ACC') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">Work in Process</b></a>
-                                    <table class="table table-bordered table-striped mb-2">
-                                        <thead style="background-color: #212529; color:white;">
-                                            <tr>
-                                                <td>Nomor PO</td>
-                                                <td>Status Order</td>
-                                                <td>Tanggal PO</td>
-                                                <td>Nama Pengaju</td>
-                                                <td>Departement</td>
-                                                <td>Tujuan Pembelian</td>
-                                                <td>#</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($stspo as $st) : ?>
-                                                <tr>
-                                                    <td><?= $st->nopo ?></td>
-                                                    <?php if ($st->status == 'ON PROGRESS') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '2') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-exclamation"></i>&nbsp;
-                                                                Terdapat Update Dari Direktur
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '3') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                ON PROGRESS
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '3') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-exclamation"></i>&nbsp;
-                                                                Terdapat Update Dari Keuangan
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '2') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                ON PROGRESS
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '2') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                MENUNGGU ACC KADEP
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'DONE') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-success btn-sm">
-                                                                <i class="fas fa-thumbs-up"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'REJECT') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-danger btn-sm">
-                                                                <i class="fas fa-times"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'PO REVISI') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-undo"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'PENDING') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-pause"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'ACC-KADEP') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-primary btn-sm">
-                                                                <i class="fas fa-thumbs-up"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'PROSES PEMBELIAN') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-primary btn-sm">
-                                                                <i class="fas fa-thumbs-up"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '5') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                MENUNGGU ACC KADEP
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') != '3') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                <?= $st->status ?>
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') == '3') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-warning btn-sm">
-                                                                <i class="fas fa-clock"></i>&nbsp;
-                                                                PENGAJUAN PEMBELIAN BARU
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-primary btn-sm">
-                                                                <i class="fas fa-thumbs-up"></i>&nbsp;
-                                                                ACC DIREKTUR
-                                                            </a>
-                                                        </td>
-                                                    <?php elseif ($st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '2' || $st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '4' || $st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '5') : ?>
-                                                        <td>
-                                                            <a class="btn btn-block btn-primary btn-sm">
-                                                                <i class="fas fa-thumbs-up"></i>&nbsp;
-                                                                PROSES PEMBELIAN
-                                                            </a>
-                                                        </td>
-                                                    <?php endif; ?>
-                                                    <td><?= format_tgl_lahir($st->tgltr) ?></td>
-                                                    <td><?= $st->nmuser ?></td>
-                                                    <td><?= $st->dep ?></td>
-                                                    <td><?= $st->tjbeli ?></td>
-                                                    <td>
-                                                        <a href="<?= base_url('detailponk/' . $st->kdpo) ?>" class="btn btn-block btn-primary btn-sm"><i class="fas fa-eye"></i></a>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-
-                                        </tbody>
-                                    </table>
-                                    <a href="#" class="btn btn-success btn-block mt-4"><b>BARANG READY</b></a>
-                                    <table class="table table-bordered table-striped mb-2 ">
-                                        <thead style="background-color: #212529; color:white;">
-                                            <tr>
-                                                <td>Nama Barang</td>
-                                                <td>Deskripsi</td>
-                                                <td>Keterangan</td>
-                                                <td>QTY</td>
-                                                <td>Satuan</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($detreqpic1 as $d) : ?>
-                                                <tr>
-                                                    <td><?= $d->nama_barang ?></td>
-                                                    <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qtykebutuhan ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                    <a href="#" class="btn btn-warning btn-block mt-4"><b>BARANG PENDING</b></a>
-                                    <table class="table table-bordered table-striped mb-2 ">
-                                        <thead style="background-color: #212529; color:white;">
-                                            <tr>
-                                                <td>Nama Barang</td>
-                                                <td>Deskripsi</td>
-                                                <td>Keterangan</td>
-                                                <td>QTY</td>
-                                                <td>Satuan</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($detreqpic2 as $d) : ?>
-                                                <tr>
-                                                    <td><?= $d->nama_barang ?></td>
-                                                    <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qtykebutuhan ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                                    <?php foreach ($stspo1 as $tot) : ?>
+                                        <?php if ($tot->tot == '0') : ?>
+                                            <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">barang request</b></a>
+                                            <table class="table table-bordered table-striped mb-2 ">
+                                                <thead style="background-color: #212529; color:white;">
+                                                    <tr>
+                                                        <td>Nama Barang</td>
+                                                        <td>Deskripsi</td>
+                                                        <td>Keterangan</td>
+                                                        <td>QTY</td>
+                                                        <td>Satuan</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($detreqpic1 as $d) : ?>
+                                                        <tr>
+                                                            <td><?= $d->nama_barang ?></td>
+                                                            <td><?= $d->deskripsi ?></td>
+                                                            <td><?= $d->keterangan ?></td>
+                                                            <td><?= $d->qtykebutuhan ?></td>
+                                                            <td><?= $d->nm_satuan ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                            <a href="#" class="btn btn-success btn-block mt-2"><b style="text-transform: uppercase;">Work in Process</b></a>
+                                        <?php else : ?>
+                                            <table class="table table-bordered table-striped mb-2">
+                                                <thead style="background-color: #212529; color:white;">
+                                                    <tr>
+                                                        <td>Nomor PO</td>
+                                                        <td>Status Order</td>
+                                                        <td>Tanggal PO</td>
+                                                        <td>Nama Pengaju</td>
+                                                        <td>Departement</td>
+                                                        <td>Tujuan Pembelian</td>
+                                                        <td>#</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($stspo as $st) : ?>
+                                                        <tr>
+                                                            <td><?= $st->nopo ?></td>
+                                                            <?php if ($st->status == 'ON PROGRESS') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '2') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-exclamation"></i>&nbsp;
+                                                                        Terdapat Update Dari Direktur
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'NOTE DIREKTUR' && $this->session->userdata('lv') == '3') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        ON PROGRESS
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '3') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-exclamation"></i>&nbsp;
+                                                                        Terdapat Update Dari Keuangan
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'NOTE KEUANGAN' && $this->session->userdata('lv') == '2') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        ON PROGRESS
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '2') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        MENUNGGU ACC KADEP
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'DONE') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-success btn-sm">
+                                                                        <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'REJECT') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-danger btn-sm">
+                                                                        <i class="fas fa-times"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'PO REVISI') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-undo"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'PENDING') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-pause"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'ACC-KADEP') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-primary btn-sm">
+                                                                        <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'PROSES PEMBELIAN') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-primary btn-sm">
+                                                                        <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'ON PROGRESS - KADEP' && $this->session->userdata('lv') == '5') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        MENUNGGU ACC KADEP
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') != '3') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        <?= $st->status ?>
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'SEDANG DIAJUKAN' && $this->session->userdata('lv') == '3') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-warning btn-sm">
+                                                                        <i class="fas fa-clock"></i>&nbsp;
+                                                                        PENGAJUAN PEMBELIAN BARU
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '2' || $st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '4' || $st->status == 'ACC DIREKTUR' && $this->session->userdata('lv') == '5') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-primary btn-sm">
+                                                                        <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                                        ACC DIREKTUR
+                                                                    </a>
+                                                                </td>
+                                                            <?php elseif ($st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '2' || $st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '4' || $st->status == 'PROSES PEMBELIAN' && $this->session->userdata('lv') == '5') : ?>
+                                                                <td>
+                                                                    <a class="btn btn-block btn-primary btn-sm">
+                                                                        <i class="fas fa-thumbs-up"></i>&nbsp;
+                                                                        PROSES PEMBELIAN
+                                                                    </a>
+                                                                </td>
+                                                            <?php endif; ?>
+                                                            <td><?= format_tgl_lahir($st->tgltr) ?></td>
+                                                            <td><?= $st->nmuser ?></td>
+                                                            <td><?= $st->dep ?></td>
+                                                            <td><?= $st->tjbeli ?></td>
+                                                            <td>
+                                                                <a href="<?= base_url('detailponk/' . $st->kdpo) ?>" class="btn btn-block btn-primary btn-sm"><i class="fas fa-eye"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
                                 <?php elseif ($s->status == 'DONE') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4">BARANG READY</a>
+                                    <a href="#" class="btn btn-success btn-block mt-4">ITEM LIST</a>
                                     <table class="table table-bordered table-striped mb-2 ">
                                         <thead style="background-color: #212529; color:white;">
                                             <tr>
@@ -289,30 +270,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($detreqpic1 as $d) : ?>
-                                                <tr>
-                                                    <td><?= $d->nama_barang ?></td>
-                                                    <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qtykebutuhan ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                    <a href="#" class="btn btn-warning btn-block mt-4">BARANG PENDING</a>
-                                    <table class="table table-bordered table-striped mb-2 ">
-                                        <thead style="background-color: #212529; color:white;">
-                                            <tr>
-                                                <td>Nama Barang</td>
-                                                <td>Deskripsi</td>
-                                                <td>Keterangan</td>
-                                                <td>QTY</td>
-                                                <td>Satuan</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($detreqpic2 as $d) : ?>
+                                            <?php foreach ($datereqpic as $d) : ?>
                                                 <tr>
                                                     <td><?= $d->nama_barang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
@@ -324,7 +282,6 @@
                                         </tbody>
                                     </table>
                                 <?php endif; ?>
-
                             </div>
                         </div>
                         <div class="row mr-2">
@@ -735,10 +692,15 @@
                                     ?>
                                         <?php if ($toty == $tot) : ?>
                                             <?php echo form_open_multipart('accreqpic'); ?>
-                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly>
-                                            <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly>
-                                            <input type="text" id="jmls" name="jmls" style="max-width: 550px;" value="<?= $totn ?>" class="form-control" readonly>
-                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
+                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="nmuser" name="nmuser" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="kduser" name="kduser" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="tjbeli" name="tjbeli" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="jmls" name="jmls" style="max-width: 550px;" value="<?= $toty ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="totn" name="totn" style="max-width: 550px;" value="<?= $totn ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
                                             <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                         <?php else : ?>
                                         <?php endif; ?>
@@ -775,7 +737,7 @@
                                 <div class="col">
                                     <?php echo form_open_multipart('reqpicdone'); ?>
                                     <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                    <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
+                                    <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
                                     <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
                                     <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
                                 </div>

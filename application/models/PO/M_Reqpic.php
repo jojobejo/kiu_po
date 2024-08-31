@@ -318,6 +318,14 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_req = '$kd'
         ");
     }
+    public function getbuystsponks($kd)
+    {
+        return $this->db->query("SELECT
+        COUNT(a.kd_po_req)  as tot
+        FROM tb_po_nk a
+        WHERE a.kd_po_req = '$kd'
+        ");
+    }
     public function getlisttmptr($kd)
     {
         return $this->db->query("SELECT
@@ -475,25 +483,3 @@ class M_Reqpic extends CI_Model
 // WHERE x.kd_po_nk = 'PONK2108240002'
 
 // CREATE VIEW STOCK
-
-// CREATE VIEW v_stockbarangnk AS
-// SELECT
-// x.kode_barang,
-// x.nama_barang,
-// x.deskripsi,
-// COALESCE(x.qty_in,0) AS qty_in,
-// COALESCE(x.qty_out,0) AS qty_out,
-// (COALESCE(x.qty_in,0)-COALESCE(x.qty_out,0)) AS qty_ready
-// FROM
-// (	
-//     SELECT
-//     a.kd_br_adm AS kode_barang,
-//     a.nama_barang AS nama_barang,
-//     a.descnk AS deskripsi,
-//     (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barang = a.kd_br_adm AND d.kd_akun = '11512' GROUP BY d.kd_barang)AS qty_out,
-//     (SELECT SUM(e.tr_qty) FROM tb_transaksi e WHERE e.kd_barang = a.kd_br_adm AND e.kd_akun = '11511' GROUP BY e.kd_barang ) AS qty_in
-//     FROM tb_barang_nk a
-//     JOIN tb_satuan b ON b.id_satuan = a.satuan
-//     JOIN tb_kat_br c ON c.kd_kat = a.kat_barang
-//     GROUP BY a.kd_br_adm
-// ) AS x
