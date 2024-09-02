@@ -222,16 +222,25 @@ class C_Reqpic extends CI_Controller
             $this->load->view('partial/footer');
         }
     }
-    public function confirmreq($kd)
+    public function confirmreq()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $itemconfirm    = $this->M_Reqpic->getitemreq($kd)->result();
-        $kduser         = $this->session->userdata('kode');
+        $idponks    = $this->input->post('idponks');
+        $kd_user    = $this->input->post('kduser');
+        $kdponk     = $this->input->post('kdponk');
+        $kdponks    = $this->input->post('kdponks');
+        $jml        = $this->input->post('jmls');
+        $kd_user    = $this->input->post('kduser');
+        $nm_user    = $this->input->post('nmuser');
+        $departemen = $this->input->post('dep');
+        $tjbeli     = $this->input->post('tjbeli');
         $now            = date('Y-m-d');
+        $itemconfirm    = $this->M_Reqpic->getitemreq($idponks)->result();
 
         if ($itemconfirm) {
             foreach ($itemconfirm as $i) {
-                $dataitm = array(
+
+                $updatedpostmp = array(
                     'kd_akun'           => '11512',
                     'kd_po_nk'          => $i->kd_po_nk,
                     'kd_barang'         => $i->kd_barang,
@@ -241,52 +250,145 @@ class C_Reqpic extends CI_Controller
                     'tr_qty'            => $i->qty,
                     'satuan'            => $i->satuan,
                     'status'            => 'confirm',
-                    'inputer'           => $kduser,
+                    'inputer'           => $kd_user,
                     'create_at'         => $now,
-                    'last_updated_by'   => $kduser
+                    'last_updated_by'   => $kd_user
+                );
+                $detitmreq = array(
+                    'status'    => '1'
                 );
             }
-            $detitmreq = array(
-                'status'    => '1'
-            );
-            $this->M_Reqpic->updatestsitem($kd, $detitmreq);
-            $this->M_Reqpic->insert_tmp_transaksi($dataitm);
+            $this->M_Reqpic->updatestsitem($idponks, $detitmreq);
             redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
         }
     }
-    public function pendingreq($kd)
+    public function pendingreq()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $itemconfirm    = $this->M_Reqpic->getitemreq($kd)->result();
-        $kduser         = $this->session->userdata('kode');
+
+        $idponks        = $this->input->post('idponks');
+        $kdponk         = $this->input->post('kdponk');
+        $kdponks        = $this->input->post('kdponks');
+        $jml            = $this->input->post('jmls');
+        $kd_user        = $this->input->post('kduser');
+        $nm_user        = $this->input->post('nmuser');
+        $departemen     = $this->input->post('dep');
+        $tjbeli         = $this->input->post('tjbeli');
+        $totn           = $this->input->post('totn');
+        $itemconfirm    = $this->M_Reqpic->getitemreq($idponks)->result();
         $now            = date('Y-m-d');
 
-        if ($itemconfirm) {
-            foreach ($itemconfirm as $i) {
-                $dataitm = array(
-                    'kd_akun'           => '11512',
-                    'kd_po_nk'          => $i->kd_po_nk,
-                    'kd_barang'         => $i->kd_barang,
-                    'kd_barangsys'      => $i->kd_bsys,
-                    'keterangan'        => $i->ket,
-                    'kat_barang'        => $i->kat_barang,
-                    'tr_qty'            => $i->qty,
-                    'satuan'            => $i->satuan,
-                    'status'            => 'pending',
-                    'inputer'           => $kduser,
-                    'create_at'         => $now,
-                    'last_updated_by'   => $kduser
-                );
-                $this->M_Reqpic->insert_tmp_transaksi($dataitm);
-                // DELETE DATA DETAIL
-                $detitmreq = array(
-                    'status'    => '3'
-                );
-                $this->M_Reqpic->updatestsitem($kd, $detitmreq);
-                $this->M_Reqpic->deletedetailponk($kd);
+        if ($totn <= '0') {
 
-                redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
+            $newponk = array(
+                'jns_po'            => '2',
+                'kd_po_nk'          => $kdponks,
+                'kd_po_req'         => $kdponk,
+                'nopo'              => '-',
+                'kd_user'           => $kd_user,
+                'nm_user'           => $nm_user,
+                'tgl_transaksi'     => $now,
+                'jml_item'          => $jml,
+                'total_harga'       => '0',
+                'status'            => 'ON PROGRESS - KADEP',
+                'departemen'        => $departemen,
+                'tj_pembelian'      => $tjbeli,
+                'tax'               => '0',
+                'hrg_pajak'         => '0',
+                'hrg_nyata'         => '0',
+                'status_hrg_nyata'  => '0',
+                'acc_with'          => '',
+                'acc_with_kadep'    => ''
+            );
+
+            $detitmreq = array(
+                'status'    => '3'
+            );
+
+            if ($itemconfirm) {
+                foreach ($itemconfirm as $i) {
+                    $updatedpostmp = array(
+                        'kd_akun'           => '11512',
+                        'kd_po_nk'          => $i->kd_po_nk,
+                        'kd_barang'         => $i->kd_barang,
+                        'kd_barangsys'      => $i->kd_bsys,
+                        'keterangan'        => $i->ket,
+                        'kat_barang'        => $i->kat_barang,
+                        'tr_qty'            => $i->qty,
+                        'satuan'            => $i->satuan,
+                        'status'            => 'pending',
+                        'inputer'           => $kd_user,
+                        'create_at'         => $now,
+                        'last_updated_by'   => $kd_user
+                    );
+                    $dataitm = array(
+                        'kd_po_nk'      => $kdponks,
+                        'kd_po_req'     => $kdponk,
+                        'kd_user'       => $kd_user,
+                        'tgl_transaksi' => $now,
+                        'kd_bsys'       => $i->kd_bsys,
+                        'kd_barang'     => $i->kd_barang,
+                        'nama_barang'   => $i->nm_barang,
+                        'deskripsi'     => $i->descnk,
+                        'keterangan'    => $i->ket,
+                        'qty'           => $i->qty,
+                        'hrg_satuan'    => '0',
+                        'hrg_nyata'     => '0',
+                        'total_harga'   => '0',
+                        'total_nyata'   => '0',
+                        'gbr_produk'    => 'Karisma.png',
+                    );
+                    $this->M_Reqpic->insert_tmp_transaksi($updatedpostmp);
+                    $this->M_Reqpic->insertbrponkpending($dataitm);
+                }
             }
+            $this->M_Reqpic->insertpobaru($newponk);
+            $this->M_Reqpic->updatestsitem($idponks, $detitmreq);
+            redirect('reqpic/detreqbarangpic/' . $kdponk);
+        } else {
+            if ($itemconfirm) {
+                foreach ($itemconfirm as $i) {
+                    $updatedpostmp = array(
+                        'kd_akun'           => '11512',
+                        'kd_po_nk'          => $i->kd_po_nk,
+                        'kd_barang'         => $i->kd_barang,
+                        'kd_barangsys'      => $i->kd_bsys,
+                        'keterangan'        => $i->ket,
+                        'kat_barang'        => $i->kat_barang,
+                        'tr_qty'            => $i->qty,
+                        'satuan'            => $i->satuan,
+                        'status'            => 'pending',
+                        'inputer'           => $kd_user,
+                        'create_at'         => $now,
+                        'last_updated_by'   => $kd_user
+                    );
+                    $dataitm = array(
+                        'kd_po_nk'      => $kdponks,
+                        'kd_po_req'     => $kdponk,
+                        'kd_user'       => $kd_user,
+                        'tgl_transaksi' => $now,
+                        'kd_bsys'       => $i->kd_bsys,
+                        'kd_barang'     => $i->kd_barang,
+                        'nama_barang'   => $i->nm_barang,
+                        'deskripsi'     => $i->descnk,
+                        'keterangan'    => $i->ket,
+                        'qty'           => $i->qty,
+                        'hrg_satuan'    => '0',
+                        'hrg_nyata'     => '0',
+                        'total_harga'   => '0',
+                        'total_nyata'   => '0',
+                        'gbr_produk'    => 'Karisma.png',
+                    );
+                    $this->M_Reqpic->insert_tmp_transaksi($updatedpostmp);
+                    $this->M_Reqpic->insertbrponkpending($dataitm);
+                }
+            }
+            $detitmreq = array(
+                'status'    => '3'
+            );
+            
+            $this->M_Reqpic->updatestsitem($idponks, $detitmreq);
+            redirect('reqpic/detreqbarangpic/' . $kdponk);
         }
     }
     public function accreqpic()

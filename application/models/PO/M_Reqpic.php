@@ -281,6 +281,8 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT 
         a.kd_po_nk as kd_po_nk,
         a.kd_barang as kd_barang,
+        a.nama_barang AS nm_barang,
+        a.deskripsi AS descnk,
         a.kd_bsys as kd_bsys,
         a.keterangan as ket,
         b.kat_barang as kat_barang,
@@ -296,9 +298,22 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_po_nk');
     }
+    public function insertpobaru($dt)
+    {
+        $this->db->insert('tb_po_nk', $dt);
+    }
+    public function deletedetailporeq($id)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->delete('tb_detail_req');
+    }
     public function insert_tmp_transaksi($data)
     {
         $this->db->insert('tb_transaksi_tmp', $data);
+    }
+    public function insertbrponkpending($data)
+    {
+        $this->db->insert('tb_detail_po_nk', $data);
     }
     public function insert_transaksi($data)
     {

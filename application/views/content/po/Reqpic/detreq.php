@@ -671,7 +671,24 @@
                                                                     <a href="<?= base_url('confirmreq/') . $d->id ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                                 </div>
                                                                 <div class="col">
-                                                                    <a href="<?= base_url('pendingreq/') . $d->id ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></a>
+                                                                    <?php echo form_open_multipart('pendingreq'); ?>
+                                                                    <input type="text" id="idponks" name="idponks" style="max-width: 550px;" value="<?= $d->id ?>" class="form-control" readonly>
+                                                                    <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly>
+                                                                    <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly>
+                                                                    <input type="text" id="nmuser" name="nmuser" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
+                                                                    <input type="text" id="kduser" name="kduser" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly>
+                                                                    <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
+                                                                    <input type="text" id="tjbeli" name="tjbeli" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly>
+                                                                    <?php foreach ($countitm as $c) :
+                                                                        $tot    = $c->total;
+                                                                        $toty   = $c->tot_yes + $c->tot_no;
+                                                                        $totn   = $c->tot_no;
+                                                                    ?>
+                                                                        <input type="text" id="jmls" name="jmls" style="max-width: 550px;" value="<?= $toty ?>" class="form-control" readonly>
+                                                                        <input type="text" id="totn" name="totn" style="max-width: 550px;" value="<?= $totn ?>" class="form-control" readonly>
+                                                                    <?php endforeach; ?>
+                                                                    <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
+                                                                    <button type="submit" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></button>
                                                                 </div>
                                                             </div>
                                                         </td>
