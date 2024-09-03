@@ -137,6 +137,7 @@ $route['deletedtmpnkreq'] = 'purchaseorder/C_Reqpic/deletedtmpnkreq';
 $route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
 $route['confirmreq'] = 'purchaseorder/C_Reqpic/confirmreq';
 $route['pendingreq'] = 'purchaseorder/C_Reqpic/pendingreq';
+$route['pendingreq1'] = 'purchaseorder/C_Reqpic/pendingreq1';
 $route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed'] = 'purchaseorder/C_Reqpic/reqpicconfirmed';
 $route['reqpicdone'] = 'purchaseorder/C_Reqpic/reqpicdone';

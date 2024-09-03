@@ -293,6 +293,7 @@ class M_Reqpic extends CI_Model
         WHERE a.id_det_po_nk = '$id'
             ");
     }
+
     public function deletedetailponk($id)
     {
         $this->db->where('id_det_po_nk', $id);
@@ -328,7 +329,8 @@ class M_Reqpic extends CI_Model
         a.nm_user AS nmuser,
         a.departemen AS dep,
         a.tj_pembelian AS tjbeli,
-        a.kd_po_nk AS kdpo
+        a.kd_po_nk AS kdpo,
+        a.kd_po_req as kdporeq
         FROM tb_po_nk a
         WHERE a.kd_po_req = '$kd'
         ");
@@ -386,6 +388,10 @@ class M_Reqpic extends CI_Model
     function input_tr($data)
     {
         $this->db->insert('tb_transaksi', $data);
+    }
+    function inpt_tr_tmp($data)
+    {
+        $this->db->insert('tb_transaksi_tmp', $data);
     }
     public function deletedtmpnkreqkd($id)
     {

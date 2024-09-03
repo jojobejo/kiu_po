@@ -1006,8 +1006,7 @@ class C_PoStatus extends CI_Controller
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
-
-        $now = date('Y-m-d H:i:s');
+        $now = date('Y-m-d');
 
         if ($tmp) {
             foreach ($tmp as $t) {
@@ -1034,7 +1033,6 @@ class C_PoStatus extends CI_Controller
                 'note_for'  => '1',
                 'update_status' => '1'
             );
-
             $noteupdateuser = array(
                 'status'    => 'DONE'
             );
