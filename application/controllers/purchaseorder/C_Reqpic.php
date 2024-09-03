@@ -258,19 +258,44 @@ class C_Reqpic extends CI_Controller
             redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
         }
     }
+    public function actpending($id)
+    {
+        $itempnd    = $this->M_Reqpic->getitemreq($id)->result();
+
+
+        // if ($itempnd) {
+        //     foreach ($itempnd as $i) {
+        //         $updatedpostmp = array(
+        //             'kd_akun'           => '11512',
+        //             'kd_po_nk'          => $i->kd_po_nk,
+        //             'kd_barang'         => $i->kd_barang,
+        //             'kd_barangsys'      => $i->kd_bsys,
+        //             'kat_barang'        => $i->kat_barang,
+        //             'tr_qty'            => $i->qty,
+        //             'satuan'            => $i->satuan,
+        //             'status'            => 'pending',
+        //             'keterangan'        => $i->ket,
+        //             'inputer'           => $kd_user,
+        //             'create_at'         => $now,
+        //             'last_updated_by'   => $kd_user
+        //         );
+        //     }
+        // }
+    }
+
     public function pendingreq()
     {
         date_default_timezone_set("Asia/Jakarta");
 
-        $idponks        = $this->input->post('idponks');
-        $kdponk         = $this->input->post('kdponk');
-        $kdponks        = $this->input->post('kdponks');
-        $jml            = $this->input->post('jmls');
-        $kd_user        = $this->input->post('kduser');
-        $nm_user        = $this->input->post('nmuser');
-        $departemen     = $this->input->post('dep');
-        $tjbeli         = $this->input->post('tjbeli');
-        $totn           = $this->input->post('totn');
+        $idponks        = $this->input->post('pndidponks');
+        $kdponk         = $this->input->post('pndkdponk');
+        $kdponks        = $this->input->post('pndkdponks');
+        $jml            = $this->input->post('pndjmls');
+        $kd_user        = $this->input->post('pndkduser');
+        $nm_user        = $this->input->post('pndnmuser');
+        $departemen     = $this->input->post('pnddep');
+        $tjbeli         = $this->input->post('pndtjbeli');
+        $totn           = $this->input->post('pndtotn');
         $itemconfirm    = $this->M_Reqpic->getitemreq($idponks)->result();
         $now            = date('Y-m-d');
 
@@ -304,11 +329,11 @@ class C_Reqpic extends CI_Controller
                         'kd_po_nk'          => $i->kd_po_nk,
                         'kd_barang'         => $i->kd_barang,
                         'kd_barangsys'      => $i->kd_bsys,
-                        'keterangan'        => $i->ket,
                         'kat_barang'        => $i->kat_barang,
                         'tr_qty'            => $i->qty,
                         'satuan'            => $i->satuan,
                         'status'            => 'pending',
+                        'keterangan'        => $i->ket,
                         'inputer'           => $kd_user,
                         'create_at'         => $now,
                         'last_updated_by'   => $kd_user

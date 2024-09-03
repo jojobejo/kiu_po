@@ -591,45 +591,20 @@
                                                 <?php else : ?>
                                                     <td><a href="" class="btn btn-success btn-block"></a></td>
                                                 <?php endif; ?>
-                                                <td>
-                                                    <?php if ($d->sts == '0') : ?>
+                                                <?php if ($d->sts == '0') : ?>
+                                                    <td>
                                                         <div class="row">
                                                             <div class="col">
-                                                                <?php echo form_open_multipart('confirmreq'); ?>
-                                                                <input type="text" id="idponkss" name="idponkss" style="max-width: 550px;" value="<?= $d->id ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="nmuser" name="nmuser" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kduserss" name="kduserss" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="tjbeli" name="tjbeli" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                                                <button type="submit" class="btn btn-block btn-success btn-sm"><i class="fas fa-check "></i></button>
+                                                                <a href="#" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                             </div>
                                                             <div class="col">
-                                                                <?php echo form_open_multipart('pendingreq'); ?>
-                                                                <input type="text" id="idponks" name="idponks" style="max-width: 550px;" value="<?= $d->id ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="nmuser" name="nmuser" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="kduser" name="kduser" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="tjbeli" name="tjbeli" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
-                                                                <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                                                <?php foreach ($countitm as $c) :
-                                                                    $tot    = $c->total;
-                                                                    $toty   = $c->tot_yes + $c->tot_no;
-                                                                    $totn   = $c->tot_no;
-                                                                ?>
-                                                                    <input type="text" id="jmls" name="jmls" style="max-width: 550px;" value="<?= $toty ?>" class="form-control" readonly hidden>
-                                                                    <input type="text" id="totn" name="totn" style="max-width: 550px;" value="<?= $totn ?>" class="form-control" readonly hidden>
-                                                                <?php endforeach; ?>
-                                                                <button type="submit" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times "></i></button>
+                                                                <a href="<?= base_url('actpending/' . $d->id) ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times"></i></a>
                                                             </div>
                                                         </div>
-                                                    <?php else : ?>
-                                                <td><a href="#" class="btn btn-block btn-info btn-sm"><i class="fas fa-clipboard-check "></i></a></td>
-                                            <?php endif; ?>
+                                                    </td>
+                                                <?php else : ?>
+                                                    <td><a href="#" class="btn btn-block btn-info btn-sm"><i class="fas fa-clipboard-check "></i></a></td>
+                                                <?php endif; ?>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

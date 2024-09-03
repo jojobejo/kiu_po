@@ -167,6 +167,7 @@ class M_Reqpic extends CI_Model
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
             ) AS x 
             WHERE x.kd_po_nk = '$kd'
+            ORDER BY x.id_det_po_nk
         ");
     }
     public function getreqwhere($kd, $sts)
