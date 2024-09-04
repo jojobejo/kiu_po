@@ -258,29 +258,70 @@ class C_Reqpic extends CI_Controller
             redirect('reqpic/detreqbarangpic/' . $i->kd_po_nk);
         }
     }
-    public function actpending($id)
+    public function actconfirm($id)
     {
+        date_default_timezone_set("Asia/Jakarta");
+        $itempnd        = $this->M_Reqpic->getitemreq($id)->result();
+        $now            = date('Y-m-d h:m:s');
+        $now1           = date('Y-m-d');
+
+        if ($itempnd) {
+            foreach ($itempnd as $i) {
+                $updatedpostmp = array(
+                    'kd_akun'           => '11512',
+                    'kd_po_nk'          => $i->kd_po_nk,
+                    'kd_barang'         => $i->kd_barang,
+                    'kd_barangsys'      => $i->kd_bsys,
+                    'keterangan'        => $i->ket,
+                    'kat_barang'        => $i->kat_barang,
+                    'tr_qty'            => $i->qty,
+                    'satuan'            => $i->satuan,
+                    'inputer'           => $this->session->userdata('kode'),
+                    'tgl_transaksi'     => $now1,
+                    'create_at'         => $now,
+                    'last_updated_by'   => $this->session->userdata('kode')
+                );
+                $updtstatus = array(
+                    'status'    => '1'
+                );
+                $kode_po    = $i->kd_po_nk;
+                $this->M_Reqpic->insert_transaksi($updatedpostmp);
+                $this->M_Reqpic->updatedetreqitm($id, $updtstatus);
+                redirect('reqpic/detreqbarangpic/' . $kode_po);
+            }
+        }
+    }
+    public function actpending($id, $kd)
+    {
+        date_default_timezone_set("Asia/Jakarta");
         $itempnd    = $this->M_Reqpic->getitemreq($id)->result();
+        $now            = date('Y-m-d h:m:s');
 
+        if ($itempnd) {
+            foreach ($itempnd as $i) {
+                $updatedpostmp = array(
+                    'kd_akun'           => '11512',
+                    'kd_po_nk'          => $i->kd_po_nk,
+                    'kd_barang'         => $i->kd_barang,
+                    'kd_barangsys'      => $i->kd_bsys,
+                    'kat_barang'        => $i->kat_barang,
+                    'tr_qty'            => $i->qty,
+                    'satuan'            => $i->satuan,
+                    'status'            => 'pending',
+                    'keterangan'        => $i->ket,
+                    'inputer'           => $this->session->userdata('kode'),
+                    'create_at'         => $now,
+                    'last_updated_by'   => $this->session->userdata('kode')
+                );
+                $updtstatus = array(
+                    'status'    => '3'
+                );
 
-        // if ($itempnd) {
-        //     foreach ($itempnd as $i) {
-        //         $updatedpostmp = array(
-        //             'kd_akun'           => '11512',
-        //             'kd_po_nk'          => $i->kd_po_nk,
-        //             'kd_barang'         => $i->kd_barang,
-        //             'kd_barangsys'      => $i->kd_bsys,
-        //             'kat_barang'        => $i->kat_barang,
-        //             'tr_qty'            => $i->qty,
-        //             'satuan'            => $i->satuan,
-        //             'status'            => 'pending',
-        //             'keterangan'        => $i->ket,
-        //             'inputer'           => $kd_user,
-        //             'create_at'         => $now,
-        //             'last_updated_by'   => $kd_user
-        //         );
-        //     }
-        // }
+                $this->M_Reqpic->insert_tmp_transaksi($updatedpostmp);
+                $this->M_Reqpic->updatedetreqitm($id, $updtstatus);
+                redirect('reqpic/detreqbarangpic/' . $kd);
+            }
+        }
     }
 
     public function pendingreq()
@@ -538,6 +579,21 @@ class C_Reqpic extends CI_Controller
             $this->M_Reqpic->updatestsitem($idponks, $detitmreq);
             redirect('reqpic/detreqbarangpic/' . $kdponk);
         }
+    }
+    public function acc_req_admin($kd)
+    {
+        $trtmp  = $this->M_Reqpic->getlisttmptr($kd)->result();
+        $now    = date('Y-m-d h:m:s');
+        $now1   = date('Y-m-d');
+
+        if($trtmp){
+            foreach($trtmp as $t) {
+                $dt_po_nk   = array(
+                    
+                );
+            }
+        }
+
     }
     public function accreqpic()
     {

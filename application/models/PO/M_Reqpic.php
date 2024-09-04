@@ -274,12 +274,12 @@ class M_Reqpic extends CI_Model
     public function deletedet($id, $sts)
     {
         $this->db->where('id_tmp_nk', $id);
-        $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_detail_req');
     }
     public function getitemreq($id)
     {
         return $this->db->query("SELECT 
+        a.id_det_po_nk AS id,
         a.kd_po_nk as kd_po_nk,
         a.kd_barang as kd_barang,
         a.nama_barang AS nm_barang,
@@ -288,9 +288,13 @@ class M_Reqpic extends CI_Model
         a.keterangan as ket,
         b.kat_barang as kat_barang,
         a.qty as qty,
-        b.satuan as satuan
+        b.satuan as satuan,
+        c.kode_user AS kduser,
+        c.nama_user AS nmuser,
+        c.departement AS dep
         FROM tb_detail_req a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        JOIN tb_user c ON c.kode_user = a.kd_user
         WHERE a.id_det_po_nk = '$id'
             ");
     }
@@ -375,6 +379,12 @@ class M_Reqpic extends CI_Model
     function updatedetreqitm($kd, $data)
     {
         $this->db->where('id_det_po_nk', $kd);
+        return $this->db->update('tb_detail_req', $data);
+    }
+    function updatereqnk_sts($kd, $sts, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('status', $sts);
         return $this->db->update('tb_detail_req', $data);
     }
     function updatereqnk($kd, $data)
@@ -472,6 +482,34 @@ class M_Reqpic extends CI_Model
         $kdnk1 = 'NPONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+    function kdnewbuy()
+    {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd1 = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd1 = "0001";
+        }
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'NPONK' . date('dmy') . $kd1;
+        return $kdnk1;
+    }
+    // function viewtot($kd)
+    // {
+    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totdetail FROM tb_detail_req b WHERE b.kd_po_nk = '$kd'");
+    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totalbrtmp FROM tb_detail_req b WHERE b.kd_po_nk = '$kd'");
+    //     $q2     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tb_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'confirm'");
+    //     $q3     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tb_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'pending'");
+
+    //     if ($q->num_rows() > 0) {
+    //         foreach ($q1->result() as $x1) {
+    //         }
+    //     }
+    // }
 }
 
 

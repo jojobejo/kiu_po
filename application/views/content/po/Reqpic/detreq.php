@@ -577,7 +577,7 @@
                                     </thead>
                                     <tbody>
                                         <?php foreach ($detreq as $d) :
-                                            $tot = ($d->qty_ready) - ($d->qty_req);
+                                            $tot    = ($d->qty_ready) - ($d->qty_req);
                                         ?>
                                             <tr>
                                                 <td><?= $d->nama_barang ?></td>
@@ -595,10 +595,10 @@
                                                     <td>
                                                         <div class="row">
                                                             <div class="col">
-                                                                <a href="#" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
+                                                                <a href="<?= base_url('actconfirm/' . $d->id) ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                             </div>
                                                             <div class="col">
-                                                                <a href="<?= base_url('actpending/' . $d->id) ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times"></i></a>
+                                                                <a href="<?= base_url('actpending/' . $d->id . '/' . $d->kode_po) ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times"></i></a>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -609,6 +609,16 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                <?php foreach ($countitm as $c) :
+                                    $tot    = $c->total;
+                                    $toty   = $c->tot_yes + $c->tot_no;
+                                    $totacc = $c->tot_yes;
+                                    $totpnd = $c->tot_no;
+                                ?>
+                                    <?php if ($toty == $tot) : ?>
+                                        <a href="<?= base_url('acc_req_admin/' . $s->kd_po_nk) ?>" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;CONFIRM REQUEST</a>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
 
                                 <!-- END ON PROGRESS -->
 

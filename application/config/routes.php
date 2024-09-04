@@ -126,6 +126,8 @@ $route['edit_note_pembelian_tmp'] = 'purchaseorder/C_Order/edit_note_pembelian_t
 $route['hapus_note_pembelian_tmp/(:any)'] = 'purchaseorder/C_Order/hapus_note_pembelian_tmp/$1';
 $route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/addtmpponk';
 
+// TESTING
+$route['testing']  = 'settings/C_Testing/';
 // PO REQUEST BY PIC
 $route['reqpic'] = 'purchaseorder/C_Reqpic';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
@@ -137,7 +139,9 @@ $route['deletedtmpnkreq'] = 'purchaseorder/C_Reqpic/deletedtmpnkreq';
 $route['reqpic/detreqbarangpic/(:any)'] = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
 $route['confirmreq'] = 'purchaseorder/C_Reqpic/confirmreq';
 $route['pendingreq'] = 'purchaseorder/C_Reqpic/pendingreq';
-$route['actpending/(:any)'] = 'purchaseorder/C_Reqpic/actpending/$1';
+$route['actpending/(:any)/(:any)'] = 'purchaseorder/C_Reqpic/actpending/$1/$2';
+$route['actconfirm/(:any)'] = 'purchaseorder/C_Reqpic/actconfirm/$1/';
+$route['acc_req_admin/(:any)'] = 'purchaseorder/C_Reqpic/acc_req_admin/$1';
 $route['pendingreq1'] = 'purchaseorder/C_Reqpic/pendingreq1';
 $route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed'] = 'purchaseorder/C_Reqpic/reqpicconfirmed';
