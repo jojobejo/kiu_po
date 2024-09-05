@@ -310,6 +310,11 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_po_nk');
     }
+    public function updatestsponk($id, $data)
+    {
+        $this->db->where('kd_po_nk', $id);
+        return $this->db->update('tb_po_nk', $data);
+    }
     public function insertpobaru($dt)
     {
         $this->db->insert('tb_po_nk', $dt);

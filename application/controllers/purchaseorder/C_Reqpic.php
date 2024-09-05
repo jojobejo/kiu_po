@@ -843,6 +843,11 @@ class C_Reqpic extends CI_Controller
         );
         $this->M_Reqpic->updatereqnk($kdporeq, $updatests);
 
+        $updatepobeli = array(
+            'status'    => 'DONE'
+        );
+        $this->M_Reqpic->updatestsponk($kdponk, $updatepobeli);
+
         $addnoteuser = array(
             'kd_po'         => $kdponk,
             'isi_note'      => 'BARANG DI TERIMA - ADMIN',
@@ -881,8 +886,6 @@ class C_Reqpic extends CI_Controller
                 redirect('reqpic/detreqbarangpic/' . $kdporeq);
             }
         }
-        $this->M_Reqpic->inputtransaksi($databelink);
-        redirect('reqpic/detreqbarangpic/' . $kdporeq);
     }
 
     public function reqpicdone()
