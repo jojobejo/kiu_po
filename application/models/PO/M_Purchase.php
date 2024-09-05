@@ -214,7 +214,7 @@ class M_Purchase extends CI_Model
     }
     function getkdnoponk()
     {
-        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po_nk,4)) AS kd_max FROM tb_detail_po_nk WHERE DATE(create_at)=CURDATE()");
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po_nk,4)) AS kd_max FROM tb_po_nk WHERE DATE(create_at)=CURDATE()");
         $kd = "";
         if ($cd->num_rows() > 0) {
             foreach ($cd->result() as $k) {

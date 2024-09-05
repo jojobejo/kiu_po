@@ -276,6 +276,12 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_detail_req');
     }
+    public function deletedetailporeqkdall($kd, $sts)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('status', $sts);
+        return $this->db->delete('tb_detail_req');
+    }
     public function getitemreq($id)
     {
         return $this->db->query("SELECT 
@@ -340,6 +346,14 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_req = '$kd'
         ");
     }
+    public function getitmponk($kd)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_detail_po_nk a
+        WHERE a.kd_po_nk = '$kd'
+        ");
+    }
     public function getbuystsponks($kd)
     {
         return $this->db->query("SELECT
@@ -384,7 +398,6 @@ class M_Reqpic extends CI_Model
     function updatereqnk_sts($kd, $sts, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        $this->db->where('status', $sts);
         return $this->db->update('tb_detail_req', $data);
     }
     function updatereqnk($kd, $data)

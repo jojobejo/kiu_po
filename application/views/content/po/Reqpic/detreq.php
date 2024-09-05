@@ -548,12 +548,13 @@
                                     <?php if ($st->status == 'PROSES PEMBELIAN') : ?>
                                         <?php echo form_open_multipart('reqpicconfirmed'); ?>
                                         <?php $now = date("Y-m-d"); ?>
-                                        <input type="text" id="kdporeq" name="kdporeq" style="max-width: 550px;" value="<?= $st->kdporeq ?>" class="form-control" readonly>
-                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly>
+                                        <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly>
+                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly>
                                         <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly>
                                         <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
                                         <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly>
                                         <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
+                                        <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly>
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                     <?php else : ?>
                                     <?php endif; ?>
@@ -616,7 +617,17 @@
                                     $totpnd = $c->tot_no;
                                 ?>
                                     <?php if ($toty == $tot) : ?>
-                                        <a href="<?= base_url('acc_req_admin/' . $s->kd_po_nk) ?>" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;CONFIRM REQUEST</a>
+                                        <?php echo form_open_multipart('acc_req_admin'); ?>
+                                        <?php $now = date("Y-m-d"); ?>
+                                        <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly>
+                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly>
+                                        <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly>
+                                        <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly>
+                                        <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly>
+                                        <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
+                                        <input type="number" id="jml" name="jml" style="max-width: 550px;" value="<?= $totpnd ?>" class="form-control" readonly>
+                                        <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly>
+                                        <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
 
