@@ -72,6 +72,7 @@ class C_Reqpic extends CI_Controller
         $kdbarang   = $this->input->post('kdbr');
         $kdsys      = $this->input->post('kdbys');
         $katbarang  = $this->input->post('katbr');
+        $idsat  = $this->input->post('idsat');
 
         $inputtmp = array(
             'jnis_po'       => '1',
@@ -79,6 +80,7 @@ class C_Reqpic extends CI_Controller
             'deskripsi'     => $desc,
             'keterangan'    => $ket,
             'qty'           => $qty,
+            'satuan'        => $idsat,
             'hrg_satuan'    => '0',
             'total_harga'   => '0',
             'kd_bsys'       => $kdsys,
@@ -165,6 +167,7 @@ class C_Reqpic extends CI_Controller
                     'deskripsi'         => $t->deskripsi,
                     'keterangan'        => $t->keterangan,
                     'qty'               => $t->qty,
+                    'satuan'            => $t->satuan,
                     'status'            => '0'
                 );
                 $this->M_Reqpic->input_detail_po_nk($listdetreq);

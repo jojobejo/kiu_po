@@ -21,7 +21,8 @@ class M_Reqpic extends CI_Model
         a.gbr_barang,
         a.id_brg_nk,
         a.kat_barang,
-        a.qty_ready
+        a.qty_ready,
+        a.id_satuan
         FROM v_stockbarangnk a
         JOIN tb_satuan b ON b.id_satuan = a.id_satuan
     ");

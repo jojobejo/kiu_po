@@ -594,10 +594,16 @@
                                                 <td><?= $d->qty_req ?></td>
                                                 <td><?= $tot ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
-                                                <?php if ($tot <= '0') : ?>
-                                                    <td><a href="" class="btn btn-danger btn-block"></a></td>
+                                                <?php if ($d->sts != '0') : ?>
+                                                    <td><a href="" class="btn btn-info btn-block"></a></td>
                                                 <?php else : ?>
-                                                    <td><a href="" class="btn btn-success btn-block"></a></td>
+                                                    <?php if ($tot == '0' && $d->sts == '0') : ?>
+                                                        <td><a href="" class="btn btn-success btn-block"></a></td>
+                                                    <?php elseif ($tot < '0' && $d->sts == '0') : ?>
+                                                        <td><a href="" class="btn btn-danger btn-block"></a></td>
+                                                    <?php elseif ($tot > '0' && $d->sts == '0') : ?>
+                                                        <td><a href="" class="btn btn-success btn-block"></a></td>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
                                                 <?php if ($d->sts == '0') : ?>
                                                     <td>
