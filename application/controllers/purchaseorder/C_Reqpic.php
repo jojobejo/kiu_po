@@ -168,6 +168,7 @@ class C_Reqpic extends CI_Controller
                     'keterangan'        => $t->keterangan,
                     'qty'               => $t->qty,
                     'satuan'            => $t->satuan,
+                    'kat_barang'        => $t->kat_barang,
                     'status'            => '0'
                 );
                 $this->M_Reqpic->input_detail_po_nk($listdetreq);
@@ -219,6 +220,7 @@ class C_Reqpic extends CI_Controller
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
+            $data['gettr']      = $this->M_Reqpic->gettr($kdpo)->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -834,11 +836,9 @@ class C_Reqpic extends CI_Controller
         $nmadmin    = $this->session->userdata('nama_user');
         $kdporeq    = $this->input->post('kdreqpo');
         $kdponk     = $this->input->post('kdponk');
-        $tgl        = $this->input->post('tgl');
-        $pic        = $this->input->post('pic');
-        $kdpic      = $this->input->post('kdpic');
-        $dep        = $this->input->post('dep');
-        $tmp        = $this->M_Reqpic->getitmponk($kdponk);
+        $now        = date('Y-m-d h:m:s');
+        $now1       = date('Y-m-d');
+        $tmp        = $this->M_Reqpic->getdatapobaru($kdponk)->result();
 
         $updatests  = array(
             'status'    => 'BARANG TERSEDIA',
@@ -874,20 +874,21 @@ class C_Reqpic extends CI_Controller
             foreach ($tmp as $t) {
                 $databelink = array(
                     'kd_akun'           => '11512',
-                    'kd_po_nk'          => $t->kd_po_req,
-                    'kd_barang'         => $t->kd_barang,
-                    'kd_barangsys'      => $t->kd_bsys,
-                    'keterangan'        => $t->keterangan,
-                    'kat_barang'        => $t->kat_barang,
-                    'tr_qty'            => $t->qty,
+                    'kd_po_nk'          => $t->kdporeq,
+                    'kd_barang'         => $t->kdbr,
+                    'kd_barangsys'      => $t->kdbsys,
+                    'keterangan'        => $t->ket,
+                    'kat_barang'        => $t->kat,
+                    'tr_qty'            => $t->trqty,
                     'satuan'            => $t->satuan,
-                    'inputer'           => $t->kd_user,
-                    'create_at'         => $tgl,
+                    'tgl_transaksi'     => $now1,
+                    'inputer'           => $this->session->userdata('kode'),
+                    'create_at'         => $now,
                     'last_updated_by'   => $this->session->userdata('kode')
                 );
                 $this->M_Reqpic->input_tr($databelink);
-                redirect('reqpic/detreqbarangpic/' . $kdporeq);
             }
+            redirect('reqpic/detreqbarangpic/' . $kdporeq);
         }
     }
 

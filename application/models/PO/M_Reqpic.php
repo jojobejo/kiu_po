@@ -219,7 +219,22 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->get('tb_req_nk')->result();
     }
-
+    public function gettr($kd)
+    {
+        return $this->db->query("SELECT
+        a.id_transnk,
+        a.kd_po_nk,
+        b.nama_barang,
+        b.descnk,
+        a.keterangan,
+        a.tr_qty,
+        c.nm_satuan
+        FROM tb_transaksi a 
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+        JOIN tb_satuan c ON c.id_satuan = a.satuan
+        WHERE a.kd_po_nk = '$kd'
+    ");
+    }
     public function countjmltmpbr($kd)
     {
         $this->db->select('id_tmp_nk');
@@ -366,6 +381,22 @@ class M_Reqpic extends CI_Model
         COUNT(a.kd_po_req)  as tot
         FROM tb_po_nk a
         WHERE a.kd_po_req = '$kd'
+        ");
+    }
+    public function getdatapobaru($kd)
+    {
+        return $this->db->query("SELECT 
+        a.kd_po_req AS kdporeq,
+        a.kd_barang AS kdbr,
+        a.kd_bsys AS kdbsys,
+        a.keterangan AS ket,
+        a.kat_barang AS kat,
+        a.qty AS trqty,
+        a.satuan AS satuan,
+        a.kd_user AS kduser
+        FROM tb_detail_po_nk a
+        WHERE a.kd_po_nk = '$kd'
+        GROUP BY a.kd_barang
         ");
     }
     public function getlisttmptr($kd)

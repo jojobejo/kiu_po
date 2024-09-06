@@ -556,7 +556,7 @@
                                         <?php echo form_open_multipart('reqpicconfirmed'); ?>
                                         <?php $now = date("Y-m-d"); ?>
                                         <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
                                         <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
                                         <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
                                         <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
@@ -592,7 +592,7 @@
                                                 <td><?= $d->deskripsi ?></td>
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->qty_req ?></td>
-                                                <td><?= $tot ?></td>
+                                                <td><?= $d->qty_ready ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
                                                 <?php if ($d->sts != '0') : ?>
                                                     <td><a href="" class="btn btn-info btn-block"></a></td>
@@ -660,12 +660,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq as $d) : ?>
+                                        <?php foreach ($gettr as $d) : ?>
                                             <tr>
                                                 <td><?= $d->nama_barang ?></td>
-                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->descnk ?></td>
                                                 <td><?= $d->keterangan ?></td>
-                                                <td style="text-align: center;"><?= $d->qty_req ?></td>
+                                                <td style="text-align: center;"><?= $d->tr_qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nm_satuan ?></td>
                                             </tr>
                                         <?php endforeach; ?>
