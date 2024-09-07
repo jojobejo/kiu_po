@@ -133,6 +133,21 @@ class M_Reqpic extends CI_Model
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
         ");
     }
+    public function getitmlistpicreq($kd)
+    {
+        return $this->db->query("SELECT
+            b.nama_barang AS nmbarang,
+            b.descnk AS deskripsi,
+            a.keterangan AS ket,
+            a.tr_qty AS qty,
+            c.nm_satuan AS nmsatuan
+            FROM tb_transaksi a
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
+            JOIN tb_satuan c ON c.id_satuan = a.satuan 
+            WHERE a.kd_po_nk = '$kd'
+            GROUP BY a.kd_barangsys
+        ");
+    }
     public function getreqwheres($kd)
     {
         return $this->db->query("SELECT
@@ -233,6 +248,7 @@ class M_Reqpic extends CI_Model
         JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
         JOIN tb_satuan c ON c.id_satuan = a.satuan
         WHERE a.kd_po_nk = '$kd'
+        GROUP BY a.kd_barangsys
     ");
     }
     public function countjmltmpbr($kd)

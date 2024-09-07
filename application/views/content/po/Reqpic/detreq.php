@@ -57,7 +57,7 @@
                                         </tbody>
                                     </table>
                                 <?php elseif ($s->status == 'BARANG TERSEDIA') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">item list</b></a>
+                                    <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">item list barang request</b></a>
                                     <table class="table table-bordered table-striped mb-2">
                                         <thead style="background-color: #212529; color:white;">
                                             <tr>
@@ -69,13 +69,13 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($datereqpic as $d) : ?>
+                                            <?php foreach ($getitmlistpicreq as $d) : ?>
                                                 <tr>
-                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->nmbarang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td style="text-align: center;"><?= $d->qtykebutuhan ?></td>
-                                                    <td style="text-align: center;"><?= $d->nm_satuan ?></td>
+                                                    <td><?= $d->ket ?></td>
+                                                    <td style="text-align: center;"><?= $d->qty ?></td>
+                                                    <td style="text-align: center;"><?= $d->nmsatuan ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -265,25 +265,25 @@
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php elseif ($s->status == 'DONE') : ?>
-                                    <a href="#" class="btn btn-success btn-block mt-4">ITEM LIST</a>
-                                    <table class="table table-bordered table-striped mb-2 ">
+                                    <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">REQUEST DONE</b></a>
+                                    <table class="table table-bordered table-striped mb-2">
                                         <thead style="background-color: #212529; color:white;">
                                             <tr>
                                                 <td>Nama Barang</td>
                                                 <td>Deskripsi</td>
-                                                <td>Keterangan</td>
-                                                <td>QTY</td>
-                                                <td>Satuan</td>
+                                                <td style="width:20%;">Keterangan</td>
+                                                <td style="width:10%;text-align: center;">QTY</td>
+                                                <td style="width:10%;text-align: center;">Satuan</td>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($datereqpic as $d) : ?>
+                                            <?php foreach ($getitmlistpicreq as $d) : ?>
                                                 <tr>
-                                                    <td><?= $d->nama_barang ?></td>
+                                                    <td><?= $d->nmbarang ?></td>
                                                     <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qtykebutuhan ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
+                                                    <td><?= $d->ket ?></td>
+                                                    <td style="text-align: center;"><?= $d->qty ?></td>
+                                                    <td style="text-align: center;"><?= $d->nmsatuan ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -526,7 +526,6 @@
                                             <td style="width:30%">Keterangan</td>
                                             <td style="width:10%">Satuan</td>
                                             <td style="width:10%">QTY</td>
-                                            <td style="width:10%">Stock Ready</td>
                                             <td style="width:10%">#</td>
                                         </tr>
                                     </thead>
@@ -540,13 +539,7 @@
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
                                                 <td><?= $d->qty_req ?></td>
-                                                <?php if ($stkready < '0') :  ?>
-                                                    <td><?= $d->qty_ready ?></td>
-                                                    <td><a href="#" class="btn btn-block btn-danger btn-md"><i class="fas fa-times-circle"></i></a></td>
-                                                <?php else : ?>
-                                                    <td><?= $d->qty_ready ?></td>
-                                                    <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
-                                                <?php endif; ?>
+                                                <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -671,20 +664,23 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <div class="col">
-                                    <?php echo form_open_multipart('reqpicdone'); ?>
-                                    <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                    <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                    <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                    <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
-                                </div>
+                                <?php foreach ($stspo as $st) : ?>
+                                    <div class="col">
+                                        <?php echo form_open_multipart('reqpicdone'); ?>
+                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
+                                        <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
+                                    </div>
+                                <?php endforeach; ?>
 
                                 <!-- END BARANG TERSEDIA -->
 
                                 <!-- STATUS : DONE -->
                             <?php elseif ($s->status == 'DONE') : ?>
-
-                                <table class="table table-bordered table-striped mb-2 ">
+                                <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">REQUEST DONE</b></a>
+                                <table class="table table-bordered table-striped mb-2">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
                                             <td>Nama Barang</td>
@@ -695,36 +691,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($detreq as $d) : ?>
+                                        <?php foreach ($gettr as $d) : ?>
                                             <tr>
                                                 <td><?= $d->nama_barang ?></td>
-                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->descnk ?></td>
                                                 <td><?= $d->keterangan ?></td>
-                                                <td><?= $d->qty_req ?></td>
-                                                <td><?= $d->nm_satuan ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                                <h1 class="mt-3 mb-2">Barang Pending</h1>
-                                <table class="table table-bordered table-striped mb-2 ">
-                                    <thead style="background-color: #212529; color:white;">
-                                        <tr>
-                                            <td>Nama Barang</td>
-                                            <td>Deskripsi</td>
-                                            <td style="width:30%">Keterangan</td>
-                                            <td>QTY</td>
-                                            <td>Satuan</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($detreq2 as $d) : ?>
-                                            <tr>
-                                                <td><?= $d->nama_barang ?></td>
-                                                <td><?= $d->deskripsi ?></td>
-                                                <td><?= $d->keterangan ?></td>
-                                                <td><?= $d->qty_req ?></td>
-                                                <td><?= $d->nm_satuan ?></td>
+                                                <td style="text-align: center;"><?= $d->tr_qty ?></td>
+                                                <td style="text-align: center;"><?= $d->nm_satuan ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

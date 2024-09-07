@@ -187,17 +187,18 @@ class C_Reqpic extends CI_Controller
 
         // FUNGSI PIC 
         if ($this->session->userdata('lv') == '4') {
-            $data['title']      = 'PO Detail Req PIC';
-            $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['stspo']      = $this->M_Reqpic->getbuystsponk($kdpo)->result();
-            $data['stspo1']      = $this->M_Reqpic->getbuystsponks($kdpo)->result();
-            $data['datereqpic'] = $this->M_Reqpic->getreqpicnosts($kduser, $kdpo)->result();
-            $data['detreqpic1'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
-            $data['detreqpic2'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
-            $data['detreqpic0'] = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
-            $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
-            $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
-            $data['log']        = $this->M_Reqpic->getNoted($kdpo);
+            $data['title']              = 'PO Detail Req PIC';
+            $data['status']             = $this->M_Reqpic->getrequestbypic($kdpo);
+            $data['stspo']              = $this->M_Reqpic->getbuystsponk($kdpo)->result();
+            $data['stspo1']             = $this->M_Reqpic->getbuystsponks($kdpo)->result();
+            $data['datereqpic']         = $this->M_Reqpic->getreqpicnosts($kduser, $kdpo)->result();
+            $data['getitmlistpicreq']   = $this->M_Reqpic->getitmlistpicreq($kdpo)->result();
+            $data['detreqpic1']         = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts1)->result();
+            $data['detreqpic2']         = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts2)->result();
+            $data['detreqpic0']         = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
+            $data['listtr']             = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
+            $data['log']                = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -864,8 +865,8 @@ class C_Reqpic extends CI_Controller
             'isi_note'      => 'BARANG DI TERIMA - ADMIN',
             'kd_user'       => $kdadmin,
             'nama_user'     => $nmadmin,
-            'note_for'      => '1',
-            'update_status' => '1'
+            'note_for'      => '2',
+            'update_status' => '2'
         );
         $this->M_Purchase->addNote($addnoteuser);
         $this->M_Purchase->addNote($addnoteuser1);
@@ -873,7 +874,7 @@ class C_Reqpic extends CI_Controller
         if ($tmp) {
             foreach ($tmp as $t) {
                 $databelink = array(
-                    'kd_akun'           => '11512',
+                    'kd_akun'           => '11511',
                     'kd_po_nk'          => $t->kdporeq,
                     'kd_barang'         => $t->kdbr,
                     'kd_barangsys'      => $t->kdbsys,
@@ -895,14 +896,15 @@ class C_Reqpic extends CI_Controller
     public function reqpicdone()
     {
         $kdponk     = $this->input->post('kdponk');
-        $tglambil   = $this->input->post('tgl');
+        $kdponks    = $this->input->post('kdponks');
         $pic        = $this->input->post('kd_user');
         $now        = date('Y-m-d');
         $kduser     = $this->session->userdata('kode');
         $nmuser     = $this->session->userdata('nama_user');
+        $tmp        = $this->M_Reqpic->getdatapobaru($kdponks)->result();
 
         $updatests  = array(
-            'tgl_ambil' => $tglambil,
+            'tgl_ambil' => $now,
             'status'    => 'DONE',
             'acc_with'  => $kduser
         );
@@ -917,6 +919,26 @@ class C_Reqpic extends CI_Controller
             'update_status' => '2',
         );
         $this->M_Purchase->addNote($inputnt);
-        redirect('reqpic');
+
+        if ($tmp) {
+            foreach ($tmp as $t) {
+                $dataconfirm = array(
+                    'kd_akun'           => '11512',
+                    'kd_po_nk'          => $t->kdporeq,
+                    'kd_barang'         => $t->kdbr,
+                    'kd_barangsys'      => $t->kdbsys,
+                    'keterangan'        => $t->ket,
+                    'kat_barang'        => $t->kat,
+                    'tr_qty'            => $t->trqty,
+                    'satuan'            => $t->satuan,
+                    'tgl_transaksi'     => $now,
+                    'inputer'           => $this->session->userdata('kode'),
+                    'create_at'         => $now,
+                    'last_updated_by'   => $this->session->userdata('kode')
+                );
+                $this->M_Reqpic->input_tr($dataconfirm);
+            }
+            redirect('reqpic/detreqbarangpic/' . $kdponk);
+        }
     }
 }

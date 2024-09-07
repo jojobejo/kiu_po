@@ -12,9 +12,14 @@
                 </div><!-- /.row -->
                 <div class="card">
                     <div class="card-body">
-                        <div class="col-sm-0">
-                            <h1 class="m-0 mb-2">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
-                        </div><!-- /.col -->
+                        <div class="row">
+                            <div class="col-sm-0">
+                                <h1 class="m-0 mb-2">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
+                            </div><!-- /.col -->
+                            <div class="col-sm-0">
+                                <a href="<?= base_url('stocknonkomersil') ?>" class="btn btn-sm btn-block btn-success mt-1 ml-3"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
                         <table class="table table-bordered">
                             <thead style="background-color: #212529; color:white;">
                                 <tr>
@@ -25,7 +30,6 @@
                                     <td style="text-align: center;">PIC</td>
                                     <td style="text-align: center;">Qty</td>
                                     <td style="text-align: center;">Satuan</td>
-                                    <td style="text-align: center;">#</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,7 +72,6 @@
                                         <td style="text-align: center;"><?= $nm_satuan ?></td>
                                         <td style="text-align: center;"><?= $qs . $s->qty ?></td>
                                         <td style="text-align: center;"><?= $s->nm_satuan ?></td>
-                                        <td><a href="<?= base_url('revisitr/' . $s->kd_akun . '/' . $s->kd_transaksi . '/' . $s->kd_barang) ?>" class="btn btn-block btn-primary btn-sm"><i class="fa fa-solid fa-eye"></i></a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
