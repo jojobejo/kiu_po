@@ -1416,7 +1416,7 @@ class C_PoStatus extends CI_Controller
 
         if (!empty($_FILES['gambar_1'])) {
             $config['upload_path'] = './images/upbukti/';
-            $config['allowed_types'] = 'jpg|png|gif';
+            $config['allowed_types'] = 'jpg|png|gif|jpeg';
             $config['max_size'] = '2000';
             $config['max_width'] = '6000';
             $config['max_height'] = '6000';
