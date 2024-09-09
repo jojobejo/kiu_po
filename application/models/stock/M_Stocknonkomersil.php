@@ -116,7 +116,6 @@ class M_Stocknonkomersil  extends CI_Model
         LEFT JOIN tb_user e ON e.kode_user = c.kd_user
         LEFT JOIN tb_user f ON f.kode_user = d.kd_user
         WHERE a.kd_barangsys = '$kd'
-
         ");
     }
     public function qtyready($kd)
@@ -170,6 +169,23 @@ class M_Stocknonkomersil  extends CI_Model
         FROM v_stockbarangnk a
         JOIN tb_satuan b ON b.id_satuan = a.id_satuan
     ");
+    }
+    function getgeneratekd()
+    {
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $kd = "";
+        if ($cd->num_rows() > 0) {
+            foreach ($cd->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd = "0001";
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'ADJQTY' . date('dmy') . $kd;
+        return $kdnk1;
     }
 }
 

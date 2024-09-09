@@ -26,7 +26,7 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/stock/nonkomersil/body.php', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/stock/nonkomersil/datatables');
+        $this->load->view('content/stock/datatables');
     }
 
     public function list_stock_non_komersil_po()
@@ -75,9 +75,10 @@ class C_Stocknonkomersil extends CI_Controller
     }
     public function detailtransaksi($kdbarang)
     {
-        $data['title']  = 'Detail Stock Barang';
-        $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
-        $data['stock'] = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
+        $data['title']      = 'Detail Stock Barang';
+        $data['kdgenerate'] = $this->M_Stocknonkomersil->getgeneratekd();
+        $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

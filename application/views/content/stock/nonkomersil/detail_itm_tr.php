@@ -1,4 +1,5 @@
 <?php foreach ($item as $i) : ?>
+    <?php $this->load->view('content/stock/nonkomersil/modal/modalstock.php') ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +18,7 @@
                                 <h1 class="m-0 mb-2">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
                             </div><!-- /.col -->
                             <div class="col-sm-0">
-                                <a href="<?= base_url('stocknonkomersil') ?>" class="btn btn-sm btn-block btn-success mt-1 ml-3"><i class="fas fa-plus"></i></a>
+                                <a class="btn btn-sm btn-block btn-success mt-1 ml-3" data-toggle="modal" data-target="#adjustmentqty<?= $i->kode_sistem ?>"><i class="fas fa-plus"></i></a>
                             </div>
                         </div>
                         <table class="table table-bordered">
