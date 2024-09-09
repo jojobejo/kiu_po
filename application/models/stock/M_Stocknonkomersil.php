@@ -80,6 +80,10 @@ class M_Stocknonkomersil  extends CI_Model
     {
         $this->db->insert('tb_generate_kd', $data);
     }
+    function insttransaksi($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
+    }
     public function get_data_item($kd)
     {
         return $this->db->query("SELECT
@@ -88,7 +92,9 @@ class M_Stocknonkomersil  extends CI_Model
         a.nama_barang AS nama_barang,
         a.descnk AS deskripsi,
         d.qty_ready AS qty_ready,
-        b.nm_satuan AS satuan
+        b.nm_satuan AS satuan,
+        a.kat_barang AS katbr,
+        b.id_satuan AS satuanid
         FROM tb_barang_nk a
         JOIN tb_satuan b ON b.id_satuan = a.satuan
         JOIN tb_kat_br c ON c.kd_kat = a.kat_barang
@@ -105,6 +111,9 @@ class M_Stocknonkomersil  extends CI_Model
         a.tr_qty AS qty,
         b.nm_satuan AS nm_satuan,
         a.kd_barangsys AS kd_barang,
+        a.inputer AS inpt,
+        IF(COALESCE(c.nm_user,0) = '0' , 'ADMIN','-') AS adm,
+        IF(COALESCE(e.departement,0) = '0' , 'KEUANGAN','-') AS dept,
         COALESCE(c.nm_user,0) AS nm_1,
         COALESCE(d.nm_user,0) AS nm_2,
         COALESCE(e.departement,0) AS dep_1,

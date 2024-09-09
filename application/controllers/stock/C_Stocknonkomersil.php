@@ -26,7 +26,7 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/stock/nonkomersil/body.php', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/stock/datatables');
+        $this->load->view('content/stock/nonkomersil/datatables');
     }
 
     public function list_stock_non_komersil_po()
@@ -101,5 +101,40 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('content/stock/nonkomersil/revisitr', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function adjustmenqty()
+    {
+        $adjustmentkd   = $this->input->post('adjustmentkd');
+        $kdbrsistem     = $this->input->post('kdbrsistem');
+        $kdbarang       = $this->input->post('kdbarang');
+        $katbarang      = $this->input->post('katbarang');
+        $kdakun         = $this->input->post('kdakun');
+        $satuanid         = $this->input->post('satuanid');
+        $adjqty         = $this->input->post('adjqty');
+        $now            = date('Y-m-d h:m:s');
+        $now1           = date('Y-m-d');
+
+        $generatekd         = array(
+            'kd_barang'     => $adjustmentkd
+        );
+
+        $insrtadjustment    = array(
+            'kd_akun'           => $kdakun,
+            'kd_po_nk'          => $adjustmentkd,
+            'kd_barang'         => $kdbarang,
+            'kd_barangsys'      => $kdbrsistem,
+            'keterangan'        => 'ADJUSTMENT QTY',
+            'kat_barang'        => $katbarang,
+            'tr_qty'            => $adjqty,
+            'satuan'            => $satuanid,
+            'inputer'           => $this->session->userdata('kode'),
+            'tgl_transaksi'     => $now1,
+            'create_at'         => $now,
+            'last_updated_by'   => $this->session->userdata('kode'),
+            'update_at'         => $now
+        );
+        $this->M_Stocknonkomersil->generatekd($generatekd);
+        $this->M_Stocknonkomersil->insttransaksi($insrtadjustment);
+        redirect('detailtransaksi/' . $kdbrsistem);
     }
 }
