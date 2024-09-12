@@ -283,6 +283,7 @@ class C_Reqpic extends CI_Controller
                     'tr_qty'            => $i->qty,
                     'satuan'            => $i->satuan,
                     'inputer'           => $this->session->userdata('kode'),
+                    'req_by'            => $i->kduser,
                     'tgl_transaksi'     => $now1,
                     'create_at'         => $now,
                     'last_updated_by'   => $this->session->userdata('kode')
@@ -884,6 +885,7 @@ class C_Reqpic extends CI_Controller
                     'satuan'            => $t->satuan,
                     'tgl_transaksi'     => $now1,
                     'inputer'           => $this->session->userdata('kode'),
+                    'req_by'            => $t->kduser,
                     'create_at'         => $now,
                     'last_updated_by'   => $this->session->userdata('kode')
                 );
@@ -933,6 +935,7 @@ class C_Reqpic extends CI_Controller
                     'satuan'            => $t->satuan,
                     'tgl_transaksi'     => $now,
                     'inputer'           => $this->session->userdata('kode'),
+                    'req_by'            => $t->kduser,
                     'create_at'         => $now,
                     'last_updated_by'   => $this->session->userdata('kode')
                 );
