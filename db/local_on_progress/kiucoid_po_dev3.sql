@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 17 Sep 2024 pada 10.52
+-- Waktu pembuatan: 12 Sep 2024 pada 10.30
 -- Versi server: 10.4.17-MariaDB
 -- Versi PHP: 8.0.1
 
@@ -20,30 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `kiucoid_po_dev`
 --
-
--- --------------------------------------------------------
-
---
--- Struktur dari tabel `tbq_module`
---
-
-CREATE TABLE `tbq_module` (
-  `id_qmodule` int(11) NOT NULL,
-  `kdq_rate` varchar(25) NOT NULL,
-  `type_m` int(2) NOT NULL,
-  `nm_module` text NOT NULL,
-  `m_status` int(11) NOT NULL,
-  `create_at` datetime NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `lastupdated` varchar(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data untuk tabel `tbq_module`
---
-
-INSERT INTO `tbq_module` (`id_qmodule`, `kdq_rate`, `type_m`, `nm_module`, `m_status`, `create_at`, `update_at`, `lastupdated`) VALUES
-(1, 'QMODNK1709240001', 2, 'Purchase Order ', 1, '2024-09-17 15:50:09', '2024-09-17 08:50:22', 'KEU02');
 
 -- --------------------------------------------------------
 
@@ -287,8 +263,7 @@ INSERT INTO `tb_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
 (14, 'ADJQTY1209240013', '2024-09-12 08:18:53'),
 (15, 'ADJQTY1209240014', '2024-09-12 08:20:13'),
 (16, 'ADJQTY1209240015', '2024-09-12 08:21:12'),
-(17, 'ADJQTY1209240016', '2024-09-12 08:27:24'),
-(18, 'ADJQTY1209240017', '2024-09-12 08:32:01');
+(17, 'ADJQTY1209240016', '2024-09-12 08:27:24');
 
 -- --------------------------------------------------------
 
@@ -373,8 +348,7 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (22, 'PONK0608240001', 'ADJUSTMENT PENGURANGAN QTY - PENYESUAIAN BARANG\r\n', 'KEU01', 'Supriyanto', 3, 3, '2024-09-12 10:09:43', '2024-09-12 08:15:43'),
 (24, 'PONK0608240001', 'ADJUSTMENT PENAMBAHAN QTY - KESALAHAN INPUT', 'KEU01', 'Supriyanto', 3, 3, '2024-09-12 10:09:13', '2024-09-12 08:20:13'),
 (25, 'PONK0608240001', 'ADJUSTMENT PENAMBAHAN QTY - \r\nasd', 'KEU01', 'Supriyanto', 3, 3, '2024-09-12 03:09:12', '2024-09-12 08:21:12'),
-(26, 'PONK0608240001', 'ADJUSTMENT PENAMBAHAN QTY - asddasd', 'KEU01', 'Supriyanto', 3, 3, '2024-09-12 15:27:24', '2024-09-12 08:27:24'),
-(27, 'PONK3007240009', 'ADJUSTMENT PENAMBAHAN QTY - coba2', 'KEU03', 'Nadia', 3, 3, '2024-09-12 15:32:01', '2024-09-12 08:32:01');
+(26, 'PONK0608240001', 'ADJUSTMENT PENAMBAHAN QTY - asddasd', 'KEU01', 'Supriyanto', 3, 3, '2024-09-12 15:27:24', '2024-09-12 08:27:24');
 
 -- --------------------------------------------------------
 
@@ -439,23 +413,6 @@ CREATE TABLE `tb_po_nk` (
 INSERT INTO `tb_po_nk` (`id_po_nk`, `jns_po`, `kd_po_nk`, `kd_po_req`, `nopo`, `kd_user`, `nm_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `tax`, `hrg_pajak`, `hrg_nyata`, `status_hrg_nyata`, `acc_with`, `acc_with_kadep`, `create_at`) VALUES
 (1, 2, 'NKPO0709240001', 'PONK0709240001', '-', 'KARYAWAN2', 'Bram', '2024-09-07', 2, 0, 'DONE', 'KEUANGAN', 'TESTINGPO001', 0, 0, 0, 0, 'KIUDIREKTUR05', 'KADEP01', '2024-09-07 06:29:35'),
 (2, 2, 'NKPO1209240001', 'PONK1209240003', 'PO/0001/12/09/2024', 'KARYAWAN2', 'Bram', '2024-09-12', 2, 0, 'DONE', 'KEUANGAN', 'TESTPO120924', 0, 0, 0, 0, 'KIUDIREKTUR05', 'KADEP01', '2024-09-12 06:17:30');
-
--- --------------------------------------------------------
-
---
--- Struktur dari tabel `tb_ratings`
---
-
-CREATE TABLE `tb_ratings` (
-  `id_rating` int(11) NOT NULL,
-  `kd_user` varchar(25) NOT NULL,
-  `kdq_rate` varchar(25) NOT NULL,
-  `u_rate` int(2) NOT NULL,
-  `inpt_by` varchar(25) NOT NULL,
-  `create_at` datetime NOT NULL,
-  `update_by` varchar(25) NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -673,8 +630,7 @@ INSERT INTO `tb_transaksi` (`id_transnk`, `kd_akun`, `kd_po_nk`, `kd_barang`, `k
 (85, '11513', 'ADJQTY1209240013', 'QCONTO', 'PONK0608240001', 'PERSEDIAN BARANG ', 'KATBR001', 50, 10, 'KEU01', '-', '2024-09-12', '2024-09-12 10:09:53', 'KEU01', '2024-09-12 03:09:53'),
 (86, '11513', 'ADJQTY1209240014', 'QCONTO', 'PONK0608240001', 'KESALAHAN INPUT', 'KATBR001', 50, 10, 'KEU01', '-', '2024-09-12', '2024-09-12 10:09:13', 'KEU01', '2024-09-12 03:09:13'),
 (87, '11513', 'ADJQTY1209240015', 'QCONTO', 'PONK0608240001', '\r\nasd', 'KATBR001', 5, 10, 'KEU01', '-', '2024-09-12', '2024-09-12 03:09:12', 'KEU01', '2024-09-11 20:09:12'),
-(88, '11513', 'ADJQTY1209240016', 'QCONTO', 'PONK0608240001', 'asddasd', 'KATBR001', 5, 10, 'KEU01', '-', '2024-09-12', '2024-09-12 15:27:24', 'KEU01', '2024-09-12 08:27:24'),
-(89, '11513', 'ADJQTY1209240017', 'QAIRKEM1', 'PONK3007240009', 'coba2', 'KATBR002', 50, 3, 'KEU03', '-', '2024-09-12', '2024-09-12 15:32:01', 'KEU03', '2024-09-12 08:32:01');
+(88, '11513', 'ADJQTY1209240016', 'QCONTO', 'PONK0608240001', 'asddasd', 'KATBR001', 5, 10, 'KEU01', '-', '2024-09-12', '2024-09-12 15:27:24', 'KEU01', '2024-09-12 08:27:24');
 
 -- --------------------------------------------------------
 
@@ -779,12 +735,6 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
--- Indeks untuk tabel `tbq_module`
---
-ALTER TABLE `tbq_module`
-  ADD PRIMARY KEY (`id_qmodule`);
-
---
 -- Indeks untuk tabel `tb_akun_tr`
 --
 ALTER TABLE `tb_akun_tr`
@@ -875,12 +825,6 @@ ALTER TABLE `tb_po_nk`
   ADD PRIMARY KEY (`id_po_nk`);
 
 --
--- Indeks untuk tabel `tb_ratings`
---
-ALTER TABLE `tb_ratings`
-  ADD PRIMARY KEY (`id_rating`);
-
---
 -- Indeks untuk tabel `tb_req_masterbarang`
 --
 ALTER TABLE `tb_req_masterbarang`
@@ -945,12 +889,6 @@ ALTER TABLE `tb_user`
 --
 
 --
--- AUTO_INCREMENT untuk tabel `tbq_module`
---
-ALTER TABLE `tbq_module`
-  MODIFY `id_qmodule` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT untuk tabel `tb_akun_tr`
 --
 ALTER TABLE `tb_akun_tr`
@@ -1002,7 +940,7 @@ ALTER TABLE `tb_generateqrcode`
 -- AUTO_INCREMENT untuk tabel `tb_generate_kd`
 --
 ALTER TABLE `tb_generate_kd`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_kat_br`
@@ -1020,7 +958,7 @@ ALTER TABLE `tb_note_barang`
 -- AUTO_INCREMENT untuk tabel `tb_note_direktur`
 --
 ALTER TABLE `tb_note_direktur`
-  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_note_pembelian`
@@ -1039,12 +977,6 @@ ALTER TABLE `tb_nt_tmp_pembelian`
 --
 ALTER TABLE `tb_po_nk`
   MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT untuk tabel `tb_ratings`
---
-ALTER TABLE `tb_ratings`
-  MODIFY `id_rating` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_req_masterbarang`
@@ -1092,7 +1024,7 @@ ALTER TABLE `tb_tmp_tax`
 -- AUTO_INCREMENT untuk tabel `tb_transaksi`
 --
 ALTER TABLE `tb_transaksi`
-  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id_transnk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT untuk tabel `tb_transaksi_tmp`

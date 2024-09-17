@@ -206,6 +206,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('reviewapps') ?>" class="nav-link">
+              <i class="nav-icon fas fa-star"></i>
+              <p>
+                Review Apps
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('logout') ?>" class="nav-link">
               <i class="nav-icon fas fa-unlock"></i>
               <p>
@@ -248,6 +256,14 @@
               <i class="nav-icon fas fa-cubes"></i>
               <p>
                 Stock Non Komersil
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reviewapps') ?>" class="nav-link">
+              <i class="nav-icon fas fa-star"></i>
+              <p>
+                Review Apps
               </p>
             </a>
           </li>
