@@ -198,7 +198,7 @@ class C_Reqpic extends CI_Controller
             $data['detreqpic0']         = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
             $data['listtr']             = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
-            $data['detreq']     = $this->M_Reqpic->getreqwheres($kdpo)->result();
+            $data['detreq']             = $this->M_Reqpic->getreqwheres($kdpo)->result();
             $data['log']                = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
@@ -658,8 +658,14 @@ class C_Reqpic extends CI_Controller
             'note_for'      => '2',
             'update_status' => '2',
         );
+
+        $updatests = array(
+            'kd_po_nk'  => $kdreqpo,
+            'status'    => '4'
+        );
+
         $this->M_Purchase->addNote($inputntpobaru);
-        $this->M_Reqpic->deletedetailporeqkdall($kdreqpo, '3');
+        $this->M_Reqpic->updatereqnk_stsbr($kdreqpo, $updatests);
         $this->M_Reqpic->deletetmptrreq($kdreqpo);
 
         if ($trtmp) {

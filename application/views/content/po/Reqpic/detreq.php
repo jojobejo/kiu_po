@@ -536,7 +536,11 @@
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
                                                 <td><?= $d->qty_req ?></td>
-                                                <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
+                                                <?php if ($d->sts == '1') : ?>
+                                                    <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
+                                                <?php elseif ($d->sts == '4') : ?>
+                                                    <td><a href="#" class="btn btn-block btn-warning btn-md"><i class="fas fa-pause-circle "></i></a></td>
+                                                <?php endif; ?>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

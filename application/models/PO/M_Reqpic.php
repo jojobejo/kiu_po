@@ -457,9 +457,15 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $kd);
         return $this->db->update('tb_detail_req', $data);
     }
-    function updatereqnk_sts($kd, $sts, $data)
+    function updatereqnk_sts($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
+        return $this->db->update('tb_detail_req', $data);
+    }
+    function updatereqnk_stsbr($kd, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('status', '3');
         return $this->db->update('tb_detail_req', $data);
     }
     function updatereqnk($kd, $data)
