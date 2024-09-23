@@ -685,13 +685,14 @@ class C_PoStatus extends CI_Controller
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
+            $kd =  $this->session->userdata('kode');
             $tglstart   = $this->input->post('tglstart');
             $tglend     = $this->input->post('tglend');
             $_SESSION['vartgl1'] = $tglstart;
             $_SESSION['vartgl2'] = $tglend;
 
             $data['po']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
-            $data['ponk']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
+            $data['ponk']    = $this->M_Postatus->ponkgetAllNK_keu_purchasing($kd)->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');

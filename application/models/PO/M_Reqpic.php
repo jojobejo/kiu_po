@@ -100,6 +100,14 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_nk = '$kd'
         ");
     }
+    public function countjmlharga($kd)
+    {
+        return $this->db->query("SELECT
+        SUM(a.tr_qty*a.hrg_satuan) AS hrg
+        FROM tb_transaksi_tmp a
+        WHERE a.kd_po_nk = '$kd'
+        ");
+    }
 
     public function getreqwherepic($kduser, $kdpo, $sts1)
     {
@@ -434,7 +442,8 @@ class M_Reqpic extends CI_Model
         d.nm_user,
         d.departemen,
         d.tj_pembelian,
-        b.gbr_barang
+        b.gbr_barang,
+        a.hrg_satuan
         FROM tb_transaksi_tmp a
         JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
         JOIN tb_satuan c ON c.id_satuan = b.satuan

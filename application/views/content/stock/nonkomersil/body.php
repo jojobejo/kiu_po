@@ -57,7 +57,7 @@
                 </div>
 
             <?php elseif ($this->session->userdata('lv') != '2' || $this->session->userdata('lv') != '1') : ?>
-                <?php $this->load->view('content/stock/nonkomersil/modal_add_itm.php') ?>
+                <?php $this->load->view('content/stock/nonkomersil/modal/modal_add_itm.php') ?>
                 <div class="card">
                     <div class="card-body">
                         <h1 class="m-0">
@@ -71,7 +71,7 @@
                                     <td>Deskripsi</td>
                                     <td>Stock</td>
                                     <td>Satuan</td>
-                                    <td>#</td>
+                                    <!-- <td>#</td> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -86,11 +86,11 @@
                                             <td><?= $s->qty_ready ?></td>
                                         <?php endif; ?>
                                         <td><?= $s->satuan ?></td>
-                                        <td>
+                                        <!-- <td>
                                             <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartdetponk<?= $s->kode_barangs ?>">
                                                 <i class="fa fa-solid fa-cart-plus"></i>
                                             </a>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

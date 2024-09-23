@@ -198,6 +198,7 @@ class C_Reqpic extends CI_Controller
             $data['detreqpic0']         = $this->M_Reqpic->getreqwherepic($kduser, $kdpo, $sts0)->result();
             $data['listtr']             = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
+            $data['detreq']     = $this->M_Reqpic->getreqwheres($kdpo)->result();
             $data['log']                = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
@@ -220,6 +221,7 @@ class C_Reqpic extends CI_Controller
             $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
             $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
+            $data['countjmlharga']   = $this->M_Reqpic->countjmlharga($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
             $data['gettr']      = $this->M_Reqpic->gettr($kdpo)->result();
 
@@ -301,8 +303,10 @@ class C_Reqpic extends CI_Controller
     public function actpending($id, $kd)
     {
         date_default_timezone_set("Asia/Jakarta");
+        $qty        = $this->input->post('qty_isi');
+        $hrgsatuan  = $this->input->post('hrg_isi');
         $itempnd    = $this->M_Reqpic->getitemreq($id)->result();
-        $now            = date('Y-m-d h:m:s');
+        $now        = date('Y-m-d h:m:s');
 
         if ($itempnd) {
             foreach ($itempnd as $i) {
@@ -312,14 +316,16 @@ class C_Reqpic extends CI_Controller
                     'kd_barang'         => $i->kd_barang,
                     'kd_barangsys'      => $i->kd_bsys,
                     'kat_barang'        => $i->kat_barang,
-                    'tr_qty'            => $i->qty,
+                    'tr_qty'            => $qty,
                     'satuan'            => $i->satuan,
+                    'hrg_satuan'        => $hrgsatuan,
                     'status'            => 'pending',
                     'keterangan'        => $i->ket,
                     'inputer'           => $this->session->userdata('kode'),
                     'create_at'         => $now,
                     'last_updated_by'   => $this->session->userdata('kode')
                 );
+
                 $updtstatus = array(
                     'status'    => '3'
                 );
@@ -589,12 +595,17 @@ class C_Reqpic extends CI_Controller
     }
     public function acc_req_admin()
     {
+        //PIC ADMIN
+        $useradmin  =  $this->session->userdata('nama_user');
+        $kdadmin  =  $this->session->userdata('kode');
+
         $kdponk     = $this->input->post('kdponk');
         $kdreqpo    = $this->input->post('kdreqpo');
         $kduser     = $this->input->post('kdpic');
         $nmuser     = $this->input->post('pic');
         $jmlitm     = $this->input->post('jml');
         $dep        = $this->input->post('dep');
+        $jmltot     = $this->input->post('jmltot');
         $tjpem      = $this->input->post('tjbuy');
         $trtmp      = $this->M_Reqpic->getlisttmptr($kdreqpo)->result();
         $now        = date('Y-m-d h:m:s');
@@ -605,11 +616,11 @@ class C_Reqpic extends CI_Controller
             'kd_po_nk'          => $kdponk,
             'kd_po_req'         => $kdreqpo,
             'nopo'              => '-',
-            'kd_user'           => $kduser,
-            'nm_user'           => $nmuser,
+            'kd_user'           => $kdadmin,
+            'nm_user'           => $useradmin,
             'tgl_transaksi'     => $now1,
             'jml_item'          => $jmlitm,
-            'total_harga'       => '0',
+            'total_harga'       => $jmltot,
             'status'            => 'ON PROGRESS - KADEP',
             'departemen'        => $dep,
             'tj_pembelian'      => $tjpem,
@@ -653,6 +664,11 @@ class C_Reqpic extends CI_Controller
 
         if ($trtmp) {
             foreach ($trtmp as $i) {
+
+                $qty    = $i->tr_qty;
+                $hrgs   = $i->hrg_satuan;
+                $tothrg = ($qty * $hrgs);
+
                 $datainputdetailpo = array(
                     'kd_po_nk'      => $kdponk,
                     'kd_po_req'     => $kdreqpo,
@@ -666,9 +682,9 @@ class C_Reqpic extends CI_Controller
                     'qty'           => $i->tr_qty,
                     'satuan'        => $i->satuan,
                     'kat_barang'    => $i->kat_barang,
-                    'hrg_satuan'    => '0',
+                    'hrg_satuan'    => $i->hrg_satuan,
                     'hrg_nyata'     => '0',
-                    'total_harga'   => '0',
+                    'total_harga'   => $tothrg,
                     'total_nyata'   => '0',
                     'gbr_produk'    => 'Karisma.png',
                 );
