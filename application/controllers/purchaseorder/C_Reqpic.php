@@ -223,7 +223,8 @@ class C_Reqpic extends CI_Controller
             $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
             $data['countjmlharga']   = $this->M_Reqpic->countjmlharga($kdpo)->result();
             $data['log']        = $this->M_Reqpic->getNoted($kdpo);
-            $data['gettr']      = $this->M_Reqpic->gettr($kdpo)->result();
+            $data['gettrs']      = $this->M_Reqpic->gettr($kdpo)->result();
+            $data['gettr']      = $this->M_Reqpic->getdetailreq($kdpo)->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -920,12 +921,11 @@ class C_Reqpic extends CI_Controller
     public function reqpicdone()
     {
         $kdponk     = $this->input->post('kdponk');
-        $kdponks    = $this->input->post('kdponks');
         $pic        = $this->input->post('kd_user');
         $now        = date('Y-m-d');
         $kduser     = $this->session->userdata('kode');
         $nmuser     = $this->session->userdata('nama_user');
-        $tmp        = $this->M_Reqpic->getdatapobaru($kdponks)->result();
+        $tmp        = $this->M_Reqpic->getdatapobarureq($kdponk)->result();
 
         $updatests  = array(
             'tgl_ambil' => $now,

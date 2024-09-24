@@ -147,13 +147,12 @@ class M_Reqpic extends CI_Model
             b.nama_barang AS nmbarang,
             b.descnk AS deskripsi,
             a.keterangan AS ket,
-            a.tr_qty AS qty,
+            a.qty AS qty,
             c.nm_satuan AS nmsatuan
-            FROM tb_transaksi a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
-            JOIN tb_satuan c ON c.id_satuan = a.satuan 
+           FROM tb_detail_req a 
+            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+            JOIN tb_satuan c ON c.id_satuan = a.satuan
             WHERE a.kd_po_nk = '$kd'
-            GROUP BY a.kd_barangsys
         ");
     }
     public function getreqwheres($kd)
@@ -168,9 +167,12 @@ class M_Reqpic extends CI_Model
             x.status AS sts,
             x.nm_satuan as nm_satuan,
             COALESCE(x.qty_tmp,0) AS qty_tmp,
-            (COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) AS qty_transaksi,
+            COALESCE(x.qty_transaksi_pad,0) qty_adjp,
+            COALESCE(x.qty_transaksi_mad,0) qty_adjm,
+            COALESCE(x.qty_transaksi_m,0) qty_m,
+            COALESCE(x.qty_transaksi_p,0) qty_p,
             COALESCE(x.qty,0) AS qty_req,
-            IF(x.status = '1',(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0),(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0))) AS qty_ready
+            IF(x.status = '1', (COALESCE(x.qty_transaksi_pad,0)+COALESCE(x.qty_transaksi_p,0)) - (COALESCE(x.qty_transaksi_mad,0)+COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0), (COALESCE(x.qty_transaksi_pad,0)+COALESCE(x.qty_transaksi_p,0)) - (COALESCE(x.qty_transaksi_mad,0)+COALESCE(x.qty_transaksi_m,0))) AS qty_ready
             FROM
             (   SELECT 
                 a.id_det_po_nk,
@@ -185,7 +187,9 @@ class M_Reqpic extends CI_Model
                 (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
                 (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
                 (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
-                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m
+                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m,
+                (SELECT SUM(i.tr_qty) FROM tb_transaksi i WHERE i.kd_barangsys = a.kd_bsys AND i.kd_akun = '11514' GROUP BY a.kd_bsys) AS qty_transaksi_mad,
+                (SELECT SUM(j.tr_qty) FROM tb_transaksi j WHERE j.kd_barangsys = a.kd_bsys AND j.kd_akun = '11513' GROUP BY a.kd_bsys) AS qty_transaksi_pad
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
@@ -259,6 +263,23 @@ class M_Reqpic extends CI_Model
         GROUP BY a.kd_barangsys
     ");
     }
+    public function getdetailreq($kd)
+    {
+        return $this->db->query("SELECT
+        a.kd_po_nk,
+        b.nama_barang,
+        b.descnk,
+        a.keterangan,
+        a.qty,
+        c.nm_satuan
+        FROM tb_detail_req a 
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+        JOIN tb_satuan c ON c.id_satuan = a.satuan
+        WHERE a.kd_po_nk = '$kd'
+
+    ");
+    }
+
     public function countjmltmpbr($kd)
     {
         $this->db->select('id_tmp_nk');
@@ -420,6 +441,23 @@ class M_Reqpic extends CI_Model
         a.kd_user AS kduser
         FROM tb_detail_po_nk a
         WHERE a.kd_po_nk = '$kd'
+        GROUP BY a.kd_barang
+        ");
+    }
+    public function getdatapobarureq($kd)
+    {
+        return $this->db->query("SELECT 
+        a.kd_po_nk AS kdporeq,
+        a.kd_barang AS kdbr,
+        a.kd_bsys AS kdbsys,
+        a.keterangan AS ket,
+        a.kat_barang AS kat,
+        a.qty AS trqty,
+        a.satuan AS satuan,
+        a.kd_user AS kduser,
+        a.status AS sts
+        FROM tb_detail_req a
+        WHERE a.kd_po_nk = '$kd' AND a.status = '4'
         GROUP BY a.kd_barang
         ");
     }

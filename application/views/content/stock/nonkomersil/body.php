@@ -46,7 +46,7 @@
                                             <td><?= $s->qty_ready ?></td>
                                             <td><?= $s->satuan ?></td>
                                             <td>
-                                                <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
+                                                <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" target="_blanks" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     <?php endif; ?>
