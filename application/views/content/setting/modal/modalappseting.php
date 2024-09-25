@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" hidden>
                     <div class="row">
                         <label class="col-sm-3 control-label text-right" for="kd_user">-<span class="required">*</span></label>
                         <div class="col-sm-8">

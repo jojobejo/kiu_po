@@ -59,4 +59,44 @@ class C_Appsrated extends CI_Controller
         $this->M_Appsrated->inputnew($datainpt);
         redirect('reviewapps');
     }
+    public function modulereview($kd)
+    {
+        //INIT
+        $user   = $this->session->userdata('kode');
+
+        $data['title']          = 'Module Review';
+        if ($this->session->userdata('lv') == '2') {
+            $data['getallreview']   = $this->M_Appsrated->getallreviewmd($kd)->result();
+            $data['kdreview']       = $this->M_Appsrated->generatekdreview($kd);
+            $data['judul']          = $this->M_Appsrated->getjdl($kd)->result();
+            $data['question']       = $this->M_Appsrated->getquestion($kd)->result();
+        } elseif ($this->session->userdata('lv') == '4') {
+            $data['getallreviewpic']   = $this->M_Appsrated->getallreviewmdpic($kd, $user)->result();
+        }
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/setting/bodyreviewquest', $data);
+        $this->load->view('partial/footer');
+    }
+    function addqbaru()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $kdreview   = $this->input->post('kdreview');
+        $kdmodule   = $this->input->post('kdmodule');
+        $question   = $this->input->post('question');
+        $user       = $this->session->userdata('kode');
+        $now = date("Y-m-d H:i:s");
+
+        $inputdtquestion = array(
+            'kd_reviewq'    => $kdreview,
+            'kd_module'     => $kdmodule,
+            'question'      => $question,
+            'inputer'       => $user,
+            'create_at'     => $now
+        );
+
+        $this->M_Appsrated->inputquestion($inputdtquestion);
+        redirect('detailreview/' . $kdmodule);
+    }
 }

@@ -517,7 +517,6 @@
                                     </tbody>
                                 </table>
 
-
                                 <?php foreach ($countitm as $c) :
                                     $tot    = $c->total;
                                     $toty   = $c->tot_yes + $c->tot_no;
