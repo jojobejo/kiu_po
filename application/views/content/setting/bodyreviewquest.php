@@ -20,25 +20,25 @@
                 <div class="card-body">
                     <?php foreach ($question as $q) : ?>
                         <h1 class="mb-2 ml-2">
-                            <li><?= $q->question ?></li>
+                            <li><?= $q->qeustion ?></li>
                         </h1>
+                        <table class="table table-bordered table-striped mb-2">
+                            <thead style="background-color: #212529; color:white;">
+                                <tr>
+                                    <td>Isi Review</td>
+                                    <td>Nilai</td>
+                                    <td>#</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     <?php endforeach; ?>
-                    <table class="table table-bordered table-striped mb-2">
-                        <thead style="background-color: #212529; color:white;">
-                            <tr>
-                                <td>#</td>
-                                <td>#</td>
-                                <td>#</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div><!-- /.container-fluid -->

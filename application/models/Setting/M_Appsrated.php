@@ -77,11 +77,63 @@ class M_Appsrated extends CI_Model
         WHERE a.kd_module = '$kd'
         ");
     }
-    function getallreviewmdpic($kd, $usr)
+    function inputquestion($data)
     {
-        return $this->db->query("SELECT a.*
-        FROM tbq_review_q a
-        WHERE a.kd_module = '$kd' AND a.inputer = '$usr'
+        return $this->db->insert('tbq_review_q', $data);
+    }
+    function inputanswer($data)
+    {
+        return $this->db->insert_batch('tbq_review_pic', $data);
+    }
+    function getqnapic($user, $kdm)
+    {
+        return $this->db->query("SELECT
+        a.id_review AS id,
+        a.kd_module AS kdm,
+        a.isi_review AS isi,
+        a.nilai AS nilai
+        FROM tbq_review_pic a
+        WHERE a.inputer = '$user' AND a.kd_module = '$kdm'
         ");
+    }
+    function countqna($kd, $user)
+    {
+        return $this->db->query("SELECT
+        x.tot_asw AS tot_aswer,
+        COUNT(x.kd_module) AS tot_question
+        FROM(
+            SELECT
+            a.kd_reviewq,
+            a.kd_module,
+            (SELECT COUNT(b.kd_module) FROM tbq_review_pic b WHERE b.kd_module = a.kd_module AND b.inputer = '$user') AS tot_asw
+            FROM tbq_review_q a
+        ) AS x
+        WHERE x.kd_module = '$kd'
+        ");
+    }
+    function getanswerpic($kd, $usr)
+    {
+        return $this->db->query("SELECT
+        a.question AS question,
+        b.isi_review AS isi_review,
+        b.nilai AS nilai , 
+        b.inputer AS inputer
+        FROM tbq_review_q a
+        JOIN tbq_review_pic b ON b.kd_reviewq = a.kd_reviewq
+        WHERE a.kd_module = '$kd' AND b.inputer = '$usr'
+    ");
+    }
+    function getnilaipic($kd, $usr)
+    {
+        return $this->db->query("SELECT
+        a.question AS question,
+        b.isi_review AS isi_review,
+        b.nilai AS nilai , 
+        b.inputer AS inputer
+        FROM tbq_review_q a
+        JOIN tbq_review_pic b ON b.kd_reviewq = a.kd_reviewq
+        WHERE a.kd_module = '$kd' AND b.inputer = '$usr'
+        GROUP BY a.kd_module
+    ");
     }
 }

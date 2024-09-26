@@ -54,7 +54,25 @@
             <?php elseif ($this->session->userdata('lv') == '4') : ?>
                 <div class="card">
                     <div class="card-body">
-                        <h3>berikan penilaian anda terhadap module/fitur yang ada pada aplikasi ini </h3>
+                        <h3> </h3>
+                        <h1 class="mb-2 mt-2"><b>Berikan penilaian anda terhadap module/fitur yang ada pada aplikasi ini</b></h1>
+                        <table>
+                            <table class="table table-bordered table-striped mb-2">
+                                <thead style="background-color: #212529; color:white;">
+                                    <tr>
+                                        <td>Nama Module</td>
+                                        <td>#</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($module as $m) : ?>
+                                        <tr>
+                                            <td><?= $m->nm_module ?></td>
+                                            <td style="width: 15%;"><a href="<?= base_url('questionreviewpic/' . $m->kd_module) ?>" class="btn btn-info btn-block"><i class="fas fa-eye"></i></a></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                     </div>
                 </div>
             <?php endif; ?>

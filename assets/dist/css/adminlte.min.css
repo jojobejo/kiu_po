@@ -51643,6 +51643,30 @@ blockquote.quote-gray-dark h6 {
 	color: #fff !important;
 }
 
+.bg-cstm5 {
+	background-color: #F4A460 !important;
+}
+.bg-cstm5,
+.bg-cstm5 > a {
+	color: #fff !important;
+}
+
+.bg-cstm6 {
+	background-color: #b3d625 !important;
+}
+.bg-cstm6,
+.bg-cstm6 > a {
+	color: #fff !important;
+}
+
+.bg-cstm7 {
+	background-color: #efb495 !important;
+}
+.bg-cstm7,
+.bg-cstm7 > a {
+	color: #fff !important;
+}
+
 /* END CUSTOM PALLET */
 
 .bg-indigo {

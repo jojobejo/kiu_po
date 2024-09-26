@@ -31,7 +31,7 @@ class C_Appsrated extends CI_Controller
         } elseif ($this->session->userdata('lv') == '4') {
 
             $data['title'] = 'Module List';
-            $data['getallmodule'] = $this->M_Appsrated->getAllModule();
+            $data['module'] = $this->M_Appsrated->getAllModule();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -98,5 +98,48 @@ class C_Appsrated extends CI_Controller
 
         $this->M_Appsrated->inputquestion($inputdtquestion);
         redirect('detailreview/' . $kdmodule);
+    }
+    public function questionreviewpic($kd)
+    {
+        //INIT
+        $user   = $this->session->userdata('kode');
+
+        $data['title']          = 'Module Review Rating';
+        $data['judul']          = $this->M_Appsrated->getjdl($kd)->result();
+        $data['countqna']       = $this->M_Appsrated->countqna($kd, $user)->result();
+        $data['question']       = $this->M_Appsrated->getquestion($kd)->result();
+        $data['answer']         = $this->M_Appsrated->getqnapic($user, $kd)->result();
+        $data['getanswer']      = $this->M_Appsrated->getanswerpic($kd, $user)->result();
+        $data['getnilai']       = $this->M_Appsrated->getnilaipic($kd, $user)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/setting/bodyqna', $data);
+        $this->load->view('partial/footer');
+    }
+
+
+    public function reviewanswer()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $kdmodule   = $this->input->post('kodem');
+        $kdreview   = $this->input->post('koder');
+        $asnwer     = $this->input->post('asnwer');
+        $nilai      = $this->input->post('nilai');
+        $user       = $this->input->post('user');
+        $now = date("Y-m-d H:i:s");
+
+        foreach ($kdmodule as $key => $value) {
+            $data[]  = array(
+                'kd_module' => $value,
+                'kd_reviewq' => $kdreview[$key],
+                'isi_review' => $asnwer[$key],
+                'nilai' => $nilai,
+                'inputer' => $user,
+                'create_at' => $now
+            );
+        }
+        $this->M_Appsrated->inputanswer($data);
+        redirect('questionreviewpic/' . $kdmodule);
     }
 }

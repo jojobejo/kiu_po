@@ -277,3 +277,5 @@ $route['reviewapps']                    = 'settings/C_Appsrated';
 $route['addnewmodule']                  = 'settings/C_Appsrated/addnewmodule';
 $route['detailreview/(:any)']           = 'settings/C_Appsrated/modulereview/$1';
 $route['addqbaru']                      = 'settings/C_Appsrated/addqbaru';
+$route['reviewanswer']                  = 'settings/C_Appsrated/reviewanswer';
+$route['questionreviewpic/(:any)']      = 'settings/C_Appsrated/questionreviewpic/$1';
