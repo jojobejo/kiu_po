@@ -90,7 +90,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Dashboard Purchase Order</h1>
+                        <h1><b style="text-transform:uppercase">Dashboard Purchase Order</b></h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
                 <div class="row">
@@ -117,7 +117,6 @@
                                 <?php foreach ($done as $d) : ?>
                                     <h3><?= $d->tdone ?></h3>
                                 <?php endforeach; ?>
-
                                 <p>Order Terselesaikan</p>
                             </div>
                             <div class="icon">
@@ -151,7 +150,6 @@
                                 <?php foreach ($reject as $r) : ?>
                                     <h3><?= $r->treject ?></h3>
                                 <?php endforeach; ?>
-
                                 <p>Order Ditolak</p>
                             </div>
                             <div class="icon">
@@ -161,6 +159,13 @@
                         </div>
                     </div>
                     <!-- ./col -->
+                </div>
+                <div class="col-md">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1><b style="text-transform:uppercase">stok ulang barang persediaan</b></h1>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
                 </div>
             </div><!-- /.container-fluid -->
         </div>

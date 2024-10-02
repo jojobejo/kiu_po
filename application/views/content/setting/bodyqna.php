@@ -55,6 +55,7 @@
                         <h1 class="mb-4 ml-2">
                             <li>Berikan penilaian anda pada module ini</li>
                         </h1>
+                        <?php ?>
                         <div class="row ml-5 mb-4">
                             <div class="col">
                                 <select name="nilai" id="nilai" class="form-control">
