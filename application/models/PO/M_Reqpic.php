@@ -464,29 +464,29 @@ class M_Reqpic extends CI_Model
     public function getlisttmptr($kd)
     {
         return $this->db->query("SELECT
-        a.kd_akun,
-        a.kd_po_nk,
-        a.kd_barang,
-        a.kd_barangsys,
-        b.nama_barang,
-        b.descnk,
-        a.keterangan,
-        a.tr_qty,
-        a.status,
-        a.satuan,
-        c.nm_satuan,
-        b.kat_barang,
-        d.kd_user,
-        d.nm_user,
-        d.departemen,
-        d.tj_pembelian,
-        b.gbr_barang,
-        a.hrg_satuan
-        FROM tb_transaksi_tmp a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
-        JOIN tb_satuan c ON c.id_satuan = b.satuan
-        JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
-        WHERE a.kd_po_nk = '$kd'
+            a.kd_akun,
+            a.kd_po_nk,
+            a.kd_barang,
+            a.kd_barangsys,
+            b.nama_barang,
+            b.descnk,
+            a.keterangan,
+            a.tr_qty,
+            a.status,
+            a.satuan,
+            c.nm_satuan,
+            b.kat_barang,
+            d.kd_user,
+            d.nm_user,
+            d.departemen,
+            d.tj_pembelian,
+            b.gbr_barang,
+            a.hrg_satuan
+            FROM tb_transaksi_tmp a
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
+            JOIN tb_satuan c ON c.id_satuan = b.satuan
+            JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
+            WHERE a.kd_po_nk = '$kd'
         ");
     }
 

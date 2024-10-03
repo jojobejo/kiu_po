@@ -85,6 +85,10 @@ class M_Appsrated extends CI_Model
     {
         return $this->db->insert_batch('tbq_review_pic', $data);
     }
+    function inputsos($data)
+    {
+        return $this->db->insert('tb_sosialisasi', $data);
+    }
     function getqnapic($user, $kdm)
     {
         return $this->db->query("SELECT
@@ -135,5 +139,18 @@ class M_Appsrated extends CI_Model
         WHERE a.kd_module = '$kd' AND b.inputer = '$usr'
         GROUP BY a.kd_module
     ");
+    }
+    public function getDataSos($kduser)
+    {
+        return $this->db->query("SELECT
+        a.kd_user AS kduser,
+        b.nama_user AS nmuser,
+        b.departement AS dep,
+        a.create_at AS tgl,
+        a.status_nkomersil as sts
+        FROM tb_sosialisasi a 
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.kd_user = '$kduser'
+        ");
     }
 }

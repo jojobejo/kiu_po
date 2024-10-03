@@ -30,9 +30,13 @@ class C_Appsrated extends CI_Controller
             $this->load->view('partial/footer');
         } elseif ($this->session->userdata('lv') == '4') {
 
-            $data['title'] = 'Module List';
-            $data['module'] = $this->M_Appsrated->getAllModule();
+            $kduser     = $this->session->userdata('kode');
 
+            $data['title']  = 'Sosialisasi - New Module';
+            $data['module'] = $this->M_Appsrated->getAllModule();
+            $data['sos']    = $this->M_Appsrated->getDataSos($kduser)->result();
+            $data['sos']    = $this->M_Appsrated->getDataSos($kduser)->result();
+            
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
             $this->load->view('content/setting/bodyappsrated', $data);
@@ -141,5 +145,21 @@ class C_Appsrated extends CI_Controller
         }
         $this->M_Appsrated->inputanswer($data);
         redirect('questionreviewpic/' . $kdmodule);
+    }
+    public function addconfirmsos()
+    {
+
+        $kduser = $this->input->post('kduser');
+        $tgl    = $this->input->post('tgl');
+
+        $inputtososial = array(
+            'module'            => "1",
+            'kd_user'           => $kduser,
+            'create_at'         => $tgl,
+            'status_nkomersil'  => "1",
+        );
+
+        $this->M_Appsrated->inputsos($inputtososial);
+        redirect('reviewapps');
     }
 }

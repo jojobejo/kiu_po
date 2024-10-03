@@ -395,21 +395,34 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <?php foreach ($stspo as $st) : ?>
-                                    <?php if ($st->status == 'PROSES PEMBELIAN') : ?>
-                                        <?php echo form_open_multipart('reqpicconfirmed'); ?>
+                                <?php foreach ($countitm as $c) :
+                                    $tot    = $c->total;
+                                    $toty   = $c->tot_yes + $c->tot_no;
+                                    $totacc = $c->tot_yes;
+                                    $totpnd = $c->tot_no;
+                                ?>
+                                    <?php if ($totpnd == '0') : ?>
+                                        <?php foreach ($stspo as $st) : ?>
+                                            <?php if ($st->status != 'PROSES PEMBELIAN') : ?>
+                                                <?php echo form_open_multipart('reqpicconfirmed'); ?>
+                                                <?php $now = date("Y-m-d"); ?>
+                                                <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
+                                                <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
+                                                <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
+                                            <?php else : ?>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <?php echo form_open_multipart('reqpicconfirmed_plus'); ?>
                                         <?php $now = date("Y-m-d"); ?>
                                         <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
-                                    <?php else : ?>
                                     <?php endif; ?>
-
                                 <?php endforeach; ?>
 
                                 <!-- STATUS : ON PROGRESS -->
@@ -523,7 +536,8 @@
                                     $totacc = $c->tot_yes;
                                     $totpnd = $c->tot_no;
                                 ?>
-                                    <?php if ($toty == $tot) : ?>
+                                    <!-- AKSI UNTUK DAPAT MELAKUKAN PO RESTOCK  -->
+                                    <?php if ($totpnd > '0') : ?>
                                         <?php echo form_open_multipart('acc_req_admin'); ?>
                                         <?php $now = date("Y-m-d"); ?>
                                         <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
@@ -538,7 +552,25 @@
                                         <?php endforeach; ?>
                                         <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
+                                        <!-- END AKSI RESTOCK -->
+                                        <!-- AKSI TRANSAKSI / STOCK BARANG READY -->
+                                    <?php else : ?>
+                                        <?php echo form_open_multipart('acc_req_admin_plus'); ?>
+                                        <?php $now = date("Y-m-d"); ?>
+                                        <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $kdponks ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $now ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="pic" name="pic" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="kdpic" name="kdpic" style="max-width: 550px;" value="<?= $s->kd_user ?>" class="form-control" readonly hidden>
+                                        <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
+                                        <input type="number" id="jml" name="jml" style="max-width: 550px;" value="<?= $totpnd ?>" class="form-control" readonly hidden>
+                                        <?php foreach ($countjmlharga as $ct) : ?>
+                                            <input type="number" id="jmltot" name="jmltot" style="max-width: 550px;" value="<?= $ct->hrg ?>" class="form-control" readonly hidden>
+                                        <?php endforeach; ?>
+                                        <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
+                                        <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                     <?php endif; ?>
+                                    <!-- END TRANSAKSI /STOCK BARANG READY -->
                                 <?php endforeach; ?>
 
                                 <!-- END ON PROGRESS -->
@@ -568,16 +600,25 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <?php foreach ($stspo as $st) : ?>
-                                    <div class="col">
-                                        <?php echo form_open_multipart('reqpicdone'); ?>
-                                        <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                        <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                        <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
-                                    </div>
-                                <?php endforeach; ?>
+                                <?php if (!empty($stspo)) : ?>
+                                    <?php foreach ($stspo as $st) : ?>
+                                        <div class="col">
+                                            <?php echo form_open_multipart('reqpicdone'); ?>
+                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                            <input type="text" id="actdone" name="actdone" style="max-width: 550px;" value="1" class="form-control" readonly hidden>
+                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
+                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <?php echo form_open_multipart('reqpicdone'); ?>
+                                    <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                    <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
+                                    <input type="text" id="actdone" name="actdone" style="max-width: 550px;" value="2" class="form-control" readonly hidden>
+                                    <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
+                                <?php endif; ?>
 
                                 <!-- END BARANG TERSEDIA -->
 

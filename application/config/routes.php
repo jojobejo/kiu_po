@@ -143,9 +143,11 @@ $route['pendingreq'] = 'purchaseorder/C_Reqpic/pendingreq';
 $route['actpending/(:any)/(:any)'] = 'purchaseorder/C_Reqpic/actpending/$1/$2';
 $route['actconfirm/(:any)'] = 'purchaseorder/C_Reqpic/actconfirm/$1/';
 $route['acc_req_admin'] = 'purchaseorder/C_Reqpic/acc_req_admin';
+$route['acc_req_admin_plus'] = 'purchaseorder/C_Reqpic/acc_req_admin_plus';
 $route['pendingreq1'] = 'purchaseorder/C_Reqpic/pendingreq1';
 $route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed'] = 'purchaseorder/C_Reqpic/reqpicconfirmed';
+$route['reqpicconfirmed_plus'] = 'purchaseorder/C_Reqpic/reqpicconfirmed_plus';
 $route['reqpicdone'] = 'purchaseorder/C_Reqpic/reqpicdone';
 
 //PurchaseOrderNonKomersil - STATUS
@@ -279,3 +281,4 @@ $route['detailreview/(:any)']           = 'settings/C_Appsrated/modulereview/$1'
 $route['addqbaru']                      = 'settings/C_Appsrated/addqbaru';
 $route['reviewanswer']                  = 'settings/C_Appsrated/reviewanswer';
 $route['questionreviewpic/(:any)']      = 'settings/C_Appsrated/questionreviewpic/$1';
+$route['addconfirmsos']                  = 'settings/C_Appsrated/addconfirmsos';
