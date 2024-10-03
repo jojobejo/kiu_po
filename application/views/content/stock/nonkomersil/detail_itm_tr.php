@@ -1,4 +1,5 @@
 <?php foreach ($item as $i) : ?>
+    <?php $this->load->view('content/stock/nonkomersil/modal/modalstock.php') ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -12,63 +13,65 @@
                 </div><!-- /.row -->
                 <div class="card">
                     <div class="card-body">
-                        <div class="col-sm-0">
-                            <h1 class="m-0 mb-2">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
-                        </div><!-- /.col -->
+                        <div class="row">
+                            <div class="col-sm-0">
+                                <h1 class="m-0 mb-2">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
+                            </div><!-- /.col -->
+                            <div class="col-sm-0">
+                                <a class="btn btn-sm btn-block btn-success mt-1 ml-3" data-toggle="modal" data-target="#adjustmentqty<?= $i->kode_sistem ?>"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
                         <table class="table table-bordered">
                             <thead style="background-color: #212529; color:white;">
                                 <tr>
                                     <td style="text-align: center;">Kode Transaksi</td>
+                                    <td style="text-align: center; width: 5%;">Tanggal Transaksi</td>
                                     <td style="text-align: center;">Kode Akun</td>
-                                    <td style="text-align: center;">Tanggal Transaksi</td>
+                                    <td style="text-align: center;">Keterangan</td>
                                     <td style="text-align: center;">Departemen</td>
                                     <td style="text-align: center;">PIC</td>
                                     <td style="text-align: center;">Qty</td>
-                                    <td style="text-align: center;">Satuan</td>
-                                    <td style="text-align: center;">#</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($stock as $s) :
-                                    $nm_satuan = "";
-                                    $dep    = "";
                                     $qs = "";
                                     $btn = "";
                                     $txt = "";
-                                    // USER
-                                    if ($s->nm_1 == '0') {
-                                        $nm_satuan = $s->nm_2;
-                                    } elseif ($s->nm_2 == '0') {
-                                        $nm_satuan = $s->nm_1;
-                                    }
-                                    // DEPARTEMEN
-                                    if ($s->dep_1 == '0') {
-                                        $dep    = $s->dep_2;
-                                    } elseif ($s->dep_2 == '0') {
-                                        $dep    = $s->dep_1;
-                                    }
                                     // KODE AKUN
                                     if ($s->kd_akun == '11512') {
                                         $qs     = "-";
-                                        $btn    = "btn btn-block btn-warning btn-sm";
+                                        $btn    = "btn btn-block bg-cstm1 btn-sm color-palette";
                                         $txt    = 'Pengurangan Barang';
-                                    } else {
-                                        $qs     = "";
-                                        $btn    = "btn btn-block btn-success btn-sm";
-                                        $txt    = 'Persedian Barang';
+                                    } elseif ($s->kd_akun == '11511') {
+                                        $qs     = '';
+                                        $btn    = "btn btn-block btn-sm bg-cstm2 color-palette";
+                                        $txt    = 'Penambahan Barang';
+                                    } elseif ($s->kd_akun == '11513') {
+                                        $qs     = '';
+                                        $btn    = "btn btn-block btn-sm bg-cstm3 color-palette";
+                                        $txt    = 'adjustmen stock(+)';
+                                    } elseif ($s->kd_akun == '11514') {
+                                        $qs     = '-';
+                                        $btn    = "btn btn-block btn-sm bg-cstm4 color-palette";
+                                        $txt    = 'adjustmen stock(-)';
                                     }
                                 ?>
                                     <tr>
-                                        <td style="text-align: center;"><?= $s->kd_transaksi ?></td>
+                                        <td style="text-align: center; width: 5%;"><?= $s->kd_transaksi ?></td>
+                                        <td style="text-align: center;"><?= shortdate_indo($s->tgl_transaksi) ?></td>
                                         <td>
-                                            <a href="#" class="<?= $btn ?>"><b style="text-transform:uppercase"><?= $txt ?></b></a>
+                                            <a href="#" class="<?= $btn ?>"><b style="text-transform:uppercase; color: #212529;"><?= $txt ?></b></a>
                                         </td>
-                                        <td style="text-align: center;"><?= format_indo($s->tgl_transaksi) ?></td>
-                                        <td style="text-align: center;"><?= $dep ?></td>
-                                        <td style="text-align: center;"><?= $nm_satuan ?></td>
-                                        <td style="text-align: center;"><?= $qs . $s->qty ?></td>
-                                        <td style="text-align: center;"><?= $s->nm_satuan ?></td>
-                                        <td><a href="<?= base_url('revisitr/' . $s->kd_akun . '/' . $s->kd_transaksi . '/' . $s->kd_barang) ?>" class="btn btn-block btn-primary btn-sm"><i class="fa fa-solid fa-eye"></i></a></td>
+                                        <td style="text-align: center;"><?= $s->ket ?></td>
+                                        <?php if ($s->lvusr == "") : ?>
+                                            <td style="text-align: center;">ADMIN</td>
+                                            <td style="text-align: center;"><?= $s->inpt ?></td>
+                                        <?php else : ?>
+                                            <td style="text-align: center;"><?= $s->dep ?></td>
+                                            <td style="text-align: center;"><?= $s->nmreq ?></td>
+                                        <?php endif; ?>
+                                        <td style="text-align: center;"><?= $qs . $s->qty . " " . "(" . $s->nm_satuan . ")" ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -88,11 +91,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
+                                    <?php foreach ($note as $n) : ?>
+                                        <tr>
+                                            <td><?= $n->isi_note ?></td>
+                                            <td><?= $n->nama_user ?></td>
+                                            <td><?= $n->create_at ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
