@@ -14,6 +14,7 @@
                         <h1 class="m-0">
                             <b style="text-transform:uppercase">List Stock Barang - stock controller</b>
                         </h1>
+                        <a href="<?= base_url('nkrestok') ?>" class="btn btn-md mt-2 mb-2 btn-info"><b style="text-transform:uppercase">List Stock Barang Kosong</b></a>
                         <table class="table table-bordered" id="list_stocknonkomersil">
                             <thead>
                                 <tr>

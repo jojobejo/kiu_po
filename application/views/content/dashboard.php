@@ -166,6 +166,36 @@
                             <h1><b style="text-transform:uppercase">stok ulang barang persediaan</b></h1>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
+                    <div class="row mt-2">
+                        <div class="col-lg-6 col-6">
+                            <div class="small-box" style="background-color: #f7e591;">
+                                <div class="inner">
+                                    <?php foreach ($restock as $rstk) : ?>
+                                        <h3><?= $rstk->cqty ?> </h3>
+                                    <?php endforeach; ?>
+                                    <p>Restock Inventory</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <a href="<?= base_url('') ?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-6">
+                            <div class="small-box" style="background-color: #f7e591;">
+                                <div class="inner">
+                                    <?php foreach ($reqmrbarag as $req) : ?>
+                                        <h3><?= $req->totreq ?> </h3>
+                                    <?php endforeach; ?>
+                                    <p>Request Master Barang</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <a href="<?= base_url('vrequestmbarang') ?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </div>

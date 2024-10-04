@@ -95,7 +95,7 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT
         COUNT(a.id_det_po_nk) AS total,
         SUM(CASE WHEN a.status = '1' THEN 1 ELSE 0 END) tot_yes,
-        SUM(CASE WHEN a.status = '3' THEN 1 ELSE 0 END) tot_no
+        SUM(CASE WHEN a.status = '4' THEN 1 ELSE 0 END) tot_no
         FROM tb_detail_req a
         WHERE a.kd_po_nk = '$kd'
         ");

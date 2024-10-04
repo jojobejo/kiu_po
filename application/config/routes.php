@@ -91,7 +91,6 @@ $route['add_mbarang'] = 'master_barang/C_MasterBarang/add_mbarang';
 $route['edit_mbarangnk'] = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk'] = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk'] = 'master_barang/C_MasterBarang/uploadgbrbarang';
-
 $route['add_mbarang_tmp'] = 'master_barang/C_MasterBarang/addrequestmasterbarang';
 $route['add_mbarang_tmps'] = 'master_barang/C_MasterBarang/addrequestmasterbarangs';
 $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqrcbrnk/$1/$2/$3';
@@ -107,11 +106,12 @@ $route['pononkomersil/list_stocknkpo'] = 'stock/C_Stocknonkomersil/list_stock_no
 $route['detailtransaksi/(:any)'] = 'stock/C_Stocknonkomersil/detailtransaksi/$1';
 $route['revisitr/(:any)/(:any)/(:any)'] = 'stock/C_Stocknonkomersil/revisitr/$1/$2/$3';
 $route['adjustmenqty'] = 'stock/C_Stocknonkomersil/adjustmenqty';
-
+$route['nkrestok'] = 'stock/C_Stocknonkomersil/nkrestok';
+$route['indraftrestock'] = 'stock/C_Stocknonkomersil/indraftrestock';
 $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
-
 // Stock PO Komersil
+$route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';

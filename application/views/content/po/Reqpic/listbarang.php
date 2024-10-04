@@ -35,7 +35,11 @@
                                 <tr>
                                     <td><?= $l->nama_barang ?></td>
                                     <td><?= $l->descnk ?></td>
-                                    <td style="text-align: center;"><?= $l->qty_ready ?></td>
+                                    <?php if ($l->qty_ready == '0') : ?>
+                                        <td style="text-align: center;background-color:#e7a532;"><?= $l->qty_ready ?></td>
+                                    <?php else : ?>
+                                        <td style="text-align: center;background-color: ;"><?= $l->qty_ready ?></td>
+                                    <?php endif ?>
                                     <td style="text-align: center;"><?= $l->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File</a>

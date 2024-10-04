@@ -401,9 +401,9 @@
                                     $totacc = $c->tot_yes;
                                     $totpnd = $c->tot_no;
                                 ?>
-                                    <?php if ($totpnd == '0') : ?>
+                                    <?php if ($totpnd > '0') : ?>
                                         <?php foreach ($stspo as $st) : ?>
-                                            <?php if ($st->status != 'PROSES PEMBELIAN') : ?>
+                                            <?php if ($st->status == 'PROSES PEMBELIAN') : ?>
                                                 <?php echo form_open_multipart('reqpicconfirmed'); ?>
                                                 <?php $now = date("Y-m-d"); ?>
                                                 <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>

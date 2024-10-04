@@ -41,4 +41,19 @@ class M_Dashboard extends CI_Model
         AND a.kd_user = '$kduser'
         ");
     }
+    function totalRestock()
+    {
+        return $this->db->query("SELECT
+        COUNT(a.qty_ready) AS cqty
+        FROM v_stockbarangnk a
+        WHERE a.qty_ready <= 0
+        ");
+    }
+    function getreqmasterbarang()
+    {
+        return $this->db->query("SELECT
+        COUNT(a.id_reqmbarang) AS totreq
+        FROM tb_req_masterbarang a
+        ");
+    }
 }

@@ -167,4 +167,48 @@ class C_Stocknonkomersil extends CI_Controller
             redirect('detailtransaksi/' . $kdbrsistem);
         }
     }
+    public function nkrestok()
+    {
+        $data['title']      = 'List Stock Non Komersil';
+        $data['vstock']     = $this->M_Stocknonkomersil->v_stockzero()->result();
+        $data['draftpo']    = $this->M_Stocknonkomersil->draftpo()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/listnostock.php', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function indraftrestock()
+    {
+        $kduser     = $this->session->userdata('kode');
+        $kdbsys     = $this->input->post('kdbys');
+        $kdbr       = $this->input->post('kdbr');
+        $katbarang  = $this->input->post('katbr');
+        $nmbarang   = $this->input->post('nm_barang');
+        $descnk     = $this->input->post('descnk_isi');
+        $ket        = $this->input->post('ket_isi');
+        $qty        = $this->input->post('qty_isi');
+        $satuan     = $this->input->post('satqty');
+        $hrgsatuan  = $this->input->post('hrgsat');
+
+        $hrgtot     = $qty * $hrgsatuan;
+
+        $inputdt    = array(
+            'jnis_po'       => '3',
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descnk,
+            'keterangan'    => $ket,
+            'qty'           => $qty,
+            'satuan'        => $satuan,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $hrgtot,
+            'kd_bsys'       => $kdbsys,
+            'kd_barang'     => $kdbr,
+            'kat_barang'    => $katbarang,
+            'kd_user'       => $kduser
+        );
+        $this->M_Stocknonkomersil->inputtmprestock($inputdt);
+        redirect('nkrestok');
+    }
 }

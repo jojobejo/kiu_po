@@ -19,6 +19,32 @@ class M_Stocknonkomersil  extends CI_Model
         return $this->db->get('v_stockbarangnk')->result();
     }
 
+    public function v_stockzero()
+    {
+        return $this->db->query("SELECT	
+		a.id_satuan		AS idsat,
+        a.kode_barangs  as kdbarangsys,
+        a.kode_barang   as kdbarang,
+        a.nama_barang   as nmbarang,
+        a.qty_ready     as qtyready,
+        a.satuan        as satuan,
+        a.deskripsi		as desk,
+        a.kat_barang 	as katbr
+        FROM v_stockbarangnk a
+        WHERE a.qty_ready <=0
+        
+        ");
+    }
+    public function draftpo()
+    {
+        return $this->db->query("SELECT 
+        a.*,b.nm_satuan
+        FROM tb_tmp_item_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        WHERE a.jnis_po = '3'
+        ");
+    }
+
     public function getallbarang()
     {
         return $this->db->query("SELECT 
@@ -200,6 +226,10 @@ class M_Stocknonkomersil  extends CI_Model
     public function insrt_note($data)
     {
         $this->db->insert('tb_note_direktur', $data);
+    }
+    public function inputtmprestock($data)
+    {
+        $this->db->insert('tb_tmp_item_nk', $data);
     }
     public function get_note($kd)
     {
