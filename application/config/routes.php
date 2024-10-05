@@ -111,7 +111,7 @@ $route['indraftrestock'] = 'stock/C_Stocknonkomersil/indraftrestock';
 $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
 // Stock PO Komersil
-$route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
+$route['stockkomersil'] = 'stock/C_Stockkomersil';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';
