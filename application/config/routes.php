@@ -97,6 +97,9 @@ $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqr
 $route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/aprovedmasterbarang';
 $route['vrequestmbarang'] = 'master_barang/C_MasterBarang/vrequestmbarang';
 
+//MASTER BARANG NON KOMERSIL
+$route['masterbarang'] = 'master_barang/C_MasterBarang';
+
 // PO-Non-Komersil - PO JASA
 $route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
 
@@ -112,6 +115,8 @@ $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
 // Stock PO Komersil
 $route['stockkomersil'] = 'stock/C_Stockkomersil';
+$route['servergetallkomersil'] = 'stock/C_Stockkomersil/servergetallkomersil';
+$route['brgdetkomersil/(:any)'] = 'stock/C_Stockkomersil/brgdetkomersil/$1';
 
 //PurchaseOrderNonKomersil
 $route['pononkomersil'] = 'purchaseorder/C_Order/pononkomersil';

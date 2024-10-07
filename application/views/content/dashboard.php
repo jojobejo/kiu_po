@@ -162,8 +162,31 @@
                 </div>
                 <div class="col-md">
                     <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1><b style="text-transform:uppercase">stok ulang barang persediaan</b></h1>
+                        <div class="col-sm-8">
+                            <h1><b style="text-transform:uppercase">restock barang komersil</b></h1>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+                    <div class="row mt-2">
+                        <div class="col-lg">
+                            <div class="small-box" style="background-color: #f7e591;">
+                                <div class="inner">
+                                    <?php foreach ($restock as $rstk) : ?>
+                                        <h3><?= $rstk->cqty ?> </h3>
+                                    <?php endforeach; ?>
+                                    <p>Restock Inventory</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <a href="<?= base_url('') ?>" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="row mb-2">
+                        <div class="col-sm-8">
+                            <h1><b style="text-transform:uppercase">stok ulang barang persediaan - non komersil</b></h1>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
                     <div class="row mt-2">

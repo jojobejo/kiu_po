@@ -113,21 +113,41 @@
                       <p>PO Pembelian</p>
                     </a>
                   </li>
-                  <li class="nav-item">
-
-                  </li>
                 </ul>
               </li>
             </ul>
           </li>
           <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-archive"></i>
+              <p>
+                Master Barang
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarang') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
             <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
               <i class="nav-icon fas fa-box"></i>
               <p>
                 Master Barang
               </p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('vrequestmbarang') ?>" class="nav-link">
               <i class="nav-icon fas fa-box-open"></i>

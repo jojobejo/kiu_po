@@ -2,16 +2,11 @@
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">
-
-                    </h1>
-                </div><!-- /.col -->
             </div><!-- /.row -->
             <div class="card">
                 <div class="card-body">
                     <h1>
-                        <b style="text-transform:uppercase">buffer-stock barang komersil</b>
+                        <b style="text-transform:uppercase">detail per</b>
                     </h1>
                     <div class="col mt-4">
                         <table class="table table-bordered" id="list_stocknonkomersil">
