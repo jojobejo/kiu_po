@@ -49,9 +49,11 @@ class C_Stockkomersil extends CI_Controller
         //output dalam format JSON
         echo json_encode($output);
     }
+
     public function brgdetkomersil($id)
     {
-        $data['title'] = 'User';
+        $data['title']          = 'Detail Product';
+        $data['lbarangdet']     = $this->M_Stockkomersil->getdetbr($id)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');

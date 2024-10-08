@@ -27,6 +27,19 @@ class M_Stockkomersil extends CI_Model
         $this->db->where('id_user', $iduser);
         return $this->db->update('tb_user', $data);
     }
+    public function getdetbr($id)
+    {
+        return $this->db->query("SELECT
+        b.nama_suplier AS nmsup,
+        a.kode_barang AS kdbarang,
+        a.nama_barang AS nmbarang,
+        a.qty_min AS qtymin
+        FROM tb_barang a
+        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
+        JOIN tb_satuan c ON c.id_satuan = a.satuan_qty
+        WHERE a.id_barang = '$id'
+        ");
+    }
 
     var $table = 'v_brgkomersil';
     var $column_order = array('kdbarang', 'nmsup', 'nm_barang', 'satuan', 'qty', 'qty_min', 'idbrg');
@@ -37,9 +50,7 @@ class M_Stockkomersil extends CI_Model
     {
 
         $this->db->from($this->table);
-
         $i = 0;
-
         foreach ($this->column_search as $item) // looping awal
         {
             if ($_POST['search']['value']) // jika datatable mengirimkan pencarian dengan metode POST
