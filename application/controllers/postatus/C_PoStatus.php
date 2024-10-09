@@ -8,7 +8,6 @@ class C_PoStatus extends CI_Controller
 
 {
 
-
     function __construct()
     {
         parent::__construct();
@@ -351,6 +350,74 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerPrint');
     }
 
+    public function onhandpo($kdpo)
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $itemconfirm    = $this->M_Postatus->getitemreq($kdpo)->result();
+        $now            = date('Y-m-d');
+        $now1           = date('Y-m-d h:m:s');
+
+        $updatestatus = array(
+            'kd_po'     => $kdpo,
+            'status'    => 'DONE'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO DONE',
+            'kd_user'   => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+        if ($itemconfirm) {
+            foreach ($itemconfirm as $t) {
+                $inserttransaksi = array(
+                    'kd_akun'           => '11411',
+                    'kd_po_nk'          => $t->kdpo,
+                    'kd_barang'         => $t->kdbarang,
+                    'kd_barangsys'      => 'KDPO',
+                    'keterangan'        => 'KETPO',
+                    'kat_barang'        => 'POKOMERSIL',
+                    'tr_qty'            => $t->qty,
+                    'satuan'            => $t->satuan,
+                    'tgl_transaksi'     => $now,
+                    'inputer'           => $this->session->userdata('kode'),
+                    'req_by'            => 'PONONKOMERSIL',
+                    'create_at'         => $now1,
+                    'last_updated_by'   => $this->session->userdata('kode')
+                );
+                $this->M_Postatus->konfirmPo($kdpo, $updatestatus);
+                $this->M_Postatus->addNote($notedirektur);
+                $this->M_Postatus->input_tr($inserttransaksi);
+                redirect('postatus');
+            }
+        }
+    }
+
+    public function poconfirmacc($kdpo)
+    {
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po'     => $kdpo,
+            'status'    => 'ON DELIVERY'
+        );
+
+        $notedirektur = array(
+            'kd_po'     => $kdpo,
+            'isi_note'  => 'PO - ON DELIV',
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->konfirmPo($kdpo, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatus');
+    }
+
     public function konfirmasiOrder($kdpo, $kddirektur)
     {
         $departement    = $this->session->userdata('kode');
@@ -359,7 +426,7 @@ class C_PoStatus extends CI_Controller
         $dataKonfirm = array(
             'kd_po' => $kdpo,
             'acc_with' => $kddirektur,
-            'status' => 'DONE'
+            'status' => 'ACC DIREKTUR'
         );
 
         $notedirektur = array(

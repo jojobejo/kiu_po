@@ -181,4 +181,33 @@ class M_MasterBarang extends CI_Model
 
         return  $image_name;
     }
+
+    public function allmasterbarang()
+    {
+        return $this->db->query("SELECT
+        a.id_barang,
+        a.kode_barang,
+        c.nama_suplier,
+        a.nama_barang,
+        a.bahan_aktif,
+        b.nm_satuan,
+        a.panjang,
+        a.lebar,
+        a.tinggi,
+        a.hasil_dimensi
+        FROM tb_barang a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan_qty
+        JOIN tb_suplier c ON c.kd_suplier = a.kd_suplier
+        ");
+    }
+
+    public function getsuplierall()
+    {
+        return $this->db->query("SELECT 
+        a.id_suplier AS idsup,
+        a.kd_suplier AS kdsup,
+        a.nama_suplier AS namasup
+        FROM tb_suplier a
+        ");
+    }
 }

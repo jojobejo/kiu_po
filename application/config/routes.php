@@ -97,8 +97,8 @@ $route['genqrcode/(:any)/(:any)/(:any)'] = 'master_barang/C_MasterBarang/inputqr
 $route['aprovedmasterbarang'] = 'master_barang/C_MasterBarang/aprovedmasterbarang';
 $route['vrequestmbarang'] = 'master_barang/C_MasterBarang/vrequestmbarang';
 
-//MASTER BARANG NON KOMERSIL
-$route['masterbarang'] = 'master_barang/C_MasterBarang';
+//MASTER BARANG KOMERSIL
+$route['masterbarangkomersil'] = 'master_barang/C_MasterBarang/masterbarangkomersil';
 
 // PO-Non-Komersil - PO JASA
 $route['pononkomersiljasa'] = 'purchaseorder/pojasa/C_Pojasa';
@@ -225,9 +225,11 @@ $route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 $route['detailPO/(:any)']               = 'postatus/C_PoStatus/detailPO/$1';
 $route['update_printout_po']            = 'postatus/C_PoStatus/update_printout_po';
 
+$route['onhandpo/(:any)']             = 'postatus/C_PoStatus/onhandpo/$1';
 $route['printOrder/(:any)']             = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrdernk/(:any)']           = 'postatus/C_PoStatus/printOrdernk/$1';
 $route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
+$route['poconfirmacc/(:any)']           = 'postatus/C_PoStatus/poconfirmacc/$1';
 $route['tolakOrder/(:any)/(:any)']      = 'postatus/C_PoStatus/tolakOrder/$1/$2';
 $route['cancel_po']                     = 'postatus/C_PoStatus/cancel_po';
 $route['NoteDirektur']                  = 'postatus/C_PoStatus/addNote';

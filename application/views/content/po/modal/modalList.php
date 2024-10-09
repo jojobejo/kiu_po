@@ -36,7 +36,7 @@
                                 <select name="satuan_isi" id="satuan_isi" class="form-control">
                                     <option value="-">--PILIH SATUAN--</option>
                                     <?php foreach ($satuan as $s) : ?>
-                                        <option value="<?= $s->nm_satuan ?>"> <?= $s->nm_satuan ?></option>
+                                        <option value="<?= $s->id_satuan ?>"> <?= $s->nm_satuan ?></option>
                                     <?php endforeach;  ?>
                                 </select>
                             </div>

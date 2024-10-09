@@ -33,6 +33,7 @@ class M_Stockkomersil extends CI_Model
         b.nama_suplier AS nmsup,
         a.kode_barang AS kdbarang,
         a.nama_barang AS nmbarang,
+        C.nm_satuan AS qtysatuan,
         a.qty_min AS qtymin
         FROM tb_barang a
         JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier

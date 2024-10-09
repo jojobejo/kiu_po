@@ -870,5 +870,23 @@ class M_PoStatus extends CI_Model
         $this->db->insert('tb_transaksi', $data);
     }
 
+    function getitemreq($kdpo)
+    {
+        return $this->db->query("SELECT
+        a.kd_po AS kdpo,
+        a.kd_barang AS kdbarang,
+        a.qty AS qty,
+        a.satuan AS satuan,
+        a.tgl_transaksi AS tgltr
+        FROM tb_detail_po a
+        WHERE a.kd_po = '$kdpo' 
+        ");
+    }
+
+    function input_tr($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
+    }
+
     // BRACKET END MODEL
 }
