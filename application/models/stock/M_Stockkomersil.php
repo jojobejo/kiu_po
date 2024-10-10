@@ -42,6 +42,28 @@ class M_Stockkomersil extends CI_Model
         ");
     }
 
+    public function getdetbrkd($id)
+    {
+        return $this->db->query("SELECT
+        a.*,
+        b.id_barang,
+        b.nama_barang,
+        b.qty_min,
+        b.qty_all,
+        c.nama_suplier,
+        d.nm_satuan,
+        e.no_po,
+        f.nama_user
+        FROM tb_transaksi a
+        JOIN tb_barang b ON b.kode_barang = a.kd_barang
+        JOIN tb_suplier c ON c.kd_suplier = b.kd_suplier
+        JOIN tb_satuan d ON d.id_satuan = b.satuan_qty
+        JOIN tb_po e ON e.kd_po =a.kd_po_nk
+        JOIN tb_user f ON f.kode_user = a.inputer 
+        WHERE a.kd_akun = '11411' AND a.kd_barang = '$id'
+        ");
+    }
+
     var $table = 'v_brgkomersil';
     var $column_order = array('kdbarang', 'nmsup', 'nm_barang', 'satuan', 'qty', 'qty_min', 'idbrg');
     var $column_search = array('nmsup', 'nm_barang');

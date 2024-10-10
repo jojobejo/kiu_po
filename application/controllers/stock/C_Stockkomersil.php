@@ -37,7 +37,7 @@ class C_Stockkomersil extends CI_Controller
             $row[] = $field->qty;
             $row[] = $field->qty_min;
             $row[] =
-                '<a href="' . base_url('brgdetkomersil/' . $field->idbrg . '') . '" id="confirms" class="btn btn-info btn-sm d-flex justify-content-center"><i class="fas fa-eye"></i></a>';
+                '<a href="' . base_url('brgdetkomersil/' . $field->kdbarang . '') . '" id="confirms" class="btn btn-info btn-sm d-flex justify-content-center"><i class="fas fa-eye"></i></a>';
             $data[] = $row;
         }
         $output = array(
@@ -53,7 +53,7 @@ class C_Stockkomersil extends CI_Controller
     public function brgdetkomersil($id)
     {
         $data['title']          = 'Detail Product';
-        $data['lbarangdet']     = $this->M_Stockkomersil->getdetbr($id)->result();
+        $data['lbarangdet']     = $this->M_Stockkomersil->getdetbrkd($id)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
