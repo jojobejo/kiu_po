@@ -150,7 +150,7 @@ class M_Stocknonkomersil  extends CI_Model
         LEFT JOIN tb_po_nk d ON d.kd_po_nk = a.kd_po_nk
         LEFT JOIN tb_user e ON e.kode_user = a.req_by
         LEFT JOIN tb_user f ON f.kode_user = a.inputer
-        WHERE a.kd_barangsys = '$kd'
+        WHERE a.kd_barang = '$kd'
         ORDER BY a.id_transnk DESC
         ");
     }
