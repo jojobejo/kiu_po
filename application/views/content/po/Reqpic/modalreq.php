@@ -15,6 +15,7 @@
                             <div class="col-sm-8">
                                 <input class="form-control" type="text" id="kdbys" name="kdbys" value="<?= $l->kode_sys ?>" readonly />
                                 <input class="form-control" type="text" id="kdbr" name="kdbr" value="<?= $l->kode_adm ?>" readonly />
+                                <input class="form-control" type="text" id="idsat" name="idsat" value="<?= $l->id_satuan ?>" readonly />
                                 <input class="form-control" type="text" id="katbr" name="katbr" value="<?= $l->kat_barang ?>" readonly />
                                 <input class="form-control" type="text" id="nm_barang" name="nm_barang" value="<?= $l->nama_barang ?>" readonly />
                                 <input class="form-control" type="text" id="descnk_isi" name="descnk_isi" value="<?= $l->descnk ?>" readonly />

@@ -9,7 +9,7 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <a href="<?= base_url('detailponk/' . $kdbr) ?>" class="btn btn-success"><i class="fas fa-home"></i> BACK</a>
-                        <?php if ($this->session->userdata('lv') != '3' || $this->session->userdata('lc') != '5') : ?>
+                        <?php if ($this->session->userdata('lv') != '3' || $this->session->userdata('lv') != '5') : ?>
                             <a href="#" class="btn btn-success " data-toggle="modal" data-target="#addmbarangnk"><i class="fas fa-folder-plus"></i> Req Add Master Barang</a>
                         <?php else : ?>
                         <?php endif; ?>

@@ -192,6 +192,7 @@ class C_Order extends CI_Controller
         $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
         redirect('purchase/listBarang/' . $kdsuplier);
     }
+    
     public function hapusBarang($id, $kdsuplier)
     {
         $this->M_MasterBarang->hapusBarang($id);

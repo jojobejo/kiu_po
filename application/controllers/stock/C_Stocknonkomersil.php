@@ -75,10 +75,11 @@ class C_Stocknonkomersil extends CI_Controller
     }
     public function detailtransaksi($kdbarang)
     {
-        $data['title']  = 'Detail Stock Barang';
-        $data['note']   = 
-        $data['item']   = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
-        $data['stock'] = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
+        $data['title']      = 'Detail Stock Barang';
+        $data['kdgenerate'] = $this->M_Stocknonkomersil->getgeneratekd();
+        $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
+        $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -101,5 +102,113 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('content/stock/nonkomersil/revisitr', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function adjustmenqty()
+    {
+        date_default_timezone_set("Asia/Jakarta");
+        $adjustmentkd   = $this->input->post('adjustmentkd');
+        $kdbrsistem     = $this->input->post('kdbrsistem');
+        $kdbarang       = $this->input->post('kdbarang');
+        $katbarang      = $this->input->post('katbarang');
+        $kdakun         = $this->input->post('kdakun');
+        $satuanid       = $this->input->post('satuanid');
+        $adjqty         = $this->input->post('adjqty');
+        $ket            = $this->input->post('ket_isi');
+        $now            = date('Y-m-d H:i:s');
+        $now1           = date('Y-m-d');
+
+        $generatekd         = array(
+            'kd_barang'     => $adjustmentkd
+        );
+
+        $insrtadjustment    = array(
+            'kd_akun'           => $kdakun,
+            'kd_po_nk'          => $adjustmentkd,
+            'kd_barang'         => $kdbarang,
+            'kd_barangsys'      => $kdbrsistem,
+            'keterangan'        => $ket,
+            'kat_barang'        => $katbarang,
+            'tr_qty'            => $adjqty,
+            'satuan'            => $satuanid,
+            'inputer'           => $this->session->userdata('kode'),
+            'req_by'            => '-',
+            'tgl_transaksi'     => $now1,
+            'create_at'         => $now,
+            'last_updated_by'   => $this->session->userdata('kode'),
+            'update_at'         => $now
+        );
+
+        $this->M_Stocknonkomersil->generatekd($generatekd);
+        $this->M_Stocknonkomersil->insttransaksi($insrtadjustment);
+
+        if ($kdakun == '11513') {
+            $inputnote = array(
+                'kd_po'         => $kdbrsistem,
+                'isi_note'      => 'ADJUSTMENT PENAMBAHAN QTY - ' . $ket,
+                'kd_user'       => $this->session->userdata('kode'),
+                'nama_user'     => $this->session->userdata('nama_user'),
+                'note_for'      => '3',
+                'update_status' => '3',
+                'create_at'     => $now
+            );
+            $this->M_Stocknonkomersil->insrt_note($inputnote);
+            redirect('detailtransaksi/' . $kdbrsistem);
+        } else if ($kdakun == '11514') {
+            $inputnote = array(
+                'kd_po'         => $kdbrsistem,
+                'isi_note'      => 'ADJUSTMENT PENGURANGAN QTY - ' . $ket,
+                'kd_user'       => $this->session->userdata('kode'),
+                'nama_user'     => $this->session->userdata('nama_user'),
+                'note_for'      => '3',
+                'update_status' => '3',
+                'create_at'     => $now
+            );
+            $this->M_Stocknonkomersil->insrt_note($inputnote);
+            redirect('detailtransaksi/' . $kdbrsistem);
+        }
+    }
+    public function nkrestok()
+    {
+        $data['title']      = 'List Stock Non Komersil';
+        $data['vstock']     = $this->M_Stocknonkomersil->v_stockzero()->result();
+        $data['draftpo']    = $this->M_Stocknonkomersil->draftpo()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/listnostock.php', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function indraftrestock()
+    {
+        $kduser     = $this->session->userdata('kode');
+        $kdbsys     = $this->input->post('kdbys');
+        $kdbr       = $this->input->post('kdbr');
+        $katbarang  = $this->input->post('katbr');
+        $nmbarang   = $this->input->post('nm_barang');
+        $descnk     = $this->input->post('descnk_isi');
+        $ket        = $this->input->post('ket_isi');
+        $qty        = $this->input->post('qty_isi');
+        $satuan     = $this->input->post('satqty');
+        $hrgsatuan  = $this->input->post('hrgsat');
+
+        $hrgtot     = $qty * $hrgsatuan;
+
+        $inputdt    = array(
+            'jnis_po'       => '3',
+            'nama_barang'   => $nmbarang,
+            'deskripsi'     => $descnk,
+            'keterangan'    => $ket,
+            'qty'           => $qty,
+            'satuan'        => $satuan,
+            'hrg_satuan'    => $hrgsatuan,
+            'total_harga'   => $hrgtot,
+            'kd_bsys'       => $kdbsys,
+            'kd_barang'     => $kdbr,
+            'kat_barang'    => $katbarang,
+            'kd_user'       => $kduser
+        );
+        $this->M_Stocknonkomersil->inputtmprestock($inputdt);
+        redirect('nkrestok');
     }
 }

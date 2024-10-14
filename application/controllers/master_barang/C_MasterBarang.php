@@ -29,7 +29,17 @@ class C_MasterBarang extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/mbarang/datatables');
     }
+    public function masterbarangkomersil()
+    {
+        $data['title']      = 'Master Barang - Komersil';
+        $data['barang']     = $this->M_MasterBarang->allmasterbarang()->result();
 
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/mbarang/mbodyk', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/mbarang/datatables');
+    }
     public function addrequestmasterbarang()
     {
         $inputby    = $this->session->userdata('kode');
@@ -251,7 +261,7 @@ class C_MasterBarang extends CI_Controller
                 $config['max_width'] = '6000';
                 $config['max_height'] = '6000';
                 $config['overwrite'] = TRUE;
-                $config['file_name'] = date('U') .   '-' . $flnms;  
+                $config['file_name'] = date('U') .   '-' . $flnms;
                 $this->load->library('upload', $config);
                 $this->upload->initialize($config);;
 

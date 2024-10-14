@@ -18,9 +18,10 @@
                             <tr>
                                 <td>Nama Barang</td>
                                 <td>Deskripsi / Spesifikasi</td>
-                                <td>Satuan</td>
-                                <td>Gambar Produk</td>
-                                <td>#</td>
+                                <td style="text-align: center;">Stock</td>
+                                <td style="text-align: center;">Satuan</td>
+                                <td style="text-align: center;">Gambar Produk</td>
+                                <td style="text-align: center;">#</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,7 +35,12 @@
                                 <tr>
                                     <td><?= $l->nama_barang ?></td>
                                     <td><?= $l->descnk ?></td>
-                                    <td><?= $l->nm_satuan ?></td>
+                                    <?php if ($l->qty_ready == '0') : ?>
+                                        <td style="text-align: center;background-color:#e7a532;"><?= $l->qty_ready ?></td>
+                                    <?php else : ?>
+                                        <td style="text-align: center;background-color: ;"><?= $l->qty_ready ?></td>
+                                    <?php endif ?>
+                                    <td style="text-align: center;"><?= $l->nm_satuan ?></td>
                                     <td>
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File</a>
                                     </td>

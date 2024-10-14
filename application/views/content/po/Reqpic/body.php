@@ -33,6 +33,10 @@
                                                     </div>
                                                 <?php elseif ($g->status == 'REQUEST ACC') : ?>
                                                     <div class="col">
+                                                        <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
+                                                    </div>
+                                                <?php elseif ($g->status == 'BARANG TERSEDIA') : ?>
+                                                    <div class="col">
                                                         <a class="btn btn-block btn-info btn-sm"><?= $g->status ?></a>
                                                     </div>
                                                 <?php elseif ($g->status == 'DONE') : ?>
@@ -76,6 +80,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <table class="table table-bordered table-striped" id="">
                                 <thead>
                                     <tr>
@@ -123,6 +128,7 @@
                                 </tr>
                             </tfoot>
                             </table>
+
                         </div>
                         <!-- END CARD CONTENT -->
                     </div>
@@ -165,6 +171,8 @@
                                         <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'REQUEST ACC') : ?>
+                                            <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
+                                        <?php elseif ($g->status == 'BARANG TERSEDIA') : ?>
                                             <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'DONE') : ?>
                                             <td><a class="btn btn-block btn-success btn-sm"><b><?= $g->status ?></b></a></td>

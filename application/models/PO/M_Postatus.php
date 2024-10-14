@@ -356,6 +356,16 @@ class M_PoStatus extends CI_Model
         WHERE a.status != 'DONE' AND a.status != 'REJECT' AND a.status != 'PENDING' AND a.status != 'REVISI' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'ON PROGRESS'
             ");
     }
+    public function ponkgetAllNK_keu_purchasing($kd)
+    {
+        return $this->db->query("SELECT *,
+        a.status
+        FROM tb_po_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE a.status != 'DONE'
+        AND a.kd_user = '$kd'
+            ");
+    }
     public function getAllNK_kar($kduser)
     {
         return $this->db->query("SELECT *,
@@ -856,6 +866,24 @@ class M_PoStatus extends CI_Model
         return $query;
     }
     function input_transaksi($data)
+    {
+        $this->db->insert('tb_transaksi', $data);
+    }
+
+    function getitemreq($kdpo)
+    {
+        return $this->db->query("SELECT
+        a.kd_po AS kdpo,
+        a.kd_barang AS kdbarang,
+        a.qty AS qty,
+        a.satuan AS satuan,
+        a.tgl_transaksi AS tgltr
+        FROM tb_detail_po a
+        WHERE a.kd_po = '$kdpo' 
+        ");
+    }
+
+    function input_tr($data)
     {
         $this->db->insert('tb_transaksi', $data);
     }

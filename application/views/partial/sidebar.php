@@ -113,21 +113,41 @@
                       <p>PO Pembelian</p>
                     </a>
                   </li>
-                  <li class="nav-item">
-
-                  </li>
                 </ul>
               </li>
             </ul>
           </li>
           <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-archive"></i>
+              <p>
+                Master Barang
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarangkomersil') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
             <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
               <i class="nav-icon fas fa-box"></i>
               <p>
                 Master Barang
               </p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('vrequestmbarang') ?>" class="nav-link">
               <i class="nav-icon fas fa-box-open"></i>
@@ -206,6 +226,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('reviewapps') ?>" class="nav-link">
+              <i class="nav-icon fas fa-star"></i>
+              <p>
+                Review Apps
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('logout') ?>" class="nav-link">
               <i class="nav-icon fas fa-unlock"></i>
               <p>
@@ -215,20 +243,16 @@
           </li>
 
         <?php elseif ($this->session->userdata('lv') == '4') : ?>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
-              <i class="nav-icon fas fa-cash-register"></i>
-              <p>
-                Purchase Order Barang
-              </p>
+              <i class="far fa-circle nav-icon"></i>
+              <p>Non Komersil</p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="<?= base_url('postatusnk') ?>" class="nav-link">
-              <i class="nav-icon fas fa-money-check"></i>
-              <p>
-                Purchase Order Status
-              </p>
+              <i class="far fa-circle nav-icon"></i>
+              <p>Non Komersil</p>
             </a>
           </li>
           <li class="nav-item">
@@ -244,6 +268,22 @@
               <i class="nav-icon fas fa-box"></i>
               <p>
                 Request Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('stocknonkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cubes"></i>
+              <p>
+                Stock Non Komersil
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reviewapps') ?>" class="nav-link">
+              <i class="nav-icon fas fa-star"></i>
+              <p>
+                Review Apps
               </p>
             </a>
           </li>

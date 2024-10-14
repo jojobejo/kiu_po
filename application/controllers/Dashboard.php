@@ -23,10 +23,12 @@ class Dashboard extends CI_Controller
             $data['title']  = 'Dashboard';
             $kduser = $this->session->userdata("kode");
 
-            $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
-            $data['done']   = $this->M_Dashboard->totalDone($kduser)->result();
-            $data['progress'] = $this->M_Dashboard->totalOnProgress($kduser)->result();
-            $data['reject'] = $this->M_Dashboard->totalReject($kduser)->result();
+            $data['all']        = $this->M_Dashboard->totalAll($kduser)->result();
+            $data['done']       = $this->M_Dashboard->totalDone($kduser)->result();
+            $data['progress']   = $this->M_Dashboard->totalOnProgress($kduser)->result();
+            $data['reject']     = $this->M_Dashboard->totalReject($kduser)->result();
+            $data['restock']    = $this->M_Dashboard->totalRestock()->result();
+            $data['reqmrbarag'] = $this->M_Dashboard->getreqmasterbarang()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');

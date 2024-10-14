@@ -80,6 +80,14 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-undo"></i> PO REVISI</a>
                                         </div>
+                                    <?php elseif ($s->status == 'ON DELIVERY') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-warning btn-block"><i class="fas fa-truck-moving"></i> ON DELIVERY</a>
+                                        </div>
+                                    <?php elseif ($s->status == 'ACC DIREKTUR') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-primary btn-block"><i class="fas fa-user-tie"></i> ACC DIREKTUR</a>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '3' && $s->status == 'PO REVISI' || $this->session->userdata('lv') == '3' && $s->status == 'NOTE DIREKTUR' || $this->session->userdata('lv') == '3' && $s->status == 'NOTE KEUANGAN' || $this->session->userdata('lv') == '3' && $s->status == 'UPDATE KEUANGAN') : ?>
@@ -123,6 +131,17 @@
                                 <div class="col">
                                     <label for="tgTrans" class=""> Status Order :</label>
                                     <a class="btn btn-block btn-danger btn-md"><i class="fas fa-times"></i> PO - REJECT</a>
+                                </div>
+
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ON DELIVERY') : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class=""> Status Order :</label>
+                                    <a class="btn btn-block btn-primary btn-md"><i class="fas fa-truck-moving"></i>ON - DELIVERY</a>
+                                </div>
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'ACC DIREKTUR') : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class=""> Status Order :</label>
+                                    <a class="btn btn-block btn-primary btn-md"><i class="fas fa-user-tie"></i> ACC DIREKTUR</a>
                                 </div>
 
                             <?php endif; ?>
@@ -174,7 +193,31 @@
                                         </div>
                                     </div>
                                 </div>
-
+                            <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
+                                            <?php echo form_open_multipart('update_printout_po'); ?>
+                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('onhandpo/') . $s->kd_po ?>">
+                                                <i class="fas fa-clipboard-check"></i> &nbsp;
+                                                ON HAND
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
+                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('poconfirmacc/') . $s->kd_po ?>">
+                                                <i class="fas fa-clipboard-check"></i> &nbsp;
+                                                PO CONFIRM
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                 <div class="col">
                                     <div class="row">
@@ -188,31 +231,24 @@
                                     </div>
                                 </div>
                             <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
-
                             <?php endif; ?>
-
                     </div>
                 </div>
 
             </div>
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>
-        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
+        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
             <div class="col-md mb-2">
                 <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
                     <i class="fas fa-shipping-fast"> </i>
                     Shipment Setting
                 </a>
             </div>
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
-            <div class="col-md mb-2">
-                <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
-                    <i class="fas fa-shipping-fast"> </i>
-                    Shipment Setting
-                </a>
-            </div>
-        <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">
@@ -271,6 +307,8 @@
                     <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                         <td>#</td>
                     <?php endif; ?>
@@ -290,6 +328,8 @@
                         <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                             <td>
                                 <div class="row">
@@ -546,6 +586,8 @@
                     <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
                     <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+                    <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                         <td>#</td>
                     <?php endif; ?>
@@ -560,6 +602,8 @@
                         <?php if ($this->session->userdata('lv') < '3' && $s->status == 'DONE') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
                         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+                        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
                         <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                             <td>
                                 <a class="btn  btn-success btn-sm" data-toggle="modal" data-target="#modalnotebarangedit<?= $n->id_nt_barang ?>">

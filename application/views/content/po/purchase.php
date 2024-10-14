@@ -127,8 +127,8 @@
                         <td><?= $t->nama_barang ?></td>
                         <td><?= $t->satuan ?></td>
                         <td><?= $t->qty ?></td>
-                        <td>Rp. <?= number_format($t->harga_satuan,2) ?></td>
-                        <td>Rp. <?= number_format($t->total_harga,2) ?></td>
+                        <td>Rp. <?= number_format($t->harga_satuan, 2) ?></td>
+                        <td>Rp. <?= number_format($t->total_harga, 2) ?></td>
                         <td><a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>">
                                 <i class="fa fa-solid fa-pencil-alt"></i>
                             </a>
@@ -167,7 +167,7 @@
                         <td style="display: none;"></td>
                         <td style="display: none;"></td>
                         <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga,2) ?>
+                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga, 2) ?>
                             <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                             <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
                         </td>
