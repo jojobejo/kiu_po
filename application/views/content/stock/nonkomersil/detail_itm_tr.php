@@ -35,7 +35,6 @@
                             </thead>
                             <tbody>
                                 <?php foreach ($stock as $s) :
-                                    $tgl    = "";
                                     $qs     = "";
                                     $btn    = "";
                                     $txt    = "";
@@ -57,15 +56,10 @@
                                         $btn    = "btn btn-block btn-sm bg-cstm4 color-palette";
                                         $txt    = 'adjustmen stock(-)';
                                     }
-                                    if ($s->tgl_transaksi == "") {
-                                        $tgl    = '-';
-                                    } else {
-                                        $tgl    = shortdate_indo($tgl);
-                                    }
                                 ?>
                                     <tr>
                                         <td style="text-align: center; width: 5%;"><?= $s->kd_transaksi ?></td>
-                                        <td style="text-align: center;"><?= $tgl ?></td>
+                                        <td style="text-align: center;"><?= shortdate_indo($s->tgl_transaksi) ?></td>
                                         <td>
                                             <a href="#" class="<?= $btn ?>"><b style="text-transform:uppercase; color: #212529;"><?= $txt ?></b></a>
                                         </td>
