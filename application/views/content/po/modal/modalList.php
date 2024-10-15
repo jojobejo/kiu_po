@@ -36,7 +36,7 @@
                                 <select name="satuan_isi" id="satuan_isi" class="form-control">
                                     <option value="-">--PILIH SATUAN--</option>
                                     <?php foreach ($satuan as $s) : ?>
-                                        <option value="<?= $s->id_satuan ?>"> <?= $s->nm_satuan ?></option>
+                                        <option value="<?= $s->nm_satuan ?>"> <?= $s->nm_satuan ?></option>
                                     <?php endforeach;  ?>
                                 </select>
                             </div>
@@ -45,7 +45,7 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" step="0.000000000001"/></div>
+                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" step="0.000000000001" /></div>
                         </div>
                     </div>
                     <div class="form-group">
