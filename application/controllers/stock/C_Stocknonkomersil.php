@@ -124,8 +124,8 @@ class C_Stocknonkomersil extends CI_Controller
         $insrtadjustment    = array(
             'kd_akun'           => $kdakun,
             'kd_po_nk'          => $adjustmentkd,
-            'kd_barang'         => $kdbarang,
-            'kd_barangsys'      => $kdbrsistem,
+            'kd_barang'         => $kdbrsistem,
+            'kd_barangsys'      => $kdbarang,
             'keterangan'        => $ket,
             'kat_barang'        => $katbarang,
             'tr_qty'            => $adjqty,
