@@ -328,7 +328,7 @@ class C_Reqpic extends CI_Controller
                 );
 
                 $updtstatus = array(
-                    'status'    => '3'
+                    'status'    => '4'
                 );
 
                 $this->M_Reqpic->insert_tmp_transaksi($updatedpostmp);
