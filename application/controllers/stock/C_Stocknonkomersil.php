@@ -107,8 +107,8 @@ class C_Stocknonkomersil extends CI_Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $adjustmentkd   = $this->input->post('adjustmentkd');
-        $kdbrsistem     = $this->input->post('kdbrsistem');
-        $kdbarang       = $this->input->post('kdbarang');
+        $kdbrsistem     = $this->input->post('kdbarang');
+        $kdbarang       = $this->input->post('kdbrsistem');
         $katbarang      = $this->input->post('katbarang');
         $kdakun         = $this->input->post('kdakun');
         $satuanid       = $this->input->post('satuanid');
@@ -164,7 +164,7 @@ class C_Stocknonkomersil extends CI_Controller
                 'create_at'     => $now
             );
             $this->M_Stocknonkomersil->insrt_note($inputnote);
-            redirect('detailtransaksi/' . $kdbrsistem);
+            redirect('detailtransaksi/' . $kdbarang);
         }
     }
     public function nkrestok()
