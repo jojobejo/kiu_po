@@ -107,8 +107,8 @@ class C_Stocknonkomersil extends CI_Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $adjustmentkd   = $this->input->post('adjustmentkd');
-        $kdbrsistem     = $this->input->post('kdbarang');
-        $kdbarang       = $this->input->post('kdbrsistem');
+        $kdbrsistem     = $this->input->post('kdbrsistem');
+        $kdbarang       = $this->input->post('kdbarang');
         $katbarang      = $this->input->post('katbarang');
         $kdakun         = $this->input->post('kdakun');
         $satuanid       = $this->input->post('satuanid');
