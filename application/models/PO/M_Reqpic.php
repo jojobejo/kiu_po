@@ -191,7 +191,7 @@ class M_Reqpic extends CI_Model
                 (SELECT SUM(i.tr_qty) FROM tb_transaksi i WHERE i.kd_barangsys = a.kd_bsys AND i.kd_akun = '11514' GROUP BY a.kd_bsys) AS qty_transaksi_mad,
                 (SELECT SUM(j.tr_qty) FROM tb_transaksi j WHERE j.kd_barangsys = a.kd_bsys AND j.kd_akun = '11513' GROUP BY a.kd_bsys) AS qty_transaksi_pad
                 FROM tb_detail_req a 
-                JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
+                JOIN tb_barang_nk e ON e.kd_br_adm = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
             ) AS x 
             WHERE x.kd_po_nk = '$kd'
