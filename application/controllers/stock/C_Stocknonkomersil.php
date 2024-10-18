@@ -164,7 +164,7 @@ class C_Stocknonkomersil extends CI_Controller
                 'create_at'     => $now
             );
             $this->M_Stocknonkomersil->insrt_note($inputnote);
-            redirect('detailtransaksi/' . $kdbarang);
+            redirect('detailtransaksi/' . $kdbrsistem);
         }
     }
     public function nkrestok()
