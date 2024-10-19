@@ -21,7 +21,7 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
+                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_indo($s->tgl_transaksi) ?>" class="form-control" readonly>
                                 </div>
                                 <div class="col">
                                     <label for="naSupp" class="">PIC : </label>
