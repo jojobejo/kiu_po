@@ -273,7 +273,7 @@ class M_Reqpic extends CI_Model
         a.qty,
         c.nm_satuan
         FROM tb_detail_req a 
-        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
         JOIN tb_satuan c ON c.id_satuan = a.satuan
         WHERE a.kd_po_nk = '$kd'
 
@@ -360,7 +360,7 @@ class M_Reqpic extends CI_Model
         c.nama_user AS nmuser,
         c.departement AS dep
         FROM tb_detail_req a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
         JOIN tb_user c ON c.kode_user = a.kd_user
         WHERE a.id_det_po_nk = '$id'
             ");
