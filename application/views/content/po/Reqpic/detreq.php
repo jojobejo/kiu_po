@@ -21,7 +21,7 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_indo($s->tgl_transaksi) ?>" class="form-control" readonly>
+                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                 </div>
                                 <div class="col">
                                     <label for="naSupp" class="">PIC : </label>
@@ -352,7 +352,7 @@
                                                         </a>
                                                     </td>
                                                 <?php endif; ?>
-                                                <td><?= format_tgl_lahir($st->tgltr) ?></td>
+                                                <td><?= $st->tgltr ?></td>
                                                 <td><?= $st->nmuser ?></td>
                                                 <td><?= $st->dep ?></td>
                                                 <td><?= $st->tjbeli ?></td>
