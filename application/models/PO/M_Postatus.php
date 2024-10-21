@@ -468,7 +468,7 @@ class M_PoStatus extends CI_Model
     }
     function getdataStatusnk($kdpo)
     {
-        $this->db->select('*');
+        $this->db->select('a.*');
         $this->db->from('tb_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('kd_po_nk', $kdpo);
