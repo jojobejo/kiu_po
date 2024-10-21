@@ -149,8 +149,8 @@ class M_Reqpic extends CI_Model
             a.keterangan AS ket,
             a.qty AS qty,
             c.nm_satuan AS nmsatuan
-           FROM tb_detail_req a 
-            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+            FROM tb_detail_req a 
+            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = a.satuan
             WHERE a.kd_po_nk = '$kd'
         ");
