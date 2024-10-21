@@ -136,7 +136,7 @@ class M_Reqpic extends CI_Model
             c.nm_satuan AS nm_satuan,
             a.status as sts
             FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
         ");
