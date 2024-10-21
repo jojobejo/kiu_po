@@ -61,7 +61,7 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT 
         a.id_tmp_nk , b.nama_barang , b.descnk , a.keterangan , a.qty , c.nm_satuan , a.kd_bsys
         FROM tb_tmp_item_nk a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
         JOIN tb_satuan c ON c.id_satuan = b.satuan 
         WHERE a.jnis_po = '1' AND a.kd_user = '$kd'
         ");

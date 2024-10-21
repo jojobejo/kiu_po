@@ -69,8 +69,8 @@ class C_Reqpic extends CI_Controller
         $desc       = $this->input->post('descnk_isi');
         $ket        = $this->input->post('ket_isi');
         $qty        = $this->input->post('qty_isi');
-        $kdbarang   = $this->input->post('kdbr');
-        $kdsys      = $this->input->post('kdbys');
+        $kdbarang   = $this->input->post('kdbys');
+        $kdsys      = $this->input->post('kdbr');
         $katbarang  = $this->input->post('katbr');
         $idsat  = $this->input->post('idsat');
 
