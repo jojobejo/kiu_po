@@ -859,7 +859,7 @@ class M_PoStatus extends CI_Model
     {
         $this->db->select('a.* , b.kat_barang , b.satuan , c.nm_satuan');
         $this->db->from('tb_detail_po_nk a');
-        $this->db->join('tb_barang_nk b', 'b.kd_br_adm = a.kd_barang');
+        $this->db->join('tb_barang_nk b', 'b.kd_br_adm = a.kd_bsys');
         $this->db->join('tb_satuan c', 'c.id_satuan = b.satuan');
         $this->db->where('kd_po_nk', $kd);
         $query = $this->db->get()->result();

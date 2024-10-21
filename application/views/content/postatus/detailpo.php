@@ -286,12 +286,6 @@
                         Tambah Note Barang
                     </a>
                 </div>
-                <div class="col-md mb-2">
-                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
-                        <i class="fas fa-shipping-fast"> </i>
-                        Shipment Setting
-                    </a>
-                </div>
             </div>
         <?php endif; ?>
 
