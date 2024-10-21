@@ -1519,9 +1519,9 @@ class C_PoStatus extends CI_Controller
             $this->upload->initialize($config);;
 
             if (!$this->upload->do_upload('gambar_1')) {
-                $error = array('error' => $this->upload->display_errors());
-                print_r($error);
-                die;
+                $image_data1 = $this->upload->data();
+                $full_path1 = $config['file_name'];
+                $data["gbr_produk"] = $full_path1;
             } else {
                 if ($this->upload->do_upload('gambar_1')) {
                     $image_data1 = $this->upload->data();
@@ -1535,8 +1535,8 @@ class C_PoStatus extends CI_Controller
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'   => $config['file_name'],
-            'file_uploaded'    => $image_data1['file_name']
+            'file_name'     => $config['file_name'],
+            'file_uploaded' => $image_data1['file_name']
         );
         $dataKonfirm = array(
             'kd_po_nk' => $kdponk,

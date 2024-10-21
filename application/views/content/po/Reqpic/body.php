@@ -158,6 +158,7 @@
                                     <td>Nama Pengaju</td>
                                     <td>Departemen</td>
                                     <td>Tanggal Transaksi</td>
+                                    <td>Tujuan Pembelian</td>
                                     <td>Status</td>
                                     <td>#</td>
                                 </tr>
@@ -168,6 +169,7 @@
                                         <td><?= $g->nm_user ?></td>
                                         <td><?= $g->departemen ?></td>
                                         <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
+                                        <td><?= $g->tj_pembelian ?></td>
                                         <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'REQUEST ACC') : ?>

@@ -415,6 +415,10 @@
                                                 <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
                                                 <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                             <?php else : ?>
+                                                <?php echo form_open_multipart('reqpicconfirmed_plus'); ?>
+                                                <?php $now = date("Y-m-d"); ?>
+                                                <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
+                                                <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php else : ?>
