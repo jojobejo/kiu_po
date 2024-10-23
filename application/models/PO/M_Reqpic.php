@@ -245,7 +245,11 @@ class M_Reqpic extends CI_Model
     public function getlistpic()
     {
         return $this->db->get('tb_req_nk')->result();
+        //     return $this->db->query("SELECT a.*
+        //     FROM tb_req_nk a
+        //     WHERE a.status = 'ON PROGRESS';
     }
+
     public function gettr($kd)
     {
         return $this->db->query("SELECT
@@ -483,7 +487,7 @@ class M_Reqpic extends CI_Model
             b.gbr_barang,
             a.hrg_satuan
             FROM tb_transaksi_tmp a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
             JOIN tb_satuan c ON c.id_satuan = b.satuan
             JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
             WHERE a.kd_po_nk = '$kd'

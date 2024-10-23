@@ -151,6 +151,17 @@
                                 <h1 class="m-0">List Request PIC</h1>
                             </div>
                         </div> <!-- END ROW -->
+                        <!-- <div class="row mt-2">
+                            <div class="col-sm mb-2">
+                                <a href="#" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="#" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="#" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
+                            </div>
+                        </div> -->
 
                         <table class="table table-bordered ">
                             <thead class="table-dark">
