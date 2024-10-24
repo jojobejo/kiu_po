@@ -9,7 +9,7 @@
                             <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary mb-2"><i class="fas fa-plus"></i>&nbsp; New Request </a>
                         <?php else : ?>
                         <?php endif; ?>
-                        <table class="table table-bordered table-striped" id="">
+                        <table class="table table-bordered table-striped" id="list_reqpic">
                             <thead>
                                 <tr>
                                     <td>Tanggal Request</td>
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
 
-                            <table class="table table-bordered table-striped" id="">
+                            <table class="table table-bordered table-striped" id="list_reqpic">
                                 <thead>
                                     <tr>
                                         <td>Nama Barang</td>
