@@ -16,10 +16,10 @@
                             <label class="col-sm-3 control-label text-right" for="kd_user">Input Kode Barang<span class="required">*</span></label>
                             <div class="col-sm-8">
                                 <input class="form-control" type="text" id="kdbarang" name="kdbarang" value="" placeholder="Input Kode Barang" />
-                                <input class="form-control" type="text" id="syskdbarangs" name="syskdbarang" value="<?= $kdbarang ?>" hidden />
+                                <input class="form-control" type="text" id="syskdbarangs" name="syskdbarang" value="<?= $kdbarang ?>"  />
                                 <input class="form-control" type="text" id="admkd" name="admkd" value="<?= $kdqrcode ?>" hidden />
                                 <input class="form-control" type="text" id="idreq" name="idreq" value="<?= $l->id_reqmbarang ?>" hidden />
-                                <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $l->nama_barang ?>" hidden />
+                                <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $l->nama_barang ?>"  />
                                 <input class="form-control" type="text" id="descnk" name="descnk" value="<?= $l->deskripsi ?>" hidden />
                                 <input class="form-control" type="text" id="satuanisi" name="satuanisi" value="<?= $l->satuan ?>" hidden />
                                 <input class="form-control" type="text" id="reqby" name="reqby" value="<?= $l->req_by ?>" hidden />

@@ -133,7 +133,7 @@ class C_MasterBarang extends CI_Controller
         );
 
         $kdgenerate = array(
-            'kd_barang'     => $kdbarang
+            'kd_barang'     => $kdbarang1
         );
         $qrcgeneratekd = array(
             'kd_qrcode'     => $kdqrcode

@@ -16,6 +16,8 @@
             <!-- VIEW ADMIN PURCHASING -->
             <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '1') : ?>
 
+                <?php $this->load->view('content/mbarang/mreqbarang.php') ?>
+
                 <table class="table table-bordered table-striped" id="list_req">
                     <thead>
                         <tr>
@@ -81,5 +83,3 @@
 
     <!-- /.content-header -->
 </div>
-
-<?php $this->load->view('content/mbarang/mreqbarang.php') ?>

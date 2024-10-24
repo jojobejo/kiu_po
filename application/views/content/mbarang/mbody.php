@@ -24,6 +24,7 @@
                         <tr>
                             <td>No</td>
                             <td>Kode Barang</td>
+                            <td>Kode Sistem</td>
                             <td>Nama Barang</td>
                             <td>Deskripsi / Spesifikasi</td>
                             <td>Satuan</td>
@@ -49,6 +50,7 @@
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
+                                <td><?= $brnk->kd_barang ?></td>
                                 <td><?= $brnk->kd_br_adm ?></td>
                                 <td><?= $brnk->nama_barang ?></td>
                                 <td><?= $brnk->descnk ?></td>
