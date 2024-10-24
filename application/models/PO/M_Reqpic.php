@@ -486,7 +486,7 @@ class M_Reqpic extends CI_Model
         a.kd_user AS kduser,
         a.status AS sts
         FROM tb_detail_req a
-        WHERE a.kd_po_nk = '$kd' AND a.status = '4'
+        WHERE a.kd_po_nk = '$kd' AND a.status = '1'
         GROUP BY a.kd_barang
         ");
     }
@@ -532,7 +532,7 @@ class M_Reqpic extends CI_Model
     function updatereqnk_stsbr($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        $this->db->where('status', '3');
+        $this->db->where('status', '4');
         return $this->db->update('tb_detail_req', $data);
     }
     function updatereqnk($kd, $data)

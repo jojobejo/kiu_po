@@ -1095,6 +1095,7 @@ class C_PoStatus extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
         $kdpo           = $this->input->post('kdpo');
+        $kdporeq        = $this->input->post('kdporeq');
         $tgl            = $this->input->post('tgl');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
@@ -1129,8 +1130,13 @@ class C_PoStatus extends CI_Controller
             $noteupdateuser = array(
                 'status'    => 'DONE'
             );
+            $updatests = array(
+                'kd_po_nk'  => $kdporeq,
+                'status'    => '1'
+            );
             $this->M_Postatus->addNote($addnoteuser);
             $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+            $this->M_Postatus->updatereqnk_stsbr($kdporeq, $updatests);
             redirect('postatusnk');
         }
     }

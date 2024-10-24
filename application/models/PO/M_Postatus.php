@@ -869,7 +869,12 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_transaksi', $data);
     }
-
+    function updatereqnk_stsbr($kd, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('status', '4');
+        return $this->db->update('tb_detail_req', $data);
+    }
     function getitemreq($kdpo)
     {
         return $this->db->query("SELECT
