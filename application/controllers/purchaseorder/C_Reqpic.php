@@ -51,7 +51,7 @@ class C_Reqpic extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/po/Reqpic/view_req/vreq2', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/po/reqpic/datatablesreq');
+        $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
     public function index_done()
@@ -70,7 +70,7 @@ class C_Reqpic extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/po/Reqpic/view_req/vreq3', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/po/reqpic/datatablesreq');
+        $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
     public function index_accreq()
@@ -89,7 +89,7 @@ class C_Reqpic extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/po/Reqpic/view_req/vreq1', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/po/reqpic/datatablesreq');
+        $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
     public function list_barang_ready()
