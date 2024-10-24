@@ -244,10 +244,35 @@ class M_Reqpic extends CI_Model
 
     public function getlistpic()
     {
-        return $this->db->get('tb_req_nk')->result();
-        //     return $this->db->query("SELECT a.*
-        //     FROM tb_req_nk a
-        //     WHERE a.status = 'ON PROGRESS';
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'ON PROGRESS';
+            ");
+    }
+    public function getlistpicreqacc()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'REQUEST ACC';
+            ");
+    }
+    public function getlistready()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'BARANG TERSEDIA';
+            ");
+    }
+    public function getlistdone()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'DONE';
+            ");
     }
 
     public function gettr($kd)
@@ -589,9 +614,13 @@ class M_Reqpic extends CI_Model
     {
         $this->db->insert('tb_detail_po_nk', $kd);
     }
+    function generatekdponk($data)
+    {
+        $this->db->insert('tb_generate_kd_ponk', $data);
+    }
     function kdnonkomersial()
     {
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
         $kd1 = "";
         if ($cd1->num_rows() > 0) {
             foreach ($cd1->result() as $k) {

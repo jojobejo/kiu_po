@@ -394,6 +394,31 @@ class C_PoStatus extends CI_Controller
         }
     }
 
+    public function porepost()
+    {
+        $kdpoid         = $this->input->post('kdpo');
+        $notes          = $this->input->post('noteDitektur');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpoid,
+            'status' => 'ON PROGRESS'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpoid,
+            'isi_note'  => 'PO REPOST - ' . $notes,
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->pendingordernk($kdpoid, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
+
     public function poconfirmacc($kdpo)
     {
         $departement    = $this->session->userdata('kode');

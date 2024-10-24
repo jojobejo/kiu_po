@@ -136,6 +136,9 @@ $route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/a
 $route['testing']  = 'settings/C_Testing/';
 // PO REQUEST BY PIC
 $route['reqpic'] = 'purchaseorder/C_Reqpic';
+$route['reqpicaccreq'] = 'purchaseorder/C_Reqpic/index_accreq';
+$route['index_brsedia'] = 'purchaseorder/C_Reqpic/index_brsedia';
+$route['index_done'] = 'purchaseorder/C_Reqpic/index_done';
 $route['listbarangready'] = 'purchaseorder/C_Reqpic/list_barang_ready';
 $route['add_mbarang_tmp'] = 'purchaseorder/C_Reqpic/addrequestmasterbarangready';
 $route['addtmpreqbarang'] = 'purchaseorder/C_Reqpic/addtmpreqbarang';
@@ -219,6 +222,7 @@ $route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOr
 $route['tolakordernk/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakordernk/$1/$2';
 $route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
 $route['porevisi'] = 'postatus/C_PoStatus/porevisi';
+
 $route['uploadfileponk'] = 'postatus/C_PoStatus/uploadfileponk';
 $route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
 
@@ -248,6 +252,7 @@ $route['hapuspo/(:any)']                = 'postatus/C_PoStatus/hapuspo/$1';
 $route['insert_note_setting']           = 'postatus/C_PoStatus/insert_note_setting';
 
 $route['NoteUpdateKeuangan']            = 'postatus/C_PoStatus/addNote';
+$route['ntupdateporevisi']              = 'postatus/C_PoStatus/porepost';
 $route['tambahTax']                     = 'postatus/C_PoStatus/tambahTax';
 $route['tempoPembayaran']               = 'postatus/C_PoStatus/tempoPembayaran';
 $route['frankoPengiriman']              = 'postatus/C_PoStatus/frankoPengiriman';

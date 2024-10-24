@@ -218,6 +218,18 @@
                                         </div>
                                     </div>
                                 </div>
+                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PO REVISI') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
+                                            <a class="btn btn-block btn-primary btn-md" data-toggle="modal" data-target="#modalAddNoteRev">
+                                                <i class="fas fa-clipboard-check"></i> &nbsp;
+                                                Update
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                 <div class="col">
                                     <div class="row">
@@ -234,7 +246,6 @@
                             <?php endif; ?>
                     </div>
                 </div>
-
             </div>
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>

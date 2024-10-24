@@ -147,23 +147,23 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row mb-2">
-                            <div class="col-sm-6">
+                            <div class="col-sm-4">
                                 <h1 class="m-0">List Request PIC</h1>
                             </div>
+                            <div class="col-sm mb-2">
+                                <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary btn-block"><i class="fas fa-home"></i></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="<?= base_url('index_brsedia') ?>" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
+                            </div>
                         </div> <!-- END ROW -->
-                        <!-- <div class="row mt-2">
-                            <div class="col-sm mb-2">
-                                <a href="#" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
-                            </div>
-                            <div class="col-sm mb-2">
-                                <a href="#" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
-                            </div>
-                            <div class="col-sm mb-2">
-                                <a href="#" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
-                            </div>
-                        </div> -->
-
-                        <table class="table table-bordered ">
+                        <table class="table table-bordered" id="list_reqpic">
                             <thead class="table-dark">
                                 <tr>
                                     <td>Nama Pengaju</td>
@@ -181,7 +181,8 @@
                                         <td><?= $g->departemen ?></td>
                                         <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
                                         <td><?= $g->tj_pembelian ?></td>
-                                        <?php if ($g->status == 'ON PROGRESS') : ?>
+                                        <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
+                                        <!-- <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'REQUEST ACC') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
@@ -189,7 +190,7 @@
                                             <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'DONE') : ?>
                                             <td><a class="btn btn-block btn-success btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php endif; ?>
+                                        <?php endif; ?> -->
                                         <td>
                                             <div class="row">
                                                 <div class="col">
@@ -197,6 +198,7 @@
                                                 </div>
                                             </div>
                                         </td>
+
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
