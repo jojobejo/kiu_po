@@ -1,6 +1,7 @@
 <script>
     $(function() {
         $("#list_reqpic").DataTable({
+            "pageLength": 25,
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
