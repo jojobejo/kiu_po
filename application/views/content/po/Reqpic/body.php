@@ -1,3 +1,4 @@
+<a href="" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
 <?php if ($this->session->userdata('lv') == '4') : ?>
     <div class="content-wrapper">
         <div class="content-header">
@@ -120,7 +121,7 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="6">
-                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden/>
+                                        <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
                                         <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
                                         <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
                                         </form>
@@ -147,11 +148,14 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row mb-2">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <h1 class="m-0">List Request PIC</h1>
                             </div>
+                            <div class="col-sm-1 mb-2">
+                                <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary"><i class="fas fa-home"></i></a>
+                            </div>
                             <div class="col-sm mb-2">
-                                <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary btn-block"><i class="fas fa-home"></i></a>
+                                <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-primary btn-block"><b>Add Stock</b></a>
                             </div>
                             <div class="col-sm mb-2">
                                 <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
@@ -162,6 +166,7 @@
                             <div class="col-sm mb-2">
                                 <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
                             </div>
+
                         </div> <!-- END ROW -->
                         <table class="table table-bordered" id="list_reqpic">
                             <thead class="table-dark">

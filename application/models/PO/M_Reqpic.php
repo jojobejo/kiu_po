@@ -253,9 +253,17 @@ class M_Reqpic extends CI_Model
     public function getlistpicreqacc()
     {
         // return $this->db->get('tb_req_nk')->result();
-        return $this->db->query("SELECT a.*
-            FROM tb_req_nk a
-            WHERE a.status = 'REQUEST ACC';
+        return $this->db->query("SELECT 
+        a.kd_po_nk AS kd_po_nk,
+        a.nm_user AS nm_user,
+        a.departemen AS departemen,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tj_pembelian AS tj_pembelian,
+        a.status AS status,
+        b.status AS status_po
+        FROM tb_req_nk a
+        JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        WHERE a.status = 'REQUEST ACC'
             ");
     }
     public function getlistready()

@@ -8,17 +8,17 @@
                             <h1 class="m-0">List Request PIC</h1>
                         </div>
                         <div class="col-sm mb-2">
-                                <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary btn-block"><i class="fas fa-home"></i></a>
-                            </div>
-                            <div class="col-sm mb-2">
-                                <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
-                            </div>
-                            <div class="col-sm mb-2">
-                                <a href="<?= base_url('index_brsedia') ?>" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
-                            </div>
-                            <div class="col-sm mb-2">
-                                <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
-                            </div>
+                            <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary btn-block"><i class="fas fa-home"></i></a>
+                        </div>
+                        <div class="col-sm mb-2">
+                            <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
+                        </div>
+                        <div class="col-sm mb-2">
+                            <a href="<?= base_url('index_brsedia') ?>" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
+                        </div>
+                        <div class="col-sm mb-2">
+                            <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-success btn-block"><b>DONE</b></a>
+                        </div>
                     </div> <!-- END ROW -->
                     <table class="table table-bordered" id="list_reqpic">
                         <thead class="table-dark">
@@ -26,8 +26,9 @@
                                 <td>Nama Pengaju</td>
                                 <td>Departemen</td>
                                 <td>Tanggal Transaksi</td>
-                                <td>Tujuan Pembelian</td>
+                                <td style="width: min-content;">Tujuan Pembelian</td>
                                 <td>Status</td>
+                                <td>Status PO</td>
                                 <td>#</td>
                             </tr>
                         </thead>
@@ -37,17 +38,25 @@
                                     <td><?= $g->nm_user ?></td>
                                     <td><?= $g->departemen ?></td>
                                     <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
-                                    <td><?= $g->tj_pembelian ?></td>
-                                    <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                    <!-- <?php if ($g->status == 'ON PROGRESS') : ?>
-                                            <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'REQUEST ACC') : ?>
-                                            <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'BARANG TERSEDIA') : ?>
-                                            <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'DONE') : ?>
-                                            <td><a class="btn btn-block btn-success btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php endif; ?> -->
+                                    <td style="width: min-content;"><?= $g->tj_pembelian ?></td>
+                                    <td>
+                                        <a class="btn btn-block btn-warning btn-sm m-1"><b><?= $g->status ?></b></a>
+                                    </td>
+                                    <td>
+                                        <?php if ($g->status_po == 'ON PROGRESS - KADEP') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'ACC-KADEP') : ?>
+                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'SEDANG DIAJUKAN') : ?>
+                                            <a class="btn btn-block btn-warning btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'ACC DIREKTUR') : ?>
+                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'PROSES PEMBELIAN') : ?>
+                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'DONE') : ?>
+                                            <a class="btn btn-block btn-success btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <div class="row">
                                             <div class="col">

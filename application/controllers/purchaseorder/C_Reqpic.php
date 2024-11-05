@@ -272,19 +272,19 @@ class C_Reqpic extends CI_Controller
             $data['title']      = 'PO Detail Req PIC';
             $data['stspo']      = $this->M_Reqpic->getbuystsponk($kdpo)->result();
 
-            $data['status']     = $this->M_Reqpic->getrequestbypic($kdpo);
-            $data['kdponks']    = $this->M_Purchase->getkdnoponk();
-            $data['detreq']     = $this->M_Reqpic->getreqwheres($kdpo)->result();
-            $data['detreq1']    = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
-            $data['detreq2']    = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
-            $data['detreq0']    = $this->M_Reqpic->getreqwhere($kdpo, $sts0)->result();
-            $data['listtr']     = $this->M_Reqpic->getlisttmptr($kdpo)->result();
-            $data['totsts']     = $this->M_Reqpic->gettotsts($kdpo)->result();
-            $data['countitm']   = $this->M_Reqpic->count_acc_req($kdpo)->result();
+            $data['status']          = $this->M_Reqpic->getrequestbypic($kdpo);
+            $data['kdponks']         = $this->M_Purchase->getkdnoponk();
+            $data['detreq']          = $this->M_Reqpic->getreqwheres($kdpo)->result();
+            $data['detreq1']         = $this->M_Reqpic->getreqwhere($kdpo, $sts1)->result();
+            $data['detreq2']         = $this->M_Reqpic->getreqwhere($kdpo, $sts2)->result();
+            $data['detreq0']         = $this->M_Reqpic->getreqwhere($kdpo, $sts0)->result();
+            $data['listtr']          = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['totsts']          = $this->M_Reqpic->gettotsts($kdpo)->result();
+            $data['countitm']        = $this->M_Reqpic->count_acc_req($kdpo)->result();
             $data['countjmlharga']   = $this->M_Reqpic->countjmlharga($kdpo)->result();
-            $data['log']        = $this->M_Reqpic->getNoted($kdpo);
-            $data['gettrs']      = $this->M_Reqpic->gettr($kdpo)->result();
-            $data['gettr']      = $this->M_Reqpic->getdetailreq($kdpo)->result();
+            $data['log']             = $this->M_Reqpic->getNoted($kdpo);
+            $data['gettrs']          = $this->M_Reqpic->gettr($kdpo)->result();
+            $data['gettr']           = $this->M_Reqpic->getdetailreq($kdpo)->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
