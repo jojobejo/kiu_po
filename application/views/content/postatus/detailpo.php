@@ -259,7 +259,7 @@
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
-        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS') : ?>
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '2' &&  $s->status == 'PO REVISI') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">
