@@ -113,6 +113,8 @@ $route['nkrestok'] = 'stock/C_Stocknonkomersil/nkrestok';
 $route['indraftrestock'] = 'stock/C_Stocknonkomersil/indraftrestock';
 $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
 
+$route['tr_trash/(:any)/(:any)'] = 'stock/C_Stocknonkomersil/trash_transaksi/$1/$2';
+
 // Stock PO Komersil
 $route['stockkomersil'] = 'stock/C_Stockkomersil';
 $route['servergetallkomersil'] = 'stock/C_Stockkomersil/servergetallkomersil';
