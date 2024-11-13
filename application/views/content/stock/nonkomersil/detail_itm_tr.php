@@ -21,7 +21,7 @@
                                 <a class="btn btn-sm btn-block btn-success mt-1 ml-3" data-toggle="modal" data-target="#adjustmentqty<?= $i->kode_sistem ?>"><i class="fas fa-plus"></i></a>
                             </div>
                         </div>
-                        <table class="table table-bordered">
+                        <table class="table table-bordered mb-5">
                             <thead style="background-color: #212529; color:white;">
                                 <tr>
                                     <td style="text-align: center;">Kode Transaksi</td>
@@ -31,6 +31,9 @@
                                     <td style="text-align: center;">Departemen</td>
                                     <td style="text-align: center;">PIC</td>
                                     <td style="text-align: center;">Qty</td>
+                                    <?php if ($this->session->userdata('kode') == 'KEU09') : ?>
+                                        <td style="text-align: center;">#</td>
+                                    <?php endif; ?>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,6 +75,40 @@
                                             <td style="text-align: center;"><?= $s->nmreq ?></td>
                                         <?php endif; ?>
                                         <td style="text-align: center;"><?= $qs . $s->qty . " " . "(" . $s->nm_satuan . ")" ?></td>
+                                        <?php if ($this->session->userdata('kode') == 'KEU09') : ?>
+                                            <td style="text-align: center;">
+                                                <a href="<?= base_url('tr_trash/1/') . $s->id ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-alt"></i></a>
+                                            </td>
+                                        <?php endif; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-bordered mt-2">
+                            <thead style="background-color: #212529; color:white;">
+                                <tr>
+                                    <td style="text-align: center;">Kode Transaksi</td>
+                                    <td style="text-align: center; width: 5%;">Tanggal Transaksi</td>
+                                    <td style="text-align: center;">Kode Akun</td>
+                                    <td style="text-align: center;">Keterangan</td>
+                                    <td style="text-align: center;">Departemen</td>
+                                    <td style="text-align: center;">PIC</td>
+                                    <td style="text-align: center;">Qty</td>
+                                    <td style="text-align: center;">#</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($trash as $trh) : ?>
+                                    <tr>
+                                        <td><?= $trh->kd_po_nk ?></td>
+                                        <td><?= $trh->create_at ?></td>
+                                        <td><?= $trh->kd_akun ?></td>
+                                        <td><?= $trh->keterangan ?></td>
+                                        <td><?= $trh->departemen ?></td>
+                                        <td><?= $trh->nm_user ?></td>
+                                        <td><?= $trh->tr_qty ?></td>
+                                        <td style="text-align: center;"><a href="<?= base_url('tr_trash/2/') . $trh->id_trashbin ?>" class="btn btn-warning btn-sm"><i class="fa fa-redo-alt"></i></a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

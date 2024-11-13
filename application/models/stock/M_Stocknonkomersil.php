@@ -128,6 +128,14 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE a.kd_barang = '$kd'
         ");
     }
+    public function get_data_itemtr($id)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_transaksi a
+        WHERE a.id_transnk = '$id'
+        ");
+    }
     public function get_detail_transaksi_itm($kd)
     {
         return $this->db->query("SELECT
@@ -138,6 +146,7 @@ class M_Stocknonkomersil  extends CI_Model
         a.tr_qty AS qty,
         b.nm_satuan AS nm_satuan,
         a.kd_barangsys AS kd_barang,
+        a.kd_barang AS kd_barangs,
         f.nama_user AS inpt,
         f.aksess_lv AS lvadm,
         e.aksess_lv AS lvusr,
@@ -237,6 +246,40 @@ class M_Stocknonkomersil  extends CI_Model
         $this->db->from('tb_note_direktur a');
         $this->db->where('kd_po', $kd);
         return $this->db->get()->result();
+    }
+    public function deldettransaksi($id)
+    {
+        $this->db->where('id_transnk', $id);
+        return $this->db->delete('tb_transaksi');
+    }
+    public function insert_trash_bin_tr($data)
+    {
+        $this->db->insert('tb_transaksi_trashbin', $data);
+    }
+    public function get_data_trash($kd)
+    {
+        return $this->db->query("SELECT
+        a.*,
+        a.id_trashbin as id_trashbin,
+        b.departement AS departemen,
+        b.nama_user AS nm_user
+        FROM tb_transaksi_trashbin a
+        JOIN tb_user b ON b.kode_user = a.req_by 
+        WHERE a.kd_barang = '$kd'
+         ");
+    }
+    public function delete_trash($id)
+    {
+        $this->db->where('id_trashbin', $id);
+        return $this->db->delete('tb_transaksi_trashbin');
+    }
+    public function get_data_trashid($id)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_transaksi_trashbin a
+        WHERE a.id_trashbin = '$id'
+        ");
     }
 }
 

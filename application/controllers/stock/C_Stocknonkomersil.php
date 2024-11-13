@@ -80,6 +80,7 @@ class C_Stocknonkomersil extends CI_Controller
         $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
         $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
         $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
+        $data['trash']      = $this->M_Stocknonkomersil->get_data_trash($kdbarang)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -87,6 +88,67 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }
+
+    public function trash_transaksi($key, $id)
+    {
+        $action = $key;
+
+        switch ($action) {
+                // 1 = delete transaksi
+                // 2 = redo transaksi
+            case '1':
+                $item_tr = $this->M_Stocknonkomersil->get_data_itemtr($id)->result();
+                if ($item_tr) {
+                    foreach ($item_tr as $t) {
+                        $trashdata = array(
+                            'kd_akun'           => $t->kd_akun,
+                            'kd_po_nk'          => $t->kd_po_nk,
+                            'kd_barang'         => $t->kd_barang,
+                            'kd_barangsys'      => $t->kd_barangsys,
+                            'keterangan'        => $t->keterangan,
+                            'kat_barang'        => $t->kat_barang,
+                            'tr_qty'            => $t->tr_qty,
+                            'satuan'            => $t->satuan,
+                            'inputer'           => $t->inputer,
+                            'req_by'            => $t->req_by,
+                            'tgl_transaksi'     => $t->tgl_transaksi,
+                            'create_at'         => $t->create_at,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $this->M_Stocknonkomersil->insert_trash_bin_tr($trashdata);
+                        $this->M_Stocknonkomersil->deldettransaksi($id);
+                        redirect('detailtransaksi/' . $t->kd_barang);
+                    }
+                }
+                break;
+            case '2':
+                $item_trs = $this->M_Stocknonkomersil->get_data_trashid($id)->result();
+                if ($item_trs) {
+                    foreach ($item_trs as $t) {
+                        $trashdata = array(
+                            'kd_akun'           => $t->kd_akun,
+                            'kd_po_nk'          => $t->kd_po_nk,
+                            'kd_barang'         => $t->kd_barang,
+                            'kd_barangsys'      => $t->kd_barangsys,
+                            'keterangan'        => $t->keterangan,
+                            'kat_barang'        => $t->kat_barang,
+                            'tr_qty'            => $t->tr_qty,
+                            'satuan'            => $t->satuan,
+                            'inputer'           => $t->inputer,
+                            'req_by'            => $t->req_by,
+                            'tgl_transaksi'     => $t->tgl_transaksi,
+                            'create_at'         => $t->create_at,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $this->M_Stocknonkomersil->insttransaksi($trashdata);
+                        $this->M_Stocknonkomersil->delete_trash($id);
+                        redirect('detailtransaksi/' . $t->kd_barang);
+                    }
+                }
+                break;
+        }
+    }
+
     public function revisitr($akun, $kdpo, $kdbr)
     {
         $data['title']      = 'Revisi Qty Persedian';
