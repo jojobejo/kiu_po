@@ -21,7 +21,7 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
-                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= format_tgl_lahir($s->tgl_transaksi) ?>" class="form-control" readonly>
+                                    <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                                 </div>
                                 <div class="col">
                                     <label for="naSupp" class="">PIC : </label>
@@ -352,7 +352,7 @@
                                                         </a>
                                                     </td>
                                                 <?php endif; ?>
-                                                <td><?= format_tgl_lahir($st->tgltr) ?></td>
+                                                <td><?= $st->tgltr ?></td>
                                                 <td><?= $st->nmuser ?></td>
                                                 <td><?= $st->dep ?></td>
                                                 <td><?= $st->tjbeli ?></td>
@@ -403,7 +403,7 @@
                                 ?>
                                     <?php if ($totpnd > '0') : ?>
                                         <?php foreach ($stspo as $st) : ?>
-                                            <?php if ($st->status == 'PROSES PEMBELIAN') : ?>
+                                            <?php if ($st->status == 'DONE') : ?>
                                                 <?php echo form_open_multipart('reqpicconfirmed'); ?>
                                                 <?php $now = date("Y-m-d"); ?>
                                                 <input type="text" id="kdreqpo" name="kdreqpo" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
@@ -414,7 +414,6 @@
                                                 <input type="text" id="dep" name="dep" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly hidden>
                                                 <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
                                                 <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
-                                            <?php else : ?>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php else : ?>

@@ -104,8 +104,8 @@ class C_MasterBarang extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
         $id         = $this->input->post('idreq');
-        $kdbarang   = $this->input->post('syskdbarang');
-        $kdbarang1  = $this->input->post('kdbarang');
+        $kdbarang   = $this->input->post('kdbarang');
+        $kdbarang1  = $this->input->post('syskdbarang');
         $kdqrcode   = $this->input->post('admkd');
         $katbarang  = $this->input->post('katbr');
         $nmbarang   = $this->input->post('nmbarang');
@@ -133,7 +133,7 @@ class C_MasterBarang extends CI_Controller
         );
 
         $kdgenerate = array(
-            'kd_barang'     => $kdbarang
+            'kd_barang'     => $kdbarang1
         );
         $qrcgeneratekd = array(
             'kd_qrcode'     => $kdqrcode

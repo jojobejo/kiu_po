@@ -642,6 +642,7 @@
                         <div class="row">
                             <label class="col-sm-2 control-label text-right" for="kd_user">Kd<span class="required">*</span></label>
                             <div class="col-sm-9"><input type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po_nk ?>" readonly></div>
+                            <div class="col-sm-9"><input type="text" id="kdporeq" name="kdporeq" value="<?= $s->kd_po_req ?>"></div>
                             <div class="col-sm-9"><input type="text" id="tgl" name="tgl" value="<?= $s->tgl_transaksi ?>" readonly></div>
                         </div>
                     </div>

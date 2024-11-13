@@ -25,7 +25,7 @@
                             </div>
                             <div class="col-2">
                                 <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
-                                <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
+                                <input type="text" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                             </div>
                             <div class="col-2">
                                 <label for="naSupp" class="">Nama Pengaju: </label>

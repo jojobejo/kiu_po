@@ -394,6 +394,31 @@ class C_PoStatus extends CI_Controller
         }
     }
 
+    public function porepost()
+    {
+        $kdpoid         = $this->input->post('kdpo');
+        $notes          = $this->input->post('noteDitektur');
+        $departement    = $this->session->userdata('kode');
+        $namauser       = $this->session->userdata('nama_user');
+
+        $dataKonfirm = array(
+            'kd_po_nk' => $kdpoid,
+            'status' => 'ON PROGRESS'
+        );
+        $notedirektur = array(
+            'kd_po'     => $kdpoid,
+            'isi_note'  => 'PO REPOST - ' . $notes,
+            'kd_user'   => $departement,
+            'nama_user'   => $namauser,
+            'note_for'  => '1',
+            'update_status' => '1'
+        );
+
+        $this->M_Postatus->pendingordernk($kdpoid, $dataKonfirm);
+        $this->M_Postatus->addNote($notedirektur);
+        redirect('postatusnk');
+    }
+
     public function poconfirmacc($kdpo)
     {
         $departement    = $this->session->userdata('kode');
@@ -1070,6 +1095,7 @@ class C_PoStatus extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
         $kdpo           = $this->input->post('kdpo');
+        $kdporeq        = $this->input->post('kdporeq');
         $tgl            = $this->input->post('tgl');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
@@ -1104,8 +1130,13 @@ class C_PoStatus extends CI_Controller
             $noteupdateuser = array(
                 'status'    => 'DONE'
             );
+            $updatests = array(
+                'kd_po_nk'  => $kdporeq,
+                'status'    => '1'
+            );
             $this->M_Postatus->addNote($addnoteuser);
             $this->M_Postatus->updateStatusnk($kdpo, $noteupdateuser);
+            $this->M_Postatus->updatereqnk_stsbr($kdporeq, $updatests);
             redirect('postatusnk');
         }
     }
@@ -1519,9 +1550,9 @@ class C_PoStatus extends CI_Controller
             $this->upload->initialize($config);;
 
             if (!$this->upload->do_upload('gambar_1')) {
-                $error = array('error' => $this->upload->display_errors());
-                print_r($error);
-                die;
+                $image_data1 = $this->upload->data();
+                $full_path1 = $config['file_name'];
+                $data["gbr_produk"] = $full_path1;
             } else {
                 if ($this->upload->do_upload('gambar_1')) {
                     $image_data1 = $this->upload->data();
@@ -1535,8 +1566,8 @@ class C_PoStatus extends CI_Controller
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'   => $config['file_name'],
-            'file_uploaded'    => $image_data1['file_name']
+            'file_name'     => $config['file_name'],
+            'file_uploaded' => $image_data1['file_name']
         );
         $dataKonfirm = array(
             'kd_po_nk' => $kdponk,

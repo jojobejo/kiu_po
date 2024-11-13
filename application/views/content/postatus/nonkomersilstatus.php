@@ -174,7 +174,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><?= date_indo($p->tgl_transaksi) ?></td>
+                                <td><?= $p->tgl_transaksi ?></td>
                                 <td><?= $p->nama_user ?></td>
                                 <td><?= $p->departement ?></td>
                                 <td><?= $p->tj_pembelian ?></td>
@@ -332,7 +332,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><?= date_indo($p1->tgl_transaksi) ?></td>
+                                <td><?= $p1->tgl_transaksi ?></td>
                                 <td><?= $p1->nama_user ?></td>
                                 <td><?= $p1->departement ?></td>
                                 <td><?= $p1->tj_pembelian ?></td>

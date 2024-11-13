@@ -218,6 +218,18 @@
                                         </div>
                                     </div>
                                 </div>
+                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PO REVISI') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
+                                            <a class="btn btn-block btn-primary btn-md" data-toggle="modal" data-target="#modalAddNoteRev">
+                                                <i class="fas fa-clipboard-check"></i> &nbsp;
+                                                Update
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             <?php elseif ($this->session->userdata('lv') < '3' && $s->status != 'DONE') : ?>
                                 <div class="col">
                                     <div class="row">
@@ -234,7 +246,6 @@
                             <?php endif; ?>
                     </div>
                 </div>
-
             </div>
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>
@@ -248,7 +259,7 @@
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
-        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS') : ?>
+        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '2' &&  $s->status == 'PO REVISI') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">
@@ -284,12 +295,6 @@
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalnotebarang<?= $s->kd_po ?>  ">
                         <i class="fas fa-notes-medical"> </i>
                         Tambah Note Barang
-                    </a>
-                </div>
-                <div class="col-md mb-2">
-                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
-                        <i class="fas fa-shipping-fast"> </i>
-                        Shipment Setting
                     </a>
                 </div>
             </div>

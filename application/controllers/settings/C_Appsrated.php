@@ -36,7 +36,7 @@ class C_Appsrated extends CI_Controller
             $data['module'] = $this->M_Appsrated->getAllModule();
             $data['sos']    = $this->M_Appsrated->getDataSos($kduser)->result();
             $data['sos']    = $this->M_Appsrated->getDataSos($kduser)->result();
-            
+
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
             $this->load->view('content/setting/bodyappsrated', $data);

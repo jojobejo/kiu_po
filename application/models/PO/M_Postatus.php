@@ -454,7 +454,7 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_detail_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
-        $this->db->join('tb_barang_nk c', 'c.kd_barang = a.kd_bsys');
+        $this->db->join('tb_barang_nk c', 'c.kd_barang = a.kd_barang');
         $this->db->where('kd_po_nk', $kd);
         return $this->db->get()->result();
     }
@@ -468,7 +468,7 @@ class M_PoStatus extends CI_Model
     }
     function getdataStatusnk($kdpo)
     {
-        $this->db->select('*');
+        $this->db->select('a.*');
         $this->db->from('tb_po_nk a');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('kd_po_nk', $kdpo);
@@ -859,7 +859,7 @@ class M_PoStatus extends CI_Model
     {
         $this->db->select('a.* , b.kat_barang , b.satuan , c.nm_satuan');
         $this->db->from('tb_detail_po_nk a');
-        $this->db->join('tb_barang_nk b', 'b.kd_br_adm = a.kd_barang');
+        $this->db->join('tb_barang_nk b', 'b.kd_br_adm = a.kd_bsys');
         $this->db->join('tb_satuan c', 'c.id_satuan = b.satuan');
         $this->db->where('kd_po_nk', $kd);
         $query = $this->db->get()->result();
@@ -869,7 +869,12 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_transaksi', $data);
     }
-
+    function updatereqnk_stsbr($kd, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('status', '4');
+        return $this->db->update('tb_detail_req', $data);
+    }
     function getitemreq($kdpo)
     {
         return $this->db->query("SELECT

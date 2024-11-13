@@ -35,9 +35,9 @@
                             </thead>
                             <tbody>
                                 <?php foreach ($stock as $s) :
-                                    $qs = "";
-                                    $btn = "";
-                                    $txt = "";
+                                    $qs     = "";
+                                    $btn    = "";
+                                    $txt    = "";
                                     // KODE AKUN
                                     if ($s->kd_akun == '11512') {
                                         $qs     = "-";
@@ -59,7 +59,7 @@
                                 ?>
                                     <tr>
                                         <td style="text-align: center; width: 5%;"><?= $s->kd_transaksi ?></td>
-                                        <td style="text-align: center;"><?= shortdate_indo($s->tgl_transaksi) ?></td>
+                                        <td style="text-align: center;"><?= $s->tgl_transaksi ?></td>
                                         <td>
                                             <a href="#" class="<?= $btn ?>"><b style="text-transform:uppercase; color: #212529;"><?= $txt ?></b></a>
                                         </td>

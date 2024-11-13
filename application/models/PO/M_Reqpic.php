@@ -61,7 +61,7 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT 
         a.id_tmp_nk , b.nama_barang , b.descnk , a.keterangan , a.qty , c.nm_satuan , a.kd_bsys
         FROM tb_tmp_item_nk a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
         JOIN tb_satuan c ON c.id_satuan = b.satuan 
         WHERE a.jnis_po = '1' AND a.kd_user = '$kd'
         ");
@@ -136,7 +136,7 @@ class M_Reqpic extends CI_Model
             c.nm_satuan AS nm_satuan,
             a.status as sts
             FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
         ");
@@ -149,8 +149,8 @@ class M_Reqpic extends CI_Model
             a.keterangan AS ket,
             a.qty AS qty,
             c.nm_satuan AS nmsatuan
-           FROM tb_detail_req a 
-            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+            FROM tb_detail_req a 
+            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = a.satuan
             WHERE a.kd_po_nk = '$kd'
         ");
@@ -191,7 +191,7 @@ class M_Reqpic extends CI_Model
                 (SELECT SUM(i.tr_qty) FROM tb_transaksi i WHERE i.kd_barangsys = a.kd_bsys AND i.kd_akun = '11514' GROUP BY a.kd_bsys) AS qty_transaksi_mad,
                 (SELECT SUM(j.tr_qty) FROM tb_transaksi j WHERE j.kd_barangsys = a.kd_bsys AND j.kd_akun = '11513' GROUP BY a.kd_bsys) AS qty_transaksi_pad
                 FROM tb_detail_req a 
-                JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
+                JOIN tb_barang_nk e ON e.kd_br_adm = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
             ) AS x 
             WHERE x.kd_po_nk = '$kd'
@@ -244,8 +244,45 @@ class M_Reqpic extends CI_Model
 
     public function getlistpic()
     {
-        return $this->db->get('tb_req_nk')->result();
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'ON PROGRESS';
+            ");
     }
+    public function getlistpicreqacc()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT 
+        a.kd_po_nk AS kd_po_nk,
+        a.nm_user AS nm_user,
+        a.departemen AS departemen,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tj_pembelian AS tj_pembelian,
+        a.status AS status,
+        b.status AS status_po
+        FROM tb_req_nk a
+        JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        WHERE a.status = 'REQUEST ACC'
+            ");
+    }
+    public function getlistready()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'BARANG TERSEDIA';
+            ");
+    }
+    public function getlistdone()
+    {
+        // return $this->db->get('tb_req_nk')->result();
+        return $this->db->query("SELECT a.*
+            FROM tb_req_nk a
+            WHERE a.status = 'DONE';
+            ");
+    }
+
     public function gettr($kd)
     {
         return $this->db->query("SELECT
@@ -273,7 +310,7 @@ class M_Reqpic extends CI_Model
         a.qty,
         c.nm_satuan
         FROM tb_detail_req a 
-        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
         JOIN tb_satuan c ON c.id_satuan = a.satuan
         WHERE a.kd_po_nk = '$kd'
 
@@ -360,7 +397,7 @@ class M_Reqpic extends CI_Model
         c.nama_user AS nmuser,
         c.departement AS dep
         FROM tb_detail_req a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
+        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
         JOIN tb_user c ON c.kode_user = a.kd_user
         WHERE a.id_det_po_nk = '$id'
             ");
@@ -457,7 +494,7 @@ class M_Reqpic extends CI_Model
         a.kd_user AS kduser,
         a.status AS sts
         FROM tb_detail_req a
-        WHERE a.kd_po_nk = '$kd' AND a.status = '4'
+        WHERE a.kd_po_nk = '$kd' AND a.status = '1'
         GROUP BY a.kd_barang
         ");
     }
@@ -483,7 +520,7 @@ class M_Reqpic extends CI_Model
             b.gbr_barang,
             a.hrg_satuan
             FROM tb_transaksi_tmp a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barangsys
+            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
             JOIN tb_satuan c ON c.id_satuan = b.satuan
             JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
             WHERE a.kd_po_nk = '$kd'
@@ -503,7 +540,7 @@ class M_Reqpic extends CI_Model
     function updatereqnk_stsbr($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        $this->db->where('status', '3');
+        $this->db->where('status', '4');
         return $this->db->update('tb_detail_req', $data);
     }
     function updatereqnk($kd, $data)
@@ -585,9 +622,13 @@ class M_Reqpic extends CI_Model
     {
         $this->db->insert('tb_detail_po_nk', $kd);
     }
+    function generatekdponk($data)
+    {
+        $this->db->insert('tb_generate_kd_ponk', $data);
+    }
     function kdnonkomersial()
     {
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
         $kd1 = "";
         if ($cd1->num_rows() > 0) {
             foreach ($cd1->result() as $k) {
