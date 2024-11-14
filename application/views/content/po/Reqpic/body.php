@@ -8,7 +8,9 @@
                         <h3>List Request Status</h3>
                         <?php if ($countreq == '0') : ?>
                             <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary mb-2"><i class="fas fa-plus"></i>&nbsp; New Request </a>
+                            <a href="<?= base_url('historireqpic') ?>" class="btn btn-sm btn-success mb-2"><i class="fas fa-check"></i>&nbsp;REQ-DONE</a>
                         <?php else : ?>
+                            <a href="<?= base_url('historireqpic') ?>" class="btn btn-sm btn-success mb-2"><i class="fas fa-check"></i>&nbsp;REQ-DONE</a>
                         <?php endif; ?>
                         <table class="table table-bordered table-striped" id="list_reqpic">
                             <thead>
@@ -30,7 +32,7 @@
                                             <div class="row">
                                                 <?php if ($g->status == 'ON PROGRESS') : ?>
                                                     <div class="col">
-                                                        <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
+                                                        <a class="btn btn-block btn-secondary btn-sm"><?= $g->status ?></a>
                                                     </div>
                                                 <?php elseif ($g->status == 'REQUEST ACC') : ?>
                                                     <div class="col">

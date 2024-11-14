@@ -71,7 +71,17 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT 
         a.*
         FROM tb_req_nk a
-        WHERE a.kd_user = '$kd'
+        WHERE a.kd_user = '$kd' 
+        AND a.status != 'DONE'
+        ");
+    }
+    public function getallreqdone($kd)
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tb_req_nk a
+        WHERE a.kd_user = '$kd' 
+        AND a.status = 'DONE'
         ");
     }
     function input_detail_po_nk($data)

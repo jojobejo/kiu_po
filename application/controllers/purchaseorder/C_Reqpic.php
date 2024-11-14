@@ -34,6 +34,19 @@ class C_Reqpic extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/Reqpic/datatablesreq');
     }
+    public function historireqpic()
+    {
+        $kduser = $this->session->userdata('kode');
+
+        $data['title']      = 'PO Request By PIC ';
+        $data['getallreq']  = $this->M_Reqpic->getallreqdone($kduser)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/historipodonepic', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
 
     public function index_brsedia()
     {
