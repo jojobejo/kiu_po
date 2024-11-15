@@ -270,9 +270,9 @@ class M_Reqpic extends CI_Model
         a.tgl_transaksi AS tgl_transaksi,
         a.tj_pembelian AS tj_pembelian,
         a.status AS status,
-        b.status AS status_po
+        COALESCE(b.status,0) AS status_po
         FROM tb_req_nk a
-        JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.status = 'REQUEST ACC'
             ");
     }

@@ -176,4 +176,102 @@ class C_Laporan extends CI_Controller
         ob_end_clean();
         $write->save('php://output');
     }
+    
+    public function exported_allstock()
+    {
+        include APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        $excel = new PHPExcel();
+        $excel->getProperties()->setCreator('it_karisma')
+            ->setLastModifiedBy('it_karisma')
+            ->setTitle("Stock Ready non komersil")
+            ->setSubject("Laporan Non Komersil")
+            ->setDescription("Laporan Stock")
+            ->setKeywords("Laporan Stock Non Komersil");
+
+        $style_col = array(
+            'font' => array('bold' => true),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN)
+            )
+        );
+
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN)
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Data Stock Non Komersil");
+        $excel->getActiveSheet()->mergeCells('A1:F1');
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15);
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "NO");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Kode Barang");
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Nama Barang");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Deskripsi");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Stock");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Satuan");
+
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+
+        $export = $this->M_Laporanp->v_stock();
+
+        $no = 1;
+        $numrow = 4;
+        foreach ($export as $data) {
+            $excel->setActiveSheetIndex(0)->setCellValue('A' . $numrow, $no);
+            $excel->setActiveSheetIndex(0)->setCellValue('B' . $numrow, $data->kode_barangs);
+            $excel->setActiveSheetIndex(0)->setCellValue('C' . $numrow, $data->nama_barang);
+            $excel->setActiveSheetIndex(0)->setCellValue('D' . $numrow, $data->deskripsi);
+            $excel->setActiveSheetIndex(0)->setCellValue('E' . $numrow, $data->qty_ready);
+            $excel->setActiveSheetIndex(0)->setCellValue('F' . $numrow, $data->satuan);
+            $excel->getActiveSheet()->getStyle('A' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('B' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('C' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('D' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('E' . $numrow)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('F' . $numrow)->applyFromArray($style_row);
+            $no++;
+            $numrow++;
+        }
+
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension('E')->setWidth(10);
+        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
+        $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
+        $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+        $excel->getActiveSheet(0)->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
+        $excel->setActiveSheetIndex(0);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="lap_stock_po_nonkomersil.xlsx"');
+        header('Cache-Control: max-age=0');
+
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        ob_end_clean();
+        $write->save('php://output');
+    }
 }

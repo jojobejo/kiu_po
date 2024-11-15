@@ -38,4 +38,8 @@ class M_Laporanp extends CI_Model
         $query = $this->db->get();
         return $query;
     }
+    public function v_stock()
+    {
+        return $this->db->get('v_stockbarangnk')->result();
+    }
 }
