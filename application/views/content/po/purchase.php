@@ -94,12 +94,12 @@
                     <input type="text" class="form-control" placeholder="Tempo Pembayaran" value="" name="tmpo" id="tmpo">
                 </div>
             </div>
-            <div class="col-md" hidden>
+            <div class="col-md" >
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Tanggal Transaksi" value="<?= $kdpo ?>" name="kd_po_isi" id="kd_po_isi" hidden readonly>
+                    <input type="text" class="form-control" placeholder="Tanggal Transaksi" value="<?= $kdpo ?>" name="kd_po_isi" id="kd_po_isi"  readonly>
                 </div>
             </div>
         </div>

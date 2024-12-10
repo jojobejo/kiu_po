@@ -254,7 +254,7 @@ $route['unpostpo/(:any)']               = 'postatus/C_PoStatus/unpostpo/$1';
 $route['hapuspo/(:any)']                = 'postatus/C_PoStatus/hapuspo/$1';
 $route['insert_note_setting']           = 'postatus/C_PoStatus/insert_note_setting';
 
-$route['NoteUpdateKeuangan']            = 'postatus/C_PoStatus/addNote';
+$route['note_updated_keuangan']         = 'postatus/C_PoStatus/addNote';
 $route['ntupdateporevisi']              = 'postatus/C_PoStatus/porepost';
 $route['tambahTax']                     = 'postatus/C_PoStatus/tambahTax';
 $route['tempoPembayaran']               = 'postatus/C_PoStatus/tempoPembayaran';

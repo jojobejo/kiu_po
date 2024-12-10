@@ -20,7 +20,6 @@
             <div class="m-2">
                 <div class="">
                     <div class="row">
-
                         <?php foreach ($status as $s) : ?>
                             <div class="col">
                                 <label for="noInv" class="">No Po</label>

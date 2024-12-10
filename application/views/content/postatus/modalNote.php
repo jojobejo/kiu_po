@@ -9,7 +9,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <?php echo form_open_multipart('NoteUpdateKeuangan'); ?>
+                        <?php echo form_open_multipart('note_updated_keuangan'); ?>
                         <div class="form-group" hidden>
                             <div class="row">
                                 <label class="col-sm-2 control-label text-right" for="kd_user">Kd<span class="required">*</span></label>
@@ -19,7 +19,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-2 control-label text-right" for="kd_user">Catatan<span class="required">*</span></label>
-                                <div class="col-sm-9"><textarea class="form-control" type="text" id="noteDitektur" name="noteDitektur" value=""> </textarea></div>
+                                <div class="col-sm-9"><textarea class="form-control" type="text" id="note_direktur" name="note_direktur" value=""> </textarea></div>
                             </div>
                         </div>
                     </div>

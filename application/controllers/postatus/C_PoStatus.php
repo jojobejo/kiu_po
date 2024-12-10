@@ -521,7 +521,7 @@ class C_PoStatus extends CI_Controller
     public function addNote()
     {
         $kdpo           = $this->input->post('kdpo');
-        $note           = $this->input->post('noteDitektur');
+        $note           = $this->input->post('note_direktur');
         $stslogin       = $this->session->userdata('lv');
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
