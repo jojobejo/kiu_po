@@ -160,6 +160,12 @@ $route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed'] = 'purchaseorder/C_Reqpic/reqpicconfirmed';
 $route['reqpicconfirmed_plus'] = 'purchaseorder/C_Reqpic/reqpicconfirmed_plus';
 $route['reqpicdone'] = 'purchaseorder/C_Reqpic/reqpicdone';
+$route['po_nk_req_revisi_note'] = 'purchaseorder/C_Reqpic/po_nk_req_revisi_note';
+$route['updated_det_req_po_nk'] = 'purchaseorder/C_Reqpic/updated_det_req_po_nk';
+$route['reqpic/requestpending/(:any)'] = 'purchaseorder/C_Reqpic/requestpending/$1';
+$route['requestpendings'] = 'purchaseorder/C_Reqpic/requestpendings';
+$route['updated_po_nk/(:any)'] = 'purchaseorder/C_Reqpic/updated_po_nk/$1';
+
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';

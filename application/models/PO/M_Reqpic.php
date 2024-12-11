@@ -72,7 +72,16 @@ class M_Reqpic extends CI_Model
         a.*
         FROM tb_req_nk a
         WHERE a.kd_user = '$kd' 
-        AND a.status != 'DONE'
+        AND a.status != 'DONE' AND a.status != 'PENDING'
+        ");
+    }
+    public function getallreqpending($user)
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tb_req_nk a
+        WHERE a.kd_user = '$user' 
+        AND a.status = 'PENDING'
         ");
     }
     public function getallreqdone($kd)
@@ -82,6 +91,15 @@ class M_Reqpic extends CI_Model
         FROM tb_req_nk a
         WHERE a.kd_user = '$kd' 
         AND a.status = 'DONE'
+        ");
+    }
+    public function getallpending($kd)
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tb_req_nk a
+        WHERE a.kd_user = '$kd' 
+        AND a.status = 'PENDING'
         ");
     }
     function input_detail_po_nk($data)
@@ -154,6 +172,9 @@ class M_Reqpic extends CI_Model
     public function getitmlistpicreq($kd)
     {
         return $this->db->query("SELECT
+            a.id_det_po_nk AS idbarang,
+            a.kd_bsys AS kodebarang,
+            a.kd_po_nk AS kodefaktur,
             b.nama_barang AS nmbarang,
             b.descnk AS deskripsi,
             a.keterangan AS ket,
@@ -257,7 +278,7 @@ class M_Reqpic extends CI_Model
         // return $this->db->get('tb_req_nk')->result();
         return $this->db->query("SELECT a.*
             FROM tb_req_nk a
-            WHERE a.status = 'ON PROGRESS';
+            WHERE a.status = 'ON PROGRESS' OR a.status = 'PO REVISI';
             ");
     }
     public function getlistpicreqacc()
@@ -668,6 +689,25 @@ class M_Reqpic extends CI_Model
         $kdnk1 = 'NPONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+
+    function updated_req_po_nk($kd, $data)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        return $this->db->update('tb_req_nk', $data);
+    }
+
+    function det_updated_req_po_nk($id, $data)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->update('tb_detail_req', $data);
+    }
+
+    function det_delete_req_po_nk($id)
+    {
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->delete('tb_detail_req');
+    }
+
     // function viewtot($kd)
     // {
     //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totdetail FROM tb_detail_req b WHERE b.kd_po_nk = '$kd'");

@@ -33,6 +33,8 @@
                                     <td style="text-align: center;">Qty</td>
                                     <?php if ($this->session->userdata('kode') == 'KEU09') : ?>
                                         <td style="text-align: center;">#</td>
+                                    <?php elseif ($this->session->userdata('kode') == 'KEU02') : ?>
+                                        <td style="text-align: center;">#</td>
                                     <?php endif; ?>
                                 </tr>
                             </thead>
@@ -76,6 +78,10 @@
                                         <?php endif; ?>
                                         <td style="text-align: center;"><?= $qs . $s->qty . " " . "(" . $s->nm_satuan . ")" ?></td>
                                         <?php if ($this->session->userdata('kode') == 'KEU09') : ?>
+                                            <td style="text-align: center;">
+                                                <a href="<?= base_url('tr_trash/1/') . $s->id ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-alt"></i></a>
+                                            </td>
+                                        <?php elseif ($this->session->userdata('kode') == 'KEU02') : ?>
                                             <td style="text-align: center;">
                                                 <a href="<?= base_url('tr_trash/1/') . $s->id ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-alt"></i></a>
                                             </td>
