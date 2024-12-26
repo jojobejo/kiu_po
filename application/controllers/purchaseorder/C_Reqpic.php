@@ -390,7 +390,7 @@ class C_Reqpic extends CI_Controller
                     'kd_po_nk'          => $i->kd_po_nk,
                     'kd_barang'         => $i->kd_barang,
                     'kd_barangsys'      => $i->kd_bsys,
-                    'keterangan'        => $i->ket,
+                    'keterangan'        => 'tmp-req',
                     'kat_barang'        => $i->kat_barang,
                     'tr_qty'            => $i->qty,
                     'satuan'            => $i->satuan,
@@ -1104,21 +1104,22 @@ class C_Reqpic extends CI_Controller
 
             if ($tmp) {
                 foreach ($tmp as $t) {
-                    $dataconfirm = array(
-                        'kd_akun'           => '11512',
-                        'kd_po_nk'          => $t->kdporeq,
-                        'kd_barang'         => $t->kdbr,
-                        'kd_barangsys'      => $t->kdbsys,
-                        'keterangan'        => $t->ket,
-                        'kat_barang'        => $t->kat,
-                        'tr_qty'            => $t->trqty,
-                        'satuan'            => $t->satuan,
-                        'tgl_transaksi'     => $now,
-                        'inputer'           => $this->session->userdata('kode'),
-                        'req_by'            => $t->kduser,
-                        'create_at'         => $now,
-                        'last_updated_by'   => $this->session->userdata('kode')
-                    );
+                    if ($t->ket != 'tmp-req')
+                        $dataconfirm = array(
+                            'kd_akun'           => '11512',
+                            'kd_po_nk'          => $t->kdporeq,
+                            'kd_barang'         => $t->kdbr,
+                            'kd_barangsys'      => $t->kdbsys,
+                            'keterangan'        => $t->ket,
+                            'kat_barang'        => $t->kat,
+                            'tr_qty'            => $t->trqty,
+                            'satuan'            => $t->satuan,
+                            'tgl_transaksi'     => $now,
+                            'inputer'           => $this->session->userdata('kode'),
+                            'req_by'            => $t->kduser,
+                            'create_at'         => $now,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
                     $this->M_Reqpic->input_tr($dataconfirm);
                 }
                 redirect('reqpic/detreqbarangpic/' . $kdponk);
