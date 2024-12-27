@@ -601,6 +601,13 @@ class M_Reqpic extends CI_Model
         $this->db->where('kd_po_nk', $id);
         return $this->db->delete('tb_transaksi_tmp');
     }
+    public function deleteitemtrtmp($kd, $usr, $ket)
+    {
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('req_by', $usr);
+        $this->db->where('keterangan', $ket);
+        return $this->db->delete('tb_transaksi');
+    }
     function getNoted($kdpo)
     {
         $this->db->select('*');
