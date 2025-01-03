@@ -195,7 +195,7 @@ $route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
 $route['historidone/(:any)/(:any)'] = 'postatus/C_PoStatus/historidone/$1/$2';
 $route['stsviewpo/(:any)']    = 'postatus/C_PoStatus/stsviewpo/$1';
 $route['srcexpdone'] = 'postatus/C_PoStatus/srcexpdone';
-$route['downloadfile/(:any)'] = 'postatus/C_PoStatus/downloadfile/$1';
+$route['downloadfile/(:any)']                   = 'postatus/C_PoStatus/downloadfile/$1';
 
 
 $route['edit_faktur_item_nk']                   = 'postatus/C_PoStatus/edit_faktur_item_nk';
@@ -258,7 +258,6 @@ $route['edit_no_po']                            = 'postatus/C_PoStatus/edit_no_p
 $route['unpostpo/(:any)']                       = 'postatus/C_PoStatus/unpostpo/$1';
 $route['hapuspo/(:any)']                        = 'postatus/C_PoStatus/hapuspo/$1';
 $route['insert_note_setting']                   = 'postatus/C_PoStatus/insert_note_setting';
-
 $route['NoteUpdateKeuangan']                    = 'postatus/C_PoStatus/addNote';
 $route['ntupdateporevisi']                      = 'postatus/C_PoStatus/porepost';
 $route['tambahTax']                             = 'postatus/C_PoStatus/tambahTax';
