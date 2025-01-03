@@ -49,7 +49,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'auth';
+$route['default_controller'] = 'Auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
@@ -165,7 +165,6 @@ $route['updated_det_req_po_nk'] = 'purchaseorder/C_Reqpic/updated_det_req_po_nk'
 $route['reqpic/requestpending/(:any)'] = 'purchaseorder/C_Reqpic/requestpending/$1';
 $route['requestpendings'] = 'purchaseorder/C_Reqpic/requestpendings';
 $route['updated_po_nk/(:any)'] = 'purchaseorder/C_Reqpic/updated_po_nk/$1';
-
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
