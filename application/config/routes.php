@@ -49,7 +49,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'auth';
+$route['default_controller'] = 'Auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
@@ -160,6 +160,11 @@ $route['accreqpic'] = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed'] = 'purchaseorder/C_Reqpic/reqpicconfirmed';
 $route['reqpicconfirmed_plus'] = 'purchaseorder/C_Reqpic/reqpicconfirmed_plus';
 $route['reqpicdone'] = 'purchaseorder/C_Reqpic/reqpicdone';
+$route['po_nk_req_revisi_note'] = 'purchaseorder/C_Reqpic/po_nk_req_revisi_note';
+$route['updated_det_req_po_nk'] = 'purchaseorder/C_Reqpic/updated_det_req_po_nk';
+$route['reqpic/requestpending/(:any)'] = 'purchaseorder/C_Reqpic/requestpending/$1';
+$route['requestpendings'] = 'purchaseorder/C_Reqpic/requestpendings';
+$route['updated_po_nk/(:any)'] = 'purchaseorder/C_Reqpic/updated_po_nk/$1';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk'] = 'postatus/C_PoStatus/postatusnk';
@@ -190,111 +195,110 @@ $route['srcponkbytgl'] = 'postatus/C_PoStatus/srcponkbytgl';
 $route['historidone/(:any)/(:any)'] = 'postatus/C_PoStatus/historidone/$1/$2';
 $route['stsviewpo/(:any)']    = 'postatus/C_PoStatus/stsviewpo/$1';
 $route['srcexpdone'] = 'postatus/C_PoStatus/srcexpdone';
-$route['downloadfile/(:any)'] = 'postatus/C_PoStatus/downloadfile/$1';
+$route['downloadfile/(:any)']                   = 'postatus/C_PoStatus/downloadfile/$1';
 
 
-$route['edit_faktur_item_nk'] = 'postatus/C_PoStatus/edit_faktur_item_nk';
-$route['hapus_faktur_item_nk'] = 'postatus/C_PoStatus/hapus_faktur_item_nk';
-$route['addnotebarangsupliertmp'] = 'purchaseorder/C_Order/addnotebarangsupliertmp';
-$route['edit_note_tmp_barang'] = 'purchaseorder/C_Order/edit_note_tmp_barang';
-$route['hapus_note_tmp_barang'] = 'purchaseorder/C_Order/hapus_note_tmp_barang';
-$route['add_diskon_po'] = 'purchaseorder/C_Order/add_diskon_po';
-$route['edit_diskon_po'] = 'purchaseorder/C_Order/edit_diskon_po';
-$route['hapus_diskon_po'] = 'purchaseorder/C_Order/hapus_diskon_po';
-$route['add_diskon_barang_tmp'] = 'purchaseorder/C_Order/add_diskon_barang_tmp';
-$route['add_diskon_barangs_tmp'] = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
-$route['unpostponk/(:any)']  = 'postatus/C_PoStatus/unpostponk/$1';
-$route['hapusponk/(:any)']  = 'postatus/C_PoStatus/hapusponk/$1';
+$route['edit_faktur_item_nk']                   = 'postatus/C_PoStatus/edit_faktur_item_nk';
+$route['hapus_faktur_item_nk']                  = 'postatus/C_PoStatus/hapus_faktur_item_nk';
+$route['addnotebarangsupliertmp']               = 'purchaseorder/C_Order/addnotebarangsupliertmp';
+$route['edit_note_tmp_barang']                  = 'purchaseorder/C_Order/edit_note_tmp_barang';
+$route['hapus_note_tmp_barang']                 = 'purchaseorder/C_Order/hapus_note_tmp_barang';
+$route['add_diskon_po']                         = 'purchaseorder/C_Order/add_diskon_po';
+$route['edit_diskon_po']                        = 'purchaseorder/C_Order/edit_diskon_po';
+$route['hapus_diskon_po']                       = 'purchaseorder/C_Order/hapus_diskon_po';
+$route['add_diskon_barang_tmp']                 = 'purchaseorder/C_Order/add_diskon_barang_tmp';
+$route['add_diskon_barangs_tmp']                = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
+$route['unpostponk/(:any)']                     = 'postatus/C_PoStatus/unpostponk/$1';
+$route['hapusponk/(:any)']                      = 'postatus/C_PoStatus/hapusponk/$1';
 
 //postatus
-$route['postatus'] = 'postatus/C_PoStatus/postatus';
-$route['postatus/today'] = 'postatus/C_PoStatus';
-$route['postatusall'] = 'postatus/C_PoStatus/postatus';
-$route['postatus/postatusall/done'] = 'postatus/C_PoStatus/getDone';
-$route['postatus/postatusall/onprogress'] = 'postatus/C_PoStatus/getOnProgress';
-$route['postatus/postatusall/reject'] = 'postatus/C_PoStatus/getReject';
-$route['postatus/onprogress'] = 'postatus/C_PoStatus/getOnProgres';
-$route['postatus/done'] = 'postatus/C_PoStatus/getDone';
-$route['postatus/reject'] = 'postatus/C_PoStatus/getReject';
-$route['postatus/today/done'] = 'postatus/C_PoStatus/getDoneToday';
-$route['postatus/today/onprogress'] = 'postatus/C_PoStatus/getOnProgresToday';
-$route['postatus/today/reject'] = 'postatus/C_PoStatus/getRejectToday';
-$route['konfirmasiOrderNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
-$route['konfirmasiOrderdirNK/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
+$route['postatus']                              = 'postatus/C_PoStatus/postatus';
+$route['postatus/today']                        = 'postatus/C_PoStatus';
+$route['postatusall']                           = 'postatus/C_PoStatus/postatus';
+$route['postatus/postatusall/done']             = 'postatus/C_PoStatus/getDone';
+$route['postatus/postatusall/onprogress']       = 'postatus/C_PoStatus/getOnProgress';
+$route['postatus/postatusall/reject']           = 'postatus/C_PoStatus/getReject';
+$route['postatus/onprogress']                   = 'postatus/C_PoStatus/getOnProgres';
+$route['postatus/done']                         = 'postatus/C_PoStatus/getDone';
+$route['postatus/reject']                       = 'postatus/C_PoStatus/getReject';
+$route['postatus/today/done']                   = 'postatus/C_PoStatus/getDoneToday';
+$route['postatus/today/onprogress']             = 'postatus/C_PoStatus/getOnProgresToday';
+$route['postatus/today/reject']                 = 'postatus/C_PoStatus/getRejectToday';
+$route['konfirmasiOrderNK/(:any)/(:any)']       = 'postatus/C_PoStatus/konfirmasiOrderNK/$1/$2';
+$route['konfirmasiOrderdirNK/(:any)/(:any)']    = 'postatus/C_PoStatus/konfirmasiOrderdirNK/$1/$2';
 
-$route['tolakordernk/(:any)/(:any)'] = 'postatus/C_PoStatus/tolakordernk/$1/$2';
-$route['pendingordernk'] = 'postatus/C_PoStatus/pendingordernk';
-$route['porevisi'] = 'postatus/C_PoStatus/porevisi';
+$route['tolakordernk/(:any)/(:any)']            = 'postatus/C_PoStatus/tolakordernk/$1/$2';
+$route['pendingordernk']                        = 'postatus/C_PoStatus/pendingordernk';
+$route['porevisi']                              = 'postatus/C_PoStatus/porevisi';
 
-$route['uploadfileponk'] = 'postatus/C_PoStatus/uploadfileponk';
-$route['repostponk/(:any)'] = 'postatus/C_PoStatus/repostponk/$1';
+$route['uploadfileponk']                        = 'postatus/C_PoStatus/uploadfileponk';
+$route['repostponk/(:any)']                     = 'postatus/C_PoStatus/repostponk/$1';
 
-$route['detailPO/(:any)']               = 'postatus/C_PoStatus/detailPO/$1';
-$route['update_printout_po']            = 'postatus/C_PoStatus/update_printout_po';
+$route['detailPO/(:any)']                       = 'postatus/C_PoStatus/detailPO/$1';
+$route['update_printout_po']                    = 'postatus/C_PoStatus/update_printout_po';
 
-$route['onhandpo/(:any)']             = 'postatus/C_PoStatus/onhandpo/$1';
-$route['printOrder/(:any)']             = 'postatus/C_PoStatus/printOrder/$1';
-$route['printOrdernk/(:any)']           = 'postatus/C_PoStatus/printOrdernk/$1';
-$route['konfirmasiOrder/(:any)/(:any)'] = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
-$route['poconfirmacc/(:any)']           = 'postatus/C_PoStatus/poconfirmacc/$1';
-$route['tolakOrder/(:any)/(:any)']      = 'postatus/C_PoStatus/tolakOrder/$1/$2';
-$route['cancel_po']                     = 'postatus/C_PoStatus/cancel_po';
-$route['NoteDirektur']                  = 'postatus/C_PoStatus/addNote';
-$route['addBarangRevisi/(:any)/(:any)'] = 'postatus/C_PoStatus/listBarangRevisi/$1/$2';
-$route['tambahBarangRevisi']            = 'postatus/C_PoStatus/tambahBarangRevisi';
-$route['revisiPO']                      = 'postatus/C_PoStatus/revisiPO';
-$route['hapusBarangPO/(:any)/(:any)']   = 'postatus/C_PoStatus/hapusBarangPO/$1/$2';
-$route['note_barang_suplier']           = 'postatus/C_PoStatus/note_barang_suplier';
-$route['note_barang_suplier_edit']      = 'postatus/C_PoStatus/note_barang_suplier_edit';
-$route['note_barang_suplier_hapus']     = 'postatus/C_PoStatus/note_barang_suplier_hapus';
-$route['searchPOdate']                  = 'postatus/C_PoStatus/searchdatepo';
-$route['repost_po']                     = 'postatus/C_PoStatus/repostpo';
-$route['edit_no_po']                    = 'postatus/C_PoStatus/edit_no_po';
-$route['unpostpo/(:any)']               = 'postatus/C_PoStatus/unpostpo/$1';
-$route['hapuspo/(:any)']                = 'postatus/C_PoStatus/hapuspo/$1';
-$route['insert_note_setting']           = 'postatus/C_PoStatus/insert_note_setting';
-
-$route['note_updated_keuangan']         = 'postatus/C_PoStatus/addNote';
-$route['ntupdateporevisi']              = 'postatus/C_PoStatus/porepost';
-$route['tambahTax']                     = 'postatus/C_PoStatus/tambahTax';
-$route['tempoPembayaran']               = 'postatus/C_PoStatus/tempoPembayaran';
-$route['frankoPengiriman']              = 'postatus/C_PoStatus/frankoPengiriman';
-$route['addDiskon']                     = 'postatus/C_PoStatus/tambahDiskon';
-$route['diskonEdit']                    = 'postatus/C_PoStatus/editDiskon';
-$route['hapusDiskon/(:any)/(:any)']     = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
-$route['hapusDiskonNk/(:any)/(:any)']   = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
-$route['add_diskon_barang']             = 'postatus/C_PoStatus/add_diskon_barang';
-$route['add_diskon_barangs']            = 'postatus/C_PoStatus/add_diskon_barangs';
+$route['onhandpo/(:any)']                       = 'postatus/C_PoStatus/onhandpo/$1';
+$route['printOrder/(:any)']                     = 'postatus/C_PoStatus/printOrder/$1';
+$route['printOrdernk/(:any)']                   = 'postatus/C_PoStatus/printOrdernk/$1';
+$route['konfirmasiOrder/(:any)/(:any)']         = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
+$route['poconfirmacc/(:any)']                   = 'postatus/C_PoStatus/poconfirmacc/$1';
+$route['tolakOrder/(:any)/(:any)']              = 'postatus/C_PoStatus/tolakOrder/$1/$2';
+$route['cancel_po']                             = 'postatus/C_PoStatus/cancel_po';
+$route['NoteDirektur']                          = 'postatus/C_PoStatus/addNote';
+$route['addBarangRevisi/(:any)/(:any)']         = 'postatus/C_PoStatus/listBarangRevisi/$1/$2';
+$route['tambahBarangRevisi']                    = 'postatus/C_PoStatus/tambahBarangRevisi';
+$route['revisiPO']                              = 'postatus/C_PoStatus/revisiPO';
+$route['hapusBarangPO/(:any)/(:any)']           = 'postatus/C_PoStatus/hapusBarangPO/$1/$2';
+$route['note_barang_suplier']                   = 'postatus/C_PoStatus/note_barang_suplier';
+$route['note_barang_suplier_edit']              = 'postatus/C_PoStatus/note_barang_suplier_edit';
+$route['note_barang_suplier_hapus']             = 'postatus/C_PoStatus/note_barang_suplier_hapus';
+$route['searchPOdate']                          = 'postatus/C_PoStatus/searchdatepo';
+$route['repost_po']                             = 'postatus/C_PoStatus/repostpo';
+$route['edit_no_po']                            = 'postatus/C_PoStatus/edit_no_po';
+$route['unpostpo/(:any)']                       = 'postatus/C_PoStatus/unpostpo/$1';
+$route['hapuspo/(:any)']                        = 'postatus/C_PoStatus/hapuspo/$1';
+$route['insert_note_setting']                   = 'postatus/C_PoStatus/insert_note_setting';
+$route['NoteUpdateKeuangan']                    = 'postatus/C_PoStatus/addNote';
+$route['ntupdateporevisi']                      = 'postatus/C_PoStatus/porepost';
+$route['tambahTax']                             = 'postatus/C_PoStatus/tambahTax';
+$route['tempoPembayaran']                       = 'postatus/C_PoStatus/tempoPembayaran';
+$route['frankoPengiriman']                      = 'postatus/C_PoStatus/frankoPengiriman';
+$route['addDiskon']                             = 'postatus/C_PoStatus/tambahDiskon';
+$route['diskonEdit']                            = 'postatus/C_PoStatus/editDiskon';
+$route['hapusDiskon/(:any)/(:any)']             = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
+$route['hapusDiskonNk/(:any)/(:any)']           = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
+$route['add_diskon_barang']                     = 'postatus/C_PoStatus/add_diskon_barang';
+$route['add_diskon_barangs']                    = 'postatus/C_PoStatus/add_diskon_barangs';
 
 //settings-tax
-$route['taxseting']                     = 'settings/C_TaxSetting';
-$route['addSatuanPajak']                = 'settings/C_TaxSetting/addPajak';
-$route['editSatuanPajak']               = 'settings/C_TaxSetting/editTax';
-$route['hapusPajak/(:num)']             = 'settings/C_TaxSetting/hapusPajak/$1';
+$route['taxseting']                             = 'settings/C_TaxSetting';
+$route['addSatuanPajak']                        = 'settings/C_TaxSetting/addPajak';
+$route['editSatuanPajak']                       = 'settings/C_TaxSetting/editTax';
+$route['hapusPajak/(:num)']                     = 'settings/C_TaxSetting/hapusPajak/$1';
 
 //setting-satuan
-$route['satuansetting']                 = 'settings/C_SatuanSetting';
-$route['addSatuanBarang']               = 'settings/C_SatuanSetting/addSatuanBarang';
-$route['editSatuanBarang']              = 'settings/C_SatuanSetting/editSatuan';
-$route['hapusSatuan/(:num)']            = 'settings/C_SatuanSetting/hapusSatuan/$1';
+$route['satuansetting']                         = 'settings/C_SatuanSetting';
+$route['addSatuanBarang']                       = 'settings/C_SatuanSetting/addSatuanBarang';
+$route['editSatuanBarang']                      = 'settings/C_SatuanSetting/editSatuan';
+$route['hapusSatuan/(:num)']                    = 'settings/C_SatuanSetting/hapusSatuan/$1';
 
 //setting-template
-$route['notetemplate']                  = 'settings/C_NoteSetting';
-$route['addnotetemplate']               = 'settings/C_NoteSetting/add_note_template';
-$route['notetemplate/(:any)']           = 'settings/C_NoteSetting/detail_note_template/$1';
-$route['updateisinote']                 = 'settings/C_NoteSetting/update_note_template';
+$route['notetemplate']                          = 'settings/C_NoteSetting';
+$route['addnotetemplate']                       = 'settings/C_NoteSetting/add_note_template';
+$route['notetemplate/(:any)']                   = 'settings/C_NoteSetting/detail_note_template/$1';
+$route['updateisinote']                         = 'settings/C_NoteSetting/update_note_template';
 
 //LAPORAN PEMBELIAN NON KOMERSIL
-$route['lap_nonkomersil']               = 'laporan/C_Laporan';
-$route['srclapbeli']                    = 'laporan/C_Laporan/srclapbeli';
-$route['export_laporan_pembelian_nk']   = 'laporan/C_Laporan/export_laporan_pembelian_nk';
-$route['exported_allstock']             = 'laporan/C_Laporan/exported_allstock';
+$route['lap_nonkomersil']                       = 'laporan/C_Laporan';
+$route['srclapbeli']                            = 'laporan/C_Laporan/srclapbeli';
+$route['export_laporan_pembelian_nk']           = 'laporan/C_Laporan/export_laporan_pembelian_nk';
+$route['exported_allstock']                     = 'laporan/C_Laporan/exported_allstock';
 
 //reviewapps
-$route['reviewapps']                    = 'settings/C_Appsrated';
-$route['addnewmodule']                  = 'settings/C_Appsrated/addnewmodule';
-$route['detailreview/(:any)']           = 'settings/C_Appsrated/modulereview/$1';
-$route['addqbaru']                      = 'settings/C_Appsrated/addqbaru';
-$route['reviewanswer']                  = 'settings/C_Appsrated/reviewanswer';
-$route['questionreviewpic/(:any)']      = 'settings/C_Appsrated/questionreviewpic/$1';
-$route['addconfirmsos']                  = 'settings/C_Appsrated/addconfirmsos';
+$route['reviewapps']                            = 'settings/C_Appsrated';
+$route['addnewmodule']                          = 'settings/C_Appsrated/addnewmodule';
+$route['detailreview/(:any)']                   = 'settings/C_Appsrated/modulereview/$1';
+$route['addqbaru']                              = 'settings/C_Appsrated/addqbaru';
+$route['reviewanswer']                          = 'settings/C_Appsrated/reviewanswer';
+$route['questionreviewpic/(:any)']              = 'settings/C_Appsrated/questionreviewpic/$1';
+$route['addconfirmsos']                         = 'settings/C_Appsrated/addconfirmsos';

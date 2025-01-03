@@ -48,6 +48,42 @@ class C_Reqpic extends CI_Controller
         $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
+    public function requestpendings()
+    {
+        $kduser = $this->session->userdata('kode');
+
+        $data['title']      = 'PO Request By PIC ';
+        $data['getallreq']  = $this->M_Reqpic->getallreqpending($kduser)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/requestpending', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
+
+    public function requestpending($kdpo)
+    {
+        $kodeuser   = $this->session->userdata('kode');
+        $nmuser     = $this->session->userdata('nama_user');
+
+        $data = array(
+            'status'    => 'PENDING'
+        );
+
+        $noterevisi = array(
+            'kd_po'         => $kdpo,
+            'isi_note'      => 'PO PENDING',
+            'kd_user'       => $kodeuser,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+        );
+        $this->M_Purchase->addNote($noterevisi);
+        $this->M_Reqpic->updated_req_po_nk($kdpo, $data);
+        redirect('reqpic');
+    }
+
     public function index_brsedia()
     {
         $kduser = $this->session->userdata('kode');
@@ -354,7 +390,7 @@ class C_Reqpic extends CI_Controller
                     'kd_po_nk'          => $i->kd_po_nk,
                     'kd_barang'         => $i->kd_barang,
                     'kd_barangsys'      => $i->kd_bsys,
-                    'keterangan'        => $i->ket,
+                    'keterangan'        => 'tmp-req',
                     'kat_barang'        => $i->kat_barang,
                     'tr_qty'            => $i->qty,
                     'satuan'            => $i->satuan,
@@ -368,7 +404,7 @@ class C_Reqpic extends CI_Controller
                     'status'    => '1'
                 );
                 $kode_po    = $i->kd_po_nk;
-                $this->M_Reqpic->insert_transaksi($updatedpostmp);
+                // $this->M_Reqpic->insert_transaksi($updatedpostmp);
                 $this->M_Reqpic->updatedetreqitm($id, $updtstatus);
                 redirect('reqpic/detreqbarangpic/' . $kode_po);
             }
@@ -1068,22 +1104,44 @@ class C_Reqpic extends CI_Controller
 
             if ($tmp) {
                 foreach ($tmp as $t) {
-                    $dataconfirm = array(
-                        'kd_akun'           => '11512',
-                        'kd_po_nk'          => $t->kdporeq,
-                        'kd_barang'         => $t->kdbr,
-                        'kd_barangsys'      => $t->kdbsys,
-                        'keterangan'        => $t->ket,
-                        'kat_barang'        => $t->kat,
-                        'tr_qty'            => $t->trqty,
-                        'satuan'            => $t->satuan,
-                        'tgl_transaksi'     => $now,
-                        'inputer'           => $this->session->userdata('kode'),
-                        'req_by'            => $t->kduser,
-                        'create_at'         => $now,
-                        'last_updated_by'   => $this->session->userdata('kode')
-                    );
-                    $this->M_Reqpic->input_tr($dataconfirm);
+                    if ($t->ket == 'tmp-req') {
+                        $dataconfirm = array(
+                            'kd_akun'           => '11512',
+                            'kd_po_nk'          => $t->kdporeq,
+                            'kd_barang'         => $t->kdbr,
+                            'kd_barangsys'      => $t->kdbsys,
+                            'keterangan'        => $t->ket,
+                            'kat_barang'        => $t->kat,
+                            'tr_qty'            => $t->trqty,
+                            'satuan'            => $t->satuan,
+                            'tgl_transaksi'     => $now,
+                            'inputer'           => $this->session->userdata('kode'),
+                            'req_by'            => $t->kduser,
+                            'create_at'         => $now,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $sts = 'tmp-req';
+
+                        $this->M_Reqpic->input_tr($dataconfirm);
+                        $this->M_Reqpic->deleteitemtrtmp($kdponk, $kduser, $sts);
+                    } else {
+                        $dataconfirm = array(
+                            'kd_akun'           => '11512',
+                            'kd_po_nk'          => $t->kdporeq,
+                            'kd_barang'         => $t->kdbr,
+                            'kd_barangsys'      => $t->kdbsys,
+                            'keterangan'        => $t->ket,
+                            'kat_barang'        => $t->kat,
+                            'tr_qty'            => $t->trqty,
+                            'satuan'            => $t->satuan,
+                            'tgl_transaksi'     => $now,
+                            'inputer'           => $this->session->userdata('kode'),
+                            'req_by'            => $t->kduser,
+                            'create_at'         => $now,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $this->M_Reqpic->input_tr($dataconfirm);
+                    }
                 }
                 redirect('reqpic/detreqbarangpic/' . $kdponk);
             }
@@ -1125,6 +1183,81 @@ class C_Reqpic extends CI_Controller
                 }
                 redirect('reqpic/detreqbarangpic/' . $kdponk);
             }
+        }
+    }
+
+    public function po_nk_req_revisi_note()
+    {
+        $kdponk     = $this->input->post('kodeponk');
+        $isinote    = $this->input->post('porevisi');
+        $kodeuser   = $this->session->userdata('kode');
+        $nmuser     = $this->session->userdata('nama_user');
+
+        $editeddata = array(
+            'status'    => 'PO REVISI'
+        );
+
+        $noterevisi = array(
+            'kd_po'         => $kdponk,
+            'isi_note'      => 'PO REVISI - ' . $isinote,
+            'kd_user'       => $kodeuser,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+        );
+
+        $this->M_Purchase->addNote($noterevisi);
+        $this->M_Reqpic->updated_req_po_nk($kdponk, $editeddata);
+        redirect('reqpic');
+    }
+
+    public function updated_po_nk($kdpo)
+    {
+        $kodeuser   = $this->session->userdata('kode');
+        $nmuser     = $this->session->userdata('nama_user');
+
+        $data = array(
+            'status'    => 'ON PROGRESS'
+        );
+
+        $noterevisi = array(
+            'kd_po'         => $kdpo,
+            'isi_note'      => 'PO REPOST - ' . $nmuser,
+            'kd_user'       => $kodeuser,
+            'nama_user'     => $nmuser,
+            'note_for'      => '2',
+            'update_status' => '2',
+        );
+
+        $this->M_Purchase->addNote($noterevisi);
+        $this->M_Reqpic->updated_req_po_nk($kdpo, $data);
+        redirect('reqpic');
+    }
+
+    public function updated_det_req_po_nk()
+    {
+        $kdpo   = $this->input->post('kodebarang');
+        $idpo   = $this->input->post('idbarang');
+        $action = $this->input->post('action');
+
+        switch ($action) {
+            case 'edited':
+
+                $keterangan = $this->input->post('keterangan');
+                $qty        = $this->input->post('qtyisi');
+
+                $data   = array(
+                    'keterangan'    => $keterangan,
+                    'qty'           => $qty
+                );
+
+                $this->M_Reqpic->det_updated_req_po_nk($idpo, $data);
+                redirect('reqpic/detreqbarangpic/' . $kdpo);
+                break;
+            case 'delete':
+                $this->M_Reqpic->det_delete_req_po_nk($idpo);
+                redirect('reqpic/detreqbarangpic/' . $kdpo);
+                break;
         }
     }
 }

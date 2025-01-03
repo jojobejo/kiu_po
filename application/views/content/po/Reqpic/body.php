@@ -9,6 +9,7 @@
                         <?php if ($countreq == '0') : ?>
                             <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary mb-2"><i class="fas fa-plus"></i>&nbsp; New Request </a>
                             <a href="<?= base_url('historireqpic') ?>" class="btn btn-sm btn-success mb-2"><i class="fas fa-check"></i>&nbsp;REQ-DONE</a>
+                            <a href="<?= base_url('requestpendings') ?>" class="btn btn-sm btn-warning mb-2"><i class="fas fa-pause"></i>&nbsp; REQUEST PENDING</a>
                         <?php else : ?>
                             <a href="<?= base_url('historireqpic') ?>" class="btn btn-sm btn-success mb-2"><i class="fas fa-check"></i>&nbsp;REQ-DONE</a>
                         <?php endif; ?>
@@ -46,13 +47,26 @@
                                                     <div class="col">
                                                         <a class="btn btn-block btn-success btn-sm"><?= $g->status ?></a>
                                                     </div>
+                                                <?php elseif ($g->status == 'PO REVISI') : ?>
+                                                    <div class="col">
+                                                        <a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a>
+                                                    </div>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
                                         <td>
-                                            <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('reqpic/detreqbarangpic/' . $g->kd_po_nk) ?>">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('reqpic/detreqbarangpic/' . $g->kd_po_nk) ?>">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-danger btn-sm" href="<?= base_url('reqpic/requestpending/' . $g->kd_po_nk) ?>">
+                                                        <i class="fas fa-times-circle"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -188,16 +202,11 @@
                                         <td><?= $g->departemen ?></td>
                                         <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
                                         <td><?= $g->tj_pembelian ?></td>
-                                        <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <!-- <?php if ($g->status == 'ON PROGRESS') : ?>
+                                        <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'REQUEST ACC') : ?>
-                                            <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'BARANG TERSEDIA') : ?>
+                                        <?php elseif ($g->status == 'PO REVISI') : ?>
                                             <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php elseif ($g->status == 'DONE') : ?>
-                                            <td><a class="btn btn-block btn-success btn-sm"><b><?= $g->status ?></b></a></td>
-                                        <?php endif; ?> -->
+                                        <?php endif; ?>
                                         <td>
                                             <div class="row">
                                                 <div class="col">

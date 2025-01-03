@@ -16,8 +16,28 @@
                             <a class="btn btn-block btn-success btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
                         <?php endif; ?>
                         <div class="card-body">
-                            <h1 class="m-0">Detail Request Barang - PIC - <a class="btn btn-primary btn-sm" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i></a></h1>
+                            <div class="row">
+                                <div class="col">
+                                    <h1 class="m-0">Detail Request Barang - PIC</h1>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-primary btn-sm btn-block" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i> <b>HOMEPAGE</b></a>
+                                </div>
+                                <?php if ($s->status == 'PENDING') : ?>
+                                    <div class="col">
+                                        <a href="<?= base_url('updated_po_nk/' . $s->kd_po_nk) ?>" class="btn btn-info btn-sm btn-block"><i class="fas fa-clipboard-check"></i> <b>UPDATED PO</b></a>
+                                    </div>
+                                <?php elseif ($s->status == 'ON PROGRESS') : ?>
+                                    <div class="col">
+                                        <a href="<?= base_url('reqpic/requestpending/' . $s->kd_po_nk) ?>" class="btn btn-danger btn-sm btn-block"><i class="fas fa-clipboard-check"></i> <b>PO PENDING</b></a>
+
+                                    </div>
+                                <?php endif; ?>
+
+                            </div>
+
                             <!-- FIELD DATA PENGAJUAN  -->
+                            <h3><?= $s->status ?></h3>
                             <div class="row">
                                 <div class="col">
                                     <label for="naSupp" class="">Tanggal Transaksi : </label>
@@ -77,6 +97,160 @@
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nmsatuan ?></td>
                                                 <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php elseif ($s->status == 'PENDING') : ?>
+                                <a href="#" class="btn btn-warning btn-block mt-4"><b style="text-transform: uppercase;">item list barang request</b></a>
+                                <table class="table table-bordered table-striped mb-2">
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td style="width:20%;">Keterangan</td>
+                                            <td style="width:10%;text-align: center;">QTY</td>
+                                            <td style="width:10%;text-align: center;">Satuan</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($getitmlistpicreq as $d) : ?>
+                                            <tr>
+                                                <td><?= $d->nmbarang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->ket ?></td>
+                                                <td style="text-align: center;"><?= $d->qty ?></td>
+                                                <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php elseif ($s->status == 'PO REVISI') : ?>
+                                <!-- MODAL START REVISI -->
+                                <?php foreach ($getitmlistpicreq as $d) : ?>
+                                    <div class="modal fade" id="modaleditbarang<?= $d->idbarang ?>">
+                                        <div class=" modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Edit Data Barang Request</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <?php echo form_open_multipart('updated_det_req_po_nk'); ?>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <label class="col-sm-2 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
+                                                            <div class="col-sm-10">
+                                                                <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nmbarang ?>" readonly />
+                                                                <input class="form-control" type="text" id="idbarang" name="idbarang" value="<?= $d->idbarang ?>" readonly hidden />
+                                                                <input class="form-control" type="text" id="kodebarang" name="kodebarang" value="<?= $d->kodefaktur ?>" readonly hidden />
+                                                                <input class="form-control" type="text" id="action" name="action" value="edited" readonly hidden />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <label class="col-sm-2 control-label text-right" for="kd_user">Keterangan<span class="required">*</span></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="text" class="form-control" id="keterangan" name="keterangan" value="<?= $d->ket ?>">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <label class="col-sm-2 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="number" class="form-control" id="qtyisi" name="qtyisi" value="<?= $d->qty ?>">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer justify-content-between">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                                </div>
+                                                </form>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                <?php endforeach; ?>
+
+                                <?php foreach ($getitmlistpicreq as $d) : ?>
+                                    <div class="modal fade" id="modalhapus<?= $d->idbarang ?>">
+                                        <div class=" modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Hapus Data Barang Request</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <?php echo form_open_multipart('updated_det_req_po_nk'); ?>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <div class="col-sm-10">
+                                                                <input class="form-control" type="text" id="idbarang" name="idbarang" value="<?= $d->idbarang ?>" readonly hidden />
+                                                                <input class="form-control" type="text" id="kodebarang" name="kodebarang" value="<?= $d->kodefaktur ?>" readonly hidden />
+                                                                <input class="form-control" type="text" id="action" name="action" value="delete" readonly hidden />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <div class="col-sm-10">
+                                                                <h3>Data <?= $d->nmbarang ?> akan terhapus permanent</h3>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-between">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-primary">Simpan</button>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                                <!-- /.modal-content -->
+                                            </div>
+                                            <!-- /.modal-dialog -->
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                                <!-- MODAL END REVISI -->
+
+                                <a href="#" class="btn btn-warning btn-block mt-4"><b style="text-transform: uppercase;">item list barang request</b></a>
+                                <table class="table table-bordered table-striped mb-2">
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td style="width:20%;">Keterangan</td>
+                                            <td style="width:10%;text-align: center;">QTY</td>
+                                            <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="text-align: center;">#</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($getitmlistpicreq as $d) : ?>
+                                            <tr>
+                                                <td><?= $d->nmbarang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->ket ?></td>
+                                                <td style="text-align: center;"><?= $d->qty ?></td>
+                                                <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <a href="#" class="btn btn-block btn-warning btn-md" data-toggle="modal" data-target="#modaleditbarang<?= $d->idbarang ?>"><i class="fas fa-user-edit"></i></a>
+                                                        </div>
+                                                        <div class="col">
+                                                            <a href="#" class="btn btn-block btn-danger btn-md" data-toggle="modal" data-target="#modalhapus<?= $d->idbarang ?>"><i class="fas fa-trash-alt"></i> </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -186,12 +360,57 @@
                         <a class="btn btn-block btn-info btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
                     <?php else : ?>
                     <?php endif; ?>
+
+                    <div class="modal fade" id="modalrevisi">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">Note Revisi</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <?php echo form_open_multipart('po_nk_req_revisi_note'); ?>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-2 control-label text-right" for="kd_user">Note Revisi<span class="required">*</span></label>
+                                            <div class="col-sm-10">
+                                                <textarea name="porevisi" id="porevisi" class="form-control"></textarea>
+                                            </div>
+                                            <div hidden>
+                                                <input type="text" class="form-control" id="kodeponk" name="kodeponk" value="<?= $s->kd_po_nk ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </div>
+                                </form>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="row mb-2">
-                                <div class="col-sm-6">
-                                    <h1 class="m-0">Detail Request Barang - PIC - <a class="btn btn-primary btn-sm" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i></a></h1>
-                                </div><!-- /.col -->
+                                <div class="col">
+                                    <h1 class="m-0">Detail Request Barang - PIC</h1>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-primary btn-sm btn-block" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i> HOME </a>
+                                </div>
+                                <div class="col">
+                                    <?php if ($s->status == 'ON PROGRESS') : ?>
+                                        <a class="btn btn-info btn-sm btn-block" href="#" data-toggle="modal" data-target="#modalrevisi"><i class="fas fa-recycle"></i> REVISI </a>
+                                    <?php elseif ($s->status == 'PO REVISI') : ?>
+                                        <a class="btn btn-warning btn-sm btn-block"><i class="fas fa-user-clock"></i> REVISI </a>
+                                    <?php endif; ?>
+                                </div>
+                                <!-- /.col -->
                             </div><!-- /.row -->
                             <!-- FIELD DATA PENGAJUAN  -->
                             <div class="row mt-3">
@@ -567,12 +786,45 @@
                                             <input type="number" id="jmltot" name="jmltot" style="max-width: 550px;" value="<?= $ct->hrg ?>" class="form-control" readonly hidden>
                                         <?php endforeach; ?>
                                         <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
+
+
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
+
                                     <?php endif; ?>
                                     <!-- END TRANSAKSI /STOCK BARANG READY -->
                                 <?php endforeach; ?>
 
                                 <!-- END ON PROGRESS -->
+                                <!-- START PO REVISI -->
+                            <?php elseif ($s->status == 'PO REVISI') : ?>
+                                <table class="table table-bordered table-striped mt-4 mb-2 ">
+
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nama Barang</td>
+                                            <td>Deskripsi</td>
+                                            <td>Keterangan</td>
+                                            <td>QTY</td>
+                                            <td style="width: 10%;">Qty Tersedia</td>
+                                            <td>Satuan</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($detreq as $d) :
+                                            $tot    = ($d->qty_ready) - ($d->qty_req);
+                                        ?>
+                                            <tr>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qty_req ?></td>
+                                                <td><?= $d->qty_ready ?></td>
+                                                <td><?= $d->nm_satuan ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <!-- END PO REVISI -->
 
                                 <!-- STATUS : BARANG TERSEDIA -->
                             <?php elseif ($s->status == 'BARANG TERSEDIA') : ?>
