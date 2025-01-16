@@ -344,7 +344,7 @@ class C_Reqpic extends CI_Controller
     public function confirmreq()
     {
         date_default_timezone_set("Asia/Jakarta");
-        $idponkss        = $this->input->post('idponkss');
+        $idponkss       = $this->input->post('idponkss');
         $kd_user        = $this->input->post('kduserss');
         $itemconfirm    = $this->M_Reqpic->getitemreq($idponkss)->result();
         $now            = date('Y-m-d');
