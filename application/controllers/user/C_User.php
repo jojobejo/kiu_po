@@ -111,4 +111,9 @@ class C_User extends CI_Controller
         $this->session->set_flashdata("edited", "Data Berhasil Dirubah");
         redirect('Auth');
     }
+    
+    public function test()
+    {
+
+    }
 }
