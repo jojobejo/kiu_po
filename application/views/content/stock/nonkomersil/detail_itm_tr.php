@@ -11,6 +11,19 @@
                         <a href="<?= base_url('stocknonkomersil') ?>" class="btn btn-sm btn-block btn-success mt-1"><i class="fas fa-undo-alt"></i></a>
                     </div>
                 </div><!-- /.row -->
+
+                <div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="daterange">Pilih Rentang Tanggal</label>
+                            <input type="text" id="daterange" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <button id="filter" class="btn btn-primary mt-4">Filter</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -20,7 +33,13 @@
                             <div class="col-sm-0">
                                 <a class="btn btn-sm btn-block btn-success mt-1 ml-3" data-toggle="modal" data-target="#adjustmentqty<?= $i->kode_sistem ?>"><i class="fas fa-plus"></i></a>
                             </div>
+                            <div class="col-sm-0 ml-5">
+
+                            </div>
                         </div>
+
+                        <!-- Tempat menampilkan hasil -->
+                        <div id="result"></div>
                         <table class="table table-bordered mb-5">
                             <thead style="background-color: #212529; color:white;">
                                 <tr>

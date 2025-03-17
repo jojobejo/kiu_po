@@ -30,8 +30,9 @@
 <script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.print.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.colVis.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/ekko-lightbox/ekko-lightbox.min.js') ?>"></script>
-<!-- date-range-picker -->
+<!-- JS Date Range Picker -->
 <script src="<?= base_url('assets/plugins/daterangepicker/daterangepicker.js') ?>"></script>
+
 <!-- bs-custom-file-input -->
 <script src="<?= base_url('assets/plugins/bs-custom-file-input/bs-custom-file-input.min.js') ?>"></script>
 
