@@ -140,6 +140,7 @@ $route['pononkomersil/list_stocknkpo/addtmpbarangnk'] = 'purchaseorder/C_Order/a
 $route['testing']  = 'settings/C_Testing/';
 // PO REQUEST BY PIC
 $route['reqpic'] = 'purchaseorder/C_Reqpic';
+$route['reqpic/admrestock'] = 'purchaseorder/C_Reqpic/admrestock';
 $route['historireqpic'] = 'purchaseorder/C_Reqpic/historireqpic';
 $route['reqpicaccreq'] = 'purchaseorder/C_Reqpic/index_accreq';
 $route['index_brsedia'] = 'purchaseorder/C_Reqpic/index_brsedia';

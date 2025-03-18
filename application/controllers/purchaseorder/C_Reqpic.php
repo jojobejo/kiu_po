@@ -202,6 +202,8 @@ class C_Reqpic extends CI_Controller
     }
     public function editedreqpic()
     {
+        $akses  = $this->session->userdata('lv');
+
         $idnk   = $this->input->post('id_isi');
         $ket    = $this->input->post('ket_isi');
         $qty    = $this->input->post('qty_isi');
@@ -212,14 +214,23 @@ class C_Reqpic extends CI_Controller
         );
 
         $this->M_Reqpic->editedreqpic($idnk, $tmpedited);
-        redirect('reqpic');
+        if ($akses == '2') {
+            redirect('reqpic/admrestock');
+        } else {
+            redirect('reqpic');
+        }
     }
     public function deletedtmpnkreq()
     {
+        $akses  = $this->session->userdata('lv');
         $idnk   = $this->input->post('id_isi');
         $this->M_Reqpic->deletedtmpnkreq($idnk);
 
-        redirect('reqpic');
+        if ($akses == 2) {
+            redirect('reqpic/admrestock');
+        } else {
+            redirect('reqpic');
+        }
     }
 
     public function addnewreq($kduser)
@@ -1259,5 +1270,25 @@ class C_Reqpic extends CI_Controller
                 redirect('reqpic/detreqbarangpic/' . $kdpo);
                 break;
         }
+    }
+
+    public function admrestock()
+    {
+        $kduser = $this->session->userdata('kode');
+
+        $data['title']      = 'PO Request By PIC ';
+        $data['tmpreq']     = $this->M_Reqpic->getalltmpreq($kduser)->result();
+        // $data['getallreq']  = $this->M_Reqpic->getallreq($kduser)->result();
+        $data['countreq']   = $this->M_Reqpic->countRequser('1', $kduser);
+        $data['generatekd'] = $this->M_Reqpic->kdnonkomersial();
+        $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
+
+        $data['getlistadm'] = $this->M_Reqpic->getlistadm($kduser)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/restockpo.php', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
     }
 }

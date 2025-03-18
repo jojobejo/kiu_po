@@ -281,6 +281,14 @@ class M_Reqpic extends CI_Model
             WHERE a.status = 'ON PROGRESS' OR a.status = 'PO REVISI';
             ");
     }
+    public function getlistadm()
+    {
+        return $this->db->query("SELECT a.* , b.nama_user , b.aksess_lv
+        FROM tb_req_nk a
+        JOIN tb_user b ON b.kode_user = a.kd_user
+        WHERE b.aksess_lv = 2
+        ");
+    }
     public function getlistpicreqacc()
     {
         // return $this->db->get('tb_req_nk')->result();

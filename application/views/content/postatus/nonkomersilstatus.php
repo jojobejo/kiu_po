@@ -218,8 +218,8 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            <?php elseif ($this->session->userdata('lv') == '5' || $this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '3') : ?>
 
+            <?php elseif ($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '3') : ?>
                 <table class="table table-bordered table-striped" id="tballstatus">
                     <thead>
                         <tr>
@@ -371,6 +371,53 @@
                                                 </a>
                                             </div>
                                         <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <!-- TAMBAHAN RE STOCK ADMIN -->
+            <?php elseif ($this->session->userdata('lv') == '5') : ?>
+                <table class="table table-bordered table-striped" id="tballstatus">
+                    <thead>
+                        <tr>
+                            <td>No</td>
+                            <td>Nomor PO</td>
+                            <td>Status Order</td>
+                            <td>Tanggal PO</td>
+                            <td>Nama Pembuat</td>
+                            <td>Departement</td>
+                            <td>Tujuan Pembelian</td>
+                            <td>#</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        foreach ($po as $p1) : ?>
+                            <tr>
+                                <td><?= $no++; ?></td>
+                                <td><?= $p1->nopo ?></td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-md">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><?= $p1->tgl_transaksi ?></td>
+                                <td><?= $p1->nama_user ?></td>
+                                <td><?= $p1->departement ?></td>
+                                <td><?= $p1->tj_pembelian ?></td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-md">
+                                            <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('detailponk/') . $p1->kd_po_nk ?>">
+                                                <i class="fas fa-eye"></i>
+                                                Detail
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

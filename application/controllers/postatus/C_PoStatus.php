@@ -833,7 +833,7 @@ class C_PoStatus extends CI_Controller
             $lv = $this->session->userdata('level');
 
             $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
-            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+            // $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');

@@ -171,7 +171,7 @@
                                 <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary"><i class="fas fa-home"></i></a>
                             </div>
                             <div class="col-sm mb-2">
-                                <a href="<?= base_url('index_done') ?>" class="btn btn-md btn-primary btn-block"><b>Add Stock</b></a>
+                                <a href="<?= base_url('reqpic/admrestock') ?>" class="btn btn-md btn-primary btn-block"><b>Re-Stock</b></a>
                             </div>
                             <div class="col-sm mb-2">
                                 <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
