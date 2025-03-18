@@ -128,6 +128,20 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE a.kd_barang = '$kd'
         ");
     }
+
+    public function getStockByDate($start_date, $end_date)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_transaksi');
+
+        if (!empty($start_date) && !empty($end_date)) {
+            $this->db->where('tgl_transaksi >=', $start_date);
+            $this->db->where('tgl_transaksi <=', $end_date);
+        }
+
+        return $this->db->get()->result_array();
+    }
+
     public function get_data_itemtr($id)
     {
         return $this->db->query("SELECT
@@ -136,6 +150,35 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE a.id_transnk = '$id'
         ");
     }
+    public function get_detail_transaksi_itm_date($tgl1, $tgl2, $kd)
+    {
+        return $this->db->query("SELECT
+        a.id_transnk AS id,
+        a.kd_po_nk AS kd_transaksi,
+        a.kd_akun AS kd_akun,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tr_qty AS qty,
+        b.nm_satuan AS nm_satuan,
+        a.kd_barangsys AS kd_barang,
+        a.kd_barang AS kd_barangs,
+        f.nama_user AS inpt,
+        f.aksess_lv AS lvadm,
+        e.aksess_lv AS lvusr,
+        e.nama_user AS nmreq,
+        e.departement AS dep,
+        a.keterangan as ket
+        FROM tb_transaksi a 
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        LEFT JOIN tb_req_nk c ON c.kd_po_nk = a.kd_po_nk 
+        LEFT JOIN tb_po_nk d ON d.kd_po_nk = a.kd_po_nk
+        LEFT JOIN tb_user e ON e.kode_user = a.req_by
+        LEFT JOIN tb_user f ON f.kode_user = a.inputer
+        WHERE a.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2'
+        AND a.kd_barang = '$kd'
+        ORDER BY a.id_transnk DESC
+        ");
+    }
+
     public function get_detail_transaksi_itm($kd)
     {
         return $this->db->query("SELECT

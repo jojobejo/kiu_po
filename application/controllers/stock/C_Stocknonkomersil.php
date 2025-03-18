@@ -273,4 +273,25 @@ class C_Stocknonkomersil extends CI_Controller
         $this->M_Stocknonkomersil->inputtmprestock($inputdt);
         redirect('nkrestok');
     }
+
+    public function filterqtybytgl()
+    {
+        $start_date = $this->input->post('start_date');
+        $end_date = $this->input->post('end_date');
+        $kdbarang = $this->input->post('kdbarang');
+
+        $data['title']      = 'Detail Stock Barang By Tanggal';
+        $data['start_date'] = $start_date;
+        $data['end_date']   = $end_date;
+
+        $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
+        $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm_date($start_date, $end_date, $kdbarang)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/stock_detailitm', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
 }

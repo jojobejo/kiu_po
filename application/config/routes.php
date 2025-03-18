@@ -113,6 +113,7 @@ $route['adjustmenqty'] = 'stock/C_Stocknonkomersil/adjustmenqty';
 $route['nkrestok'] = 'stock/C_Stocknonkomersil/nkrestok';
 $route['indraftrestock'] = 'stock/C_Stocknonkomersil/indraftrestock';
 $route['stockcontrollernk'] = 'stock/C_Stockcontroller';
+$route['stock/filterqtybytgl'] = 'stock/C_Stocknonkomersil/filterqtybytgl';
 
 $route['tr_trash/(:any)/(:any)'] = 'stock/C_Stocknonkomersil/trash_transaksi/$1/$2';
 

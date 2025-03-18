@@ -15,26 +15,22 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row align-items-center mb-2">
-                            <div class="col-auto">
-                                <h1 class="m-0">Stock Tersedia : <b style="text-transform:uppercase"><?= $i->qty_ready ?></b></h1>
-                            </div>
-                            <div class="col-auto">
-                                <a class="btn btn-sm btn-success mt-1" data-toggle="modal" data-target="#adjustmentqty<?= $i->kode_sistem ?>">
-                                    <i class="fas fa-plus"></i>
-                                </a>
-                            </div>
-                            <div class="col-auto">
-                                <form method="POST" action="<?= base_url('filterqtybytgl'); ?>" class="form-inline">
-                                    <label for="start_date" class="mr-2">Tanggal Mulai:</label>
-                                    <input type="date" class="form-control mr-3" name="start_date" id="start_date" value="">
-                                    <label for="end_date" class="mr-2">Tanggal Akhir:</label>
-                                    <input type="date" name="end_date" class="form-control mr-3" id="end_date" value="">
-                                    <input type="text" name="kdbarang" class="form-control mr-3" id="kdbarang" value="<?= $i->kode_sistem ?>" hidden>
-                                    <button type="submit" class="btn btn-primary">Cari</button>
-                                </form>
+                            <div class="row align-items-center mb-2">
+                                <div class="col-auto" hidden>
+                                    <h1 class="m-0">Tanggal Transaksi : <?= shortdate_indo($start_date) . " " . "-" . " " .  shortdate_indo($end_date)  ?></b></h1>
+                                </div>
+                                <div class="col-auto">
+                                    <form method="POST" action="<?= base_url('filterqtybytgl'); ?>" class="form-inline">
+                                        <label for="start_date" class="mr-2">Tanggal Mulai:</label>
+                                        <input type="date" class="form-control" name="start_date" id="start_date" value="<?= isset($start_date) ? $start_date : '' ?>">
+                                        <label for="end_date" class="ml-2 mr-2">Tanggal Akhir:</label>
+                                        <input type="date" name="end_date" class="form-control" id="end_date" value="<?= isset($end_date) ? $end_date : '' ?>">
+                                        <input type="text" name="kdbarang" class="form-control mr-3" id="kdbarang" value="<?= $i->kode_sistem ?>" hidden>
+                                        <button type="submit" class="btn btn-primary ml-2">Cari</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-
 
                         <!-- Tempat menampilkan hasil -->
                         <div id="result"></div>
@@ -103,35 +99,6 @@
                                                 <a href="<?= base_url('tr_trash/1/') . $s->id ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-alt"></i></a>
                                             </td>
                                         <?php endif; ?>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-
-                        <table class="table table-bordered mt-2">
-                            <thead style="background-color: #212529; color:white;">
-                                <tr>
-                                    <td style="text-align: center;">Kode Transaksi</td>
-                                    <td style="text-align: center; width: 5%;">Tanggal Transaksi</td>
-                                    <td style="text-align: center;">Kode Akun</td>
-                                    <td style="text-align: center;">Keterangan</td>
-                                    <td style="text-align: center;">Departemen</td>
-                                    <td style="text-align: center;">PIC</td>
-                                    <td style="text-align: center;">Qty</td>
-                                    <td style="text-align: center;">#</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($trash as $trh) : ?>
-                                    <tr>
-                                        <td><?= $trh->kd_po_nk ?></td>
-                                        <td><?= $trh->create_at ?></td>
-                                        <td><?= $trh->kd_akun ?></td>
-                                        <td><?= $trh->keterangan ?></td>
-                                        <td><?= $trh->departemen ?></td>
-                                        <td><?= $trh->nm_user ?></td>
-                                        <td><?= $trh->tr_qty ?></td>
-                                        <td style="text-align: center;"><a href="<?= base_url('tr_trash/2/') . $trh->id_trashbin ?>" class="btn btn-warning btn-sm"><i class="fa fa-redo-alt"></i></a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
