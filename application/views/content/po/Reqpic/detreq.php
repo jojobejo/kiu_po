@@ -654,10 +654,16 @@
                                             <td>Deskripsi</td>
                                             <td>Keterangan</td>
                                             <td>QTY</td>
-                                            <td style="width: 10%;">Qty Tersedia</td>
-                                            <td>Satuan</td>
-                                            <td>Status</td>
-                                            <td>#</td>
+                                            <?php if ($s->tj_pembelian == "Restock By Admin PO") : ?>
+                                                <td>Satuan</td>
+                                                <td>#</td>
+                                            <?php else : ?>
+                                                <td style="width: 10%;">Qty Tersedia</td>
+                                                <td>Satuan</td>
+                                                <td>Status</td>
+                                                <td>#</td>
+                                            <?php endif; ?>
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -706,14 +712,68 @@
                                                     </div>
                                                     <!-- /.modal-dialog -->
                                                 </div>
-                                                <!-- MODAL END -->
-                                                <tr>
-                                                    <td><?= $d->nama_barang ?></td>
-                                                    <td><?= $d->deskripsi ?></td>
-                                                    <td><?= $d->keterangan ?></td>
-                                                    <td><?= $d->qty_req ?></td>
+                                            </div>
+                                            <div class="modal fade" id="restockmodaledited<?= $d->id ?>">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title">Restock Barang</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <?php echo form_open_multipart('actpending/' . $d->id . '/' . $d->kode_po); ?>
+                                                            <div class="form-group" hidden>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <input class="form-control" type="text" id="kdponk" name="qty_isi" value="<?= $d->kode_po ?>" readonly />
+                                                                        <input class="form-control" type="text" id="idponk" name="qty_isi" value="<?= $d->id ?>" readonly />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group" hidden>
+                                                                <div class="row">
+                                                                    <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
+                                                                    <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="<?= $d->qty_req ?>" /></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                                                                    <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="" /></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer justify-content-between">
+                                                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                                            </div>
+                                                            </form>
+                                                        </div>
+                                                        <!-- /.modal-content -->
+                                                    </div>
+                                                    <!-- /.modal-dialog -->
+                                                </div>
+                                            </div>
+                                            <!-- MODAL END -->
+                                            <tr>
+                                                <td><?= $d->nama_barang ?></td>
+                                                <td><?= $d->deskripsi ?></td>
+                                                <td><?= $d->keterangan ?></td>
+                                                <td><?= $d->qty_req ?></td>
+                                                <?php if ($s->tj_pembelian == "Restock By Admin PO") : ?>
+                                                <?php else : ?>
                                                     <td><?= $d->qty_ready ?></td>
-                                                    <td><?= $d->nm_satuan ?></td>
+                                                <?php endif; ?>
+                                                <td><?= $d->nm_satuan ?></td>
+                                                <?php if ($s->tj_pembelian == "Restock By Admin PO") : ?>
+                                                    <?php if ($d->sts == '0') : ?>
+                                                        <td><a href="" class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#restockmodaledited<?= $d->id ?>"><i class="fas fa-plus"></i></a></td>
+                                                    <?php else : ?>
+                                                        <td><a href="" class="btn btn-block btn-info"></a></td>
+                                                    <?php endif; ?>
+
+                                                <?php else : ?>
                                                     <?php if ($d->sts != '0') : ?>
                                                         <td><a href="" class="btn btn-info btn-block"></a></td>
                                                     <?php else : ?>
@@ -726,15 +786,11 @@
                                                         <?php endif; ?>
                                                     <?php endif; ?>
                                                     <?php if ($d->sts == '0') : ?>
-
                                                         <td>
                                                             <div class="row">
                                                                 <div class="col">
                                                                     <a href="<?= base_url('actconfirm/' . $d->id) ?>" class="btn btn-block btn-success btn-sm"><i class="fas fa-check"></i></a>
                                                                 </div>
-                                                                <!-- <div class="col">
-                                                                <a href="<?= base_url('actpending/' . $d->id . '/' . $d->kode_po) ?>" class="btn btn-block btn-warning btn-sm"><i class="fas fa-times"></i></a>
-                                                            </div> -->
                                                                 <div class="col">
                                                                     <a href="" class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#modaledited<?= $d->id ?>"><i class="fas fa-plus"></i></a>
                                                                 </div>
@@ -743,8 +799,9 @@
                                                     <?php else : ?>
                                                         <td><a href="#" class="btn btn-block btn-info btn-sm"><i class="fas fa-clipboard-check "></i></a></td>
                                                     <?php endif; ?>
-                                                </tr>
-                                            <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
 

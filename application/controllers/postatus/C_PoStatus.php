@@ -1098,6 +1098,7 @@ class C_PoStatus extends CI_Controller
         $kdpo           = $this->input->post('kdpo');
         $kdporeq        = $this->input->post('kdporeq');
         $tgl            = $this->input->post('tgl');
+        $tjpem          = $this->input->post('tjpembelian');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
@@ -1110,6 +1111,7 @@ class C_PoStatus extends CI_Controller
                     'kd_po_nk'          => $t->kd_po_nk,
                     'kd_barang'         => $t->kd_barang,
                     'kd_barangsys'      => $t->kd_bsys,
+                    'keterangan'        => $t->keterangan,
                     'kat_barang'        => $t->kat_barang,
                     'tr_qty'            => $t->qty,
                     'satuan'            => $t->satuan,
