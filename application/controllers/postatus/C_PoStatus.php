@@ -904,6 +904,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('content/postatus/detailponk', $data);
         $this->load->view('partial/footer');
     }
+
     public function edited_fk_nk()
     {
         $kdponk = $this->input->post('kdponk');
@@ -1100,7 +1101,7 @@ class C_PoStatus extends CI_Controller
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
-        $now = date('Y-m-d');
+        $now            = date('Y-m-d');
 
         if ($tmp) {
             foreach ($tmp as $t) {

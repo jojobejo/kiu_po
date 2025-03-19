@@ -85,7 +85,7 @@
                                     <label for="naSupp" class="">Tujuan Request : </label>
                                 </div>
                                 <div class="col-md">
-                                    <input type="text" id="intj" name="intj" style="max-width: 550px;" value="" class="form-control" placeholder="Input Tujuan Pengajuan">
+                                    <input type="text" id="intj" name="intj" style="max-width: 550px;" value="Restock By Admin PO" class="form-control" placeholder="Input Tujuan Pengajuan" readonly>
                                 </div>
                             </div>
                         </div>

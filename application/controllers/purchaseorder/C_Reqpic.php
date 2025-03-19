@@ -181,7 +181,7 @@ class C_Reqpic extends CI_Controller
         $kdbarang   = $this->input->post('kdbys');
         $kdsys      = $this->input->post('kdbr');
         $katbarang  = $this->input->post('katbr');
-        $idsat  = $this->input->post('idsat');
+        $idsat      = $this->input->post('idsat');
 
         $inputtmp = array(
             'jnis_po'       => '1',

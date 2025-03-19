@@ -636,20 +636,23 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <div class="modal-body">
                     <?php echo form_open_multipart('konfirm_penerimaan'); ?>
-                    <div class="form-group" hidden>
+                    <div class="form-group">
                         <div class="row">
                             <label class="col-sm-2 control-label text-right" for="kd_user">Kd<span class="required">*</span></label>
                             <div class="col-sm-9"><input type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po_nk ?>" readonly></div>
                             <div class="col-sm-9"><input type="text" id="kdporeq" name="kdporeq" value="<?= $s->kd_po_req ?>"></div>
                             <div class="col-sm-9"><input type="text" id="tgl" name="tgl" value="<?= $s->tgl_transaksi ?>" readonly></div>
+                            <div class="col-sm-9"><input type="text" id="tgl" name="tgl" value="<?= $s->tj_pembelian ?>" readonly></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <h3>KONFIRMASI PO , BARANG TELAH DITERIMA </h3>
                     </div>
                 </div>
+
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Konfirmasi</button>
