@@ -283,10 +283,18 @@ class M_Reqpic extends CI_Model
     }
     public function getlistadm()
     {
-        return $this->db->query("SELECT a.* , b.nama_user , b.aksess_lv
+        return $this->db->query("SELECT 
+        a.kd_po_nk AS kd_po_nk,
+        a.nm_user AS nm_user,
+        a.departemen AS departemen,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tj_pembelian AS tj_pembelian,
+        a.status AS status,
+        COALESCE(b.status,0) AS status_po
         FROM tb_req_nk a
-        JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE b.aksess_lv = 2
+        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        LEFT JOIN tb_user c ON c.kode_user = a.kd_user
+        WHERE a.departemen = 'KEUANGAN' AND a.status != 'DONE' AND c.aksess_lv = '2'
         ");
     }
     public function getlistpicreqacc()

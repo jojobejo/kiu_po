@@ -1282,7 +1282,6 @@ class C_Reqpic extends CI_Controller
         $data['countreq']   = $this->M_Reqpic->countRequser('1', $kduser);
         $data['generatekd'] = $this->M_Reqpic->kdnonkomersial();
         $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
-
         $data['getlistadm'] = $this->M_Reqpic->getlistadm($kduser)->result();
 
         $this->load->view('partial/header', $data);

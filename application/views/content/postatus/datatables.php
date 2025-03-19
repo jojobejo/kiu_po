@@ -4,7 +4,11 @@
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
+            "order": [
+                [3, "desc"]
+            ]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
 
         $("#tbdone").DataTable({
             "responsive": true,
