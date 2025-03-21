@@ -23,8 +23,9 @@
                                     <i class="fas fa-plus"></i>
                                 </a>
                             </div>
+
                             <div class="col-auto">
-                                <form method="POST" action="<?= base_url('filterqtybytgl'); ?>" class="form-inline">
+                                <form method="POST" action="<?= base_url('stock/filterqtybytgl'); ?>" class="form-inline">
                                     <label for="start_date" class="mr-2">Tanggal Mulai:</label>
                                     <input type="date" class="form-control mr-3" name="start_date" id="start_date" value="">
                                     <label for="end_date" class="mr-2">Tanggal Akhir:</label>
@@ -34,7 +35,6 @@
                                 </form>
                             </div>
                         </div>
-
 
                         <!-- Tempat menampilkan hasil -->
                         <div id="result"></div>
@@ -60,6 +60,7 @@
                                     $qs     = "";
                                     $btn    = "";
                                     $txt    = "";
+
                                     // KODE AKUN
                                     if ($s->kd_akun == '11512') {
                                         $qs     = "-";

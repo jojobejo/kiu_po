@@ -1,5 +1,4 @@
 <?php foreach ($item as $i) : ?>
-    <?php $this->load->view('content/stock/nonkomersil/modal/modalstock.php') ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -20,7 +19,10 @@
                                     <h1 class="m-0">Tanggal Transaksi : <?= shortdate_indo($start_date) . " " . "-" . " " .  shortdate_indo($end_date)  ?></b></h1>
                                 </div>
                                 <div class="col-auto">
-                                    <form method="POST" action="<?= base_url('filterqtybytgl'); ?>" class="form-inline">
+                                    <h3>Stock Tersedia : <?= $i->hasil ?></h3>
+                                </div>
+                                <div class="col-auto">
+                                    <form method="POST" action="<?= base_url('stock/filterqtybytgl'); ?>" class="form-inline">
                                         <label for="start_date" class="mr-2">Tanggal Mulai:</label>
                                         <input type="date" class="form-control" name="start_date" id="start_date" value="<?= isset($start_date) ? $start_date : '' ?>">
                                         <label for="end_date" class="ml-2 mr-2">Tanggal Akhir:</label>
@@ -28,6 +30,9 @@
                                         <input type="text" name="kdbarang" class="form-control mr-3" id="kdbarang" value="<?= $i->kode_sistem ?>" hidden>
                                         <button type="submit" class="btn btn-primary ml-2">Cari</button>
                                     </form>
+                                </div>
+                                <div class="col-auto">
+                                    <a href="<?= base_url('detailtransaksi/') . $i->kode_sistem ?>" class="btn btn-block btn-success"><i class="fas fa-home"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -103,31 +108,6 @@
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                <div class="row mr-2">
-                    <div class="col-md-8">
-                        <h1><b style="text-transform:uppercase">Stock Tracking</b></h1>
-                        <div class="noteDirektur">
-                            <table class="table table-bordered table-stripeds">
-                                <thead style="background-color: #212529; color:white;">
-                                    <tr>
-                                        <td class="tdnote">ISI NOTE</td>
-                                        <td class="tduser">USER</td>
-                                        <td style="text-align: center;">TANGGAL</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($note as $n) : ?>
-                                        <tr>
-                                            <td><?= $n->isi_note ?></td>
-                                            <td><?= $n->nama_user ?></td>
-                                            <td><?= $n->create_at ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->

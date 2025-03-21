@@ -102,14 +102,17 @@ class M_Stocknonkomersil  extends CI_Model
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+
     function generatekd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
     }
+
     function insttransaksi($data)
     {
         $this->db->insert('tb_transaksi', $data);
     }
+
     public function get_data_item($kd)
     {
         return $this->db->query("SELECT
@@ -127,6 +130,48 @@ class M_Stocknonkomersil  extends CI_Model
         JOIN v_stockbarangnk d ON d.kode_barangs = a.kd_barang
         WHERE a.kd_barang = '$kd'
         ");
+    }
+
+    // public function get_item_bytgl($tgl1, $tgl2, $kd)
+    // {
+    //     return $this->db->query("SELECT 
+    //     a.kd_barang,
+    //     b.nama_barang,
+    //     SUM(CASE WHEN a.kd_akun IN ('11511', '11513') THEN a.tr_qty ELSE 0 END) AS qty_in,
+    //     SUM(CASE WHEN a.kd_akun IN ('11512', '11514') THEN a.tr_qty ELSE 0 END) AS qty_out,
+    //     (SUM(CASE WHEN a.kd_akun IN ('11511', '11513') THEN a.tr_qty ELSE 0 END) - 
+    //     SUM(CASE WHEN a.kd_akun IN ('11512', '11514') THEN a.tr_qty ELSE 0 END)) AS hasil
+    // FROM tb_transaksi a
+    // JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
+    // WHERE a.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2'
+    // AND a.kd_barang = '$kd'
+    // GROUP BY a.kd_barang, b.nama_barang;
+    //     ");
+    // }
+
+    public function get_item_bytgl($tgl1, $tgl2, $kd)
+    {
+        return $this->db->query("SELECT 
+        a.kd_barang AS kode_sistem,
+        a.kd_br_adm AS kode_barang,
+        a.nama_barang AS nama_barang,
+        a.descnk AS deskripsi,
+        d.qty_ready AS qty_ready,
+        b.nm_satuan AS satuan,
+        a.kat_barang AS katbr,
+        b.id_satuan AS satuanid,
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11511', '11513') THEN t.tr_qty ELSE 0 END), 0) AS qty_in,
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11512', '11514') THEN t.tr_qty ELSE 0 END), 0) AS qty_out,
+        (COALESCE(SUM(CASE WHEN t.kd_akun IN ('11511', '11513') THEN t.tr_qty ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11512', '11514') THEN t.tr_qty ELSE 0 END), 0)) AS hasil
+        FROM tb_barang_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        JOIN tb_kat_br c ON c.kd_kat = a.kat_barang
+        JOIN v_stockbarangnk d ON d.kode_barangs = a.kd_barang
+        LEFT JOIN tb_transaksi t ON t.kd_barang = a.kd_barang
+        AND t.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2' 
+        WHERE a.kd_barang = '$kd'
+        GROUP BY a.kd_barang, a.kd_br_adm, a.nama_barang, a.descnk, d.qty_ready, b.nm_satuan, a.kat_barang, b.id_satuan;");
     }
 
     public function getStockByDate($start_date, $end_date)

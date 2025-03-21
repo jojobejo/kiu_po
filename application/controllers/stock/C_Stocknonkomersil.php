@@ -284,7 +284,7 @@ class C_Stocknonkomersil extends CI_Controller
         $data['start_date'] = $start_date;
         $data['end_date']   = $end_date;
 
-        $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
+        $data['item']       = $this->M_Stocknonkomersil->get_item_bytgl($start_date, $end_date, $kdbarang)->result();
         $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
         $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm_date($start_date, $end_date, $kdbarang)->result();
 
