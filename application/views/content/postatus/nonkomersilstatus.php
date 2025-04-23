@@ -493,7 +493,7 @@
                                 </td>
                                 <td><?= $p1->tgl_transaksi ?></td>
                                 <td><?= $p1->nama_user ?></td>
-                                <td><?= $p1->departement ?></td>
+                                <td><?= $p1->departemen ?></td>
                                 <td><?= $p1->tj_pembelian ?></td>
                                 <td>
                                     <div class="row">

@@ -401,11 +401,11 @@ class M_PoStatus extends CI_Model
     public function getAllNK_kadep($kddep)
     {
         return $this->db->query("SELECT 
-        a.kd_po_nk ,a.nopo , a.status , a.tgl_transaksi , b.nama_user , b.departement , a.tj_pembelian
+        a.kd_po_nk ,a.nopo , a.status , a.tgl_transaksi , b.nama_user , a.departemen , a.tj_pembelian
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE b.departement = '$kddep'
-        AND a.status NOT IN ('ON PROGRESS', 'SEDANG DIAJUKAN')
+        WHERE a.departemen = '$kddep'
+        AND a.status NOT IN ('DONE','ON PROGRESS')
             ");
     }
     public function getAllNK_direktur()
