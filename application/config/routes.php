@@ -298,6 +298,11 @@ $route['srclapbeli']                            = 'laporan/C_Laporan/srclapbeli'
 $route['export_laporan_pembelian_nk']           = 'laporan/C_Laporan/export_laporan_pembelian_nk';
 $route['exported_allstock']                     = 'laporan/C_Laporan/exported_allstock';
 
+//LAPORAN TRANSAKSI NON KOMERSIL
+$route['tr_allstock']                           = 'laporan/C_Laporan/tr_allstock';
+$route['get_allstock_ajax']                     = 'laporan/C_Laporan/get_allstock_ajax';
+$route['exported_tr_allnk']                     = 'laporan/C_Laporan/exported_tr_allnk';
+
 //reviewapps
 $route['reviewapps']                            = 'settings/C_Appsrated';
 $route['addnewmodule']                          = 'settings/C_Appsrated/addnewmodule';

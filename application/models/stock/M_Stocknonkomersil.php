@@ -369,6 +369,20 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE a.id_trashbin = '$id'
         ");
     }
+
+    // FITER TGL TRANSAKSI NON KOMERSIL
+
+    public function get_filtered_data($tgl1, $tgl2)
+    {
+        $this->db->select('a.kd_akun AS jn_transaksi, a.tgl_transaksi, c.departement, c.nama_user, b.nama_barang, a.keterangan, a.tr_qty AS qty');
+        $this->db->from('tb_transaksi a');
+        $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_barang');
+        $this->db->join('tb_user c', 'c.kode_user = a.req_by');
+        $this->db->where('a.tgl_transaksi >=', $tgl1);
+        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $query = $this->db->get();
+        return $query->result();
+    }
 }
 
 // CREATE VIEW STOCK

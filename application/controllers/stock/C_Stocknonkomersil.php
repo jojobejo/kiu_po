@@ -294,4 +294,22 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }
+    public function tr_allstock()
+    {
+        $data['title']      = 'List Transaksi Allstock';
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/histori_stock_all_ponk', $data);
+        $this->load->view('partial/footer');
+    }
+
+    public function fetch_tracking_data()
+    {
+        $tgl1 = $this->input->get('tanggal_1');
+        $tgl2 = $this->input->get('tanggal_2');
+
+        $data = $this->M_Stocknonkomersil->get_filtered_data($tgl1, $tgl2);
+        echo json_encode($data);
+    }
 }

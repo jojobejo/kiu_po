@@ -38,6 +38,22 @@ class M_Laporanp extends CI_Model
         $query = $this->db->get();
         return $query;
     }
+
+    public function getdaterangelaptr($tgl1, $tgl2)
+    {
+        $this->db->select('a.kd_po_nk AS kdpo,d.nama_user AS inputer,a.kd_akun AS jn_transaksi, a.tgl_transaksi, c.departement, c.nama_user, b.nama_barang, a.keterangan, a.tr_qty AS qty');
+        $this->db->from('tb_transaksi a');
+        $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_barang', 'left');
+        $this->db->join('tb_user c', 'c.kode_user = a.req_by', 'left');
+        $this->db->join('tb_user d', 'd.kode_user = a.inputer', 'left');
+        $this->db->where('a.tgl_transaksi >=', $tgl1);
+        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $this->db->where('a.kd_akun != 11411');
+        $query = $this->db->get();
+        return $query;
+    }
+
+
     public function v_stock()
     {
         return $this->db->get('v_stockbarangnk')->result();

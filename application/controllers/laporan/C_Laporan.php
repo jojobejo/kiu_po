@@ -176,7 +176,7 @@ class C_Laporan extends CI_Controller
         ob_end_clean();
         $write->save('php://output');
     }
-    
+
     public function exported_allstock()
     {
         include APPPATH . 'third_party/PHPExcel/PHPExcel.php';
@@ -273,5 +273,148 @@ class C_Laporan extends CI_Controller
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         ob_end_clean();
         $write->save('php://output');
+    }
+
+    public function tr_allstock()
+    {
+        $data['title'] = 'Laporan Transaksi All Barang';
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/laporan/histori_stock_all_ponk', $data); // view dengan form dan tabel
+        $this->load->view('partial/footer');
+    }
+    public function get_allstock_ajax()
+    {
+        $tglstart = $this->input->post('tglstart');
+        $tglend = $this->input->post('tglend');
+
+        $result = $this->M_Laporanp->getdaterangelaptr($tglstart, $tglend)->result();
+
+        $data = [];
+        $no = 1;
+        foreach ($result as $row) {
+            $data[] = [
+                $no++,
+                $row->tgl_transaksi,
+                $row->departement,
+                $row->nama_barang,
+                $row->keterangan,
+                $row->qty,
+                $row->jn_transaksi,
+            ];
+        }
+
+        echo json_encode(['data' => $data]);
+    }
+    public function exported_tr_allnk()
+    {
+        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+
+        $tgl1 = $this->input->get('tglstart');
+        $tgl2 = $this->input->get('tglend');
+
+        if (!$tgl1 || !$tgl2) {
+            echo "Tanggal harus diisi!";
+            exit;
+        }
+
+        $export = $this->M_Laporanp->getdaterangelaptr($tgl1, $tgl2)->result();
+
+        $excel = new PHPExcel();
+        $excel->getProperties()->setCreator('Aplikasi Laporan')
+            ->setTitle('Rekap Laporan Transaksi Non Komersil');
+
+        $excel->setActiveSheetIndex(0);
+        $sheet = $excel->getActiveSheet()->setTitle('Laporan');
+
+        // Header
+        $sheet->setCellValue('A1', 'Rekap Laporan Transaksi Non Komersil');
+        $sheet->mergeCells('A1:J1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+        // Table headers
+        $sheet->setCellValue('A3', 'NO');
+        $sheet->setCellValue('B3', 'Kode PO');
+        $sheet->setCellValue('C3', 'Tanggal Transaksi');
+        $sheet->setCellValue('D3', 'Nama Inputer');
+        $sheet->setCellValue('E3', 'PIC');
+        $sheet->setCellValue('F3', 'Departemen');
+        $sheet->setCellValue('G3', 'Nama Barang');
+        $sheet->setCellValue('H3', 'Keterangan');
+        $sheet->setCellValue('I3', 'Qty');
+        $sheet->setCellValue('J3', 'Jenis Transaksi');
+
+        $no = 1;
+        $row = 4;
+
+        foreach ($export as $data) {
+            $jenis = '';
+
+            switch ($data->jn_transaksi) {
+                case '11512':
+                    $jenis = 'Pengurangan Barang';
+                    break;
+                case '11511':
+                    $jenis = 'Penambahan Barang';
+                    break;
+                case '11513':
+                    $jenis = 'Adjustmen Stock(+)';
+                    break;
+                case '11514':
+                    $jenis = 'Adjustmen Stock(-)';
+                    break;
+                default:
+                    $jenis = 'Lainnya';
+                    break;
+            }
+
+            // Cek jika kosong/null, isi dengan "-"
+            $departemen = (!empty($data->departement)) ? $data->departement : '-';
+            $inputer    = (!empty($data->inputer)) ? $data->inputer : '-';
+            $nama_user  = (!empty($data->nama_user)) ? $data->nama_user : '-';
+
+            $sheet->setCellValue("A$row", $no++);
+            $sheet->setCellValue("B$row", $data->kdpo);
+            $sheet->setCellValue("C$row", $data->tgl_transaksi);
+            $sheet->setCellValue("D$row", $inputer);
+            $sheet->setCellValue("E$row", $nama_user);
+            $sheet->setCellValue("F$row", $departemen);
+            $sheet->setCellValue("G$row", $data->nama_barang);
+            $sheet->setCellValue("H$row", $data->keterangan);
+            $sheet->setCellValue("I$row", $data->qty);
+            $sheet->setCellValue("J$row", $jenis);
+
+            $row++;
+        }
+
+
+        // Style borders
+        $styleArray = [
+            'borders' => [
+                'allborders' => [
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                ]
+            ]
+        ];
+        $sheet->getStyle("A3:J" . ($row - 1))->applyFromArray($styleArray);
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->getColumnDimension('G')->setWidth(25);
+        $sheet->getColumnDimension('H')->setWidth(30);
+        $sheet->getColumnDimension('I')->setWidth(6);
+        $sheet->getColumnDimension('j')->setWidth(20);
+
+        // Download
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Laporan_Transaksi_NonKomersil_' . $tgl1 . '_to_' . $tgl2 . '.xls"');
+        header('Cache-Control: max-age=0');
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+        $writer->save('php://output');
     }
 }
