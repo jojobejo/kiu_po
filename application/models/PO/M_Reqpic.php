@@ -542,7 +542,7 @@ class M_Reqpic extends CI_Model
         b.tj_pembelian AS tjket,
         a.status AS sts
         FROM tb_detail_req a
-        JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.kd_po_nk = '$kd' AND a.status = '1'
         GROUP BY a.kd_barang
         ");

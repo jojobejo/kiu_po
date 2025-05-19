@@ -1161,6 +1161,7 @@ class C_Reqpic extends CI_Controller
                 redirect('reqpic/detreqbarangpic/' . $kdponk);
             }
         } elseif ($actdone == '2') {
+
             $updatests  = array(
                 'tgl_ambil' => $now,
                 'status'    => 'DONE',
