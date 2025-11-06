@@ -398,6 +398,7 @@ class M_PoStatus extends CI_Model
                 ");
         }
     }
+
     public function getAllNK_kadep($kddep)
     {
         return $this->db->query("SELECT 
@@ -517,11 +518,19 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_file_bukti_beli', $data);
     }
+
     function editflupload($id, $data)
     {
         $this->db->where('id_file_nk', $id);
         return $this->db->update('tb_file_nk', $data);
     }
+
+    function updateshipment($kd, $data)
+    {
+        $this->db->where('kd_po', $kd);
+        return $this->db->update('tb_po', $data);
+    }
+
     function deletegbrfilependukung($id)
     {
         $this->db->where('id_file_nk', $id);

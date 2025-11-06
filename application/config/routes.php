@@ -273,6 +273,7 @@ $route['hapusDiskon/(:any)/(:any)']             = 'postatus/C_PoStatus/hapusDisk
 $route['hapusDiskonNk/(:any)/(:any)']           = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
 $route['add_diskon_barang']                     = 'postatus/C_PoStatus/add_diskon_barang';
 $route['add_diskon_barangs']                    = 'postatus/C_PoStatus/add_diskon_barangs';
+$route['shipment_to']                           = 'postatus/C_PoStatus/shipment_to';
 
 //settings-tax
 $route['taxseting']                             = 'settings/C_TaxSetting';

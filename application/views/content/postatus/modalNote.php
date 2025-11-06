@@ -9,7 +9,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <?php echo form_open_multipart('note_updated_keuangan'); ?>
+                        <?php echo form_open_multipart('NoteUpdateKeuangan'); ?>
                         <div class="form-group" hidden>
                             <div class="row">
                                 <label class="col-sm-2 control-label text-right" for="kd_user">Kd<span class="required">*</span></label>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary" id="btnSaveNote">Simpan</button>
                     </div>
                     </form>
                 </div>
@@ -34,6 +34,7 @@
             <!-- /.modal-dialog -->
         </div>
     <?php endforeach; ?>
+
     <?php foreach ($status as $s) : ?>
         <div class="modal fade" id="modalAddNoteRev">
             <div class="modal-dialog modal-lg">

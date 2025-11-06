@@ -94,12 +94,22 @@
                     <input type="text" class="form-control" placeholder="Tempo Pembayaran" value="" name="tmpo" id="tmpo">
                 </div>
             </div>
-            <div class="col-md" >
+
+            <div class="col-md" hidden>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                    </div>
+                    <input type="number" class="form-control" id="taxisi_in" name="taxisi_in" value="<?= $tax ?>" readonly hidden>
+                </div>
+            </div>
+
+            <div class="col-md">
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Tanggal Transaksi" value="<?= $kdpo ?>" name="kd_po_isi" id="kd_po_isi"  readonly>
+                    <input type="text" class="form-control" placeholder="Tanggal Transaksi" value="<?= $kdpo ?>" name="kd_po_isi" id="kd_po_isi" readonly>
                 </div>
             </div>
         </div>
@@ -173,21 +183,18 @@
                         </td>
                     </tr>
                 <?php endforeach; ?>
-                <?php foreach ($tax as $tx) : ?>
-                    <tr>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
-                        <td colspan="2" style="font-weight: bold;"> <?= $tx->tax ?> (%)</td>
-                        <input type="number" class="form-control" id="taxisi" name="taxisi" value="<?= $tx->tax ?>" readonly hidden>
-                    </tr>
-                <?php endforeach; ?>
+                <tr>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td style="display: none;"></td>
+                    <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
+                    <td colspan="2" style="font-weight: bold;"> <?= $tax ?> (%)</td>
+                </tr>
             </tbody>
         </table>
         <table id="" class="table table-striped mt-2">

@@ -145,7 +145,6 @@ class C_PoStatus extends CI_Controller
         $data['kdpo'] = $this->M_Postatus->kdpo($kdpo);
         $data['ntformat'] = $this->M_Postatus->ntformat();
 
-
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailpo', $data);
@@ -526,19 +525,20 @@ class C_PoStatus extends CI_Controller
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
-        if ($stslogin == '1') {
+        if ($stslogin == '2') {
             $addNoteKeuangan = array(
                 'kd_po'     => $kdpo,
                 'isi_note'  => $note,
                 'kd_user'   => $departement,
                 'nama_user'   => $namauser,
-                'note_for'  => '1',
-                'update_status' => '1'
+                'note_for'  => '2',
+                'update_status' => 'ON PROGRESS'
             );
 
             $noteUpdateKeuangan = array(
-                'status'    => 'NOTE KEUANGAN'
+                'status'    => 'ON PROGRESS'
             );
+
             $this->M_Postatus->addNote($addNoteKeuangan);
             $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
         } else if ($stslogin == '3') {
@@ -557,6 +557,20 @@ class C_PoStatus extends CI_Controller
             $this->M_Postatus->updateStatus($kdpo, $noteUpdateDirektur);
         }
         redirect('detailPO/' . $kdpo);
+    }
+
+    public function shipment_to()
+    {
+        $kddpo          = $this->input->post('update_shipment');
+        $shipment_to    = $this->input->post('template_isi');
+
+        $dataupdated = array(
+            'kd_printout_note'  => $shipment_to
+        );
+
+        $this->M_Postatus->updateshipment($kddpo, $dataupdated);
+
+        redirect('printOrder/' . $kddpo);
     }
 
     public function revisiPO()

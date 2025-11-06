@@ -19,6 +19,10 @@
 <!-- ChartJS -->
 <script src="<?= base_url('assets/plugins/chart.js/Chart.min.js') ?>"></script>
 <script src="<?php echo base_url('assets/dist/js/adminlte.js') ?>"></script>
+
+<!-- Sweet Alert 2-->
+<script src="<?= base_url('assets/plugins/sweetalert2/sweetalert2.min.js') ?>"></script>
+
 <!-- DataTables  & Plugins -->
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') ?>"></script>

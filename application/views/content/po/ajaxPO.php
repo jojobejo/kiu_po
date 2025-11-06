@@ -18,16 +18,55 @@
         var kdpo = $("#kd_po_isi").val();
         var suplier = $("#kdsuplier").val();
         var harga = $("#jmlharga").val();
-        var tax = $("#taxisi").val();
+        var tax = $("#taxisi_in").val();
 
         if (jml == 0) {
-            alert('tidak ada transaksi');
-        } else {
-            if (nopo == "") {
-                alert('Nomor PO tidak terisi');
-            } else if (tgl == "") {
-                alert('tgl order belum terisi');
-            } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Tidak ada transaksi!',
+            });
+            return;
+        }
+
+        if (nopo == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Nomor PO belum terisi!',
+            });
+            return;
+        }
+
+        if (tgl == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Tanggal order belum terisi!',
+            });
+            return;
+        }
+
+        if (tax == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Kolom pajak (Tax) belum terisi!',
+            });
+            return;
+        }
+
+
+        Swal.fire({
+            title: 'Simpan Data?',
+            text: "Pastikan semua data sudah benar.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, simpan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
                     url: "<?= base_url('rekam_po') ?>",
                     type: "POST",
@@ -46,15 +85,35 @@
                     cache: false,
                     success: function(data) {
                         if (data.msg == "success") {
-                            location.reload(true);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Data PO berhasil direkam!',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(true);
+                            });
                         } else {
-                            alert('ada kesalahan data')
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Kesalahan',
+                                text: 'Terjadi kesalahan pada data!',
+                            });
                         }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Tidak dapat terhubung ke server.',
+                        });
                     }
-                })
+                });
             }
-        }
-    })
+        });
+    });
+
 
     $("#selesaink").on('click', function() {
         var kdpo = $("#po_isi").val();

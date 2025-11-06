@@ -45,14 +45,22 @@
                             <?php if ($this->session->userdata('lv') == '2') : ?>
                                 <div class="col-lg">
                                     <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
+
                                     <?php if ($s->status == 'DONE') : ?>
                                         <?php if ($s->status == 'DONE' && $s->kd_printout_note != '') : ?>
                                             <div>
-                                                <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block"><i class="fas fa-print"></i> Cetak Form Order</a>
+                                                <a href="<?= base_url('printOrder/') . $s->kd_po ?>" target="_blank" class="btn btn-success btn-block">
+                                                    <i class="fas fa-print"></i> Cetak Form Order
+                                                </a>
                                             </div>
+
                                         <?php elseif ($s->status == 'DONE' && $s->kd_printout_note == '') : ?>
-                                            <a class="btn btn-success btn-block" onclick='alert("Format Printout Belum Terpilih")'><i class="fas fa-print"></i> Cetak Form Order</a>
+                                            <a href="#" class="btn btn-success btn-block btn-select-template" data-toggle="modal" data-target="#modalSelectTemplate" data-kdpo="<?= $s->kd_po ?>">
+                                                <i class="fas fa-print"></i> Cetak Form Order
+                                            </a>
                                         <?php endif; ?>
+
+
                                     <?php elseif ($s->status == 'CANCEL') : ?>
                                         <?php if ($s->status == 'CANCEL' && $s->kd_printout_note != '') : ?>
                                             <div>
@@ -69,7 +77,7 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-clock"></i> ON PROGRESS</a>
                                         </div>
-                                    <?php elseif ($s->status == 'UPDATE DIREKTUR') : ?>
+                                    <?php elseif ($s->status == 'NOTE DIREKTUR') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-exclamation"></i> Terdapat Update</a>
                                         </div>
@@ -96,16 +104,15 @@
                                     <div class="row">
                                         <div class="col">
                                             <label for="tgTrans" class="">Status Order : </label>
-                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                            <a href="javascript:void(0);" class="btn btn-block btn-success btn-md btn-konfirmasi" data-url="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
                                                 <i class="fas fa-clipboard-check"></i>
                                                 Accept
                                             </a>
                                         </div>
                                         <div class="col">
                                             <label for="tgTrans" class="">Status Order : </label>
-                                            <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
-                                                <i class="fas fa-times"></i>
-                                                Reject
+                                            <a href="javascript:void(0);" class="btn btn-block btn-danger btn-md btn-reject" data-url="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                                <i class="fas fa-times"></i> Reject
                                             </a>
                                         </div>
                                     </div>
@@ -250,17 +257,18 @@
             </div>
         </div>
         <?php $this->load->view('content/postatus/modal_setting/modalSetting') ?>
-        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
+        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
             <div class="col-md mb-2">
                 <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
                     <i class="fas fa-shipping-fast"> </i>
                     Shipment Setting
                 </a>
             </div>
-        <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'REJECT') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'CANCEL') : ?>
         <?php elseif ($this->session->userdata('lv') < '3' && $s->status == 'ON PROGRESS' || $this->session->userdata('lv') == '2' &&  $s->status == 'PO REVISI') : ?>
+
+
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">

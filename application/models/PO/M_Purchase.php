@@ -18,14 +18,22 @@ class M_Purchase extends CI_Model
     {
         return $this->db->get('tb_set_tax')->result();
     }
+
     public function gettmptax($kd)
     {
-        $this->db->select('*');
+        $this->db->select('COALESCE(tax, 0) AS tax');
         $this->db->from('tb_tmp_tax a');
         $this->db->where('kd_suplier', $kd);
         $query = $this->db->get();
-        return $query;
+
+        if ($query->num_rows() > 0) {
+            return $query->row()->tax;
+        } else {
+            return 0;
+        }
     }
+
+
     public function getSatuan()
     {
         return $this->db->get('tb_satuan')->result();
