@@ -123,65 +123,65 @@
 
 
         // === ACC DIREKTUR ===
-        $(document).on('click', '.btn-konfirmasi', function(e) {
-            e.preventDefault();
-            var url = $(this).data('url');
+        // $(document).on('click', '.btn-konfirmasi', function(e) {
+        //     e.preventDefault();
+        //     var url = $(this).data('url');
 
-            Swal.fire({
-                title: 'Konfirmasi Order?',
-                text: 'Pastikan data PO sudah benar sebelum dilanjutkan.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, lanjutkan',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Memproses...',
-                        text: 'Mohon tunggu sebentar.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+        //     Swal.fire({
+        //         title: 'Konfirmasi Order?',
+        //         text: 'Pastikan data PO sudah benar sebelum dilanjutkan.',
+        //         icon: 'question',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'Ya, lanjutkan',
+        //         cancelButtonText: 'Batal',
+        //         reverseButtons: true
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             Swal.fire({
+        //                 title: 'Memproses...',
+        //                 text: 'Mohon tunggu sebentar.',
+        //                 allowOutsideClick: false,
+        //                 didOpen: () => {
+        //                     Swal.showLoading();
+        //                 }
+        //             });
 
-                    setTimeout(() => {
-                        window.location.href = url;
-                    }, 800);
-                }
-            });
-        });
+        //             setTimeout(() => {
+        //                 window.location.href = url;
+        //             }, 800);
+        //         }
+        //     });
+        // });
 
-        $(document).on('click', '.btn-reject', function(e) {
-            e.preventDefault();
-            var url = $(this).data('url');
+        // $(document).on('click', '.btn-reject', function(e) {
+        //     e.preventDefault();
+        //     var url = $(this).data('url');
 
-            Swal.fire({
-                title: 'Tolak Order?',
-                text: 'Apakah Anda yakin ingin menolak order ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, tolak',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Memproses...',
-                        text: 'Order sedang ditolak.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+        //     Swal.fire({
+        //         title: 'Tolak Order?',
+        //         text: 'Apakah Anda yakin ingin menolak order ini?',
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'Ya, tolak',
+        //         cancelButtonText: 'Batal',
+        //         reverseButtons: true
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             Swal.fire({
+        //                 title: 'Memproses...',
+        //                 text: 'Order sedang ditolak.',
+        //                 allowOutsideClick: false,
+        //                 didOpen: () => {
+        //                     Swal.showLoading();
+        //                 }
+        //             });
 
-                    setTimeout(() => {
-                        window.location.href = url;
-                    }, 800);
-                }
-            });
-        });
+        //             setTimeout(() => {
+        //                 window.location.href = url;
+        //             }, 800);
+        //         }
+        //     });
+        // });
 
     });
 </script>

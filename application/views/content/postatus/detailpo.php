@@ -104,14 +104,14 @@
                                     <div class="row">
                                         <div class="col">
                                             <label for="tgTrans" class="">Status Order : </label>
-                                            <a href="javascript:void(0);" class="btn btn-block btn-success btn-md btn-konfirmasi" data-url="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                            <a href="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>" class="btn btn-block btn-success btn-md btn-konfirmasi" data-url="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
                                                 <i class="fas fa-clipboard-check"></i>
                                                 Accept
                                             </a>
                                         </div>
                                         <div class="col">
                                             <label for="tgTrans" class="">Status Order : </label>
-                                            <a href="javascript:void(0);" class="btn btn-block btn-danger btn-md btn-reject" data-url="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                            <a href="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>" class="btn btn-block btn-danger btn-md btn-reject" data-url="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
                                                 <i class="fas fa-times"></i> Reject
                                             </a>
                                         </div>
