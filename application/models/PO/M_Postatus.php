@@ -105,6 +105,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+
     function sumTransaksiPenjualan($kdpo)
     {
         $this->db->select("SUM(hrg_total) as total_harga");
@@ -113,6 +114,7 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+
     function sumTransaksiPenjualanAll($kdpo)
     {
         $this->db->select("SUM(hrg_total) as total_harga");

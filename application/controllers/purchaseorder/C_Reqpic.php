@@ -242,6 +242,7 @@ class C_Reqpic extends CI_Controller
         $kdponk = $this->input->post('kdponk');
         $totbr  = $this->input->post('totbr');
         $tjuan  = $this->input->post('intj');
+
         $now    = date('Y-m-d');
 
         $tmp    = $this->M_Reqpic->get_tmp_non_komersil($kduser);
@@ -842,9 +843,9 @@ class C_Reqpic extends CI_Controller
             }
             redirect('reqpic');
         }
-
         redirect('reqpic/detreqbarangpic/' . $kdreqpo);
     }
+
     public function accreqpic()
     {
         $kdponk     = $this->input->post('kdponk');

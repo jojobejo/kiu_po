@@ -241,6 +241,209 @@
               </p>
             </a>
           </li>
+        <?php elseif ($this->session->userdata('lv') <= '2' && $this->session->userdata('departemen') == 'PURCHASING') : ?>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-cash-register"></i>
+              <p>
+                Purchase Order
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('purchase') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>
+                    Non Komersil
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview" style="display: none;">
+                  <li class="nav-item">
+                    <a href="<?= base_url('pononkomersiljasa') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Jasa</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="<?= base_url('pononkomersil') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Pembelian</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="<?= base_url('reqpic') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Request PIC</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-money-check"></i>
+              <p>
+                Purchase Order Status
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('postatus') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="#" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>
+                    Non Komersil
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview" style="display: none;">
+                  <li class="nav-item">
+                    <a href="<?= base_url('pononkomersiljasa') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Jasa</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="<?= base_url('postatusnk') ?>" class="nav-link">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>PO Pembelian</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-archive"></i>
+              <p>
+                Master Barang
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarangkomersil') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('masterbarangnk') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('vrequestmbarang') ?>" class="nav-link">
+              <i class="nav-icon fas fa-box-open"></i>
+              <p>
+                Request Master Barang
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reqpic') ?>" class="nav-link">
+              <i class="nav-icon fas fa-folder-minus"></i>
+              <p>PO Request PIC</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-cubes"></i>
+              <p>
+                Stok Barang
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= base_url('stockkomersil') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Komersil</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<?= base_url('stocknonkomersil') ?>" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Non Komersil</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('lap_nonkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-file-excel"></i>
+              <p>
+                Laporan Pembelian
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('taxseting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-percent"></i>
+              <p>
+                Tax Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('satuansetting') ?>" class="nav-link">
+              <i class="nav-icon fa fa-weight-hanging"></i>
+              <p>
+                Satuan Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('notetemplate') ?>" class="nav-link">
+              <i class="nav-icon fas fa-pen-nib"></i>
+              <p>
+                Note Template Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                Account Setting
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('reviewapps') ?>" class="nav-link">
+              <i class="nav-icon fas fa-star"></i>
+              <p>
+                Review Apps
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>
+                Log Out
+              </p>
+            </a>
+          </li>
 
         <?php elseif ($this->session->userdata('lv') == '4') : ?>
           <!-- <li class="nav-item">

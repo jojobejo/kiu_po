@@ -151,6 +151,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/ajaxstatus');
     }
+
     public function update_printout_po()
     {
         $kdpo   = $this->input->post('kdpo');

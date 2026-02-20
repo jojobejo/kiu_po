@@ -295,6 +295,7 @@ class M_Reqpic extends CI_Model
         LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
         LEFT JOIN tb_user c ON c.kode_user = a.kd_user
         WHERE a.departemen = 'KEUANGAN' AND a.status != 'DONE' AND c.aksess_lv = '2'
+        ORDER BY a.tgl_transaksi DESC
         ");
     }
     public function getlistpicreqacc()

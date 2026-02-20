@@ -713,6 +713,7 @@
                                                     <!-- /.modal-dialog -->
                                                 </div>
                                             </div>
+
                                             <div class="modal fade" id="restockmodaledited<?= $d->id ?>">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
