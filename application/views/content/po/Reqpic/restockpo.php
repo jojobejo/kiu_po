@@ -68,80 +68,184 @@
 
                 </div> <!-- END CARD BODY -->
             </div> <!-- END CARD -->
-            <?php if ($countreq == '1') : ?>
-                <?php $this->load->view('content/po/Reqpic/modalreqedit.php') ?>
-                <div class="card">
-                    <div class="card-body">
-                        <h3>Draft </h3>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
-                            </div>
-                        </div>
-                        <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
-                        <div class="col mb-2 mt-5">
-                            <div class="row">
-                                <div class="col-md-auto">
-                                    <label for="naSupp" class="">Tujuan Request : </label>
-                                </div>
-                                <div class="col-md">
-                                    <input type="text" id="intj" name="intj" style="max-width: 550px;" value="Restock By Admin PO" class="form-control" placeholder="Input Tujuan Pengajuan" readonly>
-                                </div>
-                            </div>
-                        </div>
 
-                        <table class="table table-bordered table-striped" id="list_reqpic">
-                            <thead>
-                                <tr>
-                                    <td>Nama Barang</td>
-                                    <td>Deskripsi</td>
-                                    <td>Keterangan</td>
-                                    <td>QTY</td>
-                                    <td>Satuan</td>
-                                    <td>#</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($tmpreq as $t) : ?>
-                                    <tr>
-                                        <td><?= $t->nama_barang ?></td>
-                                        <td><?= $t->descnk ?></td>
-                                        <td><?= $t->keterangan ?></td>
-                                        <td><?= $t->qty ?></td>
-                                        <td><?= $t->nm_satuan ?></td>
-                                        <td>
-                                            <div class="row">
-                                                <div class="col">
-                                                    <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#edit<?= $t->id_tmp_nk ?>">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                    </a>
-                                                </div>
-                                                <div class="col">
-                                                    <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#hapus<?= $t->id_tmp_nk ?>">
-                                                        <i class="fas fa-times-circle"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                            </tbody>
-                        <?php endforeach; ?>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6">
-                                    <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
-                                    <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
-                                    <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tfoot>
-                        </table>
-                    </div>
-                    <!-- END CARD CONTENT -->
+
+            <div class="row mb-2">
+                <div class="col-auto">
+                    <a href="javascript:void(0)" class="btn btn-sm btn-primary" id="btn-restock">
+                        <i class="fas fa-plus"></i> Restock
+                    </a>
                 </div>
-            <?php else : ?>
-            <?php endif; ?>
+                <div class="col-auto">
+                    <a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-request">
+                        <i class="fas fa-plus"></i> Pengajuan ATK & RTK
+                    </a>
+                </div>
+            </div>
+
+            <?php $this->load->view('content/po/Reqpic/modalreqedit.php') ?>
+
+            <!-- CARD RESTOCK -->
+            <div class="card mt-3" id="card-restock" style="display:none;">
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
+                        </div>
+                    </div>
+                    <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
+                    <div class="col mb-2 mt-5">
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <label for="naSupp" class="">Tujuan Request : </label>
+                            </div>
+                            <div class="col-md">
+                                <input type="text" id="intj" name="intj" style="max-width: 550px;" value="Restock By Admin PO" class="form-control" placeholder="Input Tujuan Pengajuan" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-striped" id="list_reqpic">
+                        <thead>
+                            <tr>
+                                <td>Nama Barang</td>
+                                <td>Deskripsi</td>
+                                <td>Keterangan</td>
+                                <td>QTY</td>
+                                <td>Satuan</td>
+                                <td>#</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($tmpreq as $t) : ?>
+                                <tr>
+                                    <td><?= $t->nama_barang ?></td>
+                                    <td><?= $t->descnk ?></td>
+                                    <td><?= $t->keterangan ?></td>
+                                    <td><?= $t->qty ?></td>
+                                    <td><?= $t->nm_satuan ?></td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col">
+                                                <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#edit<?= $t->id_tmp_nk ?>">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                            </div>
+                                            <div class="col">
+                                                <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#hapus<?= $t->id_tmp_nk ?>">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                        </tbody>
+                    <?php endforeach; ?>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
+                                <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
+                                <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CARD REQUEST -->
+            <div class="card mt-3" id="card-request" style="display:none;">
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
+                        </div>
+                    </div>
+                    <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
+                    <div class="col mb-2 mt-5">
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <label for="naSupp" class="">Tujuan Request : </label>
+                            </div>
+                            <div class="col-md">
+                                <input type="text" id="intj" name="intj" style="max-width: 550px;" value="Request ATK/RTK Purchasing" class="form-control" placeholder="Input Tujuan Pengajuan" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-striped" id="list_reqpic">
+                        <thead>
+                            <tr>
+                                <td>Nama Barang</td>
+                                <td>Deskripsi</td>
+                                <td>Keterangan</td>
+                                <td>QTY</td>
+                                <td>Satuan</td>
+                                <td>#</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($tmpreq as $t) : ?>
+                                <tr>
+                                    <td><?= $t->nama_barang ?></td>
+                                    <td><?= $t->descnk ?></td>
+                                    <td><?= $t->keterangan ?></td>
+                                    <td><?= $t->qty ?></td>
+                                    <td><?= $t->nm_satuan ?></td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col">
+                                                <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#edit<?= $t->id_tmp_nk ?>">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                            </div>
+                                            <div class="col">
+                                                <a class="btn btn-block btn-danger btn-sm" data-toggle="modal" data-target="#hapus<?= $t->id_tmp_nk ?>">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                        </tbody>
+                    <?php endforeach; ?>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <input class="form-control" type="text" id="kdponk" name="kdponk" value="<?= $generatekd ?>" readonly hidden />
+                                <input class="form-control" type="text" id="totbr" name="totbr" value="<?= $jumlahbr ?>" readonly hidden />
+                                <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const btnRestock = document.getElementById("btn-restock");
+        const btnRequest = document.getElementById("btn-request");
+
+        const cardRestock = document.getElementById("card-restock");
+        const cardRequest = document.getElementById("card-request");
+
+        btnRestock.addEventListener("click", function() {
+            cardRestock.style.display = "block";
+            cardRequest.style.display = "none";
+        });
+
+        btnRequest.addEventListener("click", function() {
+            cardRequest.style.display = "block";
+            cardRestock.style.display = "none";
+        });
+
+    });
+</script>

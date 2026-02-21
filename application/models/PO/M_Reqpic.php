@@ -275,12 +275,13 @@ class M_Reqpic extends CI_Model
 
     public function getlistpic()
     {
-        // return $this->db->get('tb_req_nk')->result();
         return $this->db->query("SELECT a.*
             FROM tb_req_nk a
-            WHERE a.status = 'ON PROGRESS' OR a.status = 'PO REVISI';
+            WHERE a.status = 'ON PROGRESS' OR a.status = 'PO REVISI'
+            ORDER BY a.tgl_transaksi DESC;
             ");
     }
+
     public function getlistadm()
     {
         return $this->db->query("SELECT 
@@ -294,13 +295,13 @@ class M_Reqpic extends CI_Model
         FROM tb_req_nk a
         LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
         LEFT JOIN tb_user c ON c.kode_user = a.kd_user
-        WHERE a.departemen = 'KEUANGAN' AND a.status != 'DONE' AND c.aksess_lv = '2'
+        WHERE a.departemen = 'KEUANGAN' AND a.status != 'DONE' AND c.aksess_lv = '2' 
         ORDER BY a.tgl_transaksi DESC
         ");
     }
+
     public function getlistpicreqacc()
     {
-        // return $this->db->get('tb_req_nk')->result();
         return $this->db->query("SELECT 
         a.kd_po_nk AS kd_po_nk,
         a.nm_user AS nm_user,
@@ -312,8 +313,9 @@ class M_Reqpic extends CI_Model
         FROM tb_req_nk a
         LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.status = 'REQUEST ACC'
-            ");
+        ORDER BY a.tgl_transaksi DESC;");
     }
+
     public function getlistready()
     {
         // return $this->db->get('tb_req_nk')->result();
@@ -322,12 +324,14 @@ class M_Reqpic extends CI_Model
             WHERE a.status = 'BARANG TERSEDIA';
             ");
     }
+
     public function getlistdone()
     {
         // return $this->db->get('tb_req_nk')->result();
         return $this->db->query("SELECT a.*
             FROM tb_req_nk a
-            WHERE a.status = 'DONE';
+            WHERE a.status = 'DONE'
+            ORDER BY a.tgl_transaksi DESC;
             ");
     }
 
@@ -348,6 +352,7 @@ class M_Reqpic extends CI_Model
         GROUP BY a.kd_barangsys
     ");
     }
+
     public function getdetailreq($kd)
     {
         return $this->db->query("SELECT
@@ -374,6 +379,7 @@ class M_Reqpic extends CI_Model
         $num_results = $this->db->count_all_results();
         return $num_results;
     }
+
     public function countpend($kd)
     {
         $this->db->select('id_tmp_nk');
@@ -398,36 +404,43 @@ class M_Reqpic extends CI_Model
     {
         $this->db->insert('tb_tmp_item_nk', $data);
     }
+
     public function inputreq($data)
     {
         $this->db->insert('tb_req_nk', $data);
     }
+
     public function editedreqpic($id, $data)
     {
         $this->db->where('id_tmp_nk', $id);
         return $this->db->update('tb_tmp_item_nk', $data);
     }
+
     public function updatestsitem($id, $data)
     {
         $this->db->where('id_det_po_nk', $id);
         return $this->db->update('tb_detail_req', $data);
     }
+
     public function deletedtmpnkreq($id)
     {
         $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_tmp_item_nk');
     }
+
     public function deletedet($id, $sts)
     {
         $this->db->where('id_tmp_nk', $id);
         return $this->db->delete('tb_detail_req');
     }
+
     public function deletedetailporeqkdall($kd, $sts)
     {
         $this->db->where('kd_po_nk', $kd);
         $this->db->where('status', $sts);
         return $this->db->delete('tb_detail_req');
     }
+
     public function getitemreq($id)
     {
         return $this->db->query("SELECT 
@@ -456,32 +469,39 @@ class M_Reqpic extends CI_Model
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_po_nk');
     }
+
     public function updatestsponk($id, $data)
     {
         $this->db->where('kd_po_nk', $id);
         return $this->db->update('tb_po_nk', $data);
     }
+
     public function insertpobaru($dt)
     {
         $this->db->insert('tb_po_nk', $dt);
     }
+
     public function deletedetailporeq($id)
     {
         $this->db->where('id_det_po_nk', $id);
         return $this->db->delete('tb_detail_req');
     }
+
     public function insert_tmp_transaksi($data)
     {
         $this->db->insert('tb_transaksi_tmp', $data);
     }
+
     public function insertbrponkpending($data)
     {
         $this->db->insert('tb_detail_po_nk', $data);
     }
+
     public function insert_transaksi($data)
     {
         $this->db->insert('tb_transaksi', $data);
     }
+
     public function getbuystsponk($kd)
     {
         return $this->db->query("SELECT
@@ -497,6 +517,7 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_req = '$kd'
         ");
     }
+
     public function getitmponk($kd)
     {
         return $this->db->query("SELECT
@@ -505,6 +526,7 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_nk = '$kd'
         ");
     }
+
     public function getbuystsponks($kd)
     {
         return $this->db->query("SELECT
@@ -513,6 +535,7 @@ class M_Reqpic extends CI_Model
         WHERE a.kd_po_req = '$kd'
         ");
     }
+
     public function getdatapobaru($kd)
     {
         return $this->db->query("SELECT 
@@ -529,6 +552,7 @@ class M_Reqpic extends CI_Model
         GROUP BY a.kd_barang
         ");
     }
+
     public function getdatapobarureq($kd)
     {
         return $this->db->query("SELECT 
@@ -548,6 +572,7 @@ class M_Reqpic extends CI_Model
         GROUP BY a.kd_barang
         ");
     }
+
     public function getlisttmptr($kd)
     {
         return $this->db->query("SELECT

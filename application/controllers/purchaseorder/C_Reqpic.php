@@ -153,6 +153,7 @@ class C_Reqpic extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
     }
+
     public function addrequestmasterbarangready()
     {
         $inputby    = $this->session->userdata('kode');
@@ -1283,7 +1284,9 @@ class C_Reqpic extends CI_Controller
         $kduser = $this->session->userdata('kode');
 
         $data['title']      = 'PO Request By PIC ';
+
         $data['tmpreq']     = $this->M_Reqpic->getalltmpreq($kduser)->result();
+
         $data['countreq']   = $this->M_Reqpic->countRequser('1', $kduser);
         $data['generatekd'] = $this->M_Reqpic->kdnonkomersial();
         $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
