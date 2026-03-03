@@ -136,6 +136,8 @@ $route['edit_note_pembelian_tmp']                       = 'purchaseorder/C_Order
 $route['hapus_note_pembelian_tmp/(:any)']               = 'purchaseorder/C_Order/hapus_note_pembelian_tmp/$1';
 $route['pononkomersil/list_stocknkpo/addtmpbarangnk']   = 'purchaseorder/C_Order/addtmpponk';
 
+
+
 // TESTING
 $route['testing']                                       = 'settings/C_Testing/';
 
@@ -147,9 +149,11 @@ $route['reqpicaccreq']                                  = 'purchaseorder/C_Reqpi
 $route['index_brsedia']                                 = 'purchaseorder/C_Reqpic/index_brsedia';
 $route['index_done']                                    = 'purchaseorder/C_Reqpic/index_done';
 $route['listbarangready']                               = 'purchaseorder/C_Reqpic/list_barang_ready';
+$route['list_barang_ready_seed']                        = 'purchaseorder/C_Reqpic/list_barang_ready_seed';
 $route['add_mbarang_tmp']                               = 'purchaseorder/C_Reqpic/addrequestmasterbarangready';
 $route['addtmpreqbarang']                               = 'purchaseorder/C_Reqpic/addtmpreqbarang';
 $route['addnewreq/(:any)']                              = 'purchaseorder/C_Reqpic/addnewreq/$1';
+$route['add_promosi_seed/(:any)']                       = 'purchaseorder/C_Reqpic/add_promosi_seed/$1';
 $route['editedreqpic']                                  = 'purchaseorder/C_Reqpic/editedreqpic';
 $route['deletedtmpnkreq']                               = 'purchaseorder/C_Reqpic/deletedtmpnkreq';
 $route['reqpic/detreqbarangpic/(:any)']                 = 'purchaseorder/C_Reqpic/detreqbarangpic/$1';
@@ -169,6 +173,10 @@ $route['updated_det_req_po_nk']                         = 'purchaseorder/C_Reqpi
 $route['reqpic/requestpending/(:any)']                  = 'purchaseorder/C_Reqpic/requestpending/$1';
 $route['requestpendings']                               = 'purchaseorder/C_Reqpic/requestpendings';
 $route['updated_po_nk/(:any)']                          = 'purchaseorder/C_Reqpic/updated_po_nk/$1';
+
+
+$route['promosi_seed']                                  = 'purchaseorder/C_Reqpic/promosiseed';
+$route['promosi_cp']                                    = 'purchaseorder/C_Reqpic/promosicp';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk']                                    = 'postatus/C_PoStatus/postatusnk';

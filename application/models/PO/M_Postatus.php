@@ -411,6 +411,59 @@ class M_PoStatus extends CI_Model
         AND a.status NOT IN ('DONE','ON PROGRESS')
             ");
     }
+
+    public function getall_nk_kadep_keu_sales()
+    {
+        return $this->db->query("SELECT 
+            a.kd_po_nk,
+            a.nopo,
+            a.status,
+            a.tgl_transaksi,
+            b.nama_user,
+            a.departemen,
+            a.tj_pembelian
+        FROM tb_po_nk a
+        JOIN tb_user b 
+            ON b.kode_user = a.kd_user
+        WHERE a.status NOT IN ('DONE','ON PROGRESS')
+        AND a.departemen IN ('KEUANGAN','SALES');");
+    }
+
+    public function getall_nk_promosi_seed()
+    {
+        return $this->db->query("SELECT 
+            a.kd_po_nk,
+            a.nopo,
+            a.status,
+            a.tgl_transaksi,
+            b.nama_user,
+            a.departemen,
+            a.tj_pembelian
+        FROM tb_po_nk a
+        JOIN tb_user b 
+            ON b.kode_user = a.kd_user
+        WHERE a.status NOT IN ('DONE','ON PROGRESS')
+        AND a.departemen = 'PROMOSI SEED'
+        ");
+    }
+    public function getall_nk_promosi_cp()
+    {
+        return $this->db->query("SELECT 
+            a.kd_po_nk,
+            a.nopo,
+            a.status,
+            a.tgl_transaksi,
+            b.nama_user,
+            a.departemen,
+            a.tj_pembelian
+        FROM tb_po_nk a
+        JOIN tb_user b 
+            ON b.kode_user = a.kd_user
+        WHERE a.status NOT IN ('DONE','ON PROGRESS')
+        AND a.departemen = 'PROMOSI CP'
+        ");
+    }
+
     public function getAllNK_direktur()
     {
         return $this->db->query("SELECT *,

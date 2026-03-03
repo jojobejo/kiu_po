@@ -80,8 +80,6 @@ class C_MasterBarang extends CI_Controller
     public function vrequestmbarang()
     {
         $data['title']          = 'Request - Master Barang';
-        // $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
-        // $data['kdbarang']       = $this->M_MasterBarang->generatekdbrnk();
 
         $kdu    = $this->session->userdata('kode');
 

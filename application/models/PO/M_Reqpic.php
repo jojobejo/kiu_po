@@ -25,8 +25,9 @@ class M_Reqpic extends CI_Model
         a.id_satuan
         FROM v_stockbarangnk a
         JOIN tb_satuan b ON b.id_satuan = a.id_satuan
-    ");
+        ");
     }
+
     public function getsatuan()
     {
         return $this->db->query("SELECT
@@ -66,6 +67,7 @@ class M_Reqpic extends CI_Model
         WHERE a.jnis_po = '1' AND a.kd_user = '$kd'
         ");
     }
+
     public function getallreq($kd)
     {
         return $this->db->query("SELECT 
@@ -75,6 +77,7 @@ class M_Reqpic extends CI_Model
         AND a.status != 'DONE' AND a.status != 'PENDING'
         ");
     }
+
     public function getallreqpending($user)
     {
         return $this->db->query("SELECT 

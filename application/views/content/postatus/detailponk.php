@@ -330,6 +330,7 @@
                 <textarea type="text" id="noInv" name="noInv" class="form-control mb-2" readonly><?= $s->tj_pembelian ?></textarea>
             </div>
         </div>
+
         <!-- FITUR ADD -->
         <?php $this->load->view('content/postatus/modal_setting/modalponk') ?>
         <?php if ($this->session->userdata('lv') == '4' && $s->status == 'DONE') : ?>

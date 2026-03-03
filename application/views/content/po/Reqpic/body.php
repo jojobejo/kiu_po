@@ -174,6 +174,12 @@
                                 <a href="<?= base_url('reqpic/admrestock') ?>" class="btn btn-md btn-primary btn-block"><b>Re-Stock</b></a>
                             </div>
                             <div class="col-sm mb-2">
+                                <a href="<?= base_url('promosi_seed') ?>" class="btn btn-md btn-success btn-block"><b>Promosi Seed</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
+                                <a href="<?= base_url('promosi_cp') ?>" class="btn btn-md btn-info btn-block"><b>Promosi CP</b></a>
+                            </div>
+                            <div class="col-sm mb-2">
                                 <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
                             </div>
                             <div class="col-sm mb-2">

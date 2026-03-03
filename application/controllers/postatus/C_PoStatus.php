@@ -839,7 +839,56 @@ class C_PoStatus extends CI_Controller
             $this->load->view('content/postatus/nonkomersilstatus', $data);
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
+        } elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP02') {
+
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_seed()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
         }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP08') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getall_nk_kadep_keu_sales()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP09') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_cp()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
         //VIEW-KADEP-KEUANGAN
         elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') {
 
@@ -856,13 +905,14 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+
         // VIEW KADEP != KEUANGAN
         elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') != 'KEUANGAN') {
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
 
-            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['po']    = $this->M_Postatus->getall_nk_kadep_keu_sales()->result();
             $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
@@ -1946,5 +1996,17 @@ class C_PoStatus extends CI_Controller
     public function downloadfile($path)
     {
         force_download($path);
+    }
+
+    public function promosiseed()
+    {
+        $data['title'] = 'PO Promosi Seed';
+        $data['hdone'] = $this->M_Postatus->getdatapodone()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/dashboard_seed', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 }
