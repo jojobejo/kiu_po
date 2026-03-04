@@ -5,7 +5,7 @@
                 <div class="col-sm-6">
 
                     <?php if ($this->session->userdata('lv') == '2') : ?>
-                        <a href="<?= base_url('promosi_seed') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
+                        <a href="<?= base_url('promosi_cp') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
                     <?php else : ?>
                         <a href="<?= base_url('reqpic') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
                     <?php endif; ?>
@@ -28,7 +28,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <?php echo form_open_multipart('addtmpreqbarang_seed'); ?>
+                                <?php echo form_open_multipart('addtmpreqbarang_cp'); ?>
                                 <div class="form-group">
                                     <div class="row" hidden>
                                         <div class="col-sm-8">

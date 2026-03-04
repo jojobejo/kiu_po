@@ -19,8 +19,12 @@ class C_Stocknonkomersil extends CI_Controller
 
     public function index()
     {
+        $lokasi = trim((string)$this->input->get('lokasi', true));
+
         $data['title'] = 'List Stock Non Komersil';
-        $data['stocknk'] = $this->M_Stocknonkomersil->v_stock();
+        $data['selected_lokasi'] = $lokasi;
+        $data['lokasi_option'] = $this->M_Stocknonkomersil->get_master_lokasi();
+        $data['stocknk'] = array();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -311,5 +315,62 @@ class C_Stocknonkomersil extends CI_Controller
 
         $data = $this->M_Stocknonkomersil->get_filtered_data($tgl1, $tgl2);
         echo json_encode($data);
+    }
+
+    public function master_lokasi()
+    {
+        $data['title'] = 'Master Lokasi';
+        $data['lokasi'] = $this->M_Stocknonkomersil->get_master_lokasi();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/master_lokasi', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+
+    public function ajax_stocknonkomersil()
+    {
+        $lokasi = trim((string)$this->input->get('lokasi', true));
+        $stock = $this->M_Stocknonkomersil->v_stock($lokasi);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => true,
+                'data' => $stock
+            ]));
+    }
+
+    public function add_master_lokasi()
+    {
+        $nama_lokasi = trim($this->input->post('nama_lokasi'));
+        if ($nama_lokasi !== '') {
+            $this->M_Stocknonkomersil->add_master_lokasi([
+                'nama_lokasi' => $nama_lokasi
+            ]);
+        }
+
+        redirect('master_lokasi');
+    }
+
+    public function edit_master_lokasi()
+    {
+        $id_lokasi = $this->input->post('id_lokasi');
+        $nama_lokasi = trim($this->input->post('nama_lokasi'));
+
+        if ($id_lokasi && $nama_lokasi !== '') {
+            $this->M_Stocknonkomersil->update_master_lokasi($id_lokasi, [
+                'nama_lokasi' => $nama_lokasi
+            ]);
+        }
+
+        redirect('master_lokasi');
+    }
+
+    public function hapus_master_lokasi($id)
+    {
+        $this->M_Stocknonkomersil->delete_master_lokasi($id);
+        redirect('master_lokasi');
     }
 }

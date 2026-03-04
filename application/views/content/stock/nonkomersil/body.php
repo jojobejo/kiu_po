@@ -14,10 +14,31 @@
                         <h1 class="m-0">
                             <b style="text-transform:uppercase">List Stock Barang - stock controller</b>
                         </h1>
+
                         <a href="<?= base_url('nkrestok') ?>" class="btn btn-md mt-2 mb-2 btn-info"><b style="text-transform:uppercase">List Stock Barang Kosong</b></a>
                         <a href="<?= base_url('exported_allstock') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-file-alt"></i> &nbsp;<b style="text-transform:uppercase">Export Stock</b></a>
+                        <a href="<?= base_url('master_lokasi') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-file-alt"></i> &nbsp;<b style="text-transform:uppercase">Master Lokasi</b></a>
                         <a href="<?= base_url('tr_allstock') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-archive"></i> &nbsp;<b style="text-transform:uppercase">Histori All Stock</b></a>
-                        <table class="table table-bordered" id="list_stocknonkomersil">
+
+                        <form id="stocknk_filter_form" class="row mt-3 mb-2">
+                            <div class="col-md-4">
+                                <label class="mb-1"><b>Filter Lokasi</b></label>
+                                <select id="filter_lokasi" name="lokasi" class="form-control">
+                                    <option value="">Semua Lokasi</option>
+                                    <?php foreach ($lokasi_option as $l) : ?>
+                                        <option value="<?= $l->nama_lokasi; ?>" <?= ($selected_lokasi == $l->nama_lokasi) ? 'selected' : ''; ?>>
+                                            <?= $l->nama_lokasi; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload Cepat</button>
+                                <button type="button" id="btn_reset_filter" class="btn btn-light">Reset</button>
+                            </div>
+                        </form>
+
+                        <table class="table table-bordered" id="list_stocknonkomersil" data-admin-view="1" data-ajax-url="<?= base_url('stocknonkomersil/data') ?>">
                             <thead>
                                 <tr>
                                     <td>Kode Barang</td>
@@ -25,36 +46,11 @@
                                     <td>Deskripsi</td>
                                     <td>Stock</td>
                                     <td>Satuan</td>
+                                    <td>Lokasi</td>
                                     <td>#</td>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php foreach ($stocknk as $s) : ?>
-                                    <?php if ($s->qty_ready == '0' || $s->qty_ready < '0') : ?>
-                                        <tr>
-                                            <td><?= $s->kode_barang ?></td>
-                                            <td><?= $s->nama_barang ?></td>
-                                            <td><?= $s->deskripsi ?></td>
-                                            <td class="table-warning"><?= $s->qty_ready ?></td>
-                                            <td><?= $s->satuan ?></td>
-                                            <td>
-                                                <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
-                                            </td>
-                                        </tr>
-                                    <?php else : ?>
-                                        <tr>
-                                            <td><?= $s->kode_barang ?></td>
-                                            <td><?= $s->nama_barang ?></td>
-                                            <td><?= $s->deskripsi ?></td>
-                                            <td><?= $s->qty_ready ?></td>
-                                            <td><?= $s->satuan ?></td>
-                                            <td>
-                                                <a href="<?= base_url('detailtransaksi/') . $s->kode_barangs ?>" target="_blanks" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -66,7 +62,24 @@
                         <h1 class="m-0">
                             <b style="text-transform:uppercase">Stock Barang Tersedia</b>
                         </h1>
-                        <table class="table table-bordered" id="list_stocknonkomersil">
+                        <form id="stocknk_filter_form" class="row mt-3 mb-2">
+                            <div class="col-md-4">
+                                <label class="mb-1"><b>Filter Lokasi</b></label>
+                                <select id="filter_lokasi" name="lokasi" class="form-control">
+                                    <option value="">Semua Lokasi</option>
+                                    <?php foreach ($lokasi_option as $l) : ?>
+                                        <option value="<?= $l->nama_lokasi; ?>" <?= ($selected_lokasi == $l->nama_lokasi) ? 'selected' : ''; ?>>
+                                            <?= $l->nama_lokasi; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload Cepat</button>
+                                <button type="button" id="btn_reset_filter" class="btn btn-light">Reset</button>
+                            </div>
+                        </form>
+                        <table class="table table-bordered" id="list_stocknonkomersil" data-admin-view="0" data-ajax-url="<?= base_url('stocknonkomersil/data') ?>">
                             <thead>
                                 <tr>
                                     <td>Kode Barang</td>
@@ -74,29 +87,11 @@
                                     <td>Deskripsi</td>
                                     <td>Stock</td>
                                     <td>Satuan</td>
+                                    <td>Lokasi</td>
                                     <!-- <td>#</td> -->
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php foreach ($stocknk as $s) : ?>
-                                    <tr>
-                                        <td><?= $s->kode_barang ?></td>
-                                        <td><?= $s->nama_barang ?></td>
-                                        <td><?= $s->deskripsi ?></td>
-                                        <?php if ($s->qty_ready == '0' || $s->qty_ready < '0') : ?>
-                                            <td class="table-warning"><?= $s->qty_ready ?></td>
-                                        <?php else : ?>
-                                            <td><?= $s->qty_ready ?></td>
-                                        <?php endif; ?>
-                                        <td><?= $s->satuan ?></td>
-                                        <!-- <td>
-                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addchartdetponk<?= $s->kode_barangs ?>">
-                                                <i class="fa fa-solid fa-cart-plus"></i>
-                                            </a>
-                                        </td> -->
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>

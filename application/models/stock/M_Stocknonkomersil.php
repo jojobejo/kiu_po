@@ -14,9 +14,14 @@ class M_Stocknonkomersil  extends CI_Model
     {
         return $this->db->get('')->result();
     }
-    public function v_stock()
+
+    public function v_stock($lokasi = '')
     {
-        return $this->db->get('v_stockbarangnk')->result();
+        $this->db->from('v_stockbarangnk');
+        if ($lokasi !== '') {
+            $this->db->where('nama_lokasi', $lokasi);
+        }
+        return $this->db->get()->result();
     }
 
     public function v_stockzero()
@@ -83,6 +88,31 @@ class M_Stocknonkomersil  extends CI_Model
     public function getSatuan()
     {
         return $this->db->get('tb_satuan')->result();
+    }
+
+    public function get_master_lokasi()
+    {
+        $this->db->select('*');
+        $this->db->from('tb_barang_nk_lokasi');
+        $this->db->order_by('id_lokasi', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    public function add_master_lokasi($data)
+    {
+        return $this->db->insert('tb_barang_nk_lokasi', $data);
+    }
+
+    public function update_master_lokasi($id, $data)
+    {
+        $this->db->where('id_lokasi', $id);
+        return $this->db->update('tb_barang_nk_lokasi', $data);
+    }
+
+    public function delete_master_lokasi($id)
+    {
+        $this->db->where('id_lokasi', $id);
+        return $this->db->delete('tb_barang_nk_lokasi');
     }
 
     function kdnonkomersial()

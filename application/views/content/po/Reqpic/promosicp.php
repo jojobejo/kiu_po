@@ -13,6 +13,7 @@
                         <a href="<?= base_url('historireqpic') ?>" class="btn btn-sm btn-success mb-2"><i class="fas fa-check"></i>&nbsp;REQ-DONE</a>
                     <?php endif; ?>
                     <table class="table table-bordered table-striped" id="list_reqpic">
+
                         <thead>
                             <tr>
                                 <td>Tanggal Request</td>
@@ -22,6 +23,7 @@
                                 <td>#</td>
                             </tr>
                         </thead>
+
                         <tbody>
                             <?php foreach ($getallreq as $g) : ?>
                                 <tr>
@@ -82,11 +84,11 @@
                         <h3>Draft Request Barang</h3>
                         <div class="row mb-2">
                             <div class="col">
-                                <a href="<?= base_url('list_barang_ready_seed') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
+                                <a href="<?= base_url('list_barang_ready_cp') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
                             </div>
                         </div>
 
-                        <?php echo form_open_multipart('add_promosi_seed/' . $this->session->userdata('kode')); ?>
+                        <?php echo form_open_multipart('add_promosi_cp/' . $this->session->userdata('kode')); ?>
                         <div class="col mb-2 mt-5">
                             <div class="row">
                                 <div class="col-md-auto">

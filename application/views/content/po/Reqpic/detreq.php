@@ -829,6 +829,7 @@
                                         <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                         <!-- END AKSI RESTOCK -->
+
                                         <!-- AKSI TRANSAKSI / STOCK BARANG READY -->
                                     <?php else : ?>
                                         <?php echo form_open_multipart('acc_req_admin_plus'); ?>

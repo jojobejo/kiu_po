@@ -78,6 +78,26 @@ class M_Reqpic extends CI_Model
         ");
     }
 
+    public function getallreq_seed()
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tb_req_nk a
+        WHERE a.departemen = 'PROMOSI SEED'
+        AND a.status != 'DONE' AND a.status != 'PENDING'
+        ");
+    }
+
+    public function getallreq_cp()
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tb_req_nk a
+        WHERE a.departemen = 'PROMOSI CP'
+        AND a.status != 'DONE' AND a.status != 'PENDING'
+        ");
+    }
+
     public function getallreqpending($user)
     {
         return $this->db->query("SELECT 
