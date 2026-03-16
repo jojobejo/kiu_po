@@ -13,13 +13,21 @@ class M_Api extends CI_Model
             ->result_array();
     }
 
-    public function get_detail_po($limit = 50)
+    public function get_detail_po()
     {
         return $this->db
-            ->select('a.*')
+            ->select('
+                a.kd_po,
+                a.no_po,
+                a.tgl_transaksi,
+                a.kd_suplier,
+                a.kd_barang,
+                a.satuan,
+                a.qty,
+                a.hrg_satuan,
+                a.hrg_total
+            ')
             ->from('tb_detail_po a')
-            ->join('tb_user b', 'b.kode_user = a.kd_user', 'left')
-            ->limit($limit)
             ->get()
             ->result_array();
     }
