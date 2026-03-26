@@ -334,5 +334,4 @@ $route['questionreviewpic/(:any)']                      = 'settings/C_Appsrated/
 $route['addconfirmsos']                                 = 'settings/C_Appsrated/addconfirmsos';
 
 //API
-
 $route['get_po']                                        = 'api/C_Api/get_po';
