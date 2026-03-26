@@ -923,6 +923,23 @@ class C_PoStatus extends CI_Controller
             $this->load->view('content/postatus/datatables');
         }
 
+        //VIEW-KADEP-LOGISTIK
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP03') {
+
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
         // VIEW KADEP != KEUANGAN
         elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') != 'KEUANGAN') {
             $data['title'] = 'PO Status';
