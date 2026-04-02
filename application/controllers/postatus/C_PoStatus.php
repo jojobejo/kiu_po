@@ -879,7 +879,7 @@ class C_PoStatus extends CI_Controller
 
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
-            $data['po']    = $this->M_Postatus->getall_nk_promosi_cp()->result();
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_seed()->result();
             $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
@@ -913,7 +913,7 @@ class C_PoStatus extends CI_Controller
 
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
-            $data['po']    = $this->M_Postatus->getall_nk_promosi_cp()->result();
+            $data['po']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
             $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
