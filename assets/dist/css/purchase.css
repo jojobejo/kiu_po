@@ -172,6 +172,15 @@
     color-adjust: exact !important;
 }
 
+.noted-green{
+    background-color: #00ff00;
+    color: #cc0000;
+    font-weight: bold;
+    text-align: center;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+}
+
 .asd{
     background-color:#999999;
     -webkit-print-color-adjust: exact; 

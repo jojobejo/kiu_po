@@ -168,7 +168,7 @@
                                     $hargaPajak = $stlhDiskon * $tax;
                                     $hargaAll = $stlhDiskon + $hargaPajak; ?>
                                     <tr>
-                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
+                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL s</td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
@@ -232,6 +232,14 @@
 
                             ?>
                             <?php endforeach; ?>
+                            <tr>
+                                <td class="noted-green" style="width: 50%;">
+                                    MOHON INFORMASI DAHULU,<br>
+                                    JIKA EXP DATE KURANG DARI 2 THN<br>
+                                    DARI TGL PENGIRIMAN
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
                             <tr>
                                 <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
                                     * SHIP TO : <br>

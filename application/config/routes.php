@@ -107,6 +107,7 @@ $route['pononkomersiljasa']                             = 'purchaseorder/pojasa/
 // Stock PO Non Komersil
 $route['stocknonkomersil']                              = 'stock/C_Stocknonkomersil';
 $route['stocknonkomersil/data']                         = 'stock/C_Stocknonkomersil/ajax_stocknonkomersil';
+$route['stocknonkomersil/update_lokasi']                = 'stock/C_Stocknonkomersil/update_lokasi_barang';
 $route['pononkomersil/list_stocknkpo']                  = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['detailtransaksi/(:any)']                        = 'stock/C_Stocknonkomersil/detailtransaksi/$1';
 $route['revisitr/(:any)/(:any)/(:any)']                 = 'stock/C_Stocknonkomersil/revisitr/$1/$2/$3';

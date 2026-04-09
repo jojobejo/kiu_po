@@ -24,6 +24,7 @@ class C_Stocknonkomersil extends CI_Controller
         $data['title'] = 'List Stock Non Komersil';
         $data['selected_lokasi'] = $lokasi;
         $data['lokasi_option'] = $this->M_Stocknonkomersil->get_master_lokasi();
+        $data['lokasi_option_modal'] = $data['lokasi_option'];
         $data['stocknk'] = array();
 
         $this->load->view('partial/header', $data);
@@ -340,6 +341,28 @@ class C_Stocknonkomersil extends CI_Controller
                 'status' => true,
                 'data' => $stock
             ]));
+    }
+
+    public function update_lokasi_barang()
+    {
+        $kode_barang = trim((string)$this->input->post('kode_barang', true));
+        $id_lokasi = (int)$this->input->post('id_lokasi');
+
+        $updated = false;
+        if ($kode_barang !== '' && $id_lokasi > 0) {
+            $updated = $this->M_Stocknonkomersil->update_lokasi_barang($kode_barang, $id_lokasi);
+        }
+
+        if ($this->input->is_ajax_request()) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status' => (bool)$updated
+                ]));
+            return;
+        }
+
+        redirect('stocknonkomersil');
     }
 
     public function add_master_lokasi()

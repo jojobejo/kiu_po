@@ -17,9 +17,12 @@ class M_Stocknonkomersil  extends CI_Model
 
     public function v_stock($lokasi = '')
     {
-        $this->db->from('v_stockbarangnk');
+        $this->db->select('v.*, b.kd_lokasi AS id_lokasi, l.nama_lokasi AS nama_lokasi');
+        $this->db->from('v_stockbarangnk v');
+        $this->db->join('tb_barang_nk b', 'b.kd_barang = v.kode_barangs', 'left');
+        $this->db->join('tb_barang_nk_lokasi l', 'l.id_lokasi = b.kd_lokasi', 'left');
         if ($lokasi !== '') {
-            $this->db->where('nama_lokasi', $lokasi);
+            $this->db->where('l.nama_lokasi', $lokasi);
         }
         return $this->db->get()->result();
     }
@@ -113,6 +116,14 @@ class M_Stocknonkomersil  extends CI_Model
     {
         $this->db->where('id_lokasi', $id);
         return $this->db->delete('tb_barang_nk_lokasi');
+    }
+
+    public function update_lokasi_barang($kode_barang, $id_lokasi)
+    {
+        $this->db->where('kd_br_adm', $kode_barang);
+        return $this->db->update('tb_barang_nk', [
+            'kd_lokasi' => $id_lokasi
+        ]);
     }
 
     function kdnonkomersial()
