@@ -124,8 +124,9 @@ $route['hapus_master_lokasi/(:num)']                    = 'stock/C_Stocknonkomer
 $route['tr_trash/(:any)/(:any)']                        = 'stock/C_Stocknonkomersil/trash_transaksi/$1/$2';
 
 // Stock PO Komersil
-$route['stockkomersil']                                 = 'stock/C_Stockkomersil';
+$route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
 $route['servergetallkomersil']                          = 'stock/C_Stockkomersil/servergetallkomersil';
+$route['stockkomersil/data']                            = 'stock/C_Stockkomersil/api_stock_per_gudang';
 $route['brgdetkomersil/(:any)']                         = 'stock/C_Stockkomersil/brgdetkomersil/$1';
 
 //PurchaseOrderNonKomersil
@@ -336,3 +337,8 @@ $route['addconfirmsos']                                 = 'settings/C_Appsrated/
 
 //API
 $route['get_po']                                        = 'api/C_Api/get_po';
+
+$route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
+$route['api/stockkomersil']                             = 'stock/C_Stockkomersil/api_stock_komersil';
+
+

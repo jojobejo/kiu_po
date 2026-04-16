@@ -382,7 +382,7 @@
                 <table class="table table-bordered table-striped" id="tballstatus">
                     <thead>
                         <tr>
-                            <td>No</td>
+                            <td>Nos</td>
                             <td>Nomor PO</td>
                             <td>Status Order</td>
                             <td>Tanggal PO</td>

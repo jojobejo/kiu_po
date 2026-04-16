@@ -233,7 +233,8 @@
                             ?>
                             <?php endforeach; ?>
                             <tr>
-                                <td class="noted-green" style="width: 50%;">
+
+                                <td style="text-align: center; background-color: lime; width: 50%; font-weight: bold; color: red;">
                                     MOHON INFORMASI DAHULU,<br>
                                     JIKA EXP DATE KURANG DARI 2 THN<br>
                                     DARI TGL PENGIRIMAN
