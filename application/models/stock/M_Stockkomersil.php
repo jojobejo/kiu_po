@@ -13,10 +13,62 @@ class M_Stockkomersil extends CI_Model
     public function __construct()
     {
         parent::__construct();
-        // Sesuaikan dengan URL aplikasi API Anda (tanpa trailing slash)
-        $this->base_url = 'http://localhost/karismaerp/api/v1/stock';
+        // Bisa dioverride dari config jika endpoint upstream berubah.
+        $configured_url = config_item('stockkomersil_api_url');
+        $this->base_url = $configured_url ? $configured_url : 'http://localhost/karismaerp/api/v1/stock';
         $this->timeout  = 10;
         $this->api_key  = 'Bearer KARISMA123';
+    }
+
+    private function build_candidate_urls($gudang = null)
+    {
+        $base = rtrim($this->base_url, '/');
+        $urls = array($base);
+
+        if ($gudang === null || $gudang === '') {
+            return array_values(array_unique($urls));
+        }
+
+        $encoded = rawurlencode($gudang);
+        $urls[] = $base . '/' . $encoded;
+        $urls[] = $base . '?gudang=' . $encoded;
+
+        // Beberapa implementasi lama mengartikan "all" sebagai gudang induk.
+        if ((string) $gudang === 'all') {
+            $urls[] = $base . '/2';
+            $urls[] = $base . '?gudang=2';
+        }
+
+        return array_values(array_unique($urls));
+    }
+
+    private function request_stock_upstream($url)
+    {
+        $headers = ['Accept: application/json'];
+        if (!empty($this->api_key)) {
+            $headers[] = 'Authorization: ' . $this->api_key;
+        }
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => $this->timeout,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+
+        return array(
+            'url' => $url,
+            'response' => $response,
+            'http_code' => (int) $http_code,
+            'curl_error' => $curl_error,
+        );
     }
 
     public function getAll()
@@ -133,74 +185,79 @@ class M_Stockkomersil extends CI_Model
 
     public function fetch_stock($params = [])
     {
-        $url = $this->base_url;
+        $gudang = isset($params['gudang']) ? (string) $params['gudang'] : null;
+        $candidates = $this->build_candidate_urls($gudang);
+        $last_attempt = null;
 
-        // Tambahkan path segment gudang jika ada
-        if (!empty($params['gudang'])) {
-            $url = rtrim($url, '/') . '/' . rawurlencode($params['gudang']);
+        foreach ($candidates as $candidate_url) {
+            $attempt = $this->request_stock_upstream($candidate_url);
+            $last_attempt = $attempt;
+
+            if ($attempt['curl_error']) {
+                log_message('error', 'cURL Error fetch_stock [' . $candidate_url . ']: ' . $attempt['curl_error']);
+                continue;
+            }
+
+            if ($attempt['http_code'] !== 200) {
+                log_message('error', 'API HTTP Code [' . $candidate_url . ']: ' . $attempt['http_code']);
+                continue;
+            }
+
+            $response = $attempt['response'];
+
+            // Bersihkan BOM / komentar / byte non-JSON di awal response
+            $response = preg_replace('/^\xEF\xBB\xBF/', '', $response);
+            $pos_obj = strpos($response, '{');
+            $pos_arr = strpos($response, '[');
+            $first_json_pos = false;
+            if ($pos_obj !== false && $pos_arr !== false) {
+                $first_json_pos = min($pos_obj, $pos_arr);
+            } elseif ($pos_obj !== false) {
+                $first_json_pos = $pos_obj;
+            } elseif ($pos_arr !== false) {
+                $first_json_pos = $pos_arr;
+            }
+            if ($first_json_pos !== false && $first_json_pos > 0) {
+                $response = substr($response, $first_json_pos);
+            }
+
+            $result = json_decode($response, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                log_message('error', 'Invalid JSON from upstream [' . $candidate_url . ']');
+                continue;
+            }
+
+            return $result;
         }
 
-        $headers = ['Accept: application/json'];
-        if (!empty($this->api_key)) {
-            $headers[] = 'Authorization: ' . $this->api_key;
+        if ($last_attempt && $last_attempt['curl_error']) {
+            return [
+                'status' => false,
+                'data' => [],
+                'message' => 'Koneksi ke API stock upstream gagal.',
+                'upstream' => [
+                    'base_url' => $this->base_url,
+                    'attempted_urls' => $candidates,
+                    'last_error' => $last_attempt['curl_error'],
+                ],
+            ];
         }
 
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL            => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => $this->timeout,
-            CURLOPT_HTTPHEADER     => $headers,
-            CURLOPT_SSL_VERIFYPEER => false, // matikan jika API pakai HTTP
-        ]);
-
-        $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
-
-        // Tangani error koneksi
-        if ($curl_error) {
-            log_message('error', 'cURL Error fetch_stock: ' . $curl_error);
-            return ['status' => false, 'data' => [], 'message' => 'Koneksi ke API gagal.'];
-        }
-
-        // Tangani HTTP error
-        if ($http_code !== 200) {
-            log_message('error', 'API HTTP Code: ' . $http_code);
-            return ['status' => false, 'data' => [], 'message' => 'API merespons dengan kode ' . $http_code];
-        }
-
-        // Bersihkan BOM / komentar / byte non-JSON di awal response
-        $response = preg_replace('/^\xEF\xBB\xBF/', '', $response);
-        $pos_obj = strpos($response, '{');
-        $pos_arr = strpos($response, '[');
-        $first_json_pos = false;
-        if ($pos_obj !== false && $pos_arr !== false) {
-            $first_json_pos = min($pos_obj, $pos_arr);
-        } elseif ($pos_obj !== false) {
-            $first_json_pos = $pos_obj;
-        } elseif ($pos_arr !== false) {
-            $first_json_pos = $pos_arr;
-        }
-        if ($first_json_pos !== false && $first_json_pos > 0) {
-            $response = substr($response, $first_json_pos);
-        }
-
-        $result = json_decode($response, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return ['status' => false, 'data' => [], 'message' => 'Response API tidak valid.'];
-        }
-
-        return $result;
+        return [
+            'status' => false,
+            'data' => [],
+            'message' => 'Endpoint API stock upstream tidak ditemukan / tidak valid.',
+            'upstream' => [
+                'base_url' => $this->base_url,
+                'attempted_urls' => $candidates,
+                'last_http_code' => $last_attempt ? $last_attempt['http_code'] : null,
+            ],
+        ];
     }
 
     public function get_stock_komersil($gudang)
     {
-        if (!is_numeric($gudang)) {
-            $gudang = 2;
-        }
         return $this->fetch_stock(['gudang' => $gudang]);
     }
 }

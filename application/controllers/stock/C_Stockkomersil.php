@@ -135,7 +135,6 @@ class C_Stockkomersil extends CI_Controller
     {
         $gudang = $this->input->get('gudang', true);
 
-        // Jika ada parameter gudang, kembalikan JSON dari API eksternal
         if ($gudang !== null && $gudang !== '') {
             if ($gudang === 'all') {
                 $gudang = 2;
@@ -158,7 +157,6 @@ class C_Stockkomersil extends CI_Controller
             return;
         }
 
-        // Tanpa parameter gudang -> render halaman
         $data['title']          = 'Detail Product';
 
         $this->load->view('partial/header', $data);
@@ -169,7 +167,6 @@ class C_Stockkomersil extends CI_Controller
 
     public function api_stock($segment = null)
     {
-        // Matikan output error agar tidak merusak JSON
         $this->output->set_content_type('application/json');
 
         $gudang = $this->input->get('gudang');
