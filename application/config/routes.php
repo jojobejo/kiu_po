@@ -337,6 +337,8 @@ $route['addconfirmsos']                                 = 'settings/C_Appsrated/
 
 //API
 $route['get_po']                                        = 'api/C_Api/get_po';
+$route['get_data_pre_po_erp']                           = 'api/C_Api/get_data_pre_po_erp';
+
 
 $route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
 $route['api/stockkomersil']                             = 'stock/C_Stockkomersil/api_stock_komersil';
