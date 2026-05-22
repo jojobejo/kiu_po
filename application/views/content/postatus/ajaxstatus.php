@@ -3,6 +3,14 @@
 
         var baseUrl = '<?php echo base_url('postatus'); ?>';
 
+        <?php if ($this->session->flashdata('error')) : ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak Dapat Diproses',
+                text: '<?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>'
+            });
+        <?php endif; ?>
+
         // === REPOST ===
         $("#repost").on('click', function() {
             var kd_lama = $("#kd_lama").val();
@@ -118,6 +126,95 @@
                         }
                     });
                 }
+            });
+        });
+
+        $(document).on('click', '.btn-onhand-po', function(e) {
+            e.preventDefault();
+
+            var button = $(this);
+            var kdpo = button.data('kdpo');
+            var shipment = $.trim(button.data('shipment') || '');
+            var url = button.data('url');
+
+            if (shipment == '' || shipment == '-') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Shipment Belum Disetting',
+                    text: 'Silakan pilih / setting format shipment terlebih dahulu.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Update ON HAND?',
+                text: 'Status PO akan diubah menjadi DONE.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, lanjutkan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Mohon tunggu sebentar.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        kdpo: kdpo
+                    },
+                    dataType: 'JSON',
+                    cache: false,
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            button.closest('.konfirmasi-update-wrapper').html(
+                                '<label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>' +
+                                '<a class="btn btn-success btn-block"><i class="fas fa-thumbs-up"></i> PO - DONE</a>'
+                            );
+
+                            $('.status-order-badge[data-kdpo="' + kdpo + '"]')
+                                .removeClass('btn-warning')
+                                .addClass('btn-success')
+                                .attr('href', '<?= base_url('printOrder/') ?>' + kdpo)
+                                .attr('target', '_blank')
+                                .html('<i class="fas fa-print"></i> Cetak Form Order');
+
+                            $('a[data-target="#modalshipment' + kdpo + '"]').closest('.col-md').hide();
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Tidak Dapat Diproses',
+                                text: response.message || 'Proses update status dibatalkan.'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Tidak dapat terhubung ke server.'
+                        });
+                    }
+                });
             });
         });
 

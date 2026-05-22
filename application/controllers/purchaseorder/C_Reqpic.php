@@ -24,7 +24,7 @@ class C_Reqpic extends CI_Controller
         $data['tmpreq']     = $this->M_Reqpic->getalltmpreq($kduser)->result();
         $data['getallreq']  = $this->M_Reqpic->getallreq($kduser)->result();
         $data['countreq']   = $this->M_Reqpic->countRequser('1', $kduser);
-        $data['generatekd'] = $this->M_Reqpic->kdnonkomersial();
+        $data['generatekd'] = (strtoupper($kduser) == 'KARYAWAN4' ? 'GA' : '') . $this->M_Reqpic->kdnonkomersial();
         $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
         $data['getlistpic'] = $this->M_Reqpic->getlistpic()->result();
 
@@ -380,64 +380,145 @@ class C_Reqpic extends CI_Controller
         $nmuser = $this->session->userdata('nama_user');
         $dep    = $this->session->userdata('departemen');
         $kdus   = $this->session->userdata('kode');
-        $kdponk = $this->input->post('kdponk');
         $totbr  = $this->input->post('totbr');
         $tjuan  = $this->input->post('intj');
 
         $now    = date('Y-m-d');
 
         $tmp    = $this->M_Reqpic->get_tmp_non_komersil($kduser);
+        $kdponk = '';
+        $success = false;
+        $message = 'Request gagal disimpan';
+        $db_debug = $this->db->db_debug;
+        $this->db->db_debug = false;
 
-        $inpdataponk = array(
-            'jns_po'        => '2',
-            'kd_po_nk'      => $kdponk,
-            'kd_user'       => $kduser,
-            'nm_user'       => $nmuser,
-            'tgl_transaksi' => $now,
-            'jml_item'      => $totbr,
-            'status'        => 'ON PROGRESS',
-            'departemen'    => $dep,
-            'tj_pembelian'  => $tjuan
-        );
-        $this->M_Reqpic->inputreq($inpdataponk);
+        for ($i = 0; $i < 5; $i++) {
+            $kdponk = $this->generate_kdponk_req($kdus, $i);
 
-        $generatekd = array(
-            'kd_barang' => $kdponk
-        );
-        $this->M_Reqpic->generatekdponk($generatekd);
+            if ($this->M_Reqpic->is_kdponk_exists($kdponk)) {
+                continue;
+            }
 
-        $inputnt    = array(
-            'kd_po'         => $kdponk,
-            'isi_note'      => 'REQUEST BARU',
-            'kd_user'       => $kdus,
-            'nama_user'     => $nmuser,
-            'note_for'      => '2',
-            'update_status' => '2',
+            $this->db->trans_begin();
 
-        );
-        $this->M_Purchase->addNote($inputnt);
+            $inpdataponk = array(
+                'jns_po'        => '2',
+                'kd_po_nk'      => $kdponk,
+                'kd_user'       => $kduser,
+                'nm_user'       => $nmuser,
+                'tgl_transaksi' => $now,
+                'jml_item'      => $totbr,
+                'status'        => 'ON PROGRESS',
+                'departemen'    => $dep,
+                'tj_pembelian'  => $tjuan
+            );
+            $this->M_Reqpic->inputreq($inpdataponk);
 
-        if ($tmp) {
-            foreach ($tmp as $t) {
-                $listdetreq = array(
-                    'kd_po_nk'          => $kdponk,
-                    'kd_user'           => $kduser,
-                    'tgl_transaksi'     => $now,
-                    'kd_bsys'           => $t->kd_bsys,
-                    'kd_barang'         => $t->kd_barang,
-                    'nama_barang'       => $t->nama_barang,
-                    'deskripsi'         => $t->deskripsi,
-                    'keterangan'        => $t->keterangan,
-                    'qty'               => $t->qty,
-                    'satuan'            => $t->satuan,
-                    'kat_barang'        => $t->kat_barang,
-                    'status'            => '0'
-                );
-                $this->M_Reqpic->input_detail_po_nk($listdetreq);
+            $insert_error = $this->db->error();
+            if (!empty($insert_error['code'])) {
+                $this->db->trans_rollback();
+
+                if ($insert_error['code'] == 1062) {
+                    continue;
+                }
+
+                $message = $insert_error['message'];
+                break;
+            }
+
+            $generatekd = array(
+                'kd_barang' => $kdponk
+            );
+            $this->M_Reqpic->generatekdponk($generatekd);
+
+            $inputnt    = array(
+                'kd_po'         => $kdponk,
+                'isi_note'      => 'REQUEST BARU',
+                'kd_user'       => $kdus,
+                'nama_user'     => $nmuser,
+                'note_for'      => '2',
+                'update_status' => '2',
+
+            );
+            $this->M_Purchase->addNote($inputnt);
+
+            if ($tmp) {
+                foreach ($tmp as $t) {
+                    $listdetreq = array(
+                        'kd_po_nk'          => $kdponk,
+                        'kd_user'           => $kduser,
+                        'tgl_transaksi'     => $now,
+                        'kd_bsys'           => $t->kd_bsys,
+                        'kd_barang'         => $t->kd_barang,
+                        'nama_barang'       => $t->nama_barang,
+                        'deskripsi'         => $t->deskripsi,
+                        'keterangan'        => $t->keterangan,
+                        'qty'               => $t->qty,
+                        'satuan'            => $t->satuan,
+                        'kat_barang'        => $t->kat_barang,
+                        'status'            => '0'
+                    );
+                    $this->M_Reqpic->input_detail_po_nk($listdetreq);
+                }
+            }
+            $this->M_Reqpic->hapus_tmp_nk($kduser);
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                continue;
+            }
+
+            $this->db->trans_commit();
+            $success = true;
+            $message = 'Request berhasil disimpan';
+            break;
+        }
+
+        $this->db->db_debug = $db_debug;
+
+        if ($this->input->is_ajax_request()) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(array(
+                    'status'          => $success,
+                    'message'         => $message,
+                    'kdponk'          => $kdponk,
+                    'tgl_transaksi'   => function_exists('format_tgl_lahir') ? format_tgl_lahir($now) : $now,
+                    'jml_item'        => $totbr,
+                    'tj_pembelian'    => $tjuan,
+                    'detail_url'      => base_url('reqpic/detreqbarangpic/' . $kdponk),
+                    'pending_url'     => base_url('reqpic/requestpending/' . $kdponk)
+                )));
+            return;
+        }
+
+        if (!$success) {
+            $this->session->set_flashdata('error', $message);
+        }
+
+        redirect('reqpic');
+    }
+
+    private function generate_kdponk_req($kode_user, $offset = 0)
+    {
+        $kode_user = strtoupper($kode_user);
+        $prefix = '';
+
+        if ($kode_user == 'KARYAWAN4') {
+            $prefix = 'GA';
+        }
+
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "0001";
+
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1 + $offset;
+                $kd1 = sprintf("%04s", $tmp);
             }
         }
-        $this->M_Reqpic->hapus_tmp_nk($kduser);
-        redirect('reqpic');
+
+        return $prefix . 'NPONK' . date('dmy') . $kd1;
     }
 
     public function detreqbarangpic($kdpo)

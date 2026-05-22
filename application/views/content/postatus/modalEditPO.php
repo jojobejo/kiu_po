@@ -10,6 +10,7 @@
                 </div>
                 <div class="modal-body">
                     <?php echo form_open_multipart('revisiPO'); ?>
+                    <input type="hidden" name="is_bonus" value="<?= isset($d->is_bonus) ? (int) $d->is_bonus : 0 ?>">
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
@@ -43,12 +44,22 @@
                             <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="<?= $d->qty ?>" step="0.000000000001" /></div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="<?= $d->hrg_satuan ?>" step="0.000000000001" /></div>
+                    <?php if (isset($d->is_bonus) && (int) $d->is_bonus === 1) : ?>
+                        <input type="hidden" name="hrg_isi" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan Bonus<span class="required">*</span></label>
+                                <div class="col-sm-8"><textarea class="form-control" name="bonus_keterangan" rows="3"><?= isset($d->keterangan_bonus) ? $d->keterangan_bonus : '' ?></textarea></div>
+                            </div>
                         </div>
-                    </div>
+                    <?php else : ?>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="<?= $d->hrg_satuan ?>" step="0.000000000001" /></div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>

@@ -100,6 +100,7 @@
                 </div>
                 <div class="modal-body">
                     <?php echo form_open_multipart('edit_barang_tmp'); ?>
+                    <input type="hidden" name="is_bonus" value="<?= isset($t->is_bonus) ? (int) $t->is_bonus : 0 ?>">
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">idbarang<span class="required">*</span></label>
@@ -143,12 +144,22 @@
                             <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="<?= $t->qty ?>" /></div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="<?= $t->harga_satuan ?>" /></div>
+                    <?php if (isset($t->is_bonus) && (int) $t->is_bonus === 1) : ?>
+                        <input type="hidden" name="hrg_isi" value="0">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan Bonus<span class="required">*</span></label>
+                                <div class="col-sm-8"><textarea class="form-control" name="bonus_keterangan" rows="3"><?= isset($t->keterangan_bonus) ? $t->keterangan_bonus : '' ?></textarea></div>
+                            </div>
                         </div>
-                    </div>
+                    <?php else : ?>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                                <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="<?= $t->harga_satuan ?>" /></div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                 </div>
                 <div class="modal-footer justify-content-between">

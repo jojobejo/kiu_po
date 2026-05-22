@@ -114,7 +114,28 @@
                         <tbody>
                             <?php
                             $no = 1;
+                            $listDiskonPrint = array();
+                            foreach ($diskon as $diskonItem) {
+                                $listDiskonPrint[] = array(
+                                    'keterangan' => $diskonItem->keterangan,
+                                    'nominal' => $diskonItem->nominal,
+                                );
+                            }
+                            foreach ($detail as $bonusItem) {
+                                if (isset($bonusItem->is_bonus) && (int) $bonusItem->is_bonus === 1) {
+                                    $listDiskonPrint[] = array(
+                                        'keterangan' => $bonusItem->nama_barang . ' - ' . (!empty($bonusItem->keterangan_bonus) ? $bonusItem->keterangan_bonus : 'Bonus'),
+                                        'nominal' => 0,
+                                    );
+                                }
+                            }
                             foreach ($detail as $d) : ?>
+                                <?php
+                                $isBonus = isset($d->is_bonus) && (int) $d->is_bonus === 1;
+                                if ($isBonus) {
+                                    continue;
+                                }
+                                ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
                                     <td><?= $d->nama_barang ?></td>
@@ -152,11 +173,11 @@
                             <tr>
                                 <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
-                            <?php foreach ($diskon as $d) : ?>
-                                <?php if ($diskon > 0) : ?>
+                            <?php foreach ($listDiskonPrint as $d) : ?>
+                                <?php if (!empty($d['keterangan'])) : ?>
                                     <tr>
-                                        <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal, 2) ?></td>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d['nominal'], 2) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>

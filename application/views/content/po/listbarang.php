@@ -40,6 +40,12 @@
                                         </a>
                                     </div>
                                     <div class="col-md">
+                                        <a class="btn btn-block btn-primary btn-sm" data-toggle="modal" data-target="#modalAddBonus<?= $s->id_barang ?>">
+                                            <i class="fas fa-gift"></i>
+                                            Barang Bonus
+                                        </a>
+                                    </div>
+                                    <div class="col-md">
                                         <a class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#modal_edit<?= $s->id_barang ?>">
                                             <i class="fas fa-pencil-alt"></i>
                                             Edit Barang

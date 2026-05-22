@@ -37,6 +37,12 @@
                                             Tambah Barang Ke Chart
                                         </a>
                                     </div>
+                                    <div class="col-md">
+                                        <a class="btn btn-block btn-primary btn-sm" data-toggle="modal" data-target="#modalAddBonus<?= $s->id_barang ?>">
+                                            <i class="fas fa-gift"></i>
+                                            Barang Bonus
+                                        </a>
+                                    </div>
                                 </div>
                             </td>
                     </tr>

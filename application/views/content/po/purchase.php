@@ -124,35 +124,73 @@
                     <td>Satuan</td>
                     <td>Qty</td>
                     <td>Harga</td>
+                    <td>Harga Diskon</td>
                     <td>Total Harga</td>
+                    <td>Total Harga Setelah Diskon</td>
+                    <td>Disc</td>
                     <td>#</td>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 $no = 1;
-                foreach ($tmp as $t) : ?>
+                $totalHargaSetelahDiskon = 0;
+                foreach ($tmp as $t) :
+                    $isBonus = isset($t->is_bonus) && (int) $t->is_bonus === 1;
+                    $diskonPerSatuan = 0;
+                    if (!$isBonus) {
+                        foreach ($tmpdiskon as $diskon) {
+                            $prefixDiskonNominal = $t->nama_barang . ' - ';
+                            $prefixDiskonPersen = 'Diskon Barang - ' . $t->nama_barang . ' ';
+
+                            if (strpos($diskon->nama_diskon, $prefixDiskonNominal) === 0) {
+                                $diskonPerSatuan += $diskon->nominal;
+                            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0 && $t->qty > 0) {
+                                $diskonPerSatuan += $diskon->nominal / $t->qty;
+                            }
+                        }
+                    }
+
+                    $hargaDiskon = $isBonus ? 0 : max($t->harga_satuan - $diskonPerSatuan, 0);
+                    $totalSetelahDiskon = $hargaDiskon * $t->qty;
+                    $totalHargaSetelahDiskon += $totalSetelahDiskon;
+                ?>
                     <tr>
                         <td><?= $no++; ?></td>
-                        <td><?= $t->nama_barang ?></td>
+                        <td>
+                            <?= $t->nama_barang ?>
+                            <?php if ($isBonus) : ?>
+                                <span class="badge badge-primary ml-1">BONUS</span>
+                                <?php if (!empty($t->keterangan_bonus)) : ?>
+                                    <div><small><?= $t->keterangan_bonus ?></small></div>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
                         <td><?= $t->satuan ?></td>
                         <td><?= $t->qty ?></td>
                         <td>Rp. <?= number_format($t->harga_satuan, 2) ?></td>
+                        <td>Rp. <?= number_format($hargaDiskon, 2) ?></td>
                         <td>Rp. <?= number_format($t->total_harga, 2) ?></td>
+                        <td>Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
+                        <td>
+                            <?php if (!$isBonus) : ?>
+                                <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>" title="Tambah Diskon">
+                                    <i class="fas fa-percent"></i>
+                                </a>
+                            <?php endif; ?>
+                        </td>
                         <td><a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>">
                                 <i class="fa fa-solid fa-pencil-alt"></i>
                             </a>
                             <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
                                 <i class="fa fa-solid fa-trash-alt"></i>
                             </a>
-                            <a class="btn btn-sm bg-lightblue" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>">
-                                <i class="fas fa-tags"></i>
-                                Diskon(%)Barang
-                            </a>
-                            <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>">
-                                <i class="fas fa-tags"></i>
-                                Diskon Barang
-                            </a>
+                            <?php if (!$isBonus) : ?>
+                                <a class="btn btn-sm bg-lightblue" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>">
+                                    <i class="fas fa-tags"></i>
+                                    Diskon(%)Barang
+                                </a>
+                            <?php endif; ?>
                             <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>
                         </td>
                     </tr>
@@ -165,18 +203,13 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <?php foreach ($total as $tot) : ?>
                     <tr>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                        <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                         <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga, 2) ?>
                             <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                             <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
@@ -184,15 +217,11 @@
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td style="display: none;"></td>
-                    <td colspan="5" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
+                    <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon</td>
+                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($totalHargaSetelahDiskon, 2) ?></td>
+                </tr>
+                <tr>
+                    <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
                     <td colspan="2" style="font-weight: bold;"> <?= $tax ?> (%)</td>
                 </tr>
             </tbody>
@@ -209,17 +238,40 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($tmpdiskon as $d) : ?>
+                <?php
+                $listDiskonDisplay = array();
+                foreach ($tmpdiskon as $d) {
+                    $listDiskonDisplay[] = array(
+                        'nama_diskon' => $d->nama_diskon,
+                        'nominal' => $d->nominal,
+                        'id_tmp_diskon' => $d->id_tmp_diskon,
+                        'is_bonus_item' => false,
+                    );
+                }
+                foreach ($tmp as $t) {
+                    if (isset($t->is_bonus) && (int) $t->is_bonus === 1) {
+                        $listDiskonDisplay[] = array(
+                            'nama_diskon' => $t->nama_barang . ' - ' . (!empty($t->keterangan_bonus) ? $t->keterangan_bonus : 'Bonus'),
+                            'nominal' => 0,
+                            'id_tmp_diskon' => null,
+                            'is_bonus_item' => true,
+                        );
+                    }
+                }
+                ?>
+                <?php foreach ($listDiskonDisplay as $d) : ?>
                     <tr>
-                        <td style="text-align: center;"><?= $d->nama_diskon ?></td>
-                        <td style="text-align: center;">Rp. <?= number_format($d->nominal) ?></td>
+                        <td style="text-align: center;"><?= $d['nama_diskon'] ?></td>
+                        <td style="text-align: center;">Rp. <?= number_format($d['nominal']) ?></td>
                         <td style="text-align: center;">
-                            <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $d->id_tmp_diskon ?>">
-                                <i class="fa fa-solid fa-pencil-alt"></i>
-                            </a>
-                            <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusdiskon<?= $d->id_tmp_diskon ?>">
-                                <i class="fa fa-solid fa-trash-alt"></i>
-                            </a>
+                            <?php if (!$d['is_bonus_item']) : ?>
+                                <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $d['id_tmp_diskon'] ?>">
+                                    <i class="fa fa-solid fa-pencil-alt"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusdiskon<?= $d['id_tmp_diskon'] ?>">
+                                    <i class="fa fa-solid fa-trash-alt"></i>
+                                </a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

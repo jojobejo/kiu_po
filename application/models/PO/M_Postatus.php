@@ -164,6 +164,16 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po', $kdpo);
         return $this->db->get()->result();
     }
+    function getDataStatusPrint($kdpo)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po a');
+        $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        $this->db->join('tb_user c', 'c.kode_user = a.acc_with', 'left');
+        $this->db->join('tb_notetemplate d', 'd.kd_nt_template = a.kd_printout_note', 'left');
+        $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
     function getDataStatussnk($kdpo)
     {
         return $this->db->query("SELECT a.* , b.nama_user AS nm_karyawan , c.nama_user AS nm_kadep , d.nama_user AS nm_direktur
@@ -252,11 +262,36 @@ class M_PoStatus extends CI_Model
         return $this->db->update('tb_po', $updateTax);
     }
 
+    function updateDetailPO($id, $data)
+    {
+        $this->db->where('id_det_po', $id);
+        return $this->db->update('tb_detail_po', $data);
+    }
+
     function getDiskon($kdpo)
     {
         $this->db->select('*');
         $this->db->from('tb_diskon');
         $this->db->where('kd_po', $kdpo);
+        return $this->db->get()->result();
+    }
+
+    function getHistoriDiskonPo($kdpo)
+    {
+        $this->db->select('
+            a.id_diskon,
+            a.kd_po,
+            b.no_po,
+            b.tgl_transaksi,
+            c.nama_suplier,
+            a.keterangan,
+            a.nominal
+        ');
+        $this->db->from('tb_diskon a');
+        $this->db->join('tb_po b', 'b.kd_po = a.kd_po', 'left');
+        $this->db->join('tb_suplier c', 'c.kd_suplier = b.kd_suplier', 'left');
+        $this->db->where('a.kd_po', $kdpo);
+        $this->db->order_by('a.id_diskon', 'ASC');
         return $this->db->get()->result();
     }
     function getDiskonnk($kdpo)
@@ -309,11 +344,19 @@ class M_PoStatus extends CI_Model
     {
         $this->db->insert('tb_tracking_po', $data);
     }
+    function getDetailItemById($id)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_detail_po');
+        $this->db->where('id_det_po', $id);
+        return $this->db->get()->row();
+    }
     function getLog($kdpo)
     {
         $this->db->select('*');
         $this->db->from('tb_tracking_po');
         $this->db->where('kd_po', $kdpo);
+        $this->db->order_by('createat', 'DESC');
         return $this->db->get()->result();
     }
     function hapusBarang($id)
