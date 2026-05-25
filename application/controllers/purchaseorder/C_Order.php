@@ -228,7 +228,7 @@ class C_Order extends CI_Controller
             'harga_satuan'  => $hargaQty,
             'total_harga'   => $hargahasil,
             'is_bonus'      => $isBonus,
-            'keterangan_bonus' => $isBonus ? $bonusNote : null,
+            'keterangan_bonus' => $isBonus ? $bonusNote : '',
         );
 
         $this->M_Purchase->addChart($data);
@@ -302,7 +302,7 @@ class C_Order extends CI_Controller
                     'hrg_total'         => $chart->total_harga,
                     'hrg_total_diskon'  => $hargaTotalDiskon,
                     'is_bonus'          => $isBonus,
-                    'keterangan_bonus'  => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : null,
+                    'keterangan_bonus'  => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : '',
                 );
             }
         }
@@ -657,7 +657,7 @@ class C_Order extends CI_Controller
             'harga_satuan' => $hrg_satuan,
             'total_harga' => $total,
             'is_bonus' => $isBonus,
-            'keterangan_bonus' => $isBonus ? $bonusNote : null
+            'keterangan_bonus' => $isBonus ? $bonusNote : ''
         );
         $this->M_Purchase->edit_chart_tmp($id, $dataedit);
         redirect('purchase/sup/' . $supp);
