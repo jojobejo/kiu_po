@@ -2,6 +2,63 @@
 
     <div class="content-header">
         <div class="container-fluid">
+            <?php if ($this->session->flashdata('error')) : ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+            <style>
+                .po-detail-table-wrap {
+                    overflow-x: auto;
+                }
+
+                .po-detail-table {
+                    font-size: 14px;
+                    min-width: 1280px;
+                }
+
+                .po-detail-table td {
+                    padding: .5rem .6rem;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                }
+
+                .po-detail-table thead td {
+                    font-weight: 600;
+                    text-align: center;
+                }
+
+                .po-detail-table .col-item {
+                    max-width: 360px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: normal;
+                }
+
+                .po-detail-table .text-number {
+                    text-align: right;
+                }
+
+                .po-detail-table .action-cell {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: .25rem;
+                    justify-content: center;
+                }
+
+                .po-detail-table .btn-icon {
+                    align-items: center;
+                    display: inline-flex;
+                    height: 32px;
+                    justify-content: center;
+                    margin: 0;
+                    padding: 0;
+                    width: 32px;
+                }
+            </style>
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <div style="display: flex; text-align: center;">
@@ -380,27 +437,26 @@
                                 $showAction = true;
                             }
                             $allowEditDone = $this->session->userdata('lv') < '3' && $s->status == 'DONE';
-                            $showDisc = $this->session->userdata('lv') != '3' && $s->status != 'DONE' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY';
                             $showDiskonAction = $this->session->userdata('lv') < '3' && $s->status != 'DONE' && $s->status != 'REJECT' && $s->status != 'CANCEL' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY';
                             $showActionColumn = $showAction || $allowEditDone;
-                            $totalColspan = 8 + ($showDisc ? 1 : 0) + ($showActionColumn ? 1 : 0);
-                            $totalLabelColspan = $showDisc ? 8 : 7;
-                            $totalValueColspan = $totalColspan - $totalLabelColspan;
+                            $totalColspan = 10 + ($showActionColumn ? 1 : 0);
+                            $totalValueColspan = 2;
+                            $totalLabelColspan = max($totalColspan - $totalValueColspan, 1);
         ?>
-        <table class="table table-bordered table-striped ">
+        <div class="table-responsive po-detail-table-wrap">
+        <table class="table table-bordered table-striped po-detail-table">
             <thead style="background-color: #212529; color:white;">
                 <tr>
                     <td>No</td>
                     <td>Nama Barang</td>
                     <td>Satuan</td>
                     <td>Qty</td>
-                    <td>Harga</td>
+                    <td>Qty Kecil</td>
+                    <td>Harga Satuan</td>
+                    <td>Harga Satuan Kecil</td>
                     <td>Harga Diskon</td>
                     <td>Total Harga</td>
                     <td>Total Harga Setelah Diskon</td>
-                    <?php if ($showDisc) : ?>
-                        <td>Disc</td>
-                    <?php endif; ?>
                     <?php if ($showActionColumn) : ?>
                         <td>#</td>
                     <?php endif; ?>
@@ -413,11 +469,14 @@
                                 $isBonus = isset($d->is_bonus) && (int) $d->is_bonus === 1;
                                 $hargaDiskon = $isBonus ? 0 : (isset($d->hrg_diskon) && $d->hrg_diskon > 0 ? $d->hrg_diskon : $d->hrg_satuan);
                                 $totalSetelahDiskon = $isBonus ? 0 : (isset($d->hrg_total_diskon) && $d->hrg_total_diskon > 0 ? $d->hrg_total_diskon : $d->hrg_total);
+                                $qtyKecil = isset($d->qty_kecil) && (float) $d->qty_kecil > 0 ? $d->qty_kecil : $d->qty;
+                                $qtyKecilDisplay = ceil((float) $qtyKecil);
+                                $hargaSatuanKecil = isset($d->harga_satuan_kecil) && ((float) $d->harga_satuan_kecil > 0 || $isBonus) ? $d->harga_satuan_kecil : $d->hrg_satuan;
                                 $totalHargaSetelahDiskon += $totalSetelahDiskon;
                 ?>
                     <tr>
                         <td><?= $no++; ?></td>
-                        <td>
+                        <td class="col-item" title="<?= htmlspecialchars($d->nama_barang, ENT_QUOTES, 'UTF-8') ?>">
                             <?= $d->nama_barang ?>
                             <?php if ($isBonus) : ?>
                                 <span class="badge badge-primary ml-1">BONUS</span>
@@ -427,36 +486,29 @@
                             <?php endif; ?>
                         </td>
                         <td><?= $d->satuan ?></td>
-                        <td><?= $d->qty ?></td>
-                        <td>Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
-                        <td>Rp. <?= number_format($hargaDiskon, 2) ?></td>
-                        <td>Rp. <?= number_format($d->hrg_total, 2) ?></td>
-                        <td>Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
-                        <?php if ($showDisc) : ?>
-                            <td>
-                                <?php if ($showAction && !$isBonus) : ?>
-                                    <a class="btn btn-sm btn-info color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>" title="Tambah Diskon">
-                                        <i class="fas fa-percent"></i>
-                                    </a>
-                                <?php endif; ?>
-                            </td>
-                        <?php endif; ?>
+                        <td class="text-number"><?= $d->qty ?></td>
+                        <td class="text-number"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
+                        <td class="text-number">Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($hargaDiskon, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($d->hrg_total, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
                         <?php if ($showActionColumn) : ?>
                             <td>
-                                <div class="row">
-                                    <a class="btn btn-success btn-sm mr-1" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>">
+                                <div class="action-cell">
+                                    <a class="btn btn-success btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>" title="Edit" aria-label="Edit">
                                         <i class="fas fa-pencil-alt"></i>
-                                        Edit
                                     </a>
                                     <?php if ($showAction) : ?>
-                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>">
+                                        <a class="btn btn-danger btn-sm btn-icon" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>" title="Hapus" aria-label="Hapus">
                                             <i class="fas fa-trash-alt"></i>
-                                            Hapus
                                         </a>
                                         <?php if (!$isBonus) : ?>
-                                            <a class="btn btn-sm bg-lightblue color-palette mr-1 ml-1" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>">
+                                            <a class="btn btn-sm btn-info btn-icon color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>" title="Tambah Diskon" aria-label="Tambah Diskon">
+                                                <i class="fas fa-percent"></i>
+                                            </a>
+                                            <a class="btn btn-sm bg-lightblue btn-icon color-palette" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>" title="Diskon Barang" aria-label="Diskon Barang">
                                                 <i class="fas fa-tags"></i>
-                                                Diskon(%)
                                             </a>
                                         <?php endif; ?>
                                     <?php endif; ?>
@@ -508,11 +560,10 @@
                 <!-- TAMPILAN KEUANGAN TOTAL HARGA STATUS ON PROGRESS -->
                 <?php if ($this->session->userdata('lv') == '2' && $s->status != 'DONE') : ?>
                     <tr>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
-                        <td colspan="1" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
-                        <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
-                        <td colspan="2" style="font-weight: bold;"></td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
+                        <td colspan="2" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
+                        <td colspan="<?= max($totalColspan - 6, 1) ?>" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                     </tr>
                     <tr>
                         <td colspan="<?= $totalColspan ?>" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
@@ -576,11 +627,10 @@
                     <!-- TAMPILAN KEUANGAN TOTAL HARGA STATUS DONE -->
                 <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
                     <tr>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
-                        <td colspan="1" style="font-weight: bold;"><?= $s->tmpo_pembayaran ?></td>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
-                        <td colspan="1" style="font-weight: bold;"><?= $s->gdg_pengiriman ?></td>
-                        <td colspan="2" style="font-weight: bold;"></td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
+                        <td colspan="2" style="font-weight: bold;"><?= $s->tmpo_pembayaran ?> Hari</td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
+                        <td colspan="<?= max($totalColspan - 6, 1) ?>" style="font-weight: bold;"><?= $s->gdg_pengiriman ?></td>
                     </tr>
                     <tr>
                         <td colspan="<?= $totalColspan ?>" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
@@ -636,11 +686,10 @@
                     <!-- TAMPILAN DIREKTUR TOTAL HARGA STATUS BELUM DONE -->
                 <?php elseif ($this->session->userdata('lv') == '3' && $s->status != 'DONE') : ?>
                     <tr>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
-                        <td colspan="1" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
-                        <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
-                        <td colspan="1" style="font-weight: bold;"></td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
+                        <td colspan="2" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
+                        <td colspan="<?= max($totalColspan - 6, 1) ?>" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                     </tr>
                     <tr>
                         <td colspan="<?= $totalColspan ?>" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
@@ -704,11 +753,10 @@
                     <!-- TAMPILAN DIREKTUR TOTAL HARGA STATUS DONE -->
                 <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'DONE') : ?>
                     <tr>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
-                        <td colspan="1" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
-                        <td colspan="1" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
-                        <td colspan="2" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
-                        <td colspan="2" style="font-weight: bold;"></td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Syarat Pembayaran : </td>
+                        <td colspan="2" style="font-weight: bold;"> <?= $s->tmpo_pembayaran ?> Hari </td>
+                        <td colspan="2" style="text-align: end; padding-right:3%; font-weight: bold;"> Franko Pengiriman : </td>
+                        <td colspan="<?= max($totalColspan - 6, 1) ?>" style="font-weight: bold;"> <?= $s->gdg_pengiriman ?> </td>
                     </tr>
                     <tr>
                         <td colspan="<?= $totalColspan ?>" class="bg-black color-palette" style="text-align: center;">LIST DISKON</td>
@@ -772,6 +820,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
         <table class="table table-bordered table-striped ">
             <thead style="background-color: #212529; color:white;">
                 <tr>

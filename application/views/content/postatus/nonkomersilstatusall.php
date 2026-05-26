@@ -64,16 +64,21 @@
                                                 <i class="fas fa-thumbs-up"></i>&nbsp;
                                                 <?= $p->status ?>
                                             </a>
-                                        <?php elseif ($p->status == 'REJECT') : ?>
-                                            <a class="btn btn-block btn-danger btn-sm">
-                                                <i class="fas fa-times"></i>&nbsp;
-                                                <?= $p->status ?>
-                                            </a>
-                                        <?php elseif ($p->status == 'PO REVISI') : ?>
-                                            <a class="btn btn-block btn-warning btn-sm">
-                                                <i class="fas fa-undo"></i>&nbsp;
-                                                <?= $p->status ?>
-                                            </a>
+                                    <?php elseif ($p->status == 'REJECT') : ?>
+                                        <a class="btn btn-block btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
+                                    <?php elseif ($p->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                        <a class="btn btn-block btn-danger btn-sm">
+                                            <i class="fas fa-times-circle"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
+                                    <?php elseif ($p->status == 'PO REVISI') : ?>
+                                        <a class="btn btn-block btn-warning btn-sm">
+                                            <i class="fas fa-undo"></i>&nbsp;
+                                            <?= $p->status ?>
+                                        </a>
                                         <?php elseif ($p->status == 'PENDING') : ?>
                                             <a class="btn btn-block btn-warning btn-sm">
                                                 <i class="fas fa-pause"></i>&nbsp;

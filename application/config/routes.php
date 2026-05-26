@@ -196,6 +196,8 @@ $route['postatusnk']                                    = 'postatus/C_PoStatus/p
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
+$route['cancel_pengajuan_ponk']                         = 'postatus/C_PoStatus/cancel_pengajuan_ponk';
+$route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 $route['add_faktur_item_nk']                            = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['listbarangnk/1/2/3/(:any)']                     = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['noteupdatenk']                                  = 'postatus/C_PoStatus/addnotenk';
@@ -318,6 +320,9 @@ $route['addnotetemplate']                               = 'settings/C_NoteSettin
 $route['notetemplate/(:any)']                           = 'settings/C_NoteSetting/detail_note_template/$1';
 $route['updateisinote']                                 = 'settings/C_NoteSetting/update_note_template';
 
+//setting-formula-po
+$route['formulapo']                                     = 'settings/C_Formulapo';
+
 //LAPORAN PEMBELIAN NON KOMERSIL
 $route['lap_nonkomersil']                               = 'laporan/C_Laporan';
 $route['srclapbeli']                                    = 'laporan/C_Laporan/srclapbeli';
@@ -345,5 +350,3 @@ $route['get_data_pre_po_erp']                           = 'api/C_Api/get_data_pr
 
 $route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
 $route['api/stockkomersil']                             = 'stock/C_Stockkomersil/api_stock_komersil';
-
-

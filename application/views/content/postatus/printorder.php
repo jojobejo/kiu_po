@@ -107,8 +107,10 @@
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td>Harga</td>
-                                <td colspan="7" style="width: <?= $a ?>%;">Total Harga</td>
+                                <td style="width: 10%;">Qty Kecil</td>
+                                <td>Harga Satuan</td>
+                                <td>Harga Satuan Kecil</td>
+                                <td style="width: <?= $a ?>%;">Total Harga</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,14 +137,19 @@
                                 if ($isBonus) {
                                     continue;
                                 }
+                                $qtyKecil = isset($d->qty_kecil) && (float) $d->qty_kecil > 0 ? $d->qty_kecil : $d->qty;
+                                $qtyKecilDisplay = ceil((float) $qtyKecil);
+                                $hargaSatuanKecil = isset($d->harga_satuan_kecil) && (float) $d->harga_satuan_kecil > 0 ? $d->harga_satuan_kecil : $d->hrg_satuan;
                                 ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
                                     <td><?= $d->nama_barang ?></td>
                                     <td style="text-align: center;"><?= $d->satuan ?></td>
                                     <td style="text-align: center;"><?= $d->qty ?></td>
-                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
-                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
+                                    <td style="text-align: center;"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
+                                    <td style="text-align: end;">&nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
+                                    <td style="text-align: end;">&nbsp;Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
+                                    <td style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php
@@ -260,10 +267,11 @@
                                     JIKA EXP DATE KURANG DARI 2 THN<br>
                                     DARI TGL PENGIRIMAN
                                 </td>
-                                <td colspan="2"></td>
+                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>
                             <tr>
-                                <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
+                                <?php $noteRows = count($notesuplier) > 0 ? count($notesuplier) : 1; ?>
+                                <td rowspan="<?= $noteRows ?>" style="text-align: justify; background-color: yellow;width: 50%;">
                                     * SHIP TO : <br>
                                     KARISMA INDOAGRO UNIVERSAL <br>
                                     &nbsp;&nbsp;&nbsp;<?= $s->shipment_to ?><br>
@@ -273,10 +281,16 @@
                                     &nbsp;&nbsp;&nbsp;<?= $s->no_cp ?> <br>
                                     <?= nl2br($s->ket_1) ?><br>
                                 </td>
-                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
+                                <?php if (count($notesuplier) > 0) : ?>
+                                    <td colspan="2" class="bg-orange"><?= nl2br($notesuplier[0]->isi_note); ?></td>
+                                <?php else : ?>
+                                    <td colspan="2" class="bg-orange">&nbsp;</td>
+                                <?php endif; ?>
                             </tr>
-                            <?php foreach ($notesuplier as $ns) :
-                            ?>
+                            <?php foreach ($notesuplier as $index => $ns) : ?>
+                                <?php if ($index === 0) : ?>
+                                    <?php continue; ?>
+                                <?php endif; ?>
                                 <tr>
                                     <td colspan="2" class="bg-orange"><?= nl2br($ns->isi_note); ?></td>
                                 </tr>

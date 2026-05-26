@@ -1,6 +1,14 @@
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
+            <?php if ($this->session->flashdata('error')) : ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">

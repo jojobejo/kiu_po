@@ -46,14 +46,16 @@
                     <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
-                                <td colspan="8" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN INTERNAL</td>
+                                <td colspan="10" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN INTERNAL</td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 8%;">Qty</td>
-                                <td>Harga</td>
+                                <td style="width: 8%;">Qty Kecil</td>
+                                <td>Harga Satuan</td>
+                                <td>Harga Satuan Kecil</td>
                                 <td>Harga Diskon</td>
                                 <td>Total Harga</td>
                                 <td>Total Harga Diskon</td>
@@ -83,6 +85,9 @@
                                 $isBonus = isset($d->is_bonus) && (int) $d->is_bonus === 1;
                                 $hargaDiskon = $isBonus ? 0 : (isset($d->hrg_diskon) && $d->hrg_diskon > 0 ? $d->hrg_diskon : $d->hrg_satuan);
                                 $totalHargaDiskon = $isBonus ? 0 : (isset($d->hrg_total_diskon) && $d->hrg_total_diskon > 0 ? $d->hrg_total_diskon : $d->hrg_total);
+                                $qtyKecil = isset($d->qty_kecil) && (float) $d->qty_kecil > 0 ? $d->qty_kecil : $d->qty;
+                                $qtyKecilDisplay = ceil((float) $qtyKecil);
+                                $hargaSatuanKecil = isset($d->harga_satuan_kecil) && ((float) $d->harga_satuan_kecil > 0 || $isBonus) ? $d->harga_satuan_kecil : $d->hrg_satuan;
                                 ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
@@ -94,7 +99,9 @@
                                     </td>
                                     <td style="text-align: center;"><?= $d->satuan ?></td>
                                     <td style="text-align: center;"><?= $d->qty ?></td>
+                                    <td style="text-align: center;"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
                                     <td style="text-align: end;">&nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
+                                    <td style="text-align: end;">&nbsp;Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
                                     <td style="text-align: end;">&nbsp;Rp. <?= number_format($hargaDiskon, 2) ?></td>
                                     <td style="text-align: end;">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
                                     <td style="text-align: end;">&nbsp;Rp. <?= number_format($totalHargaDiskon, 2) ?></td>
@@ -121,41 +128,41 @@
                     <table class="table-bordered text-s listdb" style="width: 100%;">
                         <thead>
                             <tr>
-                                <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
+                                <td colspan="10" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($listDiskonPrint as $d) : ?>
                                 <tr>
-                                    <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
+                                    <td colspan="9" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
                                     <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d['nominal'], 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
-                                <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
+                                <td colspan="10" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Tanpa Diskon :</td>
+                                <td colspan="9" style="text-align: end;font-weight: bold;">Total Harga Tanpa Diskon :</td>
                                 <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_tanpa_diskon']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Dengan Diskon :</td>
+                                <td colspan="9" style="text-align: end;font-weight: bold;">Total Harga Dengan Diskon :</td>
                                 <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_dengan_diskon']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end;font-weight: bold;">Tax Tanpa Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
+                                <td colspan="9" style="text-align: end;font-weight: bold;">Tax Tanpa Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_tanpa_diskon']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end;font-weight: bold;">Tax Dengan Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
+                                <td colspan="9" style="text-align: end;font-weight: bold;">Tax Dengan Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_dengan_diskon']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga Tanpa Diskon</td>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga Tanpa Diskon</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_tanpa_diskon']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga Dengan Diskon</td>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga Dengan Diskon</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_dengan_diskon']) ?></td>
                             </tr>
                         </tbody>
@@ -163,14 +170,14 @@
 
                     <table class="table-bordered text-s listdb" style="width: 100%; border-color: black;">
                         <tbody>
-                            <?php $noteRows = count($notesuplier) > 0 ? count($notesuplier) + 1 : 2; ?>
+                            <?php $noteRows = count($notesuplier) > 0 ? count($notesuplier) : 1; ?>
                             <tr>
                                 <td style="text-align: center; background-color: lime; width: 50%; font-weight: bold; color: red;">
                                     MOHON INFORMASI DAHULU,<br>
                                     JIKA EXP DATE KURANG DARI 2 THN<br>
                                     DARI TGL PENGIRIMAN
                                 </td>
-                                <td colspan="2"></td>
+                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>
                             <tr>
                                 <td rowspan="<?= $noteRows ?>" style="text-align: justify; background-color: yellow;width: 50%;">
@@ -183,18 +190,20 @@
                                     &nbsp;&nbsp;&nbsp;<?= $s->no_cp ?> <br>
                                     <?= nl2br($s->ket_1) ?><br>
                                 </td>
-                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
+                                <?php if (count($notesuplier) > 0) : ?>
+                                    <td colspan="2" class="bg-orange"><?= nl2br($notesuplier[0]->isi_note); ?></td>
+                                <?php else : ?>
+                                    <td colspan="2" class="bg-orange">&nbsp;</td>
+                                <?php endif; ?>
                             </tr>
-                            <?php foreach ($notesuplier as $ns) : ?>
+                            <?php foreach ($notesuplier as $index => $ns) : ?>
+                                <?php if ($index === 0) : ?>
+                                    <?php continue; ?>
+                                <?php endif; ?>
                                 <tr>
                                     <td colspan="2" class="bg-orange"><?= nl2br($ns->isi_note); ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                            <?php if (count($notesuplier) == 0) : ?>
-                                <tr>
-                                    <td colspan="2" class="bg-orange">&nbsp;</td>
-                                </tr>
-                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

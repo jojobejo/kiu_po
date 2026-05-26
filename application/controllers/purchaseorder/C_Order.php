@@ -22,6 +22,108 @@ class C_Order extends CI_Controller
         return (int) $value === $this->bonusFlagValue ? 1 : 0;
     }
 
+    private function parseNumericInput($value)
+    {
+        $value = trim((string) $value);
+        $value = str_replace(' ', '', $value);
+
+        if (strpos($value, ',') !== false) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        } elseif (preg_match('/^\d{1,3}(\.\d{3})+$/', $value)) {
+            $value = str_replace('.', '', $value);
+        }
+
+        return (float) $value;
+    }
+
+    private function satuanPerluKonversi($satuan)
+    {
+        return in_array(strtolower(trim((string) $satuan)), array('box', 'ltr', 'kg'), true);
+    }
+
+    private function satuanPakaiKemasan($satuan)
+    {
+        return in_array(strtolower(trim((string) $satuan)), array('ltr', 'kg'), true);
+    }
+
+    private function hitungQtyHargaKecil($kodeBarang, $kodeSuplier, $satuan, $qty, $hargaSatuan)
+    {
+        $qty = $this->parseNumericInput($qty);
+        $hargaSatuan = $this->parseNumericInput($hargaSatuan);
+
+        if (!$this->satuanPerluKonversi($satuan)) {
+            return array(
+                'success' => true,
+                'qty_kecil' => $qty,
+                'harga_satuan_kecil' => $hargaSatuan,
+            );
+        }
+
+        $barang = $this->M_Purchase->getBarangByKode($kodeBarang, $kodeSuplier);
+
+        if ($this->satuanPakaiKemasan($satuan)) {
+            if (!$this->db->field_exists('isi', 'tb_barang')) {
+                return array(
+                    'success' => false,
+                    'message' => 'Data isi barang belum disetting',
+                );
+            }
+
+            if (!$this->db->field_exists('kemasan', 'tb_barang')) {
+                return array(
+                    'success' => false,
+                    'message' => 'Data kemasan barang belum disetting',
+                );
+            }
+
+            $isi = $barang && isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
+            $kemasan = $barang && isset($barang->kemasan) ? $this->parseNumericInput($barang->kemasan) : 0;
+
+            if ($isi <= 0) {
+                return array(
+                    'success' => false,
+                    'message' => 'Data isi barang belum disetting',
+                );
+            }
+
+            if ($kemasan <= 0) {
+                return array(
+                    'success' => false,
+                    'message' => 'Data kemasan barang belum disetting',
+                );
+            }
+
+            return array(
+                'success' => true,
+                'qty_kecil' => $isi * $qty,
+                'harga_satuan_kecil' => ($kemasan / 1000) * $hargaSatuan,
+            );
+        }
+
+        if (!$this->db->field_exists('isi', 'tb_barang')) {
+            return array(
+                'success' => false,
+                'message' => 'Data isi barang belum disetting',
+            );
+        }
+
+        $isi = $barang && isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
+
+        if ($isi <= 0) {
+            return array(
+                'success' => false,
+                'message' => 'Data isi barang belum disetting',
+            );
+        }
+
+        return array(
+            'success' => true,
+            'qty_kecil' => $isi * $qty,
+            'harga_satuan_kecil' => $hargaSatuan / $isi,
+        );
+    }
+
     public function index()
     {
 
@@ -209,23 +311,34 @@ class C_Order extends CI_Controller
 
     public function addChart()
     {
-        $suplier    = $this->input->post('kd_sup');
-        $kdbarang   = $this->input->post('kd_isi');
-        $nmbarang   = $this->input->post('nama_isi');
-        $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
+        $suplier    = $this->input->post('kd_sup', TRUE);
+        $kdbarang   = $this->input->post('kd_isi', TRUE);
+        $nmbarang   = $this->input->post('nama_isi', TRUE);
+        $satuan     = $this->input->post('satuan_isi', TRUE);
+        $qty        = $this->parseNumericInput($this->input->post('qty_isi', TRUE));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hargaQty   = $isBonus ? 0 : (float) $this->input->post('hrg_isi');
-        $bonusNote  = trim((string) $this->input->post('bonus_keterangan'));
+        $hargaQty   = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
+        $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
+        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
+
+        if (!$konversi['success']) {
+            $this->session->set_flashdata('error', $konversi['message']);
+            redirect('purchase/listBarang/' . $suplier);
+            return;
+        }
 
         $data = array(
             'kode_barang'   => $kdbarang,
+            'kd_user'       => $user,
             'nama_barang'   => $nmbarang,
             'kode_suplier'  => $suplier,
             'satuan'        => $satuan,
             'qty'           => $qty,
+            'qty_kecil'     => $konversi['qty_kecil'],
             'harga_satuan'  => $hargaQty,
+            'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'total_harga'   => $hargahasil,
             'is_bonus'      => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : '',
@@ -266,12 +379,12 @@ class C_Order extends CI_Controller
         $suplier    = $this->input->post('suplier');
         $nopo       = $this->input->post('nopo');
         $tgl        = $this->input->post('tgl');
-        $tmpo       = $this->input->post('tmpo');
+        $tmpo       = (int) $this->parseNumericInput($this->input->post('tmpo'));
         $gdg        = $this->input->post('gdg');
         $kdpo       = $this->input->post('kdpo');
-        $jml        = $this->input->post('jml');
-        $harga      = $this->input->post('harga');
-        $tax        = $this->input->post('tax');
+        $jml        = (int) $this->parseNumericInput($this->input->post('jml'));
+        $harga      = $this->parseNumericInput($this->input->post('harga'));
+        $tax        = $this->parseNumericInput($this->input->post('tax'));
         $nmuser     = $this->session->userdata('nama_user');
         $user       = $this->session->userdata('kode');
         $tmp        = $this->M_Purchase->get_tmp($suplier);
@@ -279,34 +392,44 @@ class C_Order extends CI_Controller
         $tmpnote    = $this->M_Purchase->getTmpNoteOrder($suplier);
         $detailTransaksi = array();
         $totalHargaDiskon = 0;
+        $hargaPajak = 0;
 
-        if ($tmp) {
-            foreach ($tmp as $chart) {
-                $isBonus = isset($chart->is_bonus) ? (int) $chart->is_bonus : 0;
-                $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanBarang($chart->nama_barang, $chart->qty, $tmpdiskon);
-                $hargaDiskon = $isBonus ? 0 : max($chart->harga_satuan - $diskonPerSatuan, 0);
-                $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $chart->qty);
-                $totalHargaDiskon += $hargaTotalDiskon;
-
-                $detailTransaksi[] = array(
-                    'no_po'             => $nopo,
-                    'kd_po'             => $kdpo,
-                    'tgl_transaksi'     => $tgl,
-                    'kd_barang'         => $chart->kode_barang,
-                    'nama_barang'       => $chart->nama_barang,
-                    'kd_suplier'        => $chart->kode_suplier,
-                    'satuan'            => $chart->satuan,
-                    'qty'               => $chart->qty,
-                    'hrg_satuan'        => $chart->harga_satuan,
-                    'hrg_diskon'        => $hargaDiskon,
-                    'hrg_total'         => $chart->total_harga,
-                    'hrg_total_diskon'  => $hargaTotalDiskon,
-                    'is_bonus'          => $isBonus,
-                    'keterangan_bonus'  => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : '',
-                );
-            }
+        if (!$tmp) {
+            echo json_encode(array('msg' => 'empty'));
+            return;
         }
 
+        foreach ($tmp as $chart) {
+            $isBonus = isset($chart->is_bonus) ? (int) $chart->is_bonus : 0;
+            $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanBarang($chart->nama_barang, $chart->qty, $tmpdiskon);
+            $hargaDiskon = $isBonus ? 0 : max($chart->harga_satuan - $diskonPerSatuan, 0);
+            $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $chart->qty);
+            $qtyKecil = isset($chart->qty_kecil) && (float) $chart->qty_kecil > 0 ? $chart->qty_kecil : $chart->qty;
+            $hargaSatuanKecil = isset($chart->harga_satuan_kecil) && ((float) $chart->harga_satuan_kecil > 0 || $isBonus) ? $chart->harga_satuan_kecil : $chart->harga_satuan;
+            $totalHargaDiskon += $hargaTotalDiskon;
+
+            $detailTransaksi[] = array(
+                'no_po'             => $nopo,
+                'kd_po'             => $kdpo,
+                'tgl_transaksi'     => $tgl,
+                'kd_barang'         => $chart->kode_barang,
+                'nama_barang'       => $chart->nama_barang,
+                'kd_suplier'        => $chart->kode_suplier,
+                'satuan'            => $chart->satuan,
+                'qty'               => $chart->qty,
+                'qty_kecil'         => $qtyKecil,
+                'hrg_satuan'        => $chart->harga_satuan,
+                'harga_satuan_kecil' => $hargaSatuanKecil,
+                'hrg_diskon'        => $hargaDiskon,
+                'hrg_total'         => $chart->total_harga,
+                'hrg_total_diskon'  => $hargaTotalDiskon,
+                'is_bonus'          => $isBonus,
+                'keterangan_bonus'  => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : '',
+                'kd_user'           => $user,
+            );
+        }
+
+        $hargaPajak = $totalHargaDiskon * ((float) $tax / 100);
 
         $rekamData = array(
             'kd_po'         => $kdpo,
@@ -319,8 +442,12 @@ class C_Order extends CI_Controller
             'tmpo_pembayaran' => $tmpo,
             'gdg_pengiriman'  => $gdg,
             'tax'           => $tax,
+            'hrg_pajak'     => $hargaPajak,
+            'acc_with'      => '',
+            'kd_printout_note' => '',
             'status'        => 'ON PROGRESS'
         );
+        $this->db->trans_start();
         $this->M_Purchase->inputOrder($rekamData);
         // UPDATE NOTE - REKAM BARU
         $updatenote = array(
@@ -329,38 +456,46 @@ class C_Order extends CI_Controller
             'kd_user' => $user,
             'nama_user' => $nmuser,
             'note_for' => '1',
-            'update_status' => '1'
+            'update_status' => '1',
+            'create_at' => date('Y-m-d H:i:s')
         );
         $this->M_Purchase->addNote($updatenote);
-        if ($tmp) {
-            foreach ($detailTransaksi as $listTransaksi) {
-                $this->M_Purchase->inputDetailPO($listTransaksi);
-            }
-            foreach ($tmpdiskon as $diskon) {
-                $listdiskon = array(
-                    'kd_po' => $kdpo,
-                    'kd_suplier' => $diskon->kd_suplier,
-                    'keterangan' => $diskon->nama_diskon,
-                    'nominal'    => $diskon->nominal
-                );
-                $this->M_Purchase->input_diskon($listdiskon);
-            }
-            foreach ($tmpnote as $note) {
-                $listnote = array(
-                    'kd_po' => $kdpo,
-                    'kd_suplier' => $note->kd_suplier,
-                    'isi_note'  => $note->isi_note
-                );
-                $this->M_Purchase->input_note($listnote);
-            }
-            $this->M_Purchase->delete_tmp_diskon($suplier);
-            $this->M_Purchase->delete_tmp_note_sp_i($suplier);
-            $this->M_Purchase->delete_tmp_tax($suplier);
-            $this->M_Purchase->hapusTmp($suplier);
-            $msg = "success";
-            $data = array('msg' => $msg, 'nopo' => $nopo);
-            echo json_encode($data);
+
+        foreach ($detailTransaksi as $listTransaksi) {
+            $this->M_Purchase->inputDetailPO($listTransaksi);
         }
+        foreach ($tmpdiskon as $diskon) {
+            $listdiskon = array(
+                'kd_po' => $kdpo,
+                'kd_suplier' => $diskon->kd_suplier,
+                'keterangan' => $diskon->nama_diskon,
+                'nominal'    => $diskon->nominal
+            );
+            $this->M_Purchase->input_diskon($listdiskon);
+        }
+        foreach ($tmpnote as $note) {
+            $listnote = array(
+                'kd_po' => $kdpo,
+                'kd_suplier' => $note->kd_suplier,
+                'isi_note'  => $note->isi_note,
+                'color_box' => ''
+            );
+            $this->M_Purchase->input_note($listnote);
+        }
+        $this->M_Purchase->delete_tmp_diskon($suplier);
+        $this->M_Purchase->delete_tmp_note_sp_i($suplier);
+        $this->M_Purchase->delete_tmp_tax($suplier);
+        $this->M_Purchase->hapusTmp($suplier);
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            echo json_encode(array('msg' => 'error'));
+            return;
+        }
+
+        $msg = "success";
+        $data = array('msg' => $msg, 'nopo' => $nopo);
+        echo json_encode($data);
     }
 
 
@@ -642,19 +777,29 @@ class C_Order extends CI_Controller
 
     public function edit_barang_tmp()
     {
-        $id         = $this->input->post('id_isi');
-        $supp       = $this->input->post('kd_sup_isi');
-        $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
+        $id         = $this->input->post('id_isi', TRUE);
+        $kdbarang   = $this->input->post('kd_isi', TRUE);
+        $supp       = $this->input->post('kd_sup_isi', TRUE);
+        $satuan     = $this->input->post('satuan_isi', TRUE);
+        $qty        = $this->parseNumericInput($this->input->post('qty_isi', TRUE));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hrg_satuan = $isBonus ? 0 : (float) $this->input->post('hrg_isi');
-        $bonusNote  = trim((string) $this->input->post('bonus_keterangan'));
+        $hrg_satuan = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
+        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $supp, $satuan, $qty, $hrg_satuan);
+
+        if (!$konversi['success']) {
+            $this->session->set_flashdata('error', $konversi['message']);
+            redirect('purchase/sup/' . $supp);
+            return;
+        }
 
         $dataedit = array(
             'satuan'    => $satuan,
             'qty'       => $qty,
+            'qty_kecil' => $konversi['qty_kecil'],
             'harga_satuan' => $hrg_satuan,
+            'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'total_harga' => $total,
             'is_bonus' => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : ''

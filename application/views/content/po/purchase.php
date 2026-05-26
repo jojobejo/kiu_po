@@ -1,6 +1,67 @@
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
+            <?php if ($this->session->flashdata('error')) : ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+            <style>
+                .po-table-wrap {
+                    overflow-x: auto;
+                }
+
+                .po-input-table {
+                    font-size: 14px;
+                    min-width: 1220px;
+                }
+
+                .po-input-table td {
+                    padding: .5rem .6rem;
+                    vertical-align: middle;
+                    white-space: nowrap;
+                }
+
+                .po-input-table thead td {
+                    font-weight: 600;
+                    text-align: center;
+                }
+
+                .po-input-table .col-item {
+                    max-width: 380px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .po-input-table .text-number {
+                    text-align: right;
+                }
+
+                .po-input-table tbody td:first-child,
+                .po-input-table tbody td:nth-child(3),
+                .po-input-table tbody td:last-child {
+                    text-align: center;
+                }
+
+                .po-input-table .action-cell {
+                    display: flex;
+                    gap: .25rem;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .po-input-table .btn-icon {
+                    align-items: center;
+                    display: inline-flex;
+                    height: 32px;
+                    justify-content: center;
+                    padding: 0;
+                    width: 32px;
+                }
+            </style>
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">
@@ -116,18 +177,20 @@
 
         <?php $this->load->view('content/po/modalpo') ?>
 
-        <table id="" class="table table-striped">
+        <div class="table-responsive po-table-wrap">
+        <table id="table_form_input_po" class="table table-sm table-striped po-input-table">
             <thead style="background-color: #212529; color:white;">
                 <tr>
                     <td>No</td>
                     <td>Nama Barang</td>
                     <td>Satuan</td>
                     <td>Qty</td>
+                    <td>Qty Kecil</td>
                     <td>Harga</td>
+                    <td>Harga Satuan Kecil</td>
                     <td>Harga Diskon</td>
                     <td>Total Harga</td>
                     <td>Total Harga Setelah Diskon</td>
-                    <td>Disc</td>
                     <td>#</td>
                 </tr>
             </thead>
@@ -152,12 +215,15 @@
                     }
 
                     $hargaDiskon = $isBonus ? 0 : max($t->harga_satuan - $diskonPerSatuan, 0);
+                    $qtyKecil = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? $t->qty_kecil : $t->qty;
+                    $qtyKecilDisplay = ceil((float) $qtyKecil);
+                    $hargaSatuanKecil = isset($t->harga_satuan_kecil) && ((float) $t->harga_satuan_kecil > 0 || $isBonus) ? $t->harga_satuan_kecil : $t->harga_satuan;
                     $totalSetelahDiskon = $hargaDiskon * $t->qty;
                     $totalHargaSetelahDiskon += $totalSetelahDiskon;
                 ?>
                     <tr>
                         <td><?= $no++; ?></td>
-                        <td>
+                        <td class="col-item" title="<?= htmlspecialchars($t->nama_barang, ENT_QUOTES, 'UTF-8') ?>">
                             <?= $t->nama_barang ?>
                             <?php if ($isBonus) : ?>
                                 <span class="badge badge-primary ml-1">BONUS</span>
@@ -167,30 +233,30 @@
                             <?php endif; ?>
                         </td>
                         <td><?= $t->satuan ?></td>
-                        <td><?= $t->qty ?></td>
-                        <td>Rp. <?= number_format($t->harga_satuan, 2) ?></td>
-                        <td>Rp. <?= number_format($hargaDiskon, 2) ?></td>
-                        <td>Rp. <?= number_format($t->total_harga, 2) ?></td>
-                        <td>Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
+                        <td class="text-number"><?= $t->qty ?></td>
+                        <td class="text-number"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
+                        <td class="text-number">Rp. <?= number_format($t->harga_satuan, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($hargaDiskon, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($t->total_harga, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
                         <td>
-                            <?php if (!$isBonus) : ?>
-                                <a class="btn btn-sm btn-info" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>" title="Tambah Diskon">
-                                    <i class="fas fa-percent"></i>
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                        <td><a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>">
+                            <div class="action-cell">
+                            <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">
                                 <i class="fa fa-solid fa-pencil-alt"></i>
                             </a>
-                            <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>">
+                            <a href="#" class="btn btn-danger btn-sm btn-icon" data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>" title="Hapus">
                                 <i class="fa fa-solid fa-trash-alt"></i>
                             </a>
                             <?php if (!$isBonus) : ?>
-                                <a class="btn btn-sm bg-lightblue" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>">
+                                <a class="btn btn-sm btn-info btn-icon" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>" title="Tambah Diskon">
+                                    <i class="fas fa-percent"></i>
+                                </a>
+                                <a class="btn btn-sm bg-lightblue btn-icon" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>" title="Diskon Barang">
                                     <i class="fas fa-tags"></i>
-                                    Diskon(%)Barang
                                 </a>
                             <?php endif; ?>
+                            </div>
                             <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>
                         </td>
                     </tr>
@@ -206,10 +272,11 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <?php foreach ($total as $tot) : ?>
                     <tr>
-                        <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
+                        <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
                         <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga, 2) ?>
                             <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
                             <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
@@ -217,15 +284,16 @@
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon</td>
+                    <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon</td>
                     <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($totalHargaSetelahDiskon, 2) ?></td>
                 </tr>
                 <tr>
-                    <td colspan="8" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
+                    <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
                     <td colspan="2" style="font-weight: bold;"> <?= $tax ?> (%)</td>
                 </tr>
             </tbody>
         </table>
+        </div>
         <table id="" class="table table-striped mt-2">
             <thead style="background-color: #212529; color:white;">
                 <tr>

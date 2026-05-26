@@ -585,6 +585,30 @@ class M_PoStatus extends CI_Model
         return $this->db->get()->result();
     }
 
+    function get_ponk_by_id($kd_po_nk)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk');
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->get()->row();
+    }
+
+    function cancel_pengajuan_ponk($kd_po_nk)
+    {
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->update('tb_po_nk', array(
+            'status' => 'PENGAJUAN DIBATALKAN'
+        ));
+    }
+
+    function update_tujuan_pembelian_ponk($kd_po_nk, $tujuan_pembelian)
+    {
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->update('tb_po_nk', array(
+            'tj_pembelian' => $tujuan_pembelian
+        ));
+    }
+
     function flupload($kdpo)
     {
         return $this->db->query("SELECT 

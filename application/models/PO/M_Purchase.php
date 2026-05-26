@@ -46,6 +46,14 @@ class M_Purchase extends CI_Model
         $query = $this->db->get();
         return $query;
     }
+    public function getBarangByKode($kodeBarang, $kodeSuplier)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_barang');
+        $this->db->where('kode_barang', $kodeBarang);
+        $this->db->where('kd_suplier', $kodeSuplier);
+        return $this->db->get()->row();
+    }
     public function gettaxposup($kd)
     {
         $this->db->select('COUNT(a.id_tmp_tax) as tot');

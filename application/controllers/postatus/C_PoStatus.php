@@ -23,6 +23,63 @@ class C_PoStatus extends CI_Controller
         return (int) $value === $this->bonusFlagValue ? 1 : 0;
     }
 
+    private function parseNumericInput($value)
+    {
+        $value = trim((string) $value);
+        $value = str_replace(' ', '', $value);
+
+        if (strpos($value, ',') !== false) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        } elseif (preg_match('/^\d{1,3}(\.\d{3})+$/', $value)) {
+            $value = str_replace('.', '', $value);
+        }
+
+        return (float) $value;
+    }
+
+    private function satuanPerluKonversi($satuan)
+    {
+        return in_array(strtolower(trim((string) $satuan)), array('box', 'ltr', 'kg'), true);
+    }
+
+    private function hitungQtyHargaKecil($kodeBarang, $kodeSuplier, $satuan, $qty, $hargaSatuan)
+    {
+        $qty = $this->parseNumericInput($qty);
+        $hargaSatuan = $this->parseNumericInput($hargaSatuan);
+
+        if (!$this->satuanPerluKonversi($satuan)) {
+            return array(
+                'success' => true,
+                'qty_kecil' => $qty,
+                'harga_satuan_kecil' => $hargaSatuan,
+            );
+        }
+
+        if (!$this->db->field_exists('isi', 'tb_barang')) {
+            return array(
+                'success' => false,
+                'message' => 'Data isi barang belum disetting',
+            );
+        }
+
+        $barang = $this->M_Purchase->getBarangByKode($kodeBarang, $kodeSuplier);
+        $isi = $barang && isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
+
+        if ($isi <= 0) {
+            return array(
+                'success' => false,
+                'message' => 'Data isi barang belum disetting',
+            );
+        }
+
+        return array(
+            'success' => true,
+            'qty_kecil' => $isi * $qty,
+            'harga_satuan_kecil' => $hargaSatuan / $isi,
+        );
+    }
+
     private function buildTrackingSnapshot($data)
     {
         if (empty($data)) {
@@ -766,17 +823,30 @@ class C_PoStatus extends CI_Controller
         $idpo       = $this->input->post('idpo');
         $kdpo       = $this->input->post('kdpo');
         $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
+        $qty        = $this->parseNumericInput($this->input->post('qty_isi'));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hargaQty   = $isBonus ? 0 : (float) $this->input->post('hrg_isi');
+        $hargaQty   = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi'));
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan'));
         $hargahasil = $hargaQty * $qty;
         $oldItem    = $this->M_Postatus->getDetailItemById($idpo);
+        $konversi   = $oldItem ? $this->hitungQtyHargaKecil($oldItem->kd_barang, $oldItem->kd_suplier, $satuan, $qty, $hargaQty) : array(
+            'success' => true,
+            'qty_kecil' => $qty,
+            'harga_satuan_kecil' => $hargaQty,
+        );
+
+        if (!$konversi['success']) {
+            $this->session->set_flashdata('error', $konversi['message']);
+            redirect('detailPO/' . $kdpo);
+            return;
+        }
 
         $data = array(
             'satuan'        => $satuan,
             'qty'           => $qty,
+            'qty_kecil'     => $konversi['qty_kecil'],
             'hrg_satuan'    => $hargaQty,
+            'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'hrg_diskon'    => $hargaQty,
             'hrg_total'     => $hargahasil,
             'hrg_total_diskon' => $hargahasil,
@@ -792,14 +862,18 @@ class C_PoStatus extends CI_Controller
             $oldItem ? array(
                 'satuan' => $oldItem->satuan,
                 'qty' => $oldItem->qty,
+                'qty_kecil' => isset($oldItem->qty_kecil) ? $oldItem->qty_kecil : $oldItem->qty,
                 'hrg_satuan' => $oldItem->hrg_satuan,
+                'harga_satuan_kecil' => isset($oldItem->harga_satuan_kecil) ? $oldItem->harga_satuan_kecil : $oldItem->hrg_satuan,
                 'is_bonus' => isset($oldItem->is_bonus) ? $oldItem->is_bonus : 0,
                 'keterangan_bonus' => isset($oldItem->keterangan_bonus) ? $oldItem->keterangan_bonus : null,
             ) : null,
             array(
                 'satuan' => $satuan,
                 'qty' => $qty,
+                'qty_kecil' => $konversi['qty_kecil'],
                 'hrg_satuan' => $hargaQty,
+                'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
                 'is_bonus' => $isBonus,
                 'keterangan_bonus' => $isBonus ? $bonusNote : null,
             )
@@ -834,11 +908,18 @@ class C_PoStatus extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
+        $qty        = $this->parseNumericInput($this->input->post('qty_isi'));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hargaQty   = $isBonus ? 0 : (float) $this->input->post('hrg_isi');
+        $hargaQty   = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi'));
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan'));
         $hargahasil = $hargaQty * $qty;
+        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
+
+        if (!$konversi['success']) {
+            $this->session->set_flashdata('error', $konversi['message']);
+            redirect('addBarangRevisi/' . $suplier . '/' . $kdpo);
+            return;
+        }
 
         $data = array(
             'kd_po'         => $kdpo,
@@ -849,7 +930,9 @@ class C_PoStatus extends CI_Controller
             'nama_barang'   => $nmbarang,
             'satuan'        => $satuan,
             'qty'           => $qty,
+            'qty_kecil'     => $konversi['qty_kecil'],
             'hrg_satuan'    => $hargaQty,
+            'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'hrg_diskon'    => $hargaQty,
             'hrg_total'     => $hargahasil,
             'hrg_total_diskon' => $hargahasil,
@@ -1291,6 +1374,7 @@ class C_PoStatus extends CI_Controller
     public function detailponk($kd)
     {
         $data['title'] = 'PO Status';
+        $data['kd'] = $kd;
         $data['detail'] = $this->M_Postatus->getDetailnk($kd);
         $data['status'] = $this->M_Postatus->getdataStatusnk($kd);
         $data['log']    = $this->M_Postatus->getNoted($kd);
@@ -1309,6 +1393,114 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailponk', $data);
         $this->load->view('partial/footer');
+    }
+
+    private function blockedPonkEditStatuses()
+    {
+        return array(
+            'ACC-KADEP',
+            'SEDANG DIAJUKAN',
+            'ON PROGRESS - KADEP',
+            'ACC DIREKTUR',
+            'PROSES PEMBELIAN',
+            'PENGAJUAN DIBATALKAN'
+        );
+    }
+
+    private function canUpdatePonkPengajuan($status)
+    {
+        return !in_array($status, $this->blockedPonkEditStatuses(), true);
+    }
+
+    private function responseJson($status, $message)
+    {
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'status' => $status,
+                'message' => $message
+            )));
+    }
+
+    private function validatePonkForAjax($kd_po_nk)
+    {
+        $kodeUser = $this->session->userdata('kode');
+
+        if (empty($kodeUser)) {
+            return array(false, null, 'Session login tidak valid');
+        }
+
+        if (empty($kd_po_nk)) {
+            return array(false, null, 'Kode PO NK tidak boleh kosong');
+        }
+
+        $ponk = $this->M_Postatus->get_ponk_by_id($kd_po_nk);
+        if (empty($ponk)) {
+            return array(false, null, 'Data PO NK tidak ditemukan');
+        }
+
+        if (!$this->canUpdatePonkPengajuan($ponk->status)) {
+            return array(false, $ponk, 'Status pengajuan tidak dapat diproses');
+        }
+
+        return array(true, $ponk, '');
+    }
+
+    public function cancel_pengajuan_ponk()
+    {
+        $kd_po_nk = $this->input->post('kd_po_nk', true);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_nk);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_nk);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'PO CANCEL - PENGAJUAN DIBATALKAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+
+    public function update_tujuan_pembelian_ponk()
+    {
+        $kd_po_nk = $this->input->post('kd_po_nk', true);
+        $tujuan_pembelian = trim((string) $this->input->post('tujuan_pembelian', true));
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_nk);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        if ($tujuan_pembelian === '') {
+            return $this->responseJson(false, 'Tujuan pembelian tidak boleh kosong');
+        }
+
+        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_nk, $tujuan_pembelian);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'EDIT DATA TUJUAN PEMBELIAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
     }
 
     public function edited_fk_nk()
