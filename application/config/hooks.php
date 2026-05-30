@@ -18,3 +18,10 @@ $hook['post_controller_constructor'][] = array(
 	'filename' => 'AppTimezone.php',
 	'filepath' => 'hooks'
 );
+
+$hook['post_controller_constructor'][] = array(
+	'class'    => 'AuthGuard',
+	'function' => 'checkLogin',
+	'filename' => 'AuthGuard.php',
+	'filepath' => 'hooks'
+);

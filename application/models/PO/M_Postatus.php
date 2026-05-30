@@ -342,7 +342,18 @@ class M_PoStatus extends CI_Model
     }
     function updateLog($data)
     {
-        $this->db->insert('tb_tracking_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_tracking_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        if (empty($filteredData)) {
+            return false;
+        }
+
+        return $this->db->insert('tb_tracking_po', $filteredData);
     }
     function getDetailItemById($id)
     {

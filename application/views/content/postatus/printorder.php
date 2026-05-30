@@ -100,16 +100,14 @@
                     <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
-                                <td colspan="8" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
+                                <td colspan="6" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td style="width: 10%;">Qty Kecil</td>
                                 <td>Harga Satuan</td>
-                                <td>Harga Satuan Kecil</td>
                                 <td style="width: <?= $a ?>%;">Total Harga</td>
                             </tr>
                         </thead>
@@ -119,7 +117,7 @@
                             $listDiskonPrint = array();
                             foreach ($diskon as $diskonItem) {
                                 $listDiskonPrint[] = array(
-                                    'keterangan' => $diskonItem->keterangan,
+                                    'keterangan' => preg_replace('/\s*\[ROW_DET:\d+\]/', '', $diskonItem->keterangan),
                                     'nominal' => $diskonItem->nominal,
                                 );
                             }
@@ -137,25 +135,20 @@
                                 if ($isBonus) {
                                     continue;
                                 }
-                                $qtyKecil = isset($d->qty_kecil) && (float) $d->qty_kecil > 0 ? $d->qty_kecil : $d->qty;
-                                $qtyKecilDisplay = ceil((float) $qtyKecil);
-                                $hargaSatuanKecil = isset($d->harga_satuan_kecil) && (float) $d->harga_satuan_kecil > 0 ? $d->harga_satuan_kecil : $d->hrg_satuan;
                                 ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
                                     <td><?= $d->nama_barang ?></td>
                                     <td style="text-align: center;"><?= $d->satuan ?></td>
                                     <td style="text-align: center;"><?= $d->qty ?></td>
-                                    <td style="text-align: center;"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
                                     <td style="text-align: end;">&nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
-                                    <td style="text-align: end;">&nbsp;Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
                                     <td style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php
                             foreach ($total as $t) : ?>
                                 <tr>
-                                    <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                    <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
                                     <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -178,12 +171,12 @@
                     <table class="table-bordered text-s listdb" style="width: 100%;">
                         <thead>
                             <tr>
-                                <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
+                                <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
                             <?php foreach ($listDiskonPrint as $d) : ?>
                                 <?php if (!empty($d['keterangan'])) : ?>
                                     <tr>
-                                        <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
+                                        <td colspan="5" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
                                         <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d['nominal'], 2) ?></td>
                                     </tr>
                                 <?php endif; ?>
@@ -196,19 +189,19 @@
                                     $hargaPajak = $stlhDiskon * $tax;
                                     $hargaAll = $stlhDiskon + $hargaPajak; ?>
                                     <tr>
-                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
+                                        <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
+                                        <td colspan="5" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon, 2) ?> </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="7" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
+                                        <td colspan="5" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak, 2) ?> </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
+                                        <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll, 2) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>

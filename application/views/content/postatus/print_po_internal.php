@@ -67,7 +67,7 @@
                             $listDiskonPrint = array();
                             foreach ($diskon as $diskonItem) {
                                 $listDiskonPrint[] = array(
-                                    'keterangan' => $diskonItem->keterangan,
+                                    'keterangan' => preg_replace('/\s*\[ROW_DET:\d+\]/', '', $diskonItem->keterangan),
                                     'nominal' => $diskonItem->nominal,
                                 );
                             }
@@ -143,27 +143,27 @@
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end;font-weight: bold;">Total Harga Tanpa Diskon :</td>
-                                <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_tanpa_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_tanpa_diskon'], 2) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end;font-weight: bold;">Total Harga Dengan Diskon :</td>
-                                <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_dengan_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($printSummary['total_harga_dengan_diskon'], 2) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end;font-weight: bold;">Tax Tanpa Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_tanpa_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_tanpa_diskon'], 2) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end;font-weight: bold;">Tax Dengan Diskon : <?= $printSummary['tax_persen'] ?>(%)</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_dengan_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['tax_dengan_diskon'], 2) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga Tanpa Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_tanpa_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_tanpa_diskon'], 2) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga Dengan Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_dengan_diskon']) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($printSummary['grand_total_dengan_diskon'], 2) ?></td>
                             </tr>
                         </tbody>
                     </table>

@@ -93,23 +93,44 @@ class C_PoStatus extends CI_Controller
     {
         $namaUser = (string) $this->session->userdata('nama_user');
         $kodeUser = (string) $this->session->userdata('kode');
+        $hasUserLogColumn = $this->db->field_exists('user_log', 'tb_tracking_po');
+        $hasKodeUserColumn = $this->db->field_exists('kode_user', 'tb_tracking_po');
+        $hasDataLamaColumn = $this->db->field_exists('data_lama', 'tb_tracking_po');
+        $hasDataBaruColumn = $this->db->field_exists('data_baru', 'tb_tracking_po');
+        $oldSnapshot = $oldData !== null ? $this->buildTrackingSnapshot($oldData) : null;
+        $newSnapshot = $newData !== null ? $this->buildTrackingSnapshot($newData) : null;
+
+        if (!$hasUserLogColumn || !$hasKodeUserColumn) {
+            $sessionUser = trim($kodeUser . ' - ' . $namaUser, ' -');
+            if ($sessionUser !== '') {
+                $activity = $activity . ' | User: ' . $sessionUser;
+            }
+        }
+
+        if (!$hasDataLamaColumn && $oldSnapshot !== null) {
+            $activity = $activity . ' | Data Lama: ' . $oldSnapshot;
+        }
+
+        if (!$hasDataBaruColumn && $newSnapshot !== null) {
+            $activity = $activity . ' | Data Baru: ' . $newSnapshot;
+        }
 
         $logData = array(
             'kd_po' => $kdpo,
             'status' => $activity,
         );
 
-        if ($namaUser !== '') {
+        if ($hasUserLogColumn && $namaUser !== '') {
             $logData['user_log'] = $namaUser;
         }
-        if ($kodeUser !== '') {
+        if ($hasKodeUserColumn && $kodeUser !== '') {
             $logData['kode_user'] = $kodeUser;
         }
-        if ($oldData !== null) {
-            $logData['data_lama'] = $this->buildTrackingSnapshot($oldData);
+        if ($hasDataLamaColumn && $oldSnapshot !== null) {
+            $logData['data_lama'] = $oldSnapshot;
         }
-        if ($newData !== null) {
-            $logData['data_baru'] = $this->buildTrackingSnapshot($newData);
+        if ($hasDataBaruColumn && $newSnapshot !== null) {
+            $logData['data_baru'] = $newSnapshot;
         }
 
         $this->M_Postatus->updateLog($logData);
@@ -1055,22 +1076,49 @@ class C_PoStatus extends CI_Controller
         redirect('detailPO/' . $kdpo);
     }
 
-    private function diskonPerSatuanDetailPO($namaBarang, $qty, $diskonList)
+    private function getPersentaseDiskon($text)
+    {
+        if (preg_match('/\(([0-9.,]+)%\)/', (string) $text, $match)) {
+            return $this->parseNumericInput($match[1]);
+        }
+
+        return null;
+    }
+
+    private function getDiskonRowMarker($text, $type)
+    {
+        if (preg_match('/\[ROW_' . preg_quote($type, '/') . ':(\d+)\]/', (string) $text, $match)) {
+            return (int) $match[1];
+        }
+
+        return null;
+    }
+
+    private function diskonPerSatuanDetailPO($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idDetPo = null)
     {
         $diskonPerSatuan = 0;
 
         foreach ($diskonList as $diskon) {
+            $diskonRowDet = $this->getDiskonRowMarker($diskon->keterangan, 'DET');
+            if ($diskonRowDet !== null && $idDetPo !== null && $diskonRowDet !== (int) $idDetPo) {
+                continue;
+            }
+
             $prefixDiskonNominal = $namaBarang . ' - ';
             $prefixDiskonPersen = 'Diskon Barang - ' . $namaBarang . ' ';
             $prefixDiskonPersenDetail = 'Diskon Barang-' . $namaBarang . '(';
 
             if (strpos($diskon->keterangan, $prefixDiskonNominal) === 0) {
                 $diskonPerSatuan += $diskon->nominal;
-            } elseif ((strpos($diskon->keterangan, $prefixDiskonPersen) === 0 || strpos($diskon->keterangan, $prefixDiskonPersenDetail) === 0) && $qty > 0) {
-                $diskonPerSatuan += $diskon->nominal / $qty;
+            } elseif (strpos($diskon->keterangan, $prefixDiskonPersen) === 0 || strpos($diskon->keterangan, $prefixDiskonPersenDetail) === 0) {
+                $persenDiskon = $this->getPersentaseDiskon($diskon->keterangan);
+                if ($persenDiskon !== null) {
+                    $diskonPerSatuan += ($hargaSatuanKecil * $persenDiskon) / 100;
+                } elseif ($qty > 0) {
+                    $diskonPerSatuan += $diskon->nominal / $qty;
+                }
             }
         }
-
         return $diskonPerSatuan;
     }
 
@@ -1082,9 +1130,11 @@ class C_PoStatus extends CI_Controller
 
         foreach ($detail as $item) {
             $isBonus = isset($item->is_bonus) ? (int) $item->is_bonus : 0;
-            $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanDetailPO($item->nama_barang, $item->qty, $diskon);
-            $hargaDiskon = $isBonus ? 0 : max($item->hrg_satuan - $diskonPerSatuan, 0);
-            $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $item->qty);
+            $qtyKecil = isset($item->qty_kecil) && (float) $item->qty_kecil > 0 ? $item->qty_kecil : $item->qty;
+            $hargaSatuanKecil = isset($item->harga_satuan_kecil) && ((float) $item->harga_satuan_kecil > 0 || $isBonus) ? $item->harga_satuan_kecil : $item->hrg_satuan;
+            $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanDetailPO($item->nama_barang, $item->qty, $diskon, $hargaSatuanKecil, $item->id_det_po);
+            $hargaDiskon = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
+            $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
             $totalHargaDiskon += $hargaTotalDiskon;
 
             $this->M_Postatus->updateDetailPO($item->id_det_po, array(
@@ -1101,7 +1151,11 @@ class C_PoStatus extends CI_Controller
         $iddiskon  = $this->input->post('id_diskon');
         $kdpo = $this->input->post('kdpo');
         $keterangan = $this->input->post('keterangan_isi');
+        $rowMarker = trim((string) $this->input->post('row_marker'));
         $nominal = $this->input->post('nominal_isi');
+        if ($rowMarker !== '' && strpos($keterangan, $rowMarker) === false) {
+            $keterangan .= ' ' . $rowMarker;
+        }
 
         $editDiskon = array(
             'keterangan'    => $keterangan,
@@ -1884,15 +1938,16 @@ class C_PoStatus extends CI_Controller
         $kdsup       = $this->input->post('kdsup');
         $kdpo       = $this->input->post('kdpo');
         $nmbarang       = $this->input->post('nmbarang');
-        $tax        = $this->input->post('disc_isi');
-        $hargaA     = $this->input->post('tot_harga');
+        $idDetPo    = (int) $this->input->post('id_det_po');
+        $tax        = $this->parseNumericInput($this->input->post('disc_isi'));
+        $hargaA     = $this->parseNumericInput($this->input->post('hrg_satuan_kecil'));
         $hasiltax   = $tax / 100;
         $nominalTax = $hargaA * $hasiltax;
 
         $tambahDiskon = array(
             'kd_po' => $kdpo,
             'kd_suplier' => $kdsup,
-            'keterangan' => 'Diskon Barang' . '-' . $nmbarang . '(' . $tax . '%' . ')',
+            'keterangan' => 'Diskon Barang' . '-' . $nmbarang . '(' . $tax . '%' . ') [ROW_DET:' . $idDetPo . ']',
             'nominal' => $nominalTax
         );
 
@@ -1908,13 +1963,14 @@ class C_PoStatus extends CI_Controller
         $kdsup      = $this->input->post('kdsup');
         $kdpo       = $this->input->post('kdpo');
         $nmbarang   = $this->input->post('nmbarang');
+        $idDetPo    = (int) $this->input->post('id_det_po');
         $desc       = $this->input->post('desc_isi');
         $nominal    = $this->input->post('disc_isi');
 
         $tambahDiskon = array(
             'kd_po' => $kdpo,
             'kd_suplier' => $kdsup,
-            'keterangan' => $nmbarang . ' ' . '-' . ' ' . $desc,
+            'keterangan' => $nmbarang . ' ' . '-' . ' ' . $desc . ' [ROW_DET:' . $idDetPo . ']',
             'nominal' => $nominal
         );
 

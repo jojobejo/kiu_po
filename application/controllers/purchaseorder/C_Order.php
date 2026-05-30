@@ -47,81 +47,127 @@ class C_Order extends CI_Controller
         return in_array(strtolower(trim((string) $satuan)), array('ltr', 'kg'), true);
     }
 
-    private function hitungQtyHargaKecil($kodeBarang, $kodeSuplier, $satuan, $qty, $hargaSatuan)
+    private function isSatuanKosong($satuan)
     {
+        $satuan = strtolower(trim((string) $satuan));
+
+        return $satuan === '' || $satuan === '-';
+    }
+
+    private function validationError($message)
+    {
+        return array(
+            'status' => false,
+            'success' => false,
+            'message' => $message,
+        );
+    }
+
+    private function redirectWithError($message, $url)
+    {
+        $this->session->set_flashdata('error', $message);
+        redirect($url);
+    }
+
+    private function tableColumnsAvailable($table, $columns)
+    {
+        foreach ($columns as $column) {
+            if (!$this->db->field_exists($column, $table)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan)
+    {
+        $satuan = strtolower(trim((string) $satuan));
         $qty = $this->parseNumericInput($qty);
-        $hargaSatuan = $this->parseNumericInput($hargaSatuan);
+        $harga_satuan = $this->parseNumericInput($harga_satuan);
+        $isi = $this->parseNumericInput($isi);
+        $kemasan = $this->parseNumericInput($kemasan);
 
-        if (!$this->satuanPerluKonversi($satuan)) {
-            return array(
-                'success' => true,
-                'qty_kecil' => $qty,
-                'harga_satuan_kecil' => $hargaSatuan,
-            );
-        }
+        $qty_kecil = 0;
+        $harga_satuan_kecil = 0;
 
-        $barang = $this->M_Purchase->getBarangByKode($kodeBarang, $kodeSuplier);
-
-        if ($this->satuanPakaiKemasan($satuan)) {
-            if (!$this->db->field_exists('isi', 'tb_barang')) {
-                return array(
-                    'success' => false,
-                    'message' => 'Data isi barang belum disetting',
-                );
-            }
-
-            if (!$this->db->field_exists('kemasan', 'tb_barang')) {
-                return array(
-                    'success' => false,
-                    'message' => 'Data kemasan barang belum disetting',
-                );
-            }
-
-            $isi = $barang && isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
-            $kemasan = $barang && isset($barang->kemasan) ? $this->parseNumericInput($barang->kemasan) : 0;
-
+        if ($satuan == 'box') {
             if ($isi <= 0) {
-                return array(
-                    'success' => false,
-                    'message' => 'Data isi barang belum disetting',
-                );
+                return $this->validationError('Data isi barang tidak valid');
             }
 
+            $qty_kecil = $qty * $isi;
+            $harga_satuan_kecil = $harga_satuan / $isi;
+        } elseif ($satuan == 'ltr' || $satuan == 'kg') {
             if ($kemasan <= 0) {
-                return array(
-                    'success' => false,
-                    'message' => 'Data kemasan barang belum disetting',
-                );
+                return $this->validationError('Data kemasan barang tidak valid');
             }
 
-            return array(
-                'success' => true,
-                'qty_kecil' => $isi * $qty,
-                'harga_satuan_kecil' => ($kemasan / 1000) * $hargaSatuan,
-            );
-        }
+            $konversi_kemasan = $kemasan / 1000;
 
-        if (!$this->db->field_exists('isi', 'tb_barang')) {
-            return array(
-                'success' => false,
-                'message' => 'Data isi barang belum disetting',
-            );
-        }
+            if ($konversi_kemasan <= 0) {
+                return $this->validationError('Data kemasan barang tidak valid');
+            }
 
-        $isi = $barang && isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
-
-        if ($isi <= 0) {
-            return array(
-                'success' => false,
-                'message' => 'Data isi barang belum disetting',
-            );
+            $qty_kecil = $qty / $konversi_kemasan;
+            $harga_satuan_kecil = $konversi_kemasan * $harga_satuan;
+        } else {
+            $qty_kecil = $qty;
+            $harga_satuan_kecil = $harga_satuan;
         }
 
         return array(
+            'status' => true,
             'success' => true,
-            'qty_kecil' => $isi * $qty,
-            'harga_satuan_kecil' => $hargaSatuan / $isi,
+            'qty_kecil' => $qty_kecil,
+            'harga_satuan_kecil' => $harga_satuan_kecil,
         );
+    }
+
+    private function prepareKonversiBarang($kodeBarang, $satuan, $qty, $hargaSatuan, $isBonus = 0)
+    {
+        $kodeBarang = trim((string) $kodeBarang);
+        $qty = $this->parseNumericInput($qty);
+        $hargaSatuan = $this->parseNumericInput($hargaSatuan);
+
+        if ($kodeBarang === '') {
+            return $this->validationError('Kode barang wajib diisi');
+        }
+
+        if ($this->isSatuanKosong($satuan)) {
+            return $this->validationError('Satuan wajib diisi');
+        }
+
+        if ($qty <= 0) {
+            return $this->validationError('Qty harus lebih besar dari 0');
+        }
+
+        if (!$isBonus && $hargaSatuan <= 0) {
+            return $this->validationError('Harga satuan harus lebih besar dari 0');
+        }
+
+        if (!$this->db->field_exists('isi', 'tb_barang') || !$this->db->field_exists('kemasan', 'tb_barang')) {
+            return $this->validationError('Kolom isi dan kemasan pada master barang belum tersedia');
+        }
+
+        $barang = $this->M_Purchase->get_barang_by_kode($kodeBarang);
+
+        if (!$barang) {
+            return $this->validationError('Data barang tidak ditemukan');
+        }
+
+        $isi = isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
+        $kemasan = isset($barang->kemasan) ? $this->parseNumericInput($barang->kemasan) : 0;
+        $konversi = $this->hitung_qty_harga_kecil($satuan, $qty, $hargaSatuan, $isi, $kemasan);
+
+        if (!$konversi['status']) {
+            return $konversi;
+        }
+
+        $konversi['isi'] = $isi;
+        $konversi['kemasan'] = $kemasan;
+
+        return $konversi;
     }
 
     public function index()
@@ -321,11 +367,15 @@ class C_Order extends CI_Controller
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
-        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus);
 
-        if (!$konversi['success']) {
-            $this->session->set_flashdata('error', $konversi['message']);
-            redirect('purchase/listBarang/' . $suplier);
+        if (!$konversi['status']) {
+            $this->redirectWithError($konversi['message'], 'purchase/listBarang/' . $suplier);
+            return;
+        }
+
+        if (!$this->tableColumnsAvailable('tb_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
+            $this->redirectWithError('Kolom konversi pada tb_tmp_item belum tersedia', 'purchase/listBarang/' . $suplier);
             return;
         }
 
@@ -336,6 +386,8 @@ class C_Order extends CI_Controller
             'kode_suplier'  => $suplier,
             'satuan'        => $satuan,
             'qty'           => $qty,
+            'isi'           => $konversi['isi'],
+            'kemasan'       => $konversi['kemasan'],
             'qty_kecil'     => $konversi['qty_kecil'],
             'harga_satuan'  => $hargaQty,
             'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
@@ -344,7 +396,14 @@ class C_Order extends CI_Controller
             'keterangan_bonus' => $isBonus ? $bonusNote : '',
         );
 
+        $this->db->trans_start();
         $this->M_Purchase->addChart($data);
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->redirectWithError('Barang gagal disimpan', 'purchase/listBarang/' . $suplier);
+            return;
+        }
 
         redirect('purchase/sup/' . $suplier);
     }
@@ -355,18 +414,46 @@ class C_Order extends CI_Controller
         redirect('purchase/sup/' . $kdsuplier);
     }
 
-    private function diskonPerSatuanBarang($namaBarang, $qty, $diskonList)
+    private function getPersentaseDiskon($text)
+    {
+        if (preg_match('/\(([0-9.,]+)%\)/', (string) $text, $match)) {
+            return $this->parseNumericInput($match[1]);
+        }
+
+        return null;
+    }
+
+    private function getDiskonRowMarker($text, $type)
+    {
+        if (preg_match('/\[ROW_' . preg_quote($type, '/') . ':(\d+)\]/', (string) $text, $match)) {
+            return (int) $match[1];
+        }
+
+        return null;
+    }
+
+    private function diskonPerSatuanBarang($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idTmp = null)
     {
         $diskonPerSatuan = 0;
 
         foreach ($diskonList as $diskon) {
+            $diskonRowTmp = $this->getDiskonRowMarker($diskon->nama_diskon, 'TMP');
+            if ($diskonRowTmp !== null && $idTmp !== null && $diskonRowTmp !== (int) $idTmp) {
+                continue;
+            }
+
             $prefixDiskonNominal = $namaBarang . ' - ';
             $prefixDiskonPersen = 'Diskon Barang - ' . $namaBarang . ' ';
 
             if (strpos($diskon->nama_diskon, $prefixDiskonNominal) === 0) {
                 $diskonPerSatuan += $diskon->nominal;
-            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0 && $qty > 0) {
-                $diskonPerSatuan += $diskon->nominal / $qty;
+            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0) {
+                $persenDiskon = $this->getPersentaseDiskon($diskon->nama_diskon);
+                if ($persenDiskon !== null) {
+                    $diskonPerSatuan += ($hargaSatuanKecil * $persenDiskon) / 100;
+                } elseif ($qty > 0) {
+                    $diskonPerSatuan += $diskon->nominal / $qty;
+                }
             }
         }
 
@@ -399,13 +486,21 @@ class C_Order extends CI_Controller
             return;
         }
 
+        if (!$this->tableColumnsAvailable('tb_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
+            echo json_encode(array(
+                'msg' => 'error',
+                'message' => 'Kolom konversi pada tb_detail_po belum tersedia'
+            ));
+            return;
+        }
+
         foreach ($tmp as $chart) {
             $isBonus = isset($chart->is_bonus) ? (int) $chart->is_bonus : 0;
-            $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanBarang($chart->nama_barang, $chart->qty, $tmpdiskon);
-            $hargaDiskon = $isBonus ? 0 : max($chart->harga_satuan - $diskonPerSatuan, 0);
-            $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $chart->qty);
             $qtyKecil = isset($chart->qty_kecil) && (float) $chart->qty_kecil > 0 ? $chart->qty_kecil : $chart->qty;
             $hargaSatuanKecil = isset($chart->harga_satuan_kecil) && ((float) $chart->harga_satuan_kecil > 0 || $isBonus) ? $chart->harga_satuan_kecil : $chart->harga_satuan;
+            $diskonPerSatuan = $isBonus ? 0 : $this->diskonPerSatuanBarang($chart->nama_barang, $chart->qty, $tmpdiskon, $hargaSatuanKecil, $chart->id_tmp);
+            $hargaDiskon = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
+            $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
             $totalHargaDiskon += $hargaTotalDiskon;
 
             $detailTransaksi[] = array(
@@ -417,6 +512,8 @@ class C_Order extends CI_Controller
                 'kd_suplier'        => $chart->kode_suplier,
                 'satuan'            => $chart->satuan,
                 'qty'               => $chart->qty,
+                'isi'               => isset($chart->isi) ? $chart->isi : 0,
+                'kemasan'           => isset($chart->kemasan) ? $chart->kemasan : 0,
                 'qty_kecil'         => $qtyKecil,
                 'hrg_satuan'        => $chart->harga_satuan,
                 'harga_satuan_kecil' => $hargaSatuanKecil,
@@ -426,6 +523,7 @@ class C_Order extends CI_Controller
                 'is_bonus'          => $isBonus,
                 'keterangan_bonus'  => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : '',
                 'kd_user'           => $user,
+                '_id_tmp_source'    => $chart->id_tmp,
             );
         }
 
@@ -461,14 +559,25 @@ class C_Order extends CI_Controller
         );
         $this->M_Purchase->addNote($updatenote);
 
+        $tmpToDetailId = array();
         foreach ($detailTransaksi as $listTransaksi) {
-            $this->M_Purchase->inputDetailPO($listTransaksi);
+            $idTmpSource = isset($listTransaksi['_id_tmp_source']) ? $listTransaksi['_id_tmp_source'] : null;
+            unset($listTransaksi['_id_tmp_source']);
+            $idDetPo = $this->M_Purchase->inputDetailPO($listTransaksi);
+            if ($idTmpSource !== null) {
+                $tmpToDetailId[(int) $idTmpSource] = $idDetPo;
+            }
         }
         foreach ($tmpdiskon as $diskon) {
+            $keteranganDiskon = $diskon->nama_diskon;
+            $diskonRowTmp = $this->getDiskonRowMarker($keteranganDiskon, 'TMP');
+            if ($diskonRowTmp !== null && isset($tmpToDetailId[$diskonRowTmp])) {
+                $keteranganDiskon = preg_replace('/\[ROW_TMP:' . $diskonRowTmp . '\]/', '[ROW_DET:' . $tmpToDetailId[$diskonRowTmp] . ']', $keteranganDiskon);
+            }
             $listdiskon = array(
                 'kd_po' => $kdpo,
                 'kd_suplier' => $diskon->kd_suplier,
-                'keterangan' => $diskon->nama_diskon,
+                'keterangan' => $keteranganDiskon,
                 'nominal'    => $diskon->nominal
             );
             $this->M_Purchase->input_diskon($listdiskon);
@@ -786,17 +895,23 @@ class C_Order extends CI_Controller
         $hrg_satuan = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
-        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $supp, $satuan, $qty, $hrg_satuan);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus);
 
-        if (!$konversi['success']) {
-            $this->session->set_flashdata('error', $konversi['message']);
-            redirect('purchase/sup/' . $supp);
+        if (!$konversi['status']) {
+            $this->redirectWithError($konversi['message'], 'purchase/sup/' . $supp);
+            return;
+        }
+
+        if (!$this->tableColumnsAvailable('tb_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
+            $this->redirectWithError('Kolom konversi pada tb_tmp_item belum tersedia', 'purchase/sup/' . $supp);
             return;
         }
 
         $dataedit = array(
             'satuan'    => $satuan,
             'qty'       => $qty,
+            'isi'       => $konversi['isi'],
+            'kemasan'   => $konversi['kemasan'],
             'qty_kecil' => $konversi['qty_kecil'],
             'harga_satuan' => $hrg_satuan,
             'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
@@ -804,7 +919,15 @@ class C_Order extends CI_Controller
             'is_bonus' => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : ''
         );
+        $this->db->trans_start();
         $this->M_Purchase->edit_chart_tmp($id, $dataedit);
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->redirectWithError('Barang gagal diupdate', 'purchase/sup/' . $supp);
+            return;
+        }
+
         redirect('purchase/sup/' . $supp);
     }
 
@@ -874,7 +997,11 @@ class C_Order extends CI_Controller
         $id         = $this->input->post('id_isi');
         $supp       = $this->input->post('kd_sup');
         $deskripsi  = $this->input->post('deskripsi_isi');
+        $rowMarker  = trim((string) $this->input->post('row_marker'));
         $nominal    = $this->input->post('nominal_isi');
+        if ($rowMarker !== '' && strpos($deskripsi, $rowMarker) === false) {
+            $deskripsi .= ' ' . $rowMarker;
+        }
 
         $addnote = array(
             'kd_suplier'    => $supp,
@@ -895,14 +1022,15 @@ class C_Order extends CI_Controller
     {
         $kdsup      = $this->input->post('kdsup');
         $nmbarang   = $this->input->post('nmbarang');
-        $tax        = $this->input->post('disc_isi');
-        $hargaA     = $this->input->post('tot_harga');
+        $idTmp      = (int) $this->input->post('id_tmp');
+        $tax        = $this->parseNumericInput($this->input->post('disc_isi'));
+        $hargaA     = $this->parseNumericInput($this->input->post('hrg_satuan_kecil'));
         $hasiltax   = $tax / 100;
         $nominalTax = $hargaA * $hasiltax;
 
         $tambahDiskon = array(
             'kd_suplier' => $kdsup,
-            'nama_diskon' => 'Diskon Barang' . ' ' . '-' . ' ' . $nmbarang . ' ' . '(' . $tax . '%' . ')',
+            'nama_diskon' => 'Diskon Barang' . ' ' . '-' . ' ' . $nmbarang . ' ' . '(' . $tax . '%' . ') [ROW_TMP:' . $idTmp . ']',
             'nominal' => $nominalTax
         );
 
@@ -913,12 +1041,13 @@ class C_Order extends CI_Controller
     {
         $kdsup      = $this->input->post('kdsup');
         $nmbarang   = $this->input->post('nmbarang');
+        $idTmp      = (int) $this->input->post('id_tmp');
         $deskripsi  = $this->input->post('desc_isi');
         $nominal    = $this->input->post('disc_isi');
 
         $tambahDiskon = array(
             'kd_suplier' => $kdsup,
-            'nama_diskon' => $nmbarang . ' ' . '-' . ' ' . $deskripsi,
+            'nama_diskon' => $nmbarang . ' ' . '-' . ' ' . $deskripsi . ' [ROW_TMP:' . $idTmp . ']',
             'nominal' => $nominal
         );
 

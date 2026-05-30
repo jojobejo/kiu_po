@@ -173,6 +173,13 @@
     <?php endforeach; ?>
 
     <?php foreach ($diskon as $d) : ?>
+        <?php
+        $rowMarker = '';
+        if (preg_match('/\[ROW_(TMP|DET):\d+\]/', $d->keterangan, $markerMatch)) {
+            $rowMarker = $markerMatch[0];
+        }
+        $keteranganDisplay = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $d->keterangan);
+        ?>
         <div class="modal fade" id="modalDiskonEdit<?= $d->id_diskon ?>">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -196,12 +203,14 @@
                                 <label class="col-sm-3 control-label text-right" for="kd_user">kdpo<span class="required">*</span></label>
                                 <div class="col-sm-8"><input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly>
                                 </div>
+                                <div class="col-sm-8"><input class="form-control" type="text" id="row_marker" name="row_marker" value="<?= $rowMarker ?>" readonly>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan Diskon<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="Text" id="keterangan_isi" name="keterangan_isi" value="<?= $d->keterangan ?>" /></div>
+                                <div class="col-sm-8"><input class="form-control" type="Text" id="keterangan_isi" name="keterangan_isi" value="<?= $keteranganDisplay ?>" /></div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -358,7 +367,8 @@
                                 <label class="col-sm-3" for="kd_user">Persentase Diskon<span class="required">*</span></label>
                                 <div class="col-sm-8">
                                     <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" />
-                                    <input class="form-control" type="text" id="tot_harga" name="tot_harga" value="<?= $d->hrg_total ?>" readonly hidden />
+                                    <input class="form-control" type="text" id="id_det_po" name="id_det_po" value="<?= $d->id_det_po ?>" readonly hidden />
+                                    <input class="form-control" type="text" id="hrg_satuan_kecil" name="hrg_satuan_kecil" value="<?= $d->harga_satuan_kecil ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kd_suplier ?>" readonly hidden />
                                     <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
@@ -403,6 +413,7 @@
                                 <label class="col-sm-3" for="kd_user">Nominal<span class="required">*</span></label>
                                 <div class="col-sm-8">
                                     <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" step="0.000000000001" />
+                                    <input class="form-control" type="text" id="id_det_po" name="id_det_po" value="<?= $d->id_det_po ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $d->kd_po ?>" readonly hidden />
                                     <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kd_suplier ?>" readonly hidden />
                                     <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />

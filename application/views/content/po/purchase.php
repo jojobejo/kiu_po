@@ -16,7 +16,7 @@
 
                 .po-input-table {
                     font-size: 14px;
-                    min-width: 1220px;
+                    min-width: 1280px;
                 }
 
                 .po-input-table td {
@@ -201,24 +201,37 @@
                 foreach ($tmp as $t) :
                     $isBonus = isset($t->is_bonus) && (int) $t->is_bonus === 1;
                     $diskonPerSatuan = 0;
+                    $qtyKecil = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? $t->qty_kecil : $t->qty;
+                    $qtyKecilDisplay = ceil((float) $qtyKecil);
+                    $hargaSatuanKecil = isset($t->harga_satuan_kecil) && ((float) $t->harga_satuan_kecil > 0 || $isBonus) ? $t->harga_satuan_kecil : $t->harga_satuan;
                     if (!$isBonus) {
                         foreach ($tmpdiskon as $diskon) {
+                            $diskonRowTmp = null;
+                            if (preg_match('/\[ROW_TMP:(\d+)\]/', $diskon->nama_diskon, $rowMatch)) {
+                                $diskonRowTmp = (int) $rowMatch[1];
+                            }
+                            if ($diskonRowTmp !== null && $diskonRowTmp !== (int) $t->id_tmp) {
+                                continue;
+                            }
+
                             $prefixDiskonNominal = $t->nama_barang . ' - ';
                             $prefixDiskonPersen = 'Diskon Barang - ' . $t->nama_barang . ' ';
 
                             if (strpos($diskon->nama_diskon, $prefixDiskonNominal) === 0) {
                                 $diskonPerSatuan += $diskon->nominal;
-                            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0 && $t->qty > 0) {
-                                $diskonPerSatuan += $diskon->nominal / $t->qty;
+                            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0) {
+                                if (preg_match('/\(([0-9.,]+)%\)/', $diskon->nama_diskon, $match)) {
+                                    $persenDiskon = (float) str_replace(',', '.', $match[1]);
+                                    $diskonPerSatuan += ((float) $hargaSatuanKecil * $persenDiskon) / 100;
+                                } elseif ($t->qty > 0) {
+                                    $diskonPerSatuan += $diskon->nominal / $t->qty;
+                                }
                             }
                         }
                     }
 
-                    $hargaDiskon = $isBonus ? 0 : max($t->harga_satuan - $diskonPerSatuan, 0);
-                    $qtyKecil = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? $t->qty_kecil : $t->qty;
-                    $qtyKecilDisplay = ceil((float) $qtyKecil);
-                    $hargaSatuanKecil = isset($t->harga_satuan_kecil) && ((float) $t->harga_satuan_kecil > 0 || $isBonus) ? $t->harga_satuan_kecil : $t->harga_satuan;
-                    $totalSetelahDiskon = $hargaDiskon * $t->qty;
+                    $hargaDiskon = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
+                    $totalSetelahDiskon = $hargaDiskon * $qtyKecil;
                     $totalHargaSetelahDiskon += $totalSetelahDiskon;
                 ?>
                     <tr>
@@ -236,7 +249,7 @@
                         <td class="text-number"><?= $t->qty ?></td>
                         <td class="text-number"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
                         <td class="text-number">Rp. <?= number_format($t->harga_satuan, 2) ?></td>
-                        <td class="text-number">Rp. <?= number_format($hargaSatuanKecil, 2) ?></td>
+                        <td class="text-number">Rp. <?= number_format((float) $hargaSatuanKecil, 2, ',', '.') ?></td>
                         <td class="text-number">Rp. <?= number_format($hargaDiskon, 2) ?></td>
                         <td class="text-number">Rp. <?= number_format($t->total_harga, 2) ?></td>
                         <td class="text-number">Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
@@ -297,21 +310,55 @@
         <table id="" class="table table-striped mt-2">
             <thead style="background-color: #212529; color:white;">
                 <tr>
-                    <td colspan="3" style="text-align: center;">LIST DISKON</td>
+                    <td colspan="4" style="text-align: center;">LIST DISKON</td>
                 </tr>
                 <tr>
                     <td style="text-align: center;">Deskripsi Diskon</td>
                     <td style="text-align: center;">Nominal Diskon</td>
+                    <td style="text-align: center;">Value</td>
                     <td style="text-align: center;"></td>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 $listDiskonDisplay = array();
+                $tmpQtyKecilById = array();
+                $totalQtyKecilPesanan = 0;
+
+                foreach ($tmp as $t) {
+                    $qtyKecilPesanan = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? (float) $t->qty_kecil : (float) $t->qty;
+                    $tmpQtyKecilById[(int) $t->id_tmp] = $qtyKecilPesanan;
+                    $totalQtyKecilPesanan += $qtyKecilPesanan;
+                }
+
                 foreach ($tmpdiskon as $d) {
+                    $qtyKecilDiskon = 0;
+                    if (preg_match('/\[ROW_TMP:(\d+)\]/', $d->nama_diskon, $rowMatch)) {
+                        $rowTmpId = (int) $rowMatch[1];
+                        if (isset($tmpQtyKecilById[$rowTmpId])) {
+                            $qtyKecilDiskon = $tmpQtyKecilById[$rowTmpId];
+                        }
+                    }
+
+                    if ($qtyKecilDiskon <= 0) {
+                        foreach ($tmp as $t) {
+                            $prefixDiskonNominal = $t->nama_barang . ' - ';
+                            $prefixDiskonPersen = 'Diskon Barang - ' . $t->nama_barang . ' ';
+                            if (strpos($d->nama_diskon, $prefixDiskonNominal) === 0 || strpos($d->nama_diskon, $prefixDiskonPersen) === 0) {
+                                $qtyKecilDiskon = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? (float) $t->qty_kecil : (float) $t->qty;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($qtyKecilDiskon <= 0) {
+                        $qtyKecilDiskon = $totalQtyKecilPesanan;
+                    }
+
                     $listDiskonDisplay[] = array(
                         'nama_diskon' => $d->nama_diskon,
                         'nominal' => $d->nominal,
+                        'value' => (float) $d->nominal * $qtyKecilDiskon,
                         'id_tmp_diskon' => $d->id_tmp_diskon,
                         'is_bonus_item' => false,
                     );
@@ -321,6 +368,7 @@
                         $listDiskonDisplay[] = array(
                             'nama_diskon' => $t->nama_barang . ' - ' . (!empty($t->keterangan_bonus) ? $t->keterangan_bonus : 'Bonus'),
                             'nominal' => 0,
+                            'value' => 0,
                             'id_tmp_diskon' => null,
                             'is_bonus_item' => true,
                         );
@@ -329,8 +377,9 @@
                 ?>
                 <?php foreach ($listDiskonDisplay as $d) : ?>
                     <tr>
-                        <td style="text-align: center;"><?= $d['nama_diskon'] ?></td>
+                        <td style="text-align: center;"><?= preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $d['nama_diskon']) ?></td>
                         <td style="text-align: center;">Rp. <?= number_format($d['nominal']) ?></td>
+                        <td style="text-align: center;">Rp. <?= number_format($d['value'], 2) ?></td>
                         <td style="text-align: center;">
                             <?php if (!$d['is_bonus_item']) : ?>
                                 <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $d['id_tmp_diskon'] ?>">

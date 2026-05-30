@@ -139,6 +139,13 @@
 </div>
 
 <?php foreach ($tmpdiskon as $td) : ?>
+    <?php
+    $rowMarker = '';
+    if (preg_match('/\[ROW_(TMP|DET):\d+\]/', $td->nama_diskon, $markerMatch)) {
+        $rowMarker = $markerMatch[0];
+    }
+    $namaDiskonDisplay = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $td->nama_diskon);
+    ?>
     <div class="modal fade" id="editdiskon<?= $td->id_tmp_diskon ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -155,12 +162,13 @@
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
                             <div class="col-sm-8"><input class="form-control" type="text" id="kd_sup" name="kd_sup" value="<?= $kdsuplier ?>" readonly /></div>
                             <div class="col-sm-8"><input class="form-control" type="text" id="id_isi" name="id_isi" value="<?= $td->id_tmp_diskon ?>" readonly /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="row_marker" name="row_marker" value="<?= $rowMarker ?>" readonly /></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Deskripsi Diskon<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="deskripsi_isi" name="deskripsi_isi" value="<?= $td->nama_diskon ?>" /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="deskripsi_isi" name="deskripsi_isi" value="<?= $namaDiskonDisplay ?>" /></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -297,7 +305,8 @@
                             <label class="col-sm-2" for="kd_user">Persentase Diskon<span class="required">*</span></label>
                             <div class="col-sm-9">
                                 <input class="form-control" type="number" id="disc_isi" name="disc_isi" value="" step=".01" />
-                                <input class="form-control" type="text" id="tot_harga" name="tot_harga" value="<?= $d->total_harga ?>" readonly hidden />
+                                <input class="form-control" type="text" id="id_tmp" name="id_tmp" value="<?= $d->id_tmp ?>" readonly hidden />
+                                <input class="form-control" type="text" id="hrg_satuan_kecil" name="hrg_satuan_kecil" value="<?= $d->harga_satuan_kecil ?>" readonly hidden />
                                 <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kode_suplier ?>" readonly hidden />
                                 <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
                             </div>
@@ -333,6 +342,7 @@
                             <label class="col-sm-3" for="kd_user">Deskripsi Diskon<span class="required">*</span></label>
                             <div class="col-sm-8">
                                 <input class="form-control" type="text" id="desc_isi" name="desc_isi" value="" />
+                                <input class="form-control" type="text" id="id_tmp" name="id_tmp" value="<?= $d->id_tmp ?>" readonly hidden />
                                 <input class="form-control" type="text" id="kdsup" name="kdsup" value="<?= $d->kode_suplier ?>" readonly hidden />
                                 <input class="form-control" type="text" id="nmbarang" name="nmbarang" value="<?= $d->nama_barang ?>" readonly hidden />
                             </div>

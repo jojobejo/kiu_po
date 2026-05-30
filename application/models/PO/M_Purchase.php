@@ -54,6 +54,15 @@ class M_Purchase extends CI_Model
         $this->db->where('kd_suplier', $kodeSuplier);
         return $this->db->get()->row();
     }
+    public function get_barang_by_kode($kode_barang)
+    {
+        return $this->db
+            ->select('kode_barang, nama_barang, isi, kemasan')
+            ->from('tb_barang')
+            ->where('kode_barang', $kode_barang)
+            ->get()
+            ->row();
+    }
     public function gettaxposup($kd)
     {
         $this->db->select('COUNT(a.id_tmp_tax) as tot');
@@ -131,6 +140,7 @@ class M_Purchase extends CI_Model
     public function inputDetailPO($data)
     {
         $this->db->insert('tb_detail_po', $data);
+        return $this->db->insert_id();
     }
     public function hapusTmp($id_tmp)
     {
