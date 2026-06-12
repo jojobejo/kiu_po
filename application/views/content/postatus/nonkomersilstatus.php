@@ -61,6 +61,43 @@
             <?php endif; ?>
 
             <!-- KADEP VIEW -->
+            <div class="row mb-3" id="ponkStatusFilter">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap">
+                        <button type="button" class="btn btn-dark btn-sm mr-2 mb-2 btn-filter-status-ponk active" data-status="" data-default-class="btn-dark">
+                            <i class="fas fa-list"></i>&nbsp; SEMUA
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="ON PROGRESS" data-default-class="btn-warning">
+                            <i class="fas fa-clock"></i>&nbsp; ON PROGRESS
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="ON PROGRESS - KADEP" data-default-class="btn-warning">
+                            <i class="fas fa-clock"></i>&nbsp; ON PROGRESS - KADEP
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="SEDANG DIAJUKAN" data-default-class="btn-warning">
+                            <i class="fas fa-clock"></i>&nbsp; SEDANG DIAJUKAN
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="PO REVISI" data-default-class="btn-warning">
+                            <i class="fas fa-undo"></i>&nbsp; PO REVISI
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="PENDING" data-default-class="btn-warning">
+                            <i class="fas fa-pause"></i>&nbsp; PENDING
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="ACC-KADEP" data-default-class="btn-primary">
+                            <i class="fas fa-thumbs-up"></i>&nbsp; ACC-KADEP
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="ACC DIREKTUR" data-default-class="btn-primary">
+                            <i class="fas fa-user-tie"></i>&nbsp; ACC DIREKTUR
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="PROSES PEMBELIAN" data-default-class="btn-primary">
+                            <i class="fas fa-truck-moving"></i>&nbsp; PROSES PEMBELIAN
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm mr-2 mb-2 btn-filter-status-ponk" data-status="PENGAJUAN DIBATALKAN" data-default-class="btn-danger">
+                            <i class="fas fa-times-circle"></i>&nbsp; PENGAJUAN DIBATALKAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') : ?>
                 <table class="table table-bordered table-striped" id="tballstatus">
                     <thead>
@@ -79,7 +116,7 @@
                         <?php
                         $no = 1;
                         foreach ($ponk as $p) : ?>
-                            <tr>
+                            <tr data-status-order="<?= $p->status ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= $p->nopo ?></td>
                                 <td>
@@ -123,6 +160,11 @@
                                             <?php elseif ($p->status == 'REJECT') : ?>
                                                 <a class="btn btn-block btn-danger btn-sm">
                                                     <i class="fas fa-times"></i>&nbsp;
+                                                    <?= $p->status ?>
+                                                </a>
+                                            <?php elseif ($p->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                                <a class="btn btn-block btn-danger btn-sm">
+                                                    <i class="fas fa-times-circle"></i>&nbsp;
                                                     <?= $p->status ?>
                                                 </a>
                                             <?php elseif ($p->status == 'PO REVISI') : ?>
@@ -174,7 +216,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><?= $p->tgl_transaksi ?></td>
+                                <td data-order="<?= $p->tgl_transaksi ?>"><?= $p->tgl_transaksi ?></td>
                                 <td><?= $p->nama_user ?></td>
                                 <td><?= $p->departement ?></td>
                                 <td><?= $p->tj_pembelian ?></td>
@@ -237,7 +279,7 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr>
+                            <tr data-status-order="<?= $p1->status ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= $p1->nopo ?></td>
                                 <td>
@@ -281,6 +323,11 @@
                                             <?php elseif ($p1->status == 'REJECT') : ?>
                                                 <a class="btn btn-block btn-danger btn-sm">
                                                     <i class="fas fa-times"></i>&nbsp;
+                                                    <?= $p1->status ?>
+                                                </a>
+                                            <?php elseif ($p1->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                                <a class="btn btn-block btn-danger btn-sm">
+                                                    <i class="fas fa-times-circle"></i>&nbsp;
                                                     <?= $p1->status ?>
                                                 </a>
                                             <?php elseif ($p1->status == 'PO REVISI') : ?>
@@ -332,7 +379,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><?= $p1->tgl_transaksi ?></td>
+                                <td data-order="<?= $p1->tgl_transaksi ?>"><?= $p1->tgl_transaksi ?></td>
                                 <td><?= $p1->nama_user ?></td>
                                 <td><?= $p1->departement ?></td>
                                 <td><?= $p1->tj_pembelian ?></td>
@@ -396,7 +443,7 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr>
+                            <tr data-status-order="<?= $p1->status ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= $p1->nopo ?></td>
                                 <td>
@@ -440,6 +487,11 @@
                                             <?php elseif ($p1->status == 'REJECT') : ?>
                                                 <a class="btn btn-block btn-danger btn-sm">
                                                     <i class="fas fa-times"></i>&nbsp;
+                                                    <?= $p1->status ?>
+                                                </a>
+                                            <?php elseif ($p1->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                                <a class="btn btn-block btn-danger btn-sm">
+                                                    <i class="fas fa-times-circle"></i>&nbsp;
                                                     <?= $p1->status ?>
                                                 </a>
                                             <?php elseif ($p1->status == 'PO REVISI') : ?>
@@ -491,7 +543,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><?= $p1->tgl_transaksi ?></td>
+                                <td data-order="<?= $p1->tgl_transaksi ?>"><?= $p1->tgl_transaksi ?></td>
                                 <td><?= $p1->nama_user ?></td>
                                 <td><?= $p1->departemen ?></td>
                                 <td><?= $p1->tj_pembelian ?></td>
@@ -514,4 +566,51 @@
     </div>
 </div>
 <!-- /.content-header -->
+<script>
+    (function initPonkStatusFilter() {
+        if (typeof window.jQuery === 'undefined' || !window.jQuery.fn.DataTable || !window.jQuery.fn.DataTable.isDataTable('#tballstatus')) {
+            setTimeout(initPonkStatusFilter, 50);
+            return;
+        }
+
+        var $ = window.jQuery;
+        var selectedStatus = '';
+        var table = $('#tballstatus').DataTable();
+        table.order([3, 'desc']).draw();
+
+        if (!window.ponkStatusFilterRegistered) {
+            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                if (settings.nTable.id !== 'tballstatus' || selectedStatus === '') {
+                    return true;
+                }
+
+                var rowStatus = $(settings.aoData[dataIndex].nTr).attr('data-status-order');
+                return rowStatus === selectedStatus;
+            });
+            window.ponkStatusFilterRegistered = true;
+        }
+
+        function resetFilterButton($button) {
+            var defaultClass = $button.attr('data-default-class');
+            $button.removeClass('btn-default active').addClass(defaultClass);
+        }
+
+        function activateFilterButton($button) {
+            var defaultClass = $button.attr('data-default-class');
+            $button.removeClass(defaultClass).addClass('btn-default active');
+        }
+
+        $(document).off('click.ponkStatusFilter', '.btn-filter-status-ponk').on('click.ponkStatusFilter', '.btn-filter-status-ponk', function() {
+            var $button = $(this);
+            selectedStatus = $button.attr('data-status');
+
+            $('.btn-filter-status-ponk').each(function() {
+                resetFilterButton($(this));
+            });
+            activateFilterButton($button);
+
+            table.draw();
+        });
+    })();
+</script>
 </div>

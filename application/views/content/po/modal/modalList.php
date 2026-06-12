@@ -45,13 +45,19 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" step="0.000000000001" /></div>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format" type="text" inputmode="decimal" value="" autocomplete="off" />
+                                <input type="hidden" name="qty_isi" class="number-raw" value="" />
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="" step="0.000000000001" /></div>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format" type="text" inputmode="decimal" value="" autocomplete="off" />
+                                <input type="hidden" name="hrg_isi" class="number-raw" value="" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -66,6 +72,48 @@
         <!-- /.modal-dialog -->
     </div>
 <?php endforeach; ?>
+
+<script>
+    (function() {
+        function normalizeNumberInput(value) {
+            var parts = value.replace(/[^\d,]/g, '').split(',');
+            var integerPart = parts[0].replace(/[^\d]/g, '');
+            var decimalPart = parts.length > 1 ? parts.slice(1).join('').replace(/[^\d]/g, '') : '';
+            var formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            return {
+                display: decimalPart !== '' ? formattedInteger + ',' + decimalPart : formattedInteger,
+                raw: decimalPart !== '' ? integerPart + '.' + decimalPart : integerPart
+            };
+        }
+
+        document.addEventListener('input', function(event) {
+            if (!event.target.classList.contains('number-format')) {
+                return;
+            }
+
+            var normalized = normalizeNumberInput(event.target.value);
+            var rawInput = event.target.parentNode.querySelector('.number-raw');
+
+            event.target.value = normalized.display;
+
+            if (rawInput) {
+                rawInput.value = normalized.raw;
+            }
+        });
+
+        document.addEventListener('submit', function(event) {
+            event.target.querySelectorAll('.number-format').forEach(function(input) {
+                var normalized = normalizeNumberInput(input.value);
+                var rawInput = input.parentNode.querySelector('.number-raw');
+
+                if (rawInput) {
+                    rawInput.value = normalized.raw;
+                }
+            });
+        });
+    })();
+</script>
 
 <?php foreach ($barang as $i) : ?>
     <div class="modal fade" id="modalAddBonus<?= $i->id_barang ?>">
@@ -115,7 +163,10 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" name="qty_isi" value="" step="0.000000000001" /></div>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format" type="text" inputmode="decimal" value="" autocomplete="off" />
+                                <input type="hidden" name="qty_isi" class="number-raw" value="" />
+                            </div>
                         </div>
                     </div>
                     <div class="form-group d-none">

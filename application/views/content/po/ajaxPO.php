@@ -98,7 +98,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Kesalahan',
-                                text: 'Terjadi kesalahan pada data!',
+                                text: data.message || 'Terjadi kesalahan pada data!',
                             });
                         }
                     },

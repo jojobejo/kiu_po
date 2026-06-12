@@ -196,6 +196,8 @@ $route['postatusnk']                                    = 'postatus/C_PoStatus/p
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
+$route['cancel_pengajuan_ponk']                         = 'postatus/C_PoStatus/cancel_pengajuan_ponk';
+$route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 $route['add_faktur_item_nk']                            = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['listbarangnk/1/2/3/(:any)']                     = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['noteupdatenk']                                  = 'postatus/C_PoStatus/addnotenk';
@@ -231,6 +233,7 @@ $route['hapus_note_tmp_barang']                         = 'purchaseorder/C_Order
 $route['add_diskon_po']                                 = 'purchaseorder/C_Order/add_diskon_po';
 $route['edit_diskon_po']                                = 'purchaseorder/C_Order/edit_diskon_po';
 $route['hapus_diskon_po']                               = 'purchaseorder/C_Order/hapus_diskon_po';
+$route['add_diskon_merk_tmp']                           = 'purchaseorder/C_Order/add_diskon_merk_tmp';
 $route['add_diskon_barang_tmp']                         = 'purchaseorder/C_Order/add_diskon_barang_tmp';
 $route['add_diskon_barangs_tmp']                        = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
 $route['unpostponk/(:any)']                             = 'postatus/C_PoStatus/unpostponk/$1';
@@ -296,6 +299,7 @@ $route['addDiskon']                                     = 'postatus/C_PoStatus/t
 $route['diskonEdit']                                    = 'postatus/C_PoStatus/editDiskon';
 $route['hapusDiskon/(:any)/(:any)']                     = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
 $route['hapusDiskonNk/(:any)/(:any)']                   = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
+$route['add_diskon_merk']                               = 'postatus/C_PoStatus/add_diskon_merk';
 $route['add_diskon_barang']                             = 'postatus/C_PoStatus/add_diskon_barang';
 $route['add_diskon_barangs']                            = 'postatus/C_PoStatus/add_diskon_barangs';
 $route['shipment_to']                                   = 'postatus/C_PoStatus/shipment_to';
@@ -317,6 +321,9 @@ $route['notetemplate']                                  = 'settings/C_NoteSettin
 $route['addnotetemplate']                               = 'settings/C_NoteSetting/add_note_template';
 $route['notetemplate/(:any)']                           = 'settings/C_NoteSetting/detail_note_template/$1';
 $route['updateisinote']                                 = 'settings/C_NoteSetting/update_note_template';
+
+//setting-formula-po
+$route['formulapo']                                     = 'settings/C_Formulapo';
 
 //LAPORAN PEMBELIAN NON KOMERSIL
 $route['lap_nonkomersil']                               = 'laporan/C_Laporan';
@@ -345,5 +352,3 @@ $route['get_data_pre_po_erp']                           = 'api/C_Api/get_data_pr
 
 $route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
 $route['api/stockkomersil']                             = 'stock/C_Stockkomersil/api_stock_komersil';
-
-

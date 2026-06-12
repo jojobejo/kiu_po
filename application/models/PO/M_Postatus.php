@@ -99,10 +99,37 @@ class M_PoStatus extends CI_Model
 
     public function getDetail($kdpo)
     {
-        $this->db->select('*');
+        $this->db->select('a.*, b.*');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->select('c.merk_barang');
+        }
         $this->db->from('tb_detail_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang', 'left');
+        }
         $this->db->where('kd_po', $kdpo);
+        if ($this->db->field_exists('is_bonus', 'tb_detail_po')) {
+            $this->db->order_by('COALESCE(a.is_bonus, 0)', 'ASC', false);
+        }
+        $this->db->order_by('a.id_det_po', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    public function getMerkBarangPo($kdpo)
+    {
+        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
+            return array();
+        }
+
+        $this->db->select('c.merk_barang');
+        $this->db->from('tb_detail_po a');
+        $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang', 'left');
+        $this->db->where('a.kd_po', $kdpo);
+        $this->db->where('c.merk_barang IS NOT NULL', null, false);
+        $this->db->where("TRIM(c.merk_barang) <> ''", null, false);
+        $this->db->group_by('c.merk_barang');
+        $this->db->order_by('c.merk_barang', 'ASC');
         return $this->db->get()->result();
     }
 
@@ -240,6 +267,58 @@ class M_PoStatus extends CI_Model
     function insertDiskon($data)
     {
         $this->db->insert('tb_diskon', $data);
+        return $this->db->insert_id();
+    }
+
+    function insert_diskon_merk($data)
+    {
+        $this->db->insert('tbpo_diskon_merk', $data);
+        return $this->db->insert_id();
+    }
+
+    function update_diskon_merk($id_diskon, $data)
+    {
+        if (!$this->db->table_exists('tbpo_diskon_merk')) {
+            return false;
+        }
+
+        $this->db->where('id_diskon', $id_diskon);
+        return $this->db->update('tbpo_diskon_merk', $data);
+    }
+
+    function get_items_po_by_merk($kdpo, $merkBarang)
+    {
+        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
+            return array();
+        }
+
+        $this->db->select('a.*, c.merk_barang');
+        $this->db->from('tb_detail_po a');
+        $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang AND c.kd_suplier = a.kd_suplier', 'left');
+        $this->db->where('a.kd_po', $kdpo);
+        $this->db->where('c.merk_barang', $merkBarang);
+        if ($this->db->field_exists('is_bonus', 'tb_detail_po')) {
+            $this->db->where('COALESCE(a.is_bonus, 0) = 0', null, false);
+        }
+        $this->db->order_by('a.id_det_po', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    function update_diskon_item($id_detail, $data)
+    {
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_detail_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        if (empty($filteredData)) {
+            return false;
+        }
+
+        $this->db->where('id_det_po', $id_detail);
+        return $this->db->update('tb_detail_po', $filteredData);
     }
     function editDiskon($id_diskon, $data)
     {
@@ -273,7 +352,25 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_diskon');
         $this->db->where('kd_po', $kdpo);
+        $this->db->order_by('id_diskon', 'ASC');
         return $this->db->get()->result();
+    }
+
+    function getNextNomorDiskon($kdpo)
+    {
+        $this->db->select('keterangan');
+        $this->db->from('tb_diskon');
+        $this->db->where('kd_po', $kdpo);
+        $rows = $this->db->get()->result();
+
+        $maxNomor = 0;
+        foreach ($rows as $row) {
+            if (preg_match('/^Diskon\s+(\d+)\s*-/i', (string) $row->keterangan, $match)) {
+                $maxNomor = max($maxNomor, (int) $match[1]);
+            }
+        }
+
+        return max($maxNomor, count($rows)) + 1;
     }
 
     function getHistoriDiskonPo($kdpo)
@@ -342,13 +439,30 @@ class M_PoStatus extends CI_Model
     }
     function updateLog($data)
     {
-        $this->db->insert('tb_tracking_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_tracking_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        if (empty($filteredData)) {
+            return false;
+        }
+
+        return $this->db->insert('tb_tracking_po', $filteredData);
     }
     function getDetailItemById($id)
     {
-        $this->db->select('*');
-        $this->db->from('tb_detail_po');
-        $this->db->where('id_det_po', $id);
+        $this->db->select('a.*');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->select('c.merk_barang');
+        }
+        $this->db->from('tb_detail_po a');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang AND c.kd_suplier = a.kd_suplier', 'left');
+        }
+        $this->db->where('a.id_det_po', $id);
         return $this->db->get()->row();
     }
     function getLog($kdpo)
@@ -583,6 +697,30 @@ class M_PoStatus extends CI_Model
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user');
         $this->db->where('kd_po_nk', $kdpo);
         return $this->db->get()->result();
+    }
+
+    function get_ponk_by_id($kd_po_nk)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_po_nk');
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->get()->row();
+    }
+
+    function cancel_pengajuan_ponk($kd_po_nk)
+    {
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->update('tb_po_nk', array(
+            'status' => 'PENGAJUAN DIBATALKAN'
+        ));
+    }
+
+    function update_tujuan_pembelian_ponk($kd_po_nk, $tujuan_pembelian)
+    {
+        $this->db->where('kd_po_nk', $kd_po_nk);
+        return $this->db->update('tb_po_nk', array(
+            'tj_pembelian' => $tujuan_pembelian
+        ));
     }
 
     function flupload($kdpo)
