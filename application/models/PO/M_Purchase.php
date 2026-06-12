@@ -105,11 +105,70 @@ class M_Purchase extends CI_Model
     }
     public function getTmpOrder($kd)
     {
-        $this->db->select('*');
-        $this->db->from('tb_tmp_item');
-        $this->db->where('kode_suplier', $kd);
+        $this->db->select('a.*');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->select('b.merk_barang');
+        }
+        $this->db->from('tb_tmp_item a');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+        }
+        $this->db->where('a.kode_suplier', $kd);
+        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
+            $this->db->order_by('COALESCE(a.is_bonus, 0)', 'ASC', false);
+        }
+        $this->db->order_by('a.id_tmp', 'ASC');
         $query = $this->db->get()->result();
         return $query;
+    }
+
+    public function getMerkBarangTmpOrder($kd)
+    {
+        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
+            return array();
+        }
+
+        $this->db->select('b.merk_barang');
+        $this->db->from('tb_tmp_item a');
+        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+        $this->db->where('a.kode_suplier', $kd);
+        $this->db->where('b.merk_barang IS NOT NULL', null, false);
+        $this->db->where("TRIM(b.merk_barang) <> ''", null, false);
+        $this->db->group_by('b.merk_barang');
+        $this->db->order_by('b.merk_barang', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    public function getTmpItemsByMerk($kdSuplier, $merkBarang)
+    {
+        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
+            return array();
+        }
+
+        $this->db->select('a.*, b.merk_barang');
+        $this->db->from('tb_tmp_item a');
+        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
+        $this->db->where('a.kode_suplier', $kdSuplier);
+        $this->db->where('b.merk_barang', $merkBarang);
+        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
+            $this->db->where('COALESCE(a.is_bonus, 0) = 0', null, false);
+        }
+        $this->db->order_by('a.id_tmp', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    public function getTmpItemById($idTmp)
+    {
+        $this->db->select('a.*');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->select('b.merk_barang');
+        }
+        $this->db->from('tb_tmp_item a');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
+        }
+        $this->db->where('a.id_tmp', $idTmp);
+        return $this->db->get()->row();
     }
     function sumTransaksiPenjualan($id_tmp)
     {
@@ -128,8 +187,19 @@ class M_Purchase extends CI_Model
 
     public function get_tmp($id_tmp)
     {
-        $this->db->from('tb_tmp_item');
-        $this->db->where('kode_suplier', $id_tmp);
+        $this->db->select('a.*');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->select('b.merk_barang');
+        }
+        $this->db->from('tb_tmp_item a');
+        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
+            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+        }
+        $this->db->where('a.kode_suplier', $id_tmp);
+        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
+            $this->db->order_by('COALESCE(a.is_bonus, 0)', 'ASC', false);
+        }
+        $this->db->order_by('a.id_tmp', 'ASC');
         return $this->db->get()->result();
     }
 
@@ -139,6 +209,14 @@ class M_Purchase extends CI_Model
     }
     public function inputDetailPO($data)
     {
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_detail_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        $data = $filteredData;
         $this->db->insert('tb_detail_po', $data);
         return $this->db->insert_id();
     }
@@ -358,6 +436,7 @@ class M_Purchase extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_tmp_diskon');
         $this->db->where('kd_suplier', $kd);
+        $this->db->order_by('id_tmp_diskon', 'ASC');
         $query = $this->db->get()->result();
         return $query;
     }

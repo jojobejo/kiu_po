@@ -1,6 +1,7 @@
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
+            <?php $this->load->view('content/po/_po_summary_helpers') ?>
             <?php if ($this->session->flashdata('error')) : ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
@@ -61,6 +62,44 @@
                     padding: 0;
                     width: 32px;
                 }
+
+                .po-muted {
+                    color: #6c757d;
+                    display: block;
+                    font-size: 12px;
+                    line-height: 1.35;
+                    margin-top: 2px;
+                }
+
+                .po-money-line {
+                    display: block;
+                    white-space: nowrap;
+                }
+
+                .po-summary-card {
+                    border: 1px solid #dee2e6;
+                    border-radius: 6px;
+                    margin-top: 1rem;
+                }
+
+                .po-summary-row {
+                    align-items: center;
+                    border-bottom: 1px solid #edf0f2;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: .55rem .75rem;
+                }
+
+                .po-summary-row:last-child {
+                    border-bottom: 0;
+                }
+
+                .po-summary-grand {
+                    background: #e9f7ef;
+                    color: #155724;
+                    font-size: 16px;
+                    font-weight: 700;
+                }
             </style>
             <div class="row mb-2">
                 <div class="col-sm-6">
@@ -114,6 +153,12 @@
                     <a class="btn btn-primary mb-2 mt-2 btn-block" data-toggle="modal" data-target="#modaldiskon">
                         <i class="fas fa-tags"> </i>
                         Tambah Diskon
+                    </a>
+                </div>
+                <div class="col-md">
+                    <a class="btn btn-primary mb-2 mt-2 btn-block" data-toggle="modal" data-target="#modaldiskonmerk">
+                        <i class="fas fa-tag"> </i>
+                        Diskon Merk
                     </a>
                 </div>
             </div>
@@ -177,223 +222,151 @@
 
         <?php $this->load->view('content/po/modalpo') ?>
 
+        <?php
+        list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp');
+        $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp');
+        $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
+        $poSummary = po_add_tax_summary($poSummary, $tax);
+        ?>
+        <?php if ($poSummary['has_validation_error']) : ?>
+            <div class="alert alert-danger">
+                <?php foreach ($poSummary['validation_errors'] as $error) : ?>
+                    <div><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         <div class="table-responsive po-table-wrap">
-        <table id="table_form_input_po" class="table table-sm table-striped po-input-table">
-            <thead style="background-color: #212529; color:white;">
-                <tr>
-                    <td>No</td>
-                    <td>Nama Barang</td>
-                    <td>Satuan</td>
-                    <td>Qty</td>
-                    <td>Qty Kecil</td>
-                    <td>Harga</td>
-                    <td>Harga Satuan Kecil</td>
-                    <td>Harga Diskon</td>
-                    <td>Total Harga</td>
-                    <td>Total Harga Setelah Diskon</td>
-                    <td>#</td>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $no = 1;
-                $totalHargaSetelahDiskon = 0;
-                foreach ($tmp as $t) :
-                    $isBonus = isset($t->is_bonus) && (int) $t->is_bonus === 1;
-                    $diskonPerSatuan = 0;
-                    $qtyKecil = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? $t->qty_kecil : $t->qty;
-                    $qtyKecilDisplay = ceil((float) $qtyKecil);
-                    $hargaSatuanKecil = isset($t->harga_satuan_kecil) && ((float) $t->harga_satuan_kecil > 0 || $isBonus) ? $t->harga_satuan_kecil : $t->harga_satuan;
-                    if (!$isBonus) {
-                        foreach ($tmpdiskon as $diskon) {
-                            $diskonRowTmp = null;
-                            if (preg_match('/\[ROW_TMP:(\d+)\]/', $diskon->nama_diskon, $rowMatch)) {
-                                $diskonRowTmp = (int) $rowMatch[1];
-                            }
-                            if ($diskonRowTmp !== null && $diskonRowTmp !== (int) $t->id_tmp) {
-                                continue;
-                            }
-
-                            $prefixDiskonNominal = $t->nama_barang . ' - ';
-                            $prefixDiskonPersen = 'Diskon Barang - ' . $t->nama_barang . ' ';
-
-                            if (strpos($diskon->nama_diskon, $prefixDiskonNominal) === 0) {
-                                $diskonPerSatuan += $diskon->nominal;
-                            } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0) {
-                                if (preg_match('/\(([0-9.,]+)%\)/', $diskon->nama_diskon, $match)) {
-                                    $persenDiskon = (float) str_replace(',', '.', $match[1]);
-                                    $diskonPerSatuan += ((float) $hargaSatuanKecil * $persenDiskon) / 100;
-                                } elseif ($t->qty > 0) {
-                                    $diskonPerSatuan += $diskon->nominal / $t->qty;
-                                }
-                            }
-                        }
-                    }
-
-                    $hargaDiskon = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
-                    $totalSetelahDiskon = $hargaDiskon * $qtyKecil;
-                    $totalHargaSetelahDiskon += $totalSetelahDiskon;
-                ?>
+            <table id="table_form_input_po" class="table table-sm table-striped po-input-table">
+                <thead style="background-color: #212529; color:white;">
                     <tr>
-                        <td><?= $no++; ?></td>
-                        <td class="col-item" title="<?= htmlspecialchars($t->nama_barang, ENT_QUOTES, 'UTF-8') ?>">
-                            <?= $t->nama_barang ?>
-                            <?php if ($isBonus) : ?>
-                                <span class="badge badge-primary ml-1">BONUS</span>
-                                <?php if (!empty($t->keterangan_bonus)) : ?>
-                                    <div><small><?= $t->keterangan_bonus ?></small></div>
+                        <td>No</td>
+                        <td>Nama Barang</td>
+                        <td>Satuan</td>
+                        <td>Qty</td>
+                        <td>Qty Kecil</td>
+                        <td>Harga</td>
+                        <td>Harga Satuan Kecil</td>
+                        <td>Harga Setelah Diskon</td>
+                        <td>Total Harga</td>
+                        <td>Total Harga Setelah Diskon</td>
+                        <td>#</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $no = 1; ?>
+                    <?php foreach ($poItemRows as $row) : ?>
+                        <?php $t = $row['source']; ?>
+                        <tr>
+                            <td class="text-center"><?= $no++; ?></td>
+                            <td class="col-item" title="<?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>
+                                <?php if ($row['is_bonus']) : ?>
+                                    <span class="badge badge-primary ml-1">BONUS</span>
+                                    <?php if ($row['bonus_note'] !== '') : ?>
+                                        <span class="po-muted"><?= htmlspecialchars($row['bonus_note'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td><?= $t->satuan ?></td>
-                        <td class="text-number"><?= $t->qty ?></td>
-                        <td class="text-number"><?= number_format($qtyKecilDisplay, 0, ',', '.') ?></td>
-                        <td class="text-number">Rp. <?= number_format($t->harga_satuan, 2) ?></td>
-                        <td class="text-number">Rp. <?= number_format((float) $hargaSatuanKecil, 2, ',', '.') ?></td>
-                        <td class="text-number">Rp. <?= number_format($hargaDiskon, 2) ?></td>
-                        <td class="text-number">Rp. <?= number_format($t->total_harga, 2) ?></td>
-                        <td class="text-number">Rp. <?= number_format($totalSetelahDiskon, 2) ?></td>
-                        <td>
-                            <div class="action-cell">
-                            <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">
-                                <i class="fa fa-solid fa-pencil-alt"></i>
-                            </a>
-                            <a href="#" class="btn btn-danger btn-sm btn-icon" data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>" title="Hapus">
-                                <i class="fa fa-solid fa-trash-alt"></i>
-                            </a>
-                            <?php if (!$isBonus) : ?>
-                                <a class="btn btn-sm btn-info btn-icon" data-toggle="modal" data-target="#diskonbarangs<?= $t->id_tmp ?>" title="Tambah Diskon">
-                                    <i class="fas fa-percent"></i>
-                                </a>
-                                <a class="btn btn-sm bg-lightblue btn-icon" data-toggle="modal" data-target="#diskonbarang<?= $t->id_tmp ?>" title="Diskon Barang">
-                                    <i class="fas fa-tags"></i>
-                                </a>
-                            <?php endif; ?>
-                            </div>
-                            <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <?php foreach ($total as $tot) : ?>
-                    <tr>
-                        <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga</td>
-                        <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($tot->total_harga, 2) ?>
-                            <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
-                            <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $tot->total_harga ?>" readonly hidden>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Total Harga Setelah Diskon</td>
-                    <td colspan="2" style="font-weight: bold;">Rp. <?= number_format($totalHargaSetelahDiskon, 2) ?></td>
-                </tr>
-                <tr>
-                    <td colspan="9" style="text-align: end; padding-right:3%; font-weight: bold;">Tax </td>
-                    <td colspan="2" style="font-weight: bold;"> <?= $tax ?> (%)</td>
-                </tr>
-            </tbody>
-        </table>
+                            </td>
+                            <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td class="text-number"><?= po_qty($row['qty']) ?></td>
+                            <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
+                            <td class="text-number"><?= po_money(po_exclude_ppn($row['harga_satuan'], $poSummary['tax_percent'])) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit'] / 1.11) ?></td>
+                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
+                            <td>
+                                <div class="action-cell">
+                                    <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">
+                                        <i class="fa fa-solid fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-danger btn-sm btn-icon" data-toggle="modal" data-target="#hapusChart<?= $t->id_tmp ?>" title="Hapus">
+                                        <i class="fa fa-solid fa-trash-alt"></i>
+                                    </a>
+                                    <?php if (!$row['is_bonus']) : ?>
+                                        <a class="btn btn-sm btn-info btn-icon" data-toggle="modal" data-target="#diskonBarangNominal<?= $t->id_tmp ?>" title="Tambah Diskon Nominal">
+                                            <i class="fas fa-percent"></i>
+                                        </a>
+                                        <a class="btn btn-sm bg-lightblue btn-icon" data-toggle="modal" data-target="#diskonBarangPersen<?= $t->id_tmp ?>" title="Tambah Diskon Persentase">
+                                            <i class="fas fa-tags"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                                <input type="text" class="form-control" id="kdsuplier" name="kdsuplier" value="<?= $t->kode_suplier ?>" hidden readonly>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
-        <table id="" class="table table-striped mt-2">
-            <thead style="background-color: #212529; color:white;">
-                <tr>
-                    <td colspan="4" style="text-align: center;">LIST DISKON</td>
-                </tr>
-                <tr>
-                    <td style="text-align: center;">Deskripsi Diskon</td>
-                    <td style="text-align: center;">Nominal Diskon</td>
-                    <td style="text-align: center;">Value</td>
-                    <td style="text-align: center;"></td>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $listDiskonDisplay = array();
-                $tmpQtyKecilById = array();
-                $totalQtyKecilPesanan = 0;
+        <?php foreach ($total as $tot) : ?>
+            <input type="number" class="form-control" id="jmlitem" name="jmlitem" value="<?= $tot->total_item ?>" readonly hidden>
+        <?php endforeach; ?>
+        <input type="number" class="form-control" id="jmlharga" name="jmlharga" value="<?= $poSummary['total_before_discount'] ?>" readonly hidden>
 
-                foreach ($tmp as $t) {
-                    $qtyKecilPesanan = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? (float) $t->qty_kecil : (float) $t->qty;
-                    $tmpQtyKecilById[(int) $t->id_tmp] = $qtyKecilPesanan;
-                    $totalQtyKecilPesanan += $qtyKecilPesanan;
-                }
-
-                foreach ($tmpdiskon as $d) {
-                    $qtyKecilDiskon = 0;
-                    if (preg_match('/\[ROW_TMP:(\d+)\]/', $d->nama_diskon, $rowMatch)) {
-                        $rowTmpId = (int) $rowMatch[1];
-                        if (isset($tmpQtyKecilById[$rowTmpId])) {
-                            $qtyKecilDiskon = $tmpQtyKecilById[$rowTmpId];
-                        }
-                    }
-
-                    if ($qtyKecilDiskon <= 0) {
-                        foreach ($tmp as $t) {
-                            $prefixDiskonNominal = $t->nama_barang . ' - ';
-                            $prefixDiskonPersen = 'Diskon Barang - ' . $t->nama_barang . ' ';
-                            if (strpos($d->nama_diskon, $prefixDiskonNominal) === 0 || strpos($d->nama_diskon, $prefixDiskonPersen) === 0) {
-                                $qtyKecilDiskon = isset($t->qty_kecil) && (float) $t->qty_kecil > 0 ? (float) $t->qty_kecil : (float) $t->qty;
-                                break;
-                            }
-                        }
-                    }
-
-                    if ($qtyKecilDiskon <= 0) {
-                        $qtyKecilDiskon = $totalQtyKecilPesanan;
-                    }
-
-                    $listDiskonDisplay[] = array(
-                        'nama_diskon' => $d->nama_diskon,
-                        'nominal' => $d->nominal,
-                        'value' => (float) $d->nominal * $qtyKecilDiskon,
-                        'id_tmp_diskon' => $d->id_tmp_diskon,
-                        'is_bonus_item' => false,
-                    );
-                }
-                foreach ($tmp as $t) {
-                    if (isset($t->is_bonus) && (int) $t->is_bonus === 1) {
-                        $listDiskonDisplay[] = array(
-                            'nama_diskon' => $t->nama_barang . ' - ' . (!empty($t->keterangan_bonus) ? $t->keterangan_bonus : 'Bonus'),
-                            'nominal' => 0,
-                            'value' => 0,
-                            'id_tmp_diskon' => null,
-                            'is_bonus_item' => true,
-                        );
-                    }
-                }
-                ?>
-                <?php foreach ($listDiskonDisplay as $d) : ?>
+        <div class="table-responsive">
+            <table class="table table-striped mt-2">
+                <thead style="background-color: #212529; color:white;">
                     <tr>
-                        <td style="text-align: center;"><?= preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $d['nama_diskon']) ?></td>
-                        <td style="text-align: center;">Rp. <?= number_format($d['nominal']) ?></td>
-                        <td style="text-align: center;">Rp. <?= number_format($d['value'], 2) ?></td>
-                        <td style="text-align: center;">
-                            <?php if (!$d['is_bonus_item']) : ?>
-                                <a href="#" class="btn btn-warning btn-sm " data-toggle="modal" data-target="#editdiskon<?= $d['id_tmp_diskon'] ?>">
-                                    <i class="fa fa-solid fa-pencil-alt"></i>
-                                </a>
-                                <a href="#" class="btn btn-danger btn-sm " data-toggle="modal" data-target="#hapusdiskon<?= $d['id_tmp_diskon'] ?>">
-                                    <i class="fa fa-solid fa-trash-alt"></i>
-                                </a>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="4" style="text-align: center;">LIST DISKON</td>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                    <tr>
+                        <td style="text-align: center;">Deskripsi Diskon</td>
+                        <td style="text-align: center;">Nominal Diskon</td>
+                        <td style="text-align: center;">Value</td>
+                        <td style="text-align: center;"></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($poDiscountRows)) : ?>
+                        <?php foreach ($poDiscountRows as $d) : ?>
+                            <tr>
+                                <td style="text-align: center;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td style="text-align: center;"><?= po_money($d['nominal']) ?></td>
+                                <td style="text-align: center;"><?= po_money($d['total_discount']) ?></td>
+                                <td style="text-align: center;">
+                                    <?php if (!$d['is_bonus_item']) : ?>
+                                        <a href="#" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editdiskon<?= $d['id'] ?>">
+                                            <i class="fa fa-solid fa-pencil-alt"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#hapusdiskon<?= $d['id'] ?>">
+                                            <i class="fa fa-solid fa-trash-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Belum ada diskon.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="po-summary-card">
+            <div class="po-summary-row">
+                <span>Total Harga Sebelum Diskon</span>
+                <strong><?= po_money($poSummary['total_before_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Total Diskon</span>
+                <strong><span class="badge badge-success"><?= po_money($poSummary['total_discount']) ?></span></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Total Harga Setelah Diskon</span>
+                <strong><?= po_money($poSummary['total_after_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Tax <?= po_qty($poSummary['tax_percent']) ?>%</span>
+                <strong><?= po_money($poSummary['tax_with_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row po-summary-grand">
+                <span>Grand Total Harga Dengan Diskon</span>
+                <span><?= po_money($poSummary['grand_total_with_discount']) ?></span>
+            </div>
+        </div>
         <table id="" class="table table-striped mt-2">
             <thead style="background-color: #212529; color:white;">
                 <tr>

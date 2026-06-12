@@ -7,6 +7,8 @@ class AuthGuard
 		'auth/index',
 		'auth/process',
 		'auth/logout',
+		'c_api/get_po',
+		'c_api/get_data_pre_po_erp',
 	);
 
 	public function checkLogin()

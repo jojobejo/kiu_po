@@ -2,6 +2,7 @@
 
     <div class="content-header">
         <div class="container-fluid">
+            <?php $this->load->view('content/po/_po_summary_helpers') ?>
             <?php if ($this->session->flashdata('error')) : ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
@@ -57,6 +58,44 @@
                     margin: 0;
                     padding: 0;
                     width: 32px;
+                }
+
+                .po-muted {
+                    color: #6c757d;
+                    display: block;
+                    font-size: 12px;
+                    line-height: 1.35;
+                    margin-top: 2px;
+                }
+
+                .po-money-line {
+                    display: block;
+                    white-space: nowrap;
+                }
+
+                .po-summary-card {
+                    border: 1px solid #dee2e6;
+                    border-radius: 6px;
+                    margin: 1rem 0;
+                }
+
+                .po-summary-row {
+                    align-items: center;
+                    border-bottom: 1px solid #edf0f2;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: .55rem .75rem;
+                }
+
+                .po-summary-row:last-child {
+                    border-bottom: 0;
+                }
+
+                .po-summary-grand {
+                    background: #e9f7ef;
+                    color: #155724;
+                    font-size: 16px;
+                    font-weight: 700;
                 }
             </style>
             <div class="row mb-2">
@@ -423,6 +462,12 @@
                     </a>
                 </div>
                 <div class="col-md">
+                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalDiskonMerk<?= $s->kd_po ?>">
+                        <i class="fas fa-tag"> </i>
+                        Diskon Merk
+                    </a>
+                </div>
+                <div class="col-md">
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalnotebarang<?= $s->kd_po ?>  ">
                         <i class="fas fa-notes-medical"> </i>
                         Tambah Note Barang
@@ -439,6 +484,173 @@
                             $allowEditDone = $this->session->userdata('lv') < '3' && $s->status == 'DONE';
                             $showDiskonAction = $this->session->userdata('lv') < '3' && $s->status != 'DONE' && $s->status != 'REJECT' && $s->status != 'CANCEL' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY';
                             $showActionColumn = $showAction || $allowEditDone;
+                            list($poDetailRows, $poDetailSummary) = po_build_item_rows($detail, $diskon, 'detail');
+                            $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail');
+                            $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
+                            $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
+        ?>
+        <?php if ($poDetailSummary['has_validation_error']) : ?>
+            <div class="alert alert-danger">
+                <?php foreach ($poDetailSummary['validation_errors'] as $error) : ?>
+                    <div><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <div class="table-responsive po-detail-table-wrap">
+            <table class="table table-bordered table-striped po-detail-table">
+                <thead style="background-color: #212529; color:white;">
+                    <tr>
+                        <td>No</td>
+                        <td>Nama Barang</td>
+                        <td>Satuan</td>
+                        <td>Qty</td>
+                        <td>Qty Kecil</td>
+                        <td>Harga Satuan</td>
+                        <td>Harga Satuan Kecil</td>
+                        <td>Harga Setelah Diskon</td>
+                        <td>Total Harga</td>
+                        <td>Total Harga Setelah Diskon</td>
+                        <?php if ($showActionColumn) : ?>
+                            <td>#</td>
+                        <?php endif; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $noDetailRow = 1; ?>
+                    <?php foreach ($poDetailRows as $row) : ?>
+                        <?php $d = $row['source']; ?>
+                        <tr>
+                            <td class="text-center"><?= $noDetailRow++; ?></td>
+                            <td class="col-item" title="<?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>">
+                                <?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>
+                                <?php if ($row['is_bonus']) : ?>
+                                    <span class="badge badge-primary ml-1">BONUS</span>
+                                    <?php if ($row['bonus_note'] !== '') : ?>
+                                        <span class="po-muted"><?= htmlspecialchars($row['bonus_note'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
+                            <td class="text-number"><?= po_qty($row['qty']) ?></td>
+                            <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
+                            <td class="text-number"><?= po_money(po_exclude_ppn($row['harga_satuan'], $poDetailSummary['tax_percent'])) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit'] / 1.11) ?></td>
+                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
+                            <?php if ($showActionColumn) : ?>
+                                <td>
+                                    <div class="action-cell">
+                                        <a class="btn btn-success btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>" title="Edit" aria-label="Edit">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <?php if ($showAction) : ?>
+                                            <a class="btn btn-danger btn-sm btn-icon" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>" title="Hapus" aria-label="Hapus">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                            <?php if (!$row['is_bonus']) : ?>
+                                                <a class="btn btn-sm btn-info btn-icon color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>" title="Tambah Diskon" aria-label="Tambah Diskon">
+                                                    <i class="fas fa-percent"></i>
+                                                </a>
+                                                <a class="btn btn-sm bg-lightblue btn-icon color-palette" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>" title="Diskon Barang" aria-label="Diskon Barang">
+                                                    <i class="fas fa-tags"></i>
+                                                </a>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead style="background-color: #212529; color:white;">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">LIST DISKON</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">Deskripsi Diskon</td>
+                        <td style="text-align: center;">Nominal Diskon</td>
+                        <td style="text-align: center;">Value</td>
+                        <td style="text-align: center;">Aksi</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($poDetailDiscountRows)) : ?>
+                        <?php foreach ($poDetailDiscountRows as $d) : ?>
+                            <tr>
+                                <td style="text-align: center;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td style="text-align: center;"><?= po_money($d['nominal']) ?></td>
+                                <td style="text-align: center;"><?= po_money($d['total_discount']) ?></td>
+                                <td style="text-align: center;">
+                                    <?php if ($showDiskonAction && !$d['is_bonus_item']) : ?>
+                                        <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalDiskonEdit<?= $d['id'] ?>">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" href="<?= base_url('hapusDiskon/') . $d['id'] . '/' . $d['kd_po'] ?>">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Belum ada diskon.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="po-summary-card">
+            <div class="po-summary-row">
+                <span>Total Harga Sebelum Diskon</span>
+                <strong><?= po_money($poDetailSummary['total_before_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Total Diskon</span>
+                <strong><span class="badge badge-success"><?= po_money($poDetailSummary['total_discount']) ?></span></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Total Harga Setelah Diskon</span>
+                <strong><?= po_money($poDetailSummary['total_after_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row">
+                <span>Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%</span>
+                <strong><?= po_money($poDetailSummary['tax_with_discount']) ?></strong>
+            </div>
+            <div class="po-summary-row po-summary-grand">
+                <span>Grand Total Harga Dengan Diskon</span>
+                <span><?= po_money($poDetailSummary['grand_total_with_discount']) ?></span>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="alert alert-light border mb-0">
+                    <strong>Syarat Pembayaran:</strong> <?= htmlspecialchars($s->tmpo_pembayaran, ENT_QUOTES, 'UTF-8') ?> Hari
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-light border mb-0">
+                    <strong>Franko Pengiriman:</strong> <?= htmlspecialchars($s->gdg_pengiriman, ENT_QUOTES, 'UTF-8') ?>
+                </div>
+            </div>
+        </div>
+
+        <?php
+                            $showAction = false;
+                            if ($this->session->userdata('lv') < '3' && $s->status != 'DONE' && $s->status != 'REJECT' && $s->status != 'CANCEL' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY') {
+                                $showAction = true;
+                            }
+                            $allowEditDone = $this->session->userdata('lv') < '3' && $s->status == 'DONE';
+                            $showDiskonAction = $this->session->userdata('lv') < '3' && $s->status != 'DONE' && $s->status != 'REJECT' && $s->status != 'CANCEL' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY';
+                            $showActionColumn = $showAction || $allowEditDone;
                             $totalColspan = 10 + ($showActionColumn ? 1 : 0);
                             $totalValueColspan = 2;
                             $totalLabelColspan = max($totalColspan - $totalValueColspan, 1);
@@ -446,7 +658,7 @@
                             $diskonValueColspan = 2;
                             $diskonLabelColspan = max($totalColspan - $diskonNominalColspan - $diskonValueColspan, 1);
         ?>
-        <div class="table-responsive po-detail-table-wrap">
+        <div class="table-responsive po-detail-table-wrap d-none">
         <table class="table table-bordered table-striped po-detail-table">
             <thead style="background-color: #212529; color:white;">
                 <tr>
@@ -457,7 +669,7 @@
                     <td>Qty Kecil</td>
                     <td>Harga Satuan</td>
                     <td>Harga Satuan Kecil</td>
-                    <td>Harga Diskon</td>
+                    <td>Harga Setelah Diskon</td>
                     <td>Total Harga</td>
                     <td>Total Harga Setelah Diskon</td>
                     <?php if ($showActionColumn) : ?>
@@ -524,24 +736,54 @@
                 <?php
                             $qtyKecilByDetailId = array();
                             $qtyKecilByNamaBarang = array();
+                            $detailByMerkBarang = array();
                             foreach ($detail as $detailItem) {
                                 $detailQtyKecil = isset($detailItem->qty_kecil) && (float) $detailItem->qty_kecil > 0 ? $detailItem->qty_kecil : $detailItem->qty;
                                 $qtyKecilByDetailId[(int) $detailItem->id_det_po] = (float) $detailQtyKecil;
                                 $qtyKecilByNamaBarang[$detailItem->nama_barang] = (float) $detailQtyKecil;
+                                $detailMerkBarang = isset($detailItem->merk_barang) ? trim((string) $detailItem->merk_barang) : '';
+                                if ($detailMerkBarang !== '') {
+                                    $detailByMerkBarang[strtolower($detailMerkBarang)][] = $detailItem;
+                                }
                             }
 
                             $listDiskonPo = array();
                             foreach ($diskon as $diskonItem) {
                                 $diskonKeterangan = (string) $diskonItem->keterangan;
                                 $diskonRowDet = null;
+                                $diskonMerk = null;
                                 $qtyKecilDiskon = 0;
+                                $valueDiskon = 0;
 
                                 if (preg_match('/\[ROW_DET:(\d+)\]/', $diskonKeterangan, $diskonMatch)) {
                                     $diskonRowDet = (int) $diskonMatch[1];
                                 }
 
-                                if ($diskonRowDet !== null && isset($qtyKecilByDetailId[$diskonRowDet])) {
+                                if (preg_match('/\[MERK:([^\]]+)\]/', $diskonKeterangan, $merkMatch)) {
+                                    $diskonMerk = trim($merkMatch[1]);
+                                }
+
+                                if ($diskonMerk !== null && isset($detailByMerkBarang[strtolower($diskonMerk)])) {
+                                    $satuanDiskonMerk = 'PCS';
+                                    if (preg_match('/\[SATUAN_DISKON:(BOX|PCS|LTR|KG)\]/i', $diskonKeterangan, $satuanDiskonMatch)) {
+                                        $satuanDiskonMerk = strtoupper($satuanDiskonMatch[1]);
+                                    }
+                                    foreach ($detailByMerkBarang[strtolower($diskonMerk)] as $detailMerkItem) {
+                                        $detailQtyKecil = isset($detailMerkItem->qty_kecil) && (float) $detailMerkItem->qty_kecil > 0 ? (float) $detailMerkItem->qty_kecil : (float) $detailMerkItem->qty;
+                                        $detailIsi = isset($detailMerkItem->isi) ? (float) $detailMerkItem->isi : 0;
+                                        $detailKemasan = isset($detailMerkItem->kemasan) ? (float) $detailMerkItem->kemasan : 0;
+                                        $detailDiskonKecil = (float) $diskonItem->nominal;
+                                        if ($satuanDiskonMerk === 'BOX' && $detailIsi > 0) {
+                                            $detailDiskonKecil = (float) $diskonItem->nominal / $detailIsi;
+                                        } elseif (($satuanDiskonMerk === 'LTR' || $satuanDiskonMerk === 'KG') && $detailKemasan > 0) {
+                                            $detailDiskonKecil = (float) $diskonItem->nominal * ($detailKemasan / 1000);
+                                        }
+                                        $qtyKecilDiskon += $detailQtyKecil;
+                                        $valueDiskon += $detailDiskonKecil * $detailQtyKecil;
+                                    }
+                                } elseif ($diskonRowDet !== null && isset($qtyKecilByDetailId[$diskonRowDet])) {
                                     $qtyKecilDiskon = $qtyKecilByDetailId[$diskonRowDet];
+                                    $valueDiskon = (float) $diskonItem->nominal * $qtyKecilDiskon;
                                 } else {
                                     foreach ($qtyKecilByNamaBarang as $namaBarangDiskon => $qtyKecilBarang) {
                                         if (
@@ -550,16 +792,26 @@
                                             strpos($diskonKeterangan, 'Diskon Barang-' . $namaBarangDiskon . '(') === 0
                                         ) {
                                             $qtyKecilDiskon = $qtyKecilBarang;
+                                            $valueDiskon = (float) $diskonItem->nominal * $qtyKecilDiskon;
                                             break;
                                         }
                                     }
                                 }
 
+                                if ($valueDiskon <= 0) {
+                                    $valueDiskon = (float) $diskonItem->nominal * $qtyKecilDiskon;
+                                }
+
+                                $diskonLabel = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $diskonKeterangan);
+                                $diskonLabel = preg_replace('/\s*\[MERK:[^\]]+\]/', '', $diskonLabel);
+                                $diskonLabel = preg_replace('/\s*\[SATUAN_DISKON:(BOX|PCS|LTR|KG)\]/i', '', $diskonLabel);
+                                $diskonLabel = preg_replace('/\s*\[DISKON_MERK:\d+\]/', '', $diskonLabel);
+
                                 $listDiskonPo[] = array(
-                                    'keterangan' => preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $diskonKeterangan),
+                                    'keterangan' => trim($diskonLabel),
                                     'nominal' => $diskonItem->nominal,
                                     'qty_kecil' => $qtyKecilDiskon,
-                                    'value' => (float) $diskonItem->nominal * $qtyKecilDiskon,
+                                    'value' => $valueDiskon,
                                     'id_diskon' => $diskonItem->id_diskon,
                                     'kd_po' => $diskonItem->kd_po,
                                     'is_bonus_item' => false,
@@ -644,7 +896,7 @@
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakTanpaDiskon, 2) ?> </td>
                             </tr>
                             <tr>
-                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax Dengan Diskon : <?= $s->tax ?>(%)</td>
+                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakDenganDiskon, 2) ?> </td>
                             </tr>
                             <tr>
@@ -704,7 +956,7 @@
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakTanpaDiskon, 2) ?> </td>
                             </tr>
                             <tr>
-                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax Dengan Diskon : <?= $s->tax ?>(%)</td>
+                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakDenganDiskon, 2) ?> </td>
                             </tr>
                             <tr>
@@ -772,7 +1024,7 @@
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakTanpaDiskon, 2) ?> </td>
                             </tr>
                             <tr>
-                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax Dengan Diskon : <?= $s->tax ?>(%)</td>
+                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakDenganDiskon, 2) ?> </td>
                             </tr>
                             <tr>
@@ -840,7 +1092,7 @@
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakTanpaDiskon, 2) ?> </td>
                             </tr>
                             <tr>
-                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax Dengan Diskon : <?= $s->tax ?>(%)</td>
+                                <td colspan="<?= $totalLabelColspan ?>" style="text-align: end; padding-right:3%; font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
                                 <td colspan="<?= $totalValueColspan ?>" style="font-weight: bold;"> Rp. <?= number_format($hargaPajakDenganDiskon, 2) ?> </td>
                             </tr>
                             <tr>

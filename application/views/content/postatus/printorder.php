@@ -1,6 +1,13 @@
+<?php $this->load->view('content/po/_po_summary_helpers') ?>
 <div class="wrapper">
     <!-- Main content -->
     <?php foreach ($status as $s) : ?>
+        <?php
+        list($poPrintRows, $poPrintSummary) = po_build_item_rows($detail, $diskon, 'detail');
+        $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail');
+        $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
+        $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
+        ?>
         <section class="m-4">
             <!-- title row -->
             <div class="row">
@@ -112,46 +119,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            $no = 1;
-                            $listDiskonPrint = array();
-                            foreach ($diskon as $diskonItem) {
-                                $listDiskonPrint[] = array(
-                                    'keterangan' => preg_replace('/\s*\[ROW_DET:\d+\]/', '', $diskonItem->keterangan),
-                                    'nominal' => $diskonItem->nominal,
-                                );
-                            }
-                            foreach ($detail as $bonusItem) {
-                                if (isset($bonusItem->is_bonus) && (int) $bonusItem->is_bonus === 1) {
-                                    $listDiskonPrint[] = array(
-                                        'keterangan' => $bonusItem->nama_barang . ' - ' . (!empty($bonusItem->keterangan_bonus) ? $bonusItem->keterangan_bonus : 'Bonus'),
-                                        'nominal' => 0,
-                                    );
-                                }
-                            }
-                            foreach ($detail as $d) : ?>
+                            <?php $no = 1; ?>
+                            <?php foreach ($poPrintRows as $row) : ?>
                                 <?php
-                                $isBonus = isset($d->is_bonus) && (int) $d->is_bonus === 1;
-                                if ($isBonus) {
+                                if ($row['is_bonus']) {
                                     continue;
                                 }
                                 ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
-                                    <td><?= $d->nama_barang ?></td>
-                                    <td style="text-align: center;"><?= $d->satuan ?></td>
-                                    <td style="text-align: center;"><?= $d->qty ?></td>
-                                    <td style="text-align: end;">&nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
-                                    <td style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
+                                    <td><?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align: center;"><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align: center;"><?= po_qty($row['qty']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['harga_satuan'], $poPrintSummary['tax_percent'])) ?></td>
+                                    <td style="text-align:end">&nbsp;<?= po_money($row['total_before']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                            <?php
-                            foreach ($total as $t) : ?>
-                                <tr>
-                                    <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
-                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
+                            <tr>
+                                <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                <td style="text-align:end ">&nbsp;<?= po_money($poPrintSummary['total_before_discount']) ?></td>
+                            </tr>
                         </tbody>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%;">
@@ -173,38 +160,32 @@
                             <tr>
                                 <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
-                            <?php foreach ($listDiskonPrint as $d) : ?>
-                                <?php if (!empty($d['keterangan'])) : ?>
+                            <tr>
+                                <td colspan="4" style="text-align: center; font-weight: bold;">Deskripsi Diskon</td>
+                                <td style="text-align: center; font-weight: bold;">Nominal</td>
+                                <td style="text-align: center; font-weight: bold;">Value</td>
+                            </tr>
+                            <?php foreach ($poPrintDiscountRows as $d) : ?>
+                                <?php if (!empty($d['label'])) : ?>
                                     <tr>
-                                        <td colspan="5" style="text-align: end;font-weight: bold;"><?= $d['keterangan'] ?> : </td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d['nominal'], 2) ?></td>
+                                        <td colspan="4" style="text-align: end;font-weight: bold;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?> : </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['nominal']) ?></td>
+                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['total_discount']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
 
-                            <?php foreach ($total as $t) :
-                                foreach ($totalDiskon as $d) :
-                                    $stlhDiskon = $t->total_harga - $d->total_diskon;
-                                    $tax = $s->tax / 100;
-                                    $hargaPajak = $stlhDiskon * $tax;
-                                    $hargaAll = $stlhDiskon + $hargaPajak; ?>
-                                    <tr>
-                                        <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
-                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon, 2) ?> </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak, 2) ?> </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll, 2) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endforeach; ?>
+                            <tr>
+                                <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align: end;font-weight: bold;">Tax : <?= po_qty($poPrintSummary['tax_percent']) ?>(%)</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintSummary['tax_with_discount']) ?> </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintSummary['grand_total_with_discount']) ?></td>
+                            </tr>
                         </thead>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%; border-color: black;">
