@@ -98,11 +98,11 @@
                                     <td style="text-align: center;"><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td style="text-align: center;"><?= po_qty($row['qty']) ?></td>
                                     <td style="text-align: center;"><?= po_qty($row['qty_kecil']) ?></td>
-                                    <td hidden style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['harga_satuan'], $poPrintDisplayTaxPercent)) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['harga_satuan_kecil'], $poPrintDisplayTaxPercent)) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['harga_final_unit'], $poPrintDisplayTaxPercent)) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['total_before'], $poPrintDisplayTaxPercent)) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['total_after'], $poPrintDisplayTaxPercent)) ?></td>
+                                    <td hidden style="text-align: end;">&nbsp;<?= po_money($row['harga_satuan']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($row['harga_satuan_kecil']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($row['harga_final_unit']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($row['total_before']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($row['total_after']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>

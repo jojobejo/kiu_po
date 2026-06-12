@@ -80,12 +80,6 @@ class C_Order extends CI_Controller
         return true;
     }
 
-    private function excludePpn($value, $taxPercent)
-    {
-        $taxRate = $this->parseNumericInput($taxPercent) / 100;
-        return $taxRate > 0 ? (float) $value / (1 + $taxRate) : (float) $value;
-    }
-
     private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan)
     {
         $satuan = strtolower(trim((string) $satuan));
@@ -621,8 +615,9 @@ class C_Order extends CI_Controller
             $diskonPerSatuan = $diskonResult['diskon_per_satuan'];
             $diskonMetadata = $diskonResult['metadata'];
             $hargaDiskonInclude = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
-            $hargaSatuanKecilExclude = $isBonus ? 0 : $this->excludePpn($hargaSatuanKecil, $tax);
-            $hargaDiskon = $isBonus ? 0 : $this->excludePpn($hargaDiskonInclude, $tax);
+            // Harga dari modal adalah harga dasar sebelum tax dan harus disimpan apa adanya.
+            $hargaSatuanKecilExclude = $isBonus ? 0 : $hargaSatuanKecil;
+            $hargaDiskon = $isBonus ? 0 : $hargaDiskonInclude;
             $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
             $totalHargaDiskon += $hargaTotalDiskon;
 

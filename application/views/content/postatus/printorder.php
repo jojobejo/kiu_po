@@ -131,7 +131,7 @@
                                     <td><?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td style="text-align: center;"><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                                     <td style="text-align: center;"><?= po_qty($row['qty']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money(po_exclude_ppn($row['harga_satuan'], $poPrintSummary['tax_percent'])) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($row['harga_satuan']) ?></td>
                                     <td style="text-align:end">&nbsp;<?= po_money($row['total_before']) ?></td>
                                 </tr>
                             <?php endforeach; ?>

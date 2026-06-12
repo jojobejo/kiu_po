@@ -46,6 +46,14 @@ if (!function_exists('po_exclude_ppn')) {
     }
 }
 
+if (!function_exists('po_include_tax')) {
+    function po_include_tax($value, $taxPercent)
+    {
+        $taxRate = po_num($taxPercent) / 100;
+        return po_num($value) * (1 + $taxRate);
+    }
+}
+
 if (!function_exists('po_clean_label')) {
     function po_clean_label($text)
     {
