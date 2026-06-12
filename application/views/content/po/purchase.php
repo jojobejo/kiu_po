@@ -271,10 +271,10 @@
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
                             <td class="text-number"><?= po_money($row['harga_satuan']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money(po_include_tax($row['harga_final_unit'], $poSummary['tax_percent'])) ?></td>
-                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money(po_include_tax($row['total_after'], $poSummary['tax_percent'])) ?></td>
+                            <td class="text-number"><?= po_money(po_include_tax($row['harga_satuan_kecil'], $poSummary['tax_percent'])) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit']) ?></td>
+                            <td class="text-number"><?= po_money(po_include_tax($row['total_before'], $poSummary['tax_percent'])) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
                             <td>
                                 <div class="action-cell">
                                     <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">

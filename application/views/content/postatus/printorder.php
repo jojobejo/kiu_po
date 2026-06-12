@@ -166,6 +166,7 @@
                                 <td style="text-align: center; font-weight: bold;">Value</td>
                             </tr>
                             <?php foreach ($poPrintDiscountRows as $d) : ?>
+                                <?php if (!empty($hideBonusDiscountRows) && $d['is_bonus_item']) continue; ?>
                                 <?php if (!empty($d['label'])) : ?>
                                     <tr>
                                         <td colspan="4" style="text-align: end;font-weight: bold;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?> : </td>

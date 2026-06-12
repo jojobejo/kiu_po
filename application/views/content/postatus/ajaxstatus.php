@@ -11,6 +11,79 @@
             });
         <?php endif; ?>
 
+        $(document).on('click', '.btn-po-confirm', function(event) {
+            event.preventDefault();
+
+            var button = $(this);
+            var shipment = $.trim(button.data('shipment') || '');
+            if (shipment === '' || shipment === '-') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Shipment Setting Belum Dipilih',
+                    text: 'Silakan pilih format shipment terlebih dahulu.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Selesaikan Data PO?',
+                text: 'Data PO akan diselesaikan dan status akan diubah menjadi DONE.',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then(function(result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                button.addClass('disabled').attr('aria-disabled', 'true');
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Mohon tunggu sebentar.',
+                    allowOutsideClick: false,
+                    didOpen: function() {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: button.data('url'),
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (!response.success) {
+                            button.removeClass('disabled').removeAttr('aria-disabled');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Tidak Dapat Diproses',
+                                text: response.message || 'Data PO tidak dapat diselesaikan.'
+                            });
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        }).then(function() {
+                            window.location.reload();
+                        });
+                    },
+                    error: function() {
+                        button.removeClass('disabled').removeAttr('aria-disabled');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Tidak dapat terhubung ke server.'
+                        });
+                    }
+                });
+            });
+        });
+
         // === REPOST ===
         $("#repost").on('click', function() {
             var kd_lama = $("#kd_lama").val();

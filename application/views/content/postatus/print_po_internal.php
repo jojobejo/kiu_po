@@ -7,11 +7,9 @@
         $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail');
         $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
         $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
-        $poPrintDisplayTaxPercent = po_num($poPrintSummary['tax_percent']) > 0 ? $poPrintSummary['tax_percent'] : 11;
-        $poPrintDisplayTaxRate = po_num($poPrintDisplayTaxPercent) / 100;
-        $poPrintTotalAfterDiscountExclude = po_exclude_ppn($poPrintSummary['total_after_discount'], $poPrintDisplayTaxPercent);
-        $poPrintTotalPajak = $poPrintTotalAfterDiscountExclude * $poPrintDisplayTaxRate;
-        $poPrintGrandTotalHarga = $poPrintTotalAfterDiscountExclude + $poPrintTotalPajak;
+        $poPrintDisplayTaxPercent = $poPrintSummary['tax_percent'];
+        $poPrintTotalPajak = $poPrintSummary['tax_with_discount'];
+        $poPrintGrandTotalHarga = $poPrintSummary['grand_total_with_discount'];
         ?>
         <section class="m-4">
             <div class="row">
@@ -107,8 +105,8 @@
                             <?php endforeach; ?>
                             <tr>
                                 <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga :</td>
-                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money(po_exclude_ppn($poPrintSummary['total_before_discount'], $poPrintDisplayTaxPercent)) ?></td>
-                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money(po_exclude_ppn($poPrintSummary['total_after_discount'], $poPrintDisplayTaxPercent)) ?></td>
+                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money($poPrintSummary['total_before_discount']) ?></td>
+                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money($poPrintSummary['total_after_discount']) ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -150,10 +148,12 @@
                             <tr>
                                 <td colspan="10" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                             </tr>
-                            <tr>
-                                <td colspan="9" style="text-align: end;font-weight: bold;">Total Pajak : <?= po_qty($poPrintDisplayTaxPercent) ?>(%)</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintTotalPajak) ?></td>
-                            </tr>
+                            <?php if (po_num($poPrintDisplayTaxPercent) > 0) : ?>
+                                <tr>
+                                    <td colspan="9" style="text-align: end;font-weight: bold;">Total Pajak : <?= po_qty($poPrintDisplayTaxPercent) ?>(%)</td>
+                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintTotalPajak) ?></td>
+                                </tr>
+                            <?php endif; ?>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintGrandTotalHarga) ?></td>

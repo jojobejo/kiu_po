@@ -320,7 +320,10 @@
                                     <div class="row">
                                         <div class="col">
                                             <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
-                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('poconfirmacc/') . $s->kd_po ?>">
+                                            <a class="btn btn-block btn-success btn-md btn-po-confirm"
+                                                href="#"
+                                                data-url="<?= base_url('poconfirmacc/') . $s->kd_po ?>"
+                                                data-shipment="<?= htmlspecialchars((string) $s->kd_printout_note, ENT_QUOTES, 'UTF-8') ?>">
                                                 <i class="fas fa-clipboard-check"></i> &nbsp;
                                                 PO CONFIRM
                                             </a>
@@ -418,7 +421,7 @@
                 </div>
             </div>
         </div>
-        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'ON DELIVERY') : ?>
+        <?php if ($this->session->userdata('lv') < '3' && $s->status == 'ACC DIREKTUR') : ?>
             <div class="col-md mb-2">
                 <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalshipment<?= $s->kd_po ?>">
                     <i class="fas fa-shipping-fast"> </i>
@@ -488,6 +491,8 @@
                             $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail');
                             $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
                             $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
+                            $poDetailRows = po_add_tax_to_item_rows($poDetailRows, $s->tax);
+                            $taxLabel = po_num($s->tax) > 0 ? ' (Incl. Tax ' . po_qty($s->tax) . '%)' : '';
         ?>
         <?php if ($poDetailSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -506,10 +511,10 @@
                         <td>Qty</td>
                         <td>Qty Kecil</td>
                         <td>Harga Satuan</td>
-                        <td>Harga Satuan Kecil</td>
-                        <td>Harga Setelah Diskon</td>
-                        <td>Total Harga</td>
-                        <td>Total Harga Setelah Diskon</td>
+                        <td>Harga Satuan Kecil<?= $taxLabel ?></td>
+                        <td>Harga Setelah Diskon<?= $taxLabel ?></td>
+                        <td>Total Harga<?= $taxLabel ?></td>
+                        <td>Total Harga Setelah Diskon<?= $taxLabel ?></td>
                         <?php if ($showActionColumn) : ?>
                             <td>#</td>
                         <?php endif; ?>
@@ -534,10 +539,10 @@
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
                             <td class="text-number"><?= po_money($row['harga_satuan']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_final_unit']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan_kecil_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_before_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after_with_tax']) ?></td>
                             <?php if ($showActionColumn) : ?>
                                 <td>
                                     <div class="action-cell">
@@ -609,7 +614,7 @@
 
         <div class="po-summary-card">
             <div class="po-summary-row">
-                <span>Total Harga Sebelum Diskon</span>
+                <span>DPP Sebelum Diskon</span>
                 <strong><?= po_money($poDetailSummary['total_before_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
@@ -617,7 +622,7 @@
                 <strong><span class="badge badge-success"><?= po_money($poDetailSummary['total_discount']) ?></span></strong>
             </div>
             <div class="po-summary-row">
-                <span>Total Harga Setelah Diskon</span>
+                <span>DPP Setelah Diskon</span>
                 <strong><?= po_money($poDetailSummary['total_after_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
@@ -806,6 +811,7 @@
                                 $diskonLabel = preg_replace('/\s*\[MERK:[^\]]+\]/', '', $diskonLabel);
                                 $diskonLabel = preg_replace('/\s*\[SATUAN_DISKON:(BOX|PCS|LTR|KG)\]/i', '', $diskonLabel);
                                 $diskonLabel = preg_replace('/\s*\[DISKON_MERK:\d+\]/', '', $diskonLabel);
+                                $diskonLabel = preg_replace('/^Diskon\s+\d+(?:\s*-\s*)?/i', '', $diskonLabel);
 
                                 $listDiskonPo[] = array(
                                     'keterangan' => trim($diskonLabel),

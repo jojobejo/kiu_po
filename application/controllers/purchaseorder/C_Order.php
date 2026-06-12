@@ -406,7 +406,7 @@ class C_Order extends CI_Controller
             return;
         }
 
-        redirect('purchase/sup/' . $suplier);
+        redirect('purchase/listBarang/' . $suplier);
     }
 
     public function hapusChart($id, $kdsuplier)
@@ -1187,11 +1187,18 @@ class C_Order extends CI_Controller
     {
         $kdsup = $this->input->post('kd_sup');
         $merkBarang = trim((string) $this->input->post('merk_barang'));
+        $deskripsi = trim((string) $this->input->post('deskripsi_isi'));
         $satuanDiskon = $this->normalisasiSatuanDiskon($this->input->post('satuan_diskon'));
         $nominal = $this->parseNumericInput($this->input->post('nominal_isi'));
 
         if ($merkBarang === '') {
             $this->session->set_flashdata('error', 'Merk barang wajib dipilih.');
+            redirect('purchase/sup/' . $kdsup);
+            return;
+        }
+
+        if ($deskripsi === '') {
+            $this->session->set_flashdata('error', 'Deskripsi diskon wajib diisi.');
             redirect('purchase/sup/' . $kdsup);
             return;
         }
@@ -1241,7 +1248,7 @@ class C_Order extends CI_Controller
 
         $tambahDiskon = array(
             'kd_suplier' => $kdsup,
-            'nama_diskon' => 'Diskon Merk - ' . $merkBarang . ' (' . $satuanDiskon . ') [MERK:' . $merkBarang . '] [SATUAN_DISKON:' . $satuanDiskon . ']',
+            'nama_diskon' => $deskripsi . ' [MERK:' . $merkBarang . '] [SATUAN_DISKON:' . $satuanDiskon . ']',
             'nominal' => $nominal
         );
 

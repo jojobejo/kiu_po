@@ -169,6 +169,14 @@
                 </div>
                 <div class="form-group">
                     <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="deskripsi_diskon_merk">Deskripsi Diskon<span class="required">*</span></label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="text" id="deskripsi_diskon_merk" name="deskripsi_isi" value="" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
                         <label class="col-sm-3 control-label text-right">Satuan Diskon<span class="required">*</span></label>
                         <div class="col-sm-8">
                             <label class="mr-3"><input type="radio" name="satuan_diskon" value="BOX" required> Box</label>
@@ -212,7 +220,8 @@
     if (preg_match('/\[DISKON_MERK:\d+\]/', $td->nama_diskon, $diskonMerkMarkerMatch)) {
         $diskonMerkMarker = $diskonMerkMarkerMatch[0];
     }
-    $namaDiskonDisplay = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $td->nama_diskon);
+    $namaDiskonDisplay = preg_replace('/\s*-\s*Diskon Merk\s+.*?\s+\((BOX|PCS|LTR|KG)\)(?=\s*\[MERK:)/i', '', $td->nama_diskon);
+    $namaDiskonDisplay = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $namaDiskonDisplay);
     $namaDiskonDisplay = preg_replace('/\s*\[MERK:[^\]]+\]/', '', $namaDiskonDisplay);
     $namaDiskonDisplay = preg_replace('/\s*\[SATUAN_DISKON:(BOX|PCS|LTR|KG)\]/i', '', $namaDiskonDisplay);
     $namaDiskonDisplay = preg_replace('/\s*\[DISKON_MERK:\d+\]/', '', $namaDiskonDisplay);

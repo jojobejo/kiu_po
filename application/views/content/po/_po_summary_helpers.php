@@ -57,10 +57,12 @@ if (!function_exists('po_include_tax')) {
 if (!function_exists('po_clean_label')) {
     function po_clean_label($text)
     {
-        $text = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', (string) $text);
+        $text = preg_replace('/\s*-\s*Diskon Merk\s+.*?\s+\((BOX|PCS|LTR|KG)\)(?=\s*\[MERK:)/i', '', (string) $text);
+        $text = preg_replace('/\s*\[ROW_(TMP|DET):\d+\]/', '', $text);
         $text = preg_replace('/\s*\[MERK:[^\]]+\]/', '', $text);
         $text = preg_replace('/\s*\[SATUAN_DISKON:(BOX|PCS|LTR|KG)\]/i', '', $text);
         $text = preg_replace('/\s*\[DISKON_MERK:\d+\]/', '', $text);
+        $text = preg_replace('/^Diskon\s+\d+(?:\s*-\s*)?/i', '', $text);
         return trim($text);
     }
 }
@@ -448,6 +450,23 @@ if (!function_exists('po_add_tax_summary')) {
         $summary['grand_total_with_discount'] = $summary['total_after_discount'] + $summary['tax_with_discount'];
 
         return $summary;
+    }
+}
+
+if (!function_exists('po_add_tax_to_item_rows')) {
+    function po_add_tax_to_item_rows($rows, $taxPercent)
+    {
+        $taxRate = po_num($taxPercent) / 100;
+
+        foreach ($rows as &$row) {
+            $row['harga_satuan_kecil_with_tax'] = po_num($row['harga_satuan_kecil']) * (1 + $taxRate);
+            $row['harga_final_unit_with_tax'] = po_num($row['harga_final_unit']) * (1 + $taxRate);
+            $row['total_before_with_tax'] = po_num($row['total_before']) * (1 + $taxRate);
+            $row['total_after_with_tax'] = po_num($row['total_after']) * (1 + $taxRate);
+        }
+        unset($row);
+
+        return $rows;
     }
 }
 

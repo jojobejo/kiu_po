@@ -94,7 +94,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="nomor_diskon">No Diskon<span class="required">*</span></label>
                                 <div class="col-sm-8">
@@ -112,7 +112,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Nominal<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="number" id="nominal_isi" name="nominal_isi" value="" step="0.000000000001" /></div>
+                                <div class="col-sm-8"><input class="form-control discount-number-format" type="text" inputmode="decimal" id="nominal_isi" name="nominal_isi" value="" autocomplete="off" /></div>
                             </div>
                         </div>
                     </div>
@@ -128,6 +128,25 @@
         </div>
     <?php endforeach; ?>
 
+    <script>
+        (function() {
+            function formatDiscountNumber(value) {
+                var parts = value.replace(/[^\d,]/g, '').split(',');
+                var integerPart = parts[0].replace(/[^\d]/g, '');
+                var decimalPart = parts.length > 1 ? parts.slice(1).join('').replace(/[^\d]/g, '') : '';
+                var formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                return decimalPart !== '' ? formattedInteger + ',' + decimalPart : formattedInteger;
+            }
+
+            document.addEventListener('input', function(event) {
+                if (event.target.classList.contains('discount-number-format')) {
+                    event.target.value = formatDiscountNumber(event.target.value);
+                }
+            });
+        })();
+    </script>
+
     <?php foreach ($status as $s) : ?>
         <div class="modal fade" id="modalDiskonMerk<?= $s->kd_po ?>">
             <div class="modal-dialog modal-lg">
@@ -141,6 +160,14 @@
                     <div class="modal-body">
                         <?php echo form_open_multipart('add_diskon_merk'); ?>
                         <input type="hidden" name="kdpo" value="<?= $s->kd_po ?>" />
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="deskripsi_diskon_merk">Deskripsi Diskon<span class="required">*</span></label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text" id="deskripsi_diskon_merk" name="deskripsi_diskon_merk" value="" required />
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="merk_barang">Merk Barang<span class="required">*</span></label>
@@ -557,10 +584,10 @@
                                 <label class="col-sm-3 control-label text-right" for="kd_user">Pilih Format Printout<span class="required">*</span></label>
                                 <div class="col-sm-8">
                                     <input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po ?>" readonly hidden />
-                                    <select name="frmt_option" id="frmt_option" class="form-control">
-                                        <option value="-">-- Pilih Format Note --</option>
+                                    <select name="frmt_option" id="frmt_option" class="form-control" required>
+                                        <option value="">-- Pilih Format Note --</option>
                                         <?php foreach ($ntformat as $nf) :
-                                            $selected = $s->kd_printout_note != '' ? 'selected' : '';
+                                            $selected = $s->kd_printout_note == $nf->kd_nt_template ? 'selected' : '';
                                         ?>
                                             <option value="<?= $nf->kd_nt_template ?>" <?= $selected ?>><?= $nf->nama_note ?></option>
                                         <?php endforeach; ?>
