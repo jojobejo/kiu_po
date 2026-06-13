@@ -487,8 +487,8 @@
                             $allowEditDone = $this->session->userdata('lv') < '3' && $s->status == 'DONE';
                             $showDiskonAction = $this->session->userdata('lv') < '3' && $s->status != 'DONE' && $s->status != 'REJECT' && $s->status != 'CANCEL' && $s->status != 'ACC DIREKTUR' && $s->status != 'ON DELIVERY';
                             $showActionColumn = $showAction || $allowEditDone;
-                            list($poDetailRows, $poDetailSummary) = po_build_item_rows($detail, $diskon, 'detail');
-                            $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail');
+                            list($poDetailRows, $poDetailSummary) = po_build_item_rows($detail, $diskon, 'detail', $s->tax);
+                            $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail', $s->tax);
                             $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
                             $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
                             $poDetailRows = po_add_tax_to_discounted_item_rows($poDetailRows, $s->tax);

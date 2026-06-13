@@ -30,6 +30,13 @@ if (!function_exists('po_money')) {
     }
 }
 
+if (!function_exists('po_money_round_up')) {
+    function po_money_round_up($value)
+    {
+        return 'Rp. ' . number_format(ceil(po_num($value)), 0, ',', '.');
+    }
+}
+
 if (!function_exists('po_qty')) {
     function po_qty($value)
     {
@@ -51,6 +58,14 @@ if (!function_exists('po_include_tax')) {
     {
         $taxRate = po_num($taxPercent) / 100;
         return po_num($value) * (1 + $taxRate);
+    }
+}
+
+if (!function_exists('po_discount_exclude_tax')) {
+    function po_discount_exclude_tax($value, $taxPercent)
+    {
+        $taxRate = po_num($taxPercent) / 100;
+        return $taxRate > 0 ? po_num($value) / (1 + $taxRate) : po_num($value);
     }
 }
 
@@ -138,9 +153,9 @@ if (!function_exists('po_satuan_diskon_marker')) {
 }
 
 if (!function_exists('po_diskon_satuan_kecil')) {
-    function po_diskon_satuan_kecil($nominal, $satuanDiskon, $isi, $kemasan)
+    function po_diskon_satuan_kecil($nominal, $satuanDiskon, $isi, $kemasan, $taxPercent = 0)
     {
-        $nominal = po_num($nominal);
+        $nominal = po_discount_exclude_tax($nominal, $taxPercent);
         $satuanDiskon = strtoupper(trim((string) $satuanDiskon));
         $isi = po_num($isi);
         $kemasan = po_num($kemasan);
@@ -166,7 +181,7 @@ if (!function_exists('po_diskon_satuan_kecil')) {
 }
 
 if (!function_exists('po_diskon_per_unit')) {
-    function po_diskon_per_unit($item, $diskonList, $mode, $hargaSatuanKecil)
+    function po_diskon_per_unit($item, $diskonList, $mode, $hargaSatuanKecil, $taxPercent = 0)
     {
         $hargaBerjalan = (float) $hargaSatuanKecil;
         $namaBarang = (string) po_value($item, 'nama_barang', '');
@@ -193,7 +208,8 @@ if (!function_exists('po_diskon_per_unit')) {
                     $nominal,
                     po_satuan_diskon_marker($label),
                     po_value($item, 'isi', 0),
-                    po_value($item, 'kemasan', 0)
+                    po_value($item, 'kemasan', 0),
+                    $taxPercent
                 );
 
                 if ($diskonSatuanKecil === null) {
@@ -210,7 +226,7 @@ if (!function_exists('po_diskon_per_unit')) {
             $prefixPersenCompact = 'Diskon Barang-' . $namaBarang . '(';
 
             if (strpos($label, $prefixNominal) === 0) {
-                $hargaBerjalan -= $nominal;
+                $hargaBerjalan -= po_discount_exclude_tax($nominal, $taxPercent);
                 $hargaBerjalan = max($hargaBerjalan, 0);
                 continue;
             }
@@ -228,7 +244,7 @@ if (!function_exists('po_diskon_per_unit')) {
 }
 
 if (!function_exists('po_build_item_rows')) {
-    function po_build_item_rows($items, $diskonList, $mode)
+    function po_build_item_rows($items, $diskonList, $mode, $taxPercent = 0)
     {
         $rows = array();
         $summary = array(
@@ -247,7 +263,7 @@ if (!function_exists('po_build_item_rows')) {
             $hargaSatuan = po_num(po_value($item, $isTmp ? 'harga_satuan' : 'hrg_satuan', 0));
             $hargaSatuanKecil = po_num(po_value($item, 'harga_satuan_kecil', $hargaSatuan));
             $totalBefore = $isBonus ? 0 : ($qtyKecil * $hargaSatuanKecil);
-            $diskonPerUnit = $isBonus ? 0 : po_diskon_per_unit($item, $diskonList, $mode, $hargaSatuanKecil);
+            $diskonPerUnit = $isBonus ? 0 : po_diskon_per_unit($item, $diskonList, $mode, $hargaSatuanKecil, $taxPercent);
             $hargaFinalUnit = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerUnit, 0);
 
             $totalAfter = $isBonus ? 0 : ($qtyKecil * $hargaFinalUnit);
@@ -301,7 +317,7 @@ if (!function_exists('po_build_item_rows')) {
 }
 
 if (!function_exists('po_build_discount_rows')) {
-    function po_build_discount_rows($diskonList, $itemRows, $mode)
+    function po_build_discount_rows($diskonList, $itemRows, $mode, $taxPercent = 0)
     {
         $rows = array();
         $markerType = $mode === 'tmp' ? 'TMP' : 'DET';
@@ -369,7 +385,7 @@ if (!function_exists('po_build_discount_rows')) {
                 $qtyImpact = $totalQty;
             }
 
-            $totalDiscount = $nominal;
+            $totalDiscount = po_discount_exclude_tax($nominal, $taxPercent);
             if (!empty($matchedMerkItemIds)) {
                 $totalDiscount = 0;
                 foreach ($matchedMerkItemIds as $matchedMerkItemId) {
@@ -385,7 +401,8 @@ if (!function_exists('po_build_discount_rows')) {
                                 $nominal,
                                 po_satuan_diskon_marker($label),
                                 $item['isi'],
-                                $item['kemasan']
+                                $item['kemasan'],
+                                $taxPercent
                             );
                             break;
                         }
@@ -416,16 +433,19 @@ if (!function_exists('po_build_discount_rows')) {
                 }
 
                 if (strpos($label, $prefixNominal) === 0) {
-                    $nominalDisplay = min($nominal, $hargaBerjalan);
+                    $nominalApplied = min(po_discount_exclude_tax($nominal, $taxPercent), $hargaBerjalan);
                 } else {
                     $persen = po_diskon_persen($label);
-                    $nominalDisplay = $persen !== null ? (($hargaBerjalan * $persen) / 100) : min($nominal, $hargaBerjalan);
+                    $nominalApplied = $persen !== null
+                        ? (($hargaBerjalan * $persen) / 100)
+                        : min(po_discount_exclude_tax($nominal, $taxPercent), $hargaBerjalan);
+                    $nominalDisplay = $nominalApplied;
                 }
 
-                $hargaBerjalanByItem[$matchedItemId] = max($hargaBerjalan - $nominalDisplay, 0);
-                $totalDiscount = $nominalDisplay * $qtyImpact;
+                $hargaBerjalanByItem[$matchedItemId] = max($hargaBerjalan - $nominalApplied, 0);
+                $totalDiscount = $nominalApplied * $qtyImpact;
             } elseif ($isItemDiscount) {
-                $totalDiscount = $nominal * $qtyImpact;
+                $totalDiscount = po_discount_exclude_tax($nominal, $taxPercent) * $qtyImpact;
             }
 
             $rows[] = array(

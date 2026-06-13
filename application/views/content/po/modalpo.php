@@ -99,7 +99,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('edit_barang_tmp'); ?>
+                    <?php echo form_open_multipart('edit_barang_tmp', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11')); ?>
                     <input type="hidden" name="is_bonus" value="<?= isset($t->is_bonus) ? (int) $t->is_bonus : 0 ?>">
                     <div class="form-group" hidden>
                         <div class="row">
@@ -158,10 +158,36 @@
                     <?php else : ?>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                                <label class="col-sm-3 control-label text-right" for="edit_harga_satuan_<?= $t->id_tmp ?>">Harga Satuan<span class="required">*</span></label>
                                 <div class="col-sm-8">
-                                    <input class="form-control number-format" type="text" inputmode="decimal" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 12, ',', '.'), '0'), ',') ?>" autocomplete="off" />
-                                    <input type="hidden" name="hrg_isi" class="number-raw" value="<?= $t->harga_satuan ?>" />
+                                    <input class="form-control number-format ppn-price-input" type="text" inputmode="decimal" id="edit_harga_satuan_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 12, ',', '.'), '0'), ',') ?>" autocomplete="off" />
+                                    <input type="hidden" name="hrg_isi" class="number-raw ppn-price-raw" value="<?= $t->harga_satuan ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
+                                <div class="col-sm-8 pt-2">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="edit_ppn_exclude_<?= $t->id_tmp ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
+                                        <label class="custom-control-label" for="edit_ppn_exclude_<?= $t->id_tmp ?>">Exclude PPN</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="edit_ppn_include_<?= $t->id_tmp ?>" name="ppn_mode" value="include" class="custom-control-input">
+                                        <label class="custom-control-label" for="edit_ppn_include_<?= $t->id_tmp ?>">Include PPN</label>
+                                    </div>
+                                    <small class="form-text text-muted">Include PPN dihitung menggunakan PPN 11%.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-sm-3 control-label text-right" for="edit_harga_hasil_ppn_<?= $t->id_tmp ?>">Harga Satuan Hasil Kalkulasi</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control ppn-calculated-display" type="text" id="edit_harga_hasil_ppn_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 4, ',', '.'), '0'), ',') ?>" readonly />
+                                    <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="<?= $t->harga_satuan ?>" />
+                                    <small class="form-text text-muted">Nilai exclude PPN ini yang digunakan untuk penyimpanan.</small>
                                 </div>
                             </div>
                         </div>
@@ -194,6 +220,41 @@
             };
         }
 
+        function formatCalculatedPrice(value) {
+            if (!isFinite(value)) {
+                return '';
+            }
+
+            return value.toLocaleString('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4
+            });
+        }
+
+        function updateCalculatedPrice(form) {
+            if (!form || !form.classList.contains('ppn-price-form')) {
+                return;
+            }
+
+            var rawInput = form.querySelector('.ppn-price-raw');
+            var displayOutput = form.querySelector('.ppn-calculated-display');
+            var rawOutput = form.querySelector('.ppn-calculated-raw');
+            var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+
+            if (!rawInput || !displayOutput || !rawOutput || !selectedMode || rawInput.value === '') {
+                return;
+            }
+
+            var inputPrice = parseFloat(rawInput.value);
+            var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+            var calculatedPrice = selectedMode.value === 'include'
+                ? inputPrice / (1 + (ppnRate / 100))
+                : inputPrice;
+
+            displayOutput.value = formatCalculatedPrice(calculatedPrice);
+            rawOutput.value = calculatedPrice;
+        }
+
         document.addEventListener('input', function(event) {
             if (!event.target.classList.contains('number-format')) {
                 return;
@@ -207,6 +268,16 @@
             if (rawInput) {
                 rawInput.value = normalized.raw;
             }
+
+            if (event.target.classList.contains('ppn-price-input')) {
+                updateCalculatedPrice(event.target.closest('form'));
+            }
+        });
+
+        document.addEventListener('change', function(event) {
+            if (event.target.name === 'ppn_mode') {
+                updateCalculatedPrice(event.target.closest('form'));
+            }
         });
 
         document.addEventListener('submit', function(event) {
@@ -218,6 +289,8 @@
                     rawInput.value = normalized.raw;
                 }
             });
+
+            updateCalculatedPrice(event.target);
         });
     })();
 </script>

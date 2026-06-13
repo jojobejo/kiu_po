@@ -223,15 +223,14 @@
         <?php $this->load->view('content/po/modalpo') ?>
 
         <?php
-        list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp');
-        $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp');
+        list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp', $tax);
+        $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp', $tax);
         foreach ($poDiscountRows as &$poDiscountRow) {
             $poDiscountRow['label'] = po_remove_item_name_prefix($poDiscountRow['label'], $poItemRows);
         }
         unset($poDiscountRow);
         $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
         $poSummary = po_add_tax_summary($poSummary, $tax);
-        $poItemRows = po_add_tax_to_discounted_item_rows($poItemRows, $tax);
         ?>
         <?php if ($poSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -275,9 +274,9 @@
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
                             <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_final_unit_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit']) ?></td>
                             <td class="text-number"><?= po_money($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_after_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
                             <td>
                                 <div class="action-cell">
                                     <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">
@@ -351,23 +350,23 @@
         <div class="po-summary-card">
             <div class="po-summary-row">
                 <span>Total Harga Sebelum Diskon</span>
-                <strong><?= po_money($poSummary['total_before_discount']) ?></strong>
+                <strong><?= po_money_round_up($poSummary['total_before_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
                 <span>Total Diskon</span>
-                <strong><span class="badge badge-success"><?= po_money($poSummary['total_discount']) ?></span></strong>
+                <strong><span class="badge badge-success"><?= po_money_round_up($poSummary['total_discount']) ?></span></strong>
             </div>
             <div class="po-summary-row">
                 <span>Total Harga Setelah Diskon</span>
-                <strong><?= po_money($poSummary['total_after_discount']) ?></strong>
+                <strong><?= po_money_round_up($poSummary['total_after_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
                 <span>Tax <?= po_qty($poSummary['tax_percent']) ?>%</span>
-                <strong><?= po_money($poSummary['tax_with_discount']) ?></strong>
+                <strong><?= po_money_round_up($poSummary['tax_with_discount']) ?></strong>
             </div>
             <div class="po-summary-row po-summary-grand">
                 <span>Grand Total Harga Dengan Diskon</span>
-                <span><?= po_money($poSummary['grand_total_with_discount']) ?></span>
+                <span><?= po_money_round_up($poSummary['grand_total_with_discount']) ?></span>
             </div>
         </div>
         <table id="" class="table table-striped mt-2">

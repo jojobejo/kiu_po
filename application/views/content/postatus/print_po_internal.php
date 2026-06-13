@@ -3,8 +3,8 @@
     <!-- Main content -->
     <?php foreach ($status as $s) : ?>
         <?php
-        list($poPrintRows, $poPrintSummary) = po_build_item_rows($detail, $diskon, 'detail');
-        $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail');
+        list($poPrintRows, $poPrintSummary) = po_build_item_rows($detail, $diskon, 'detail', $s->tax);
+        $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail', $s->tax);
         $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
         $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
         $poPrintDisplayTaxPercent = $poPrintSummary['tax_percent'];

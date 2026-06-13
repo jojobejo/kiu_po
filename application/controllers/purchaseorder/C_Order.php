@@ -8,6 +8,7 @@ class C_Order extends CI_Controller
 
 {
     private $bonusFlagValue = 1;
+    private $ppnPersen = 11;
 
     function __construct()
     {
@@ -78,6 +79,24 @@ class C_Order extends CI_Controller
         }
 
         return true;
+    }
+
+    private function hargaExcludePpn($harga, $ppnMode)
+    {
+        $harga = $this->parseNumericInput($harga);
+
+        if ($ppnMode !== 'include') {
+            return $harga;
+        }
+
+        return $harga / (1 + ($this->ppnPersen / 100));
+    }
+
+    private function diskonExcludeTax($nominal, $taxPercent)
+    {
+        $nominal = $this->parseNumericInput($nominal);
+        $taxRate = $this->parseNumericInput($taxPercent) / 100;
+        return $taxRate > 0 ? $nominal / (1 + $taxRate) : $nominal;
     }
 
     private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan)
@@ -364,7 +383,10 @@ class C_Order extends CI_Controller
         $satuan     = $this->input->post('satuan_isi', TRUE);
         $qty        = $this->parseNumericInput($this->input->post('qty_isi', TRUE));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hargaQty   = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode', TRUE)));
+        $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+        $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $hargaQty   = $isBonus ? 0 : $this->hargaExcludePpn($hargaInput, $ppnMode);
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
@@ -457,9 +479,9 @@ class C_Order extends CI_Controller
         return in_array($satuanDiskon, array('BOX', 'PCS', 'LTR', 'KG'), true) ? $satuanDiskon : '';
     }
 
-    private function hitungDiskonSatuanKecil($nominal, $satuanDiskon, $isi, $kemasan)
+    private function hitungDiskonSatuanKecil($nominal, $satuanDiskon, $isi, $kemasan, $taxPercent = 0)
     {
-        $nominal = $this->parseNumericInput($nominal);
+        $nominal = $this->diskonExcludeTax($nominal, $taxPercent);
         $satuanDiskon = $this->normalisasiSatuanDiskon($satuanDiskon);
         $isi = $this->parseNumericInput($isi);
         $kemasan = $this->parseNumericInput($kemasan);
@@ -495,7 +517,7 @@ class C_Order extends CI_Controller
         );
     }
 
-    private function hitungDiskonPerSatuanBarangResult($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idTmp = null, $merkBarang = '', $item = null)
+    private function hitungDiskonPerSatuanBarangResult($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idTmp = null, $merkBarang = '', $item = null, $taxPercent = 0)
     {
         $hargaAwal = (float) $hargaSatuanKecil;
         $hargaBerjalan = $hargaAwal;
@@ -522,7 +544,7 @@ class C_Order extends CI_Controller
                 $satuanDiskon = $this->getDiskonSatuanMarker($diskon->nama_diskon);
                 $isi = $item && isset($item->isi) ? $item->isi : 0;
                 $kemasan = $item && isset($item->kemasan) ? $item->kemasan : 0;
-                $konversi = $this->hitungDiskonSatuanKecil($diskon->nominal, $satuanDiskon, $isi, $kemasan);
+                $konversi = $this->hitungDiskonSatuanKecil($diskon->nominal, $satuanDiskon, $isi, $kemasan, $taxPercent);
 
                 if (!$konversi['status']) {
                     continue;
@@ -544,7 +566,7 @@ class C_Order extends CI_Controller
             $prefixDiskonPersen = 'Diskon Barang - ' . $namaBarang . ' ';
 
             if (strpos($diskon->nama_diskon, $prefixDiskonNominal) === 0) {
-                $hargaBerjalan -= (float) $diskon->nominal;
+                $hargaBerjalan -= $this->diskonExcludeTax($diskon->nominal, $taxPercent);
                 $hargaBerjalan = max($hargaBerjalan, 0);
             } elseif (strpos($diskon->nama_diskon, $prefixDiskonPersen) === 0) {
                 $persenDiskon = $this->getPersentaseDiskon($diskon->nama_diskon);
@@ -564,9 +586,9 @@ class C_Order extends CI_Controller
         );
     }
 
-    private function diskonPerSatuanBarang($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idTmp = null, $merkBarang = '')
+    private function diskonPerSatuanBarang($namaBarang, $qty, $diskonList, $hargaSatuanKecil = 0, $idTmp = null, $merkBarang = '', $taxPercent = 0)
     {
-        $result = $this->hitungDiskonPerSatuanBarangResult($namaBarang, $qty, $diskonList, $hargaSatuanKecil, $idTmp, $merkBarang);
+        $result = $this->hitungDiskonPerSatuanBarangResult($namaBarang, $qty, $diskonList, $hargaSatuanKecil, $idTmp, $merkBarang, null, $taxPercent);
         return $result['diskon_per_satuan'];
     }
 
@@ -611,7 +633,7 @@ class C_Order extends CI_Controller
             $merkBarang = isset($chart->merk_barang) ? $chart->merk_barang : '';
             $diskonResult = $isBonus
                 ? array('diskon_per_satuan' => 0, 'metadata' => array('id_diskon_merk' => null, 'satuan_diskon' => null, 'nominal_diskon' => 0, 'diskon_satuan_kecil' => 0))
-                : $this->hitungDiskonPerSatuanBarangResult($chart->nama_barang, $chart->qty, $tmpdiskon, $hargaSatuanKecil, $chart->id_tmp, $merkBarang, $chart);
+                : $this->hitungDiskonPerSatuanBarangResult($chart->nama_barang, $chart->qty, $tmpdiskon, $hargaSatuanKecil, $chart->id_tmp, $merkBarang, $chart, $tax);
             $diskonPerSatuan = $diskonResult['diskon_per_satuan'];
             $diskonMetadata = $diskonResult['metadata'];
             $hargaDiskonInclude = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
@@ -1017,7 +1039,10 @@ class C_Order extends CI_Controller
         $satuan     = $this->input->post('satuan_isi', TRUE);
         $qty        = $this->parseNumericInput($this->input->post('qty_isi', TRUE));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hrg_satuan = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode', TRUE)));
+        $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+        $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
+        $hrg_satuan = $isBonus ? 0 : $this->hargaExcludePpn($hargaInput, $ppnMode);
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
         $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus);
@@ -1127,6 +1152,7 @@ class C_Order extends CI_Controller
         $satuanMarker = trim((string) $this->input->post('satuan_marker'));
         $diskonMerkMarker = trim((string) $this->input->post('diskon_merk_marker'));
         $nominal    = $this->parseNumericInput($this->input->post('nominal_isi'));
+        $poTax      = $this->M_Purchase->gettmptax($supp);
 
         if ($merkMarker !== '' && $satuanMarker !== '') {
             $merkBarang = $this->getDiskonMerkMarker($merkMarker);
@@ -1137,7 +1163,7 @@ class C_Order extends CI_Controller
             });
 
             foreach ($items as $item) {
-                $konversi = $this->hitungDiskonSatuanKecil($nominal, $satuanDiskon, isset($item->isi) ? $item->isi : 0, isset($item->kemasan) ? $item->kemasan : 0);
+                $konversi = $this->hitungDiskonSatuanKecil($nominal, $satuanDiskon, isset($item->isi) ? $item->isi : 0, isset($item->kemasan) ? $item->kemasan : 0, $poTax);
 
                 if (!$konversi['status']) {
                     $this->redirectWithError($konversi['message'] . ' Barang: ' . $item->nama_barang, 'purchase/sup/' . $supp);
@@ -1145,7 +1171,7 @@ class C_Order extends CI_Controller
                 }
 
                 $hargaSatuanKecil = isset($item->harga_satuan_kecil) && (float) $item->harga_satuan_kecil > 0 ? $item->harga_satuan_kecil : $item->harga_satuan;
-                $diskonResult = $this->hitungDiskonPerSatuanBarangResult($item->nama_barang, $item->qty, $tmpdiskon, $hargaSatuanKecil, $item->id_tmp, $merkBarang, $item);
+                $diskonResult = $this->hitungDiskonPerSatuanBarangResult($item->nama_barang, $item->qty, $tmpdiskon, $hargaSatuanKecil, $item->id_tmp, $merkBarang, $item, $poTax);
                 $diskonBerjalan = $diskonResult['diskon_per_satuan'];
                 if ((float) $hargaSatuanKecil - $diskonBerjalan - (float) $konversi['diskon_satuan_kecil'] < 0) {
                     $this->redirectWithError('Harga setelah diskon tidak boleh minus pada barang ' . $item->nama_barang, 'purchase/sup/' . $supp);
@@ -1190,6 +1216,7 @@ class C_Order extends CI_Controller
         $deskripsi = trim((string) $this->input->post('deskripsi_isi'));
         $satuanDiskon = $this->normalisasiSatuanDiskon($this->input->post('satuan_diskon'));
         $nominal = $this->parseNumericInput($this->input->post('nominal_isi'));
+        $poTax = $this->M_Purchase->gettmptax($kdsup);
 
         if ($merkBarang === '') {
             $this->session->set_flashdata('error', 'Merk barang wajib dipilih.');
@@ -1226,7 +1253,7 @@ class C_Order extends CI_Controller
         foreach ($items as $item) {
             $isi = isset($item->isi) ? $item->isi : 0;
             $kemasan = isset($item->kemasan) ? $item->kemasan : 0;
-            $konversi = $this->hitungDiskonSatuanKecil($nominal, $satuanDiskon, $isi, $kemasan);
+            $konversi = $this->hitungDiskonSatuanKecil($nominal, $satuanDiskon, $isi, $kemasan, $poTax);
 
             if (!$konversi['status']) {
                 $this->session->set_flashdata('error', $konversi['message'] . ' Barang: ' . $item->nama_barang);
@@ -1235,7 +1262,7 @@ class C_Order extends CI_Controller
             }
 
             $hargaSatuanKecil = isset($item->harga_satuan_kecil) && (float) $item->harga_satuan_kecil > 0 ? $item->harga_satuan_kecil : $item->harga_satuan;
-            $diskonResult = $this->hitungDiskonPerSatuanBarangResult($item->nama_barang, $item->qty, $tmpdiskon, $hargaSatuanKecil, $item->id_tmp, $merkBarang, $item);
+            $diskonResult = $this->hitungDiskonPerSatuanBarangResult($item->nama_barang, $item->qty, $tmpdiskon, $hargaSatuanKecil, $item->id_tmp, $merkBarang, $item, $poTax);
             $diskonBerjalan = $diskonResult['diskon_per_satuan'];
             $hargaSetelahDiskon = (float) $hargaSatuanKecil - $diskonBerjalan - (float) $konversi['diskon_satuan_kecil'];
 
@@ -1266,7 +1293,8 @@ class C_Order extends CI_Controller
         $tmpdiskon  = $this->M_Purchase->getTmpDiskonOrder($kdsup);
         $tmpItem    = $this->M_Purchase->getTmpItemById($idTmp);
         $merkBarang = $tmpItem && isset($tmpItem->merk_barang) ? $tmpItem->merk_barang : '';
-        $diskonResult = $this->hitungDiskonPerSatuanBarangResult($nmbarang, 1, $tmpdiskon, $hargaA, $idTmp, $merkBarang, $tmpItem);
+        $poTax      = $this->M_Purchase->gettmptax($kdsup);
+        $diskonResult = $this->hitungDiskonPerSatuanBarangResult($nmbarang, 1, $tmpdiskon, $hargaA, $idTmp, $merkBarang, $tmpItem, $poTax);
         $diskonPerSatuan = $diskonResult['diskon_per_satuan'];
         $hargaSetelahDiskon = max($hargaA - $diskonPerSatuan, 0);
         $hasiltax   = $tax / 100;
