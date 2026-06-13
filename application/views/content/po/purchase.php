@@ -17,7 +17,7 @@
 
                 .po-input-table {
                     font-size: 14px;
-                    min-width: 1280px;
+                    min-width: 1160px;
                 }
 
                 .po-input-table td {
@@ -225,8 +225,13 @@
         <?php
         list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp');
         $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp');
+        foreach ($poDiscountRows as &$poDiscountRow) {
+            $poDiscountRow['label'] = po_remove_item_name_prefix($poDiscountRow['label'], $poItemRows);
+        }
+        unset($poDiscountRow);
         $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
         $poSummary = po_add_tax_summary($poSummary, $tax);
+        $poItemRows = po_add_tax_to_discounted_item_rows($poItemRows, $tax);
         ?>
         <?php if ($poSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -244,7 +249,6 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Qty Kecil</td>
-                        <td>Harga</td>
                         <td>Harga Satuan Kecil</td>
                         <td>Harga Setelah Diskon</td>
                         <td>Total Harga</td>
@@ -270,11 +274,10 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan']) ?></td>
-                            <td class="text-number"><?= po_money(po_include_tax($row['harga_satuan_kecil'], $poSummary['tax_percent'])) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_final_unit']) ?></td>
-                            <td class="text-number"><?= po_money(po_include_tax($row['total_before'], $poSummary['tax_percent'])) ?></td>
-                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_final_unit_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_after_with_tax']) ?></td>
                             <td>
                                 <div class="action-cell">
                                     <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">

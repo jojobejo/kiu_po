@@ -18,7 +18,7 @@
 
                 .po-detail-table {
                     font-size: 14px;
-                    min-width: 1280px;
+                    min-width: 1160px;
                 }
 
                 .po-detail-table td {
@@ -491,8 +491,7 @@
                             $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail');
                             $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
                             $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
-                            $poDetailRows = po_add_tax_to_item_rows($poDetailRows, $s->tax);
-                            $taxLabel = po_num($s->tax) > 0 ? ' (Incl. Tax ' . po_qty($s->tax) . '%)' : '';
+                            $poDetailRows = po_add_tax_to_discounted_item_rows($poDetailRows, $s->tax);
         ?>
         <?php if ($poDetailSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -510,11 +509,10 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Qty Kecil</td>
-                        <td>Harga Satuan</td>
-                        <td>Harga Satuan Kecil<?= $taxLabel ?></td>
-                        <td>Harga Setelah Diskon<?= $taxLabel ?></td>
-                        <td>Total Harga<?= $taxLabel ?></td>
-                        <td>Total Harga Setelah Diskon<?= $taxLabel ?></td>
+                        <td>Harga Satuan Kecil</td>
+                        <td>Harga Setelah Diskon</td>
+                        <td>Total Harga</td>
+                        <td>Total Harga Setelah Diskon</td>
                         <?php if ($showActionColumn) : ?>
                             <td>#</td>
                         <?php endif; ?>
@@ -538,10 +536,9 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan_kecil_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
                             <td class="text-number"><?= po_money($row['harga_final_unit_with_tax']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_before_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
                             <td class="text-number"><?= po_money($row['total_after_with_tax']) ?></td>
                             <?php if ($showActionColumn) : ?>
                                 <td>

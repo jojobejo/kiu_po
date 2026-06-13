@@ -67,6 +67,24 @@ if (!function_exists('po_clean_label')) {
     }
 }
 
+if (!function_exists('po_remove_item_name_prefix')) {
+    function po_remove_item_name_prefix($label, $itemRows)
+    {
+        $label = trim((string) $label);
+
+        foreach ($itemRows as $item) {
+            $namaBarang = trim((string) po_value($item, 'nama_barang', ''));
+            $prefix = $namaBarang . ' - ';
+
+            if ($namaBarang !== '' && strpos($label, $prefix) === 0) {
+                return trim(substr($label, strlen($prefix)));
+            }
+        }
+
+        return $label;
+    }
+}
+
 if (!function_exists('po_diskon_persen')) {
     function po_diskon_persen($text)
     {
@@ -453,15 +471,13 @@ if (!function_exists('po_add_tax_summary')) {
     }
 }
 
-if (!function_exists('po_add_tax_to_item_rows')) {
-    function po_add_tax_to_item_rows($rows, $taxPercent)
+if (!function_exists('po_add_tax_to_discounted_item_rows')) {
+    function po_add_tax_to_discounted_item_rows($rows, $taxPercent)
     {
         $taxRate = po_num($taxPercent) / 100;
 
         foreach ($rows as &$row) {
-            $row['harga_satuan_kecil_with_tax'] = po_num($row['harga_satuan_kecil']) * (1 + $taxRate);
             $row['harga_final_unit_with_tax'] = po_num($row['harga_final_unit']) * (1 + $taxRate);
-            $row['total_before_with_tax'] = po_num($row['total_before']) * (1 + $taxRate);
             $row['total_after_with_tax'] = po_num($row['total_after']) * (1 + $taxRate);
         }
         unset($row);
