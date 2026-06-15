@@ -513,6 +513,7 @@ class C_PoStatus extends CI_Controller
         $this->syncDiskonDetailPO($kdpo);
         $data = $this->getPrintOrderData($kdpo, true);
         $data['hideBonusDiscountRows'] = true;
+        $data['isSupplierPrint'] = true;
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);

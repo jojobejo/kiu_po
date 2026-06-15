@@ -8,8 +8,10 @@
         $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
         $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
         $poPrintDisplayTaxPercent = $poPrintSummary['tax_percent'];
-        $poPrintTotalPajak = $poPrintSummary['tax_with_discount'];
         $poPrintGrandTotalHarga = $poPrintSummary['grand_total_with_discount'];
+        $poPrintTotalDiskonRounded = ceil(po_num($poPrintSummary['total_discount']) / 10000000) * 10000000;
+        $poPrintGrandTotalHargaRounded = ceil(po_num($poPrintGrandTotalHarga) / 100000) * 100000;
+        $poPrintTotalPajakRounded = max($poPrintGrandTotalHargaRounded - po_num($poPrintSummary['total_after_discount']), 0);
         ?>
         <section class="m-4">
             <div class="row">
@@ -148,15 +150,19 @@
                             <tr>
                                 <td colspan="10" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                             </tr>
+                            <tr>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Total Diskon</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($poPrintTotalDiskonRounded, 2, '.', ',') ?></td>
+                            </tr>
                             <?php if (po_num($poPrintDisplayTaxPercent) > 0) : ?>
                                 <tr>
                                     <td colspan="9" style="text-align: end;font-weight: bold;">Total Pajak : <?= po_qty($poPrintDisplayTaxPercent) ?>(%)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintTotalPajak) ?></td>
+                                    <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($poPrintTotalPajakRounded, 2, '.', ',') ?></td>
                                 </tr>
                             <?php endif; ?>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintGrandTotalHarga) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($poPrintGrandTotalHargaRounded, 2, '.', ',') ?></td>
                             </tr>
                         </tbody>
                     </table>
