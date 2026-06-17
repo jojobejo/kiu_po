@@ -1763,11 +1763,6 @@ class C_PoStatus extends CI_Controller
     private function blockedPonkEditStatuses()
     {
         return array(
-            'ACC-KADEP',
-            'SEDANG DIAJUKAN',
-            'ON PROGRESS - KADEP',
-            'ACC DIREKTUR',
-            'PROSES PEMBELIAN',
             'PENGAJUAN DIBATALKAN'
         );
     }
@@ -1787,7 +1782,7 @@ class C_PoStatus extends CI_Controller
             )));
     }
 
-    private function validatePonkForAjax($kd_po_nk)
+    private function validatePonkForAjax($kd_po_req)
     {
         $kodeUser = $this->session->userdata('kode');
 
@@ -1795,11 +1790,11 @@ class C_PoStatus extends CI_Controller
             return array(false, null, 'Session login tidak valid');
         }
 
-        if (empty($kd_po_nk)) {
-            return array(false, null, 'Kode PO NK tidak boleh kosong');
+        if (empty($kd_po_req)) {
+            return array(false, null, 'Kode PO request tidak boleh kosong');
         }
 
-        $ponk = $this->M_Postatus->get_ponk_by_id($kd_po_nk);
+        $ponk = $this->M_Postatus->get_ponk_by_req($kd_po_req);
         if (empty($ponk)) {
             return array(false, null, 'Data PO NK tidak ditemukan');
         }
@@ -1813,14 +1808,14 @@ class C_PoStatus extends CI_Controller
 
     public function cancel_pengajuan_ponk()
     {
-        $kd_po_nk = $this->input->post('kd_po_nk', true);
-        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_nk);
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
 
         if (!$isValid) {
             return $this->responseJson(false, $message);
         }
 
-        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_nk);
+        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_req);
         if (!$updated) {
             return $this->responseJson(false, 'Data gagal diperbarui');
         }
@@ -1839,9 +1834,9 @@ class C_PoStatus extends CI_Controller
 
     public function update_tujuan_pembelian_ponk()
     {
-        $kd_po_nk = $this->input->post('kd_po_nk', true);
+        $kd_po_req = $this->input->post('kd_po_req', true);
         $tujuan_pembelian = trim((string) $this->input->post('tujuan_pembelian', true));
-        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_nk);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
 
         if (!$isValid) {
             return $this->responseJson(false, $message);
@@ -1851,7 +1846,7 @@ class C_PoStatus extends CI_Controller
             return $this->responseJson(false, 'Tujuan pembelian tidak boleh kosong');
         }
 
-        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_nk, $tujuan_pembelian);
+        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_req, $tujuan_pembelian);
         if (!$updated) {
             return $this->responseJson(false, 'Data gagal diperbarui');
         }

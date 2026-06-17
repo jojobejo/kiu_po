@@ -28,6 +28,7 @@
                             <td>Nama Barang</td>
                             <td>Deskripsi / Spesifikasi</td>
                             <td>Satuan</td>
+                            <td>Minimum Stock</td>
                             <td>Gambar Produk</td>
                             <td>QR CODE</td>
                             <td>Aksi</td>
@@ -55,6 +56,7 @@
                                 <td><?= $brnk->nama_barang ?></td>
                                 <td><?= $brnk->descnk ?></td>
                                 <td><?= $brnk->nm_satuan ?></td>
+                                <td><?= number_format((float)$brnk->minimum_stock, 2, ',', '.') ?></td>
                                 <td>
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $brnk->nama_barang ?>">Buka File
                                     </a>

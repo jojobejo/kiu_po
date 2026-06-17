@@ -58,6 +58,7 @@
             var ajaxUrl = $stockTable.data("ajax-url");
             var detailBaseUrl = "<?= base_url('detailtransaksi/'); ?>";
             var updateLokasiUrl = "<?= base_url('stocknonkomersil/update_lokasi'); ?>";
+            var updateMinimumStockUrl = "<?= base_url('stocknonkomersil/update_minimum_stock'); ?>";
 
             var tableStock = $stockTable.DataTable({
                 "responsive": true,
@@ -76,12 +77,30 @@
                 return $("<div>").text(text).html();
             }
 
-            function buildQtyCell(qty) {
+            function buildQtyCell(qty, status) {
                 var qtyNum = parseFloat(qty || 0);
                 if (qtyNum <= 0) {
-                    return '<span class="table-warning d-block p-1">' + escHtml(qty) + '</span>';
+                    return '<span class="stock-qty stock-qty-habis">' + escHtml(qty) + '</span>';
+                }
+                if (status === "hampir_habis") {
+                    return '<span class="stock-qty stock-qty-hampir-habis">' + escHtml(qty) + '</span>';
                 }
                 return escHtml(qty);
+            }
+
+            function buildStatusCell(status) {
+                if (status === "habis") {
+                    return '<span class="badge badge-danger">Habis - Harus Di-PO</span>';
+                }
+                if (status === "hampir_habis") {
+                    return '<span class="badge badge-warning">Hampir Habis - Harus Di-PO</span>';
+                }
+                return '<span class="badge badge-success">Aman</span>';
+            }
+
+            function formatQty(qty) {
+                var value = parseFloat(qty || 0);
+                return Number.isInteger(value) ? value.toString() : value.toFixed(2);
             }
 
             function renderRows(rows) {
@@ -93,18 +112,25 @@
                             escHtml(s.kode_barang),
                             escHtml(s.nama_barang),
                             escHtml(s.deskripsi),
-                            buildQtyCell(s.qty_ready),
+                            buildQtyCell(s.qty_ready, s.status_stock),
+                            escHtml(formatQty(s.minimum_stock)),
+                            escHtml(formatQty(s.qty_saran_po)),
+                            buildStatusCell(s.status_stock),
                             escHtml(s.satuan),
                             escHtml(s.nama_lokasi),
                             '<a href="' + detailBaseUrl + s.kode_barangs + '" id="btndetailbrs" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>' +
-                            '<button type="button" class="btn btn-block btn-warning btn-lokasi" data-toggle="modal" data-target="#modalUpdateLokasi" data-kode-barang="' + escHtml(s.kode_barang) + '" data-nama-barang="' + escHtml(s.nama_barang) + '" data-id-lokasi="' + escHtml(s.id_lokasi) + '"><i class="fas fa-map-marker-alt"></i></button>'
+                            '<button type="button" class="btn btn-block btn-warning btn-lokasi" data-toggle="modal" data-target="#modalUpdateLokasi" data-kode-barang="' + escHtml(s.kode_barang) + '" data-nama-barang="' + escHtml(s.nama_barang) + '" data-id-lokasi="' + escHtml(s.id_lokasi) + '"><i class="fas fa-map-marker-alt"></i></button>' +
+                            '<button type="button" class="btn btn-block btn-info btn-minimum-stock" data-toggle="modal" data-target="#modalMinimumStock" data-kode-barang="' + escHtml(s.kode_barangs) + '" data-nama-barang="' + escHtml(s.nama_barang) + '" data-minimum-stock="' + escHtml(s.minimum_stock) + '"><i class="fas fa-boxes"></i></button>'
                         ]);
                     } else {
                         tableStock.row.add([
                             escHtml(s.kode_barang),
                             escHtml(s.nama_barang),
                             escHtml(s.deskripsi),
-                            buildQtyCell(s.qty_ready),
+                            buildQtyCell(s.qty_ready, s.status_stock),
+                            escHtml(formatQty(s.minimum_stock)),
+                            escHtml(formatQty(s.qty_saran_po)),
+                            buildStatusCell(s.status_stock),
                             escHtml(s.satuan),
                             escHtml(s.nama_lokasi)
                         ]);
@@ -116,6 +142,7 @@
 
             function loadStockData() {
                 var lokasi = $("#filter_lokasi").val();
+                var statusStock = $("#filter_status_stock").val();
                 $("#btn_reload_stock").prop("disabled", true).text("Loading...");
                 toggleStockLoading(true);
 
@@ -124,7 +151,8 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        lokasi: lokasi
+                        lokasi: lokasi,
+                        status_stock: statusStock
                     },
                     success: function(res) {
                         if (res && res.status && Array.isArray(res.data)) {
@@ -144,10 +172,45 @@
             }
 
             $("#filter_lokasi").on("change", loadStockData);
+            $("#filter_status_stock").on("change", loadStockData);
             $("#btn_reload_stock").on("click", loadStockData);
             $("#btn_reset_filter").on("click", function() {
                 $("#filter_lokasi").val("");
+                $("#filter_status_stock").val("");
                 loadStockData();
+            });
+
+            $(document).on("click", ".btn-minimum-stock", function() {
+                $("#minimum_stock_kode_barang").val($(this).data("kode-barang"));
+                $("#minimum_stock_nama_barang").text($(this).data("nama-barang") || "-");
+                $("#minimum_stock_value").val($(this).data("minimum-stock") || 0);
+            });
+
+            $("#formMinimumStock").on("submit", function(e) {
+                e.preventDefault();
+                var $btn = $("#btn_save_minimum_stock");
+                $btn.prop("disabled", true).text("Menyimpan...");
+
+                $.ajax({
+                    url: updateMinimumStockUrl,
+                    type: "POST",
+                    dataType: "json",
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res && res.status) {
+                            $("#modalMinimumStock").modal("hide");
+                            loadStockData();
+                        } else {
+                            alert("Gagal update minimum stock.");
+                        }
+                    },
+                    error: function() {
+                        alert("Gagal update minimum stock.");
+                    },
+                    complete: function() {
+                        $btn.prop("disabled", false).text("Simpan");
+                    }
+                });
             });
 
             $(document).on("click", ".btn-lokasi", function() {
@@ -253,7 +316,55 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalMinimumStock" tabindex="-1" role="dialog" aria-labelledby="modalMinimumStockLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="formMinimumStock">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalMinimumStockLabel">Atur Minimum Stock</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="kode_barang" id="minimum_stock_kode_barang">
+                    <div class="form-group">
+                        <label class="mb-1"><b>Barang</b></label>
+                        <div id="minimum_stock_nama_barang">-</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="minimum_stock_value"><b>Minimum Stock</b></label>
+                        <input type="number" name="minimum_stock" id="minimum_stock_value" class="form-control" min="0" step="0.01" required>
+                        <small class="form-text text-muted">Stok sama dengan atau di bawah nilai ini akan ditandai harus di-PO.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" id="btn_save_minimum_stock" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
+    .stock-qty {
+        display: block;
+        padding: 0.25rem;
+        border-radius: 0.2rem;
+        font-weight: 700;
+    }
+
+    .stock-qty-habis {
+        color: #ffffff;
+        background: #dc3545;
+    }
+
+    .stock-qty-hampir-habis {
+        color: #212529;
+        background: #ffc107;
+    }
+
     .dt-loading-overlay {
         position: absolute;
         top: 0;

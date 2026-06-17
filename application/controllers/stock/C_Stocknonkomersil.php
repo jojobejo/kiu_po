@@ -333,13 +333,40 @@ class C_Stocknonkomersil extends CI_Controller
     public function ajax_stocknonkomersil()
     {
         $lokasi = trim((string)$this->input->get('lokasi', true));
-        $stock = $this->M_Stocknonkomersil->v_stock($lokasi);
+        $status_stock = trim((string)$this->input->get('status_stock', true));
+        $stock = $this->M_Stocknonkomersil->v_stock($lokasi, $status_stock);
 
         $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 'status' => true,
                 'data' => $stock
+            ]));
+    }
+
+    public function update_minimum_stock()
+    {
+        $level = (string)$this->session->userdata('lv');
+        if ($level !== '1' && $level !== '2') {
+            $this->output
+                ->set_status_header(403)
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => false]));
+            return;
+        }
+
+        $kode_barang = trim((string)$this->input->post('kode_barang', true));
+        $minimum_stock = (float)$this->input->post('minimum_stock');
+
+        $updated = false;
+        if ($kode_barang !== '' && $minimum_stock >= 0) {
+            $updated = $this->M_Stocknonkomersil->update_minimum_stock($kode_barang, $minimum_stock);
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => (bool)$updated
             ]));
     }
 

@@ -571,7 +571,7 @@ class M_PoStatus extends CI_Model
     public function getAllNK_kadep($kddep)
     {
         return $this->db->query("SELECT 
-        a.kd_po_nk ,a.nopo , a.status , a.tgl_transaksi , b.nama_user , a.departemen , a.tj_pembelian
+        a.kd_po_nk, a.kd_po_req, a.nopo, a.status, a.tgl_transaksi, b.nama_user, a.departemen, a.tj_pembelian
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
         WHERE a.departemen = '$kddep'
@@ -583,6 +583,7 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
             a.kd_po_nk,
+            a.kd_po_req,
             a.nopo,
             a.status,
             a.tgl_transaksi,
@@ -600,6 +601,7 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
             a.kd_po_nk,
+            a.kd_po_req,
             a.nopo,
             a.status,
             a.tgl_transaksi,
@@ -617,6 +619,7 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
             a.kd_po_nk,
+            a.kd_po_req,
             a.nopo,
             a.status,
             a.tgl_transaksi,
@@ -699,25 +702,25 @@ class M_PoStatus extends CI_Model
         return $this->db->get()->result();
     }
 
-    function get_ponk_by_id($kd_po_nk)
+    function get_ponk_by_req($kd_po_req)
     {
         $this->db->select('*');
         $this->db->from('tb_po_nk');
-        $this->db->where('kd_po_nk', $kd_po_nk);
+        $this->db->where('kd_po_req', $kd_po_req);
         return $this->db->get()->row();
     }
 
-    function cancel_pengajuan_ponk($kd_po_nk)
+    function cancel_pengajuan_ponk($kd_po_req)
     {
-        $this->db->where('kd_po_nk', $kd_po_nk);
+        $this->db->where('kd_po_req', $kd_po_req);
         return $this->db->update('tb_po_nk', array(
             'status' => 'PENGAJUAN DIBATALKAN'
         ));
     }
 
-    function update_tujuan_pembelian_ponk($kd_po_nk, $tujuan_pembelian)
+    function update_tujuan_pembelian_ponk($kd_po_req, $tujuan_pembelian)
     {
-        $this->db->where('kd_po_nk', $kd_po_nk);
+        $this->db->where('kd_po_req', $kd_po_req);
         return $this->db->update('tb_po_nk', array(
             'tj_pembelian' => $tujuan_pembelian
         ));

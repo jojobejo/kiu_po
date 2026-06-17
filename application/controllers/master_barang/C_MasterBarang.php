@@ -109,6 +109,7 @@ class C_MasterBarang extends CI_Controller
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descnk');
         $satuan     = $this->input->post('satuanisi');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->input->post('reqby');
 
         $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
@@ -122,6 +123,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'gbr_barang'    => "Karisma.png",
             'qrcode_data'   => $kdqrcode,
             'qrcode_path'   => $qrcpath,
@@ -157,6 +159,7 @@ class C_MasterBarang extends CI_Controller
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->session->userdata('kode');
 
         $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
@@ -170,6 +173,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'gbr_barang'    => "Karisma.png",
             'qrcode_data'   => $kdqrcode,
             'qrcode_path'   => $qrcpath,
@@ -222,6 +226,7 @@ class C_MasterBarang extends CI_Controller
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->session->userdata('kode');
         $dtinputbr = array(
             'kd_br_adm'     => $kdbarang1,
@@ -229,6 +234,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'inputer'       => $inputer,
         );
         $this->M_MasterBarang->edit_mbarangnk($id, $dtinputbr);

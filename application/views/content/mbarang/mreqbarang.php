@@ -39,6 +39,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right">Minimum Stock<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="number" name="minimum_stock" value="0" min="0" step="0.01" required />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>

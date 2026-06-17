@@ -15,14 +15,31 @@ class M_Stocknonkomersil  extends CI_Model
         return $this->db->get('')->result();
     }
 
-    public function v_stock($lokasi = '')
+    public function v_stock($lokasi = '', $status_stock = '')
     {
-        $this->db->select('v.*, b.kd_lokasi AS id_lokasi, l.nama_lokasi AS nama_lokasi');
+        $this->db->select("v.*, b.kd_lokasi AS id_lokasi, l.nama_lokasi AS nama_lokasi,
+            COALESCE(b.minimum_stock, 0) AS minimum_stock,
+            GREATEST(COALESCE(b.minimum_stock, 0) - COALESCE(v.qty_ready, 0), 0) AS qty_saran_po,
+            CASE
+                WHEN COALESCE(v.qty_ready, 0) <= 0 THEN 'habis'
+                WHEN COALESCE(v.qty_ready, 0) <= COALESCE(b.minimum_stock, 0) THEN 'hampir_habis'
+                ELSE 'aman'
+            END AS status_stock", false);
         $this->db->from('v_stockbarangnk v');
         $this->db->join('tb_barang_nk b', 'b.kd_barang = v.kode_barangs', 'left');
         $this->db->join('tb_barang_nk_lokasi l', 'l.id_lokasi = b.kd_lokasi', 'left');
         if ($lokasi !== '') {
             $this->db->where('l.nama_lokasi', $lokasi);
+        }
+        if ($status_stock === 'perlu_po') {
+            $this->db->where('COALESCE(v.qty_ready, 0) <= COALESCE(b.minimum_stock, 0)', null, false);
+        } elseif ($status_stock === 'hampir_habis') {
+            $this->db->where('COALESCE(v.qty_ready, 0) > 0', null, false);
+            $this->db->where('COALESCE(v.qty_ready, 0) <= COALESCE(b.minimum_stock, 0)', null, false);
+        } elseif ($status_stock === 'habis') {
+            $this->db->where('COALESCE(v.qty_ready, 0) <= 0', null, false);
+        } elseif ($status_stock === 'aman') {
+            $this->db->where('COALESCE(v.qty_ready, 0) > COALESCE(b.minimum_stock, 0)', null, false);
         }
         return $this->db->get()->result();
     }
@@ -123,6 +140,14 @@ class M_Stocknonkomersil  extends CI_Model
         $this->db->where('kd_br_adm', $kode_barang);
         return $this->db->update('tb_barang_nk', [
             'kd_lokasi' => $id_lokasi
+        ]);
+    }
+
+    public function update_minimum_stock($kode_barang, $minimum_stock)
+    {
+        $this->db->where('kd_barang', $kode_barang);
+        return $this->db->update('tb_barang_nk', [
+            'minimum_stock' => $minimum_stock
         ]);
     }
 

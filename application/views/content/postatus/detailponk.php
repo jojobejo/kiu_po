@@ -350,7 +350,7 @@
                             <?php if ($canUpdatePonkPengajuan) : ?>
                                 <div class="col-lg">
                                     <label>&nbsp;</label>
-                                    <button type="button" class="btn btn-danger btn-block btn-cancel-pengajuan-ponk" data-kd-po-nk="<?= $kdPonkDetail ?>">
+                                    <button type="button" class="btn btn-danger btn-block btn-cancel-pengajuan-ponk" data-kd-po-req="<?= htmlspecialchars($s->kd_po_req, ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fas fa-ban"></i> CANCEL PENGAJUAN
                                     </button>
                                 </div>
@@ -383,7 +383,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="kd_po_nk" value="<?= $kdPonkDetail ?>">
+                            <input type="hidden" name="kd_po_req" value="<?= htmlspecialchars($s->kd_po_req, ENT_QUOTES, 'UTF-8') ?>">
                             <div class="form-group">
                                 <label>Tujuan Pembelian</label>
                                 <textarea name="tujuan_pembelian" class="form-control" rows="5" required><?= htmlspecialchars($s->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></textarea>
@@ -1784,14 +1784,14 @@
         }
 
         $(document).off('click.ponkCancel', '.btn-cancel-pengajuan-ponk').on('click.ponkCancel', '.btn-cancel-pengajuan-ponk', function() {
-            var kdPoNk = $(this).attr('data-kd-po-nk');
+            var kdPoReq = $(this).attr('data-kd-po-req');
             var processCancel = function() {
                 $.ajax({
                     url: cancelPengajuanUrl,
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        kd_po_nk: kdPoNk
+                        kd_po_req: kdPoReq
                     },
                     success: function(response) {
                         if (response.status) {
