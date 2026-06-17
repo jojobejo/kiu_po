@@ -44,6 +44,17 @@ class C_PoStatus extends CI_Controller
         return $taxRate > 0 ? (float) $value / (1 + $taxRate) : (float) $value;
     }
 
+    private function hargaExcludePpnByMode($harga, $ppnMode, $taxPercent)
+    {
+        $harga = $this->parseNumericInput($harga);
+
+        if ($ppnMode !== 'include') {
+            return $harga;
+        }
+
+        return $this->excludePpn($harga, $taxPercent);
+    }
+
     private function diskonExcludeTax($nominal, $taxPercent)
     {
         $nominal = $this->parseNumericInput($nominal);
@@ -1038,12 +1049,15 @@ class C_PoStatus extends CI_Controller
         $satuan     = $this->input->post('satuan_isi');
         $qty        = $this->parseNumericInput($this->input->post('qty_isi'));
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
-        $hargaQty   = $isBonus ? 0 : $this->parseNumericInput($this->input->post('hrg_isi'));
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan'));
-        $hargahasil = $hargaQty * $qty;
-        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
         $status     = $this->M_Postatus->getdataStatus($kdpo);
         $tax        = !empty($status) && isset($status[0]->tax) ? $status[0]->tax : 0;
+        $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode')));
+        $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+        $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi'));
+        $hargaQty   = $isBonus ? 0 : $this->hargaExcludePpnByMode($hargaInput, $ppnMode, $tax);
+        $hargahasil = $hargaQty * $qty;
+        $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
 
         if (!$konversi['success']) {
             $this->session->set_flashdata('error', $konversi['message']);
@@ -1051,7 +1065,7 @@ class C_PoStatus extends CI_Controller
             return;
         }
 
-        $hargaSatuanKecilExclude = $isBonus ? 0 : $this->excludePpn($konversi['harga_satuan_kecil'], $tax);
+        $hargaSatuanKecilExclude = $isBonus ? 0 : $konversi['harga_satuan_kecil'];
 
         $data = array(
             'kd_po'         => $kdpo,

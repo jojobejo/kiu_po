@@ -1,4 +1,10 @@
 <!-- MODAL ADD -->
+<?php
+$ppnRate = 11;
+if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
+    $ppnRate = (float) $status[0]->tax;
+}
+?>
 <?php foreach ($barang as $i) : ?>
     <div class="modal fade" id="modalAddItem<?= $i->id_barang ?>">
         <div class="modal-dialog modal-lg">
@@ -10,7 +16,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('tambahBarangRevisi'); ?>
+                    <?php echo form_open_multipart('tambahBarangRevisi', array('class' => 'ppn-price-form', 'data-ppn-rate' => $ppnRate)); ?>
                     <div class="form-group" hidden>
                         <?php foreach ($status as $s) : ?>
                             <div class="row">
@@ -69,13 +75,45 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" /></div>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format" type="text" inputmode="decimal" value="" autocomplete="off" />
+                                <input type="hidden" name="qty_isi" class="number-raw" value="" />
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_isi" name="hrg_isi" value="" /></div>
+                            <label class="col-sm-3 control-label text-right" for="harga_satuan_<?= $i->id_barang ?>">Harga Satuan<span class="required">*</span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format ppn-price-input" type="text" inputmode="decimal" id="harga_satuan_<?= $i->id_barang ?>" value="" autocomplete="off" />
+                                <input type="hidden" name="hrg_isi" class="number-raw ppn-price-raw" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
+                            <div class="col-sm-8 pt-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="ppn_exclude_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="ppn_exclude_revisi_<?= $i->id_barang ?>">Exclude PPN</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="ppn_include_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
+                                    <label class="custom-control-label" for="ppn_include_revisi_<?= $i->id_barang ?>">Include PPN</label>
+                                </div>
+                                <small class="form-text text-muted">Include PPN dihitung menggunakan PPN <?= htmlspecialchars($ppnRate, ENT_QUOTES, 'UTF-8') ?>%.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_revisi_<?= $i->id_barang ?>">Harga Satuan Hasil Kalkulasi</label>
+                            <div class="col-sm-8">
+                                <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_revisi_<?= $i->id_barang ?>" value="" readonly />
+                                <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="" />
+                                <small class="form-text text-muted">Nilai exclude PPN ini yang digunakan untuk penyimpanan.</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -90,6 +128,101 @@
         <!-- /.modal-dialog -->
     </div>
 <?php endforeach; ?>
+
+<script>
+    (function() {
+        function normalizeNumberInput(value) {
+            var parts = value.replace(/[^\d,]/g, '').split(',');
+            var integerPart = parts[0].replace(/[^\d]/g, '');
+            var decimalPart = parts.length > 1 ? parts.slice(1).join('').replace(/[^\d]/g, '') : '';
+            var formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            return {
+                display: decimalPart !== '' ? formattedInteger + ',' + decimalPart : formattedInteger,
+                raw: decimalPart !== '' ? integerPart + '.' + decimalPart : integerPart
+            };
+        }
+
+        function formatCalculatedPrice(value) {
+            if (!isFinite(value)) {
+                return '';
+            }
+
+            return value.toLocaleString('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 4
+            });
+        }
+
+        function updateCalculatedPrice(form) {
+            if (!form || !form.classList.contains('ppn-price-form')) {
+                return;
+            }
+
+            var rawInput = form.querySelector('.ppn-price-raw');
+            var displayOutput = form.querySelector('.ppn-calculated-display');
+            var rawOutput = form.querySelector('.ppn-calculated-raw');
+            var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+
+            if (!rawInput || !displayOutput || !rawOutput || !selectedMode || rawInput.value === '') {
+                if (displayOutput) {
+                    displayOutput.value = '';
+                }
+                if (rawOutput) {
+                    rawOutput.value = '';
+                }
+                return;
+            }
+
+            var inputPrice = parseFloat(rawInput.value);
+            var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+            var calculatedPrice = selectedMode.value === 'include'
+                ? inputPrice / (1 + (ppnRate / 100))
+                : inputPrice;
+
+            displayOutput.value = formatCalculatedPrice(calculatedPrice);
+            rawOutput.value = calculatedPrice;
+        }
+
+        document.addEventListener('input', function(event) {
+            if (!event.target.classList.contains('number-format')) {
+                return;
+            }
+
+            var normalized = normalizeNumberInput(event.target.value);
+            var rawInput = event.target.parentNode.querySelector('.number-raw');
+
+            event.target.value = normalized.display;
+
+            if (rawInput) {
+                rawInput.value = normalized.raw;
+            }
+
+            if (event.target.classList.contains('ppn-price-input')) {
+                updateCalculatedPrice(event.target.closest('form'));
+            }
+        });
+
+        document.addEventListener('change', function(event) {
+            if (event.target.name === 'ppn_mode') {
+                updateCalculatedPrice(event.target.closest('form'));
+            }
+        });
+
+        document.addEventListener('submit', function(event) {
+            event.target.querySelectorAll('.number-format').forEach(function(input) {
+                var normalized = normalizeNumberInput(input.value);
+                var rawInput = input.parentNode.querySelector('.number-raw');
+
+                if (rawInput) {
+                    rawInput.value = normalized.raw;
+                }
+            });
+
+            updateCalculatedPrice(event.target);
+        });
+    })();
+</script>
 
 <?php foreach ($barang as $i) : ?>
     <div class="modal fade" id="modalAddBonus<?= $i->id_barang ?>">
@@ -163,7 +296,16 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" name="qty_isi" value="" /></div>
+                            <div class="col-sm-8">
+                                <input class="form-control number-format" type="text" inputmode="decimal" value="" autocomplete="off" />
+                                <input type="hidden" name="qty_isi" class="number-raw" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group d-none">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" value="0" readonly /></div>
                         </div>
                     </div>
                     <div class="form-group">

@@ -111,7 +111,7 @@ class M_Purchase extends CI_Model
         }
         $this->db->from('tb_tmp_item a');
         if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
         }
         $this->db->where('a.kode_suplier', $kd);
         if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
@@ -130,7 +130,7 @@ class M_Purchase extends CI_Model
 
         $this->db->select('b.merk_barang');
         $this->db->from('tb_tmp_item a');
-        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
         $this->db->where('a.kode_suplier', $kd);
         $this->db->where('b.merk_barang IS NOT NULL', null, false);
         $this->db->where("TRIM(b.merk_barang) <> ''", null, false);
@@ -193,7 +193,7 @@ class M_Purchase extends CI_Model
         }
         $this->db->from('tb_tmp_item a');
         if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang', 'left');
+            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
         }
         $this->db->where('a.kode_suplier', $id_tmp);
         if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {

@@ -143,7 +143,7 @@ class C_Order extends CI_Controller
         );
     }
 
-    private function prepareKonversiBarang($kodeBarang, $satuan, $qty, $hargaSatuan, $isBonus = 0)
+    private function prepareKonversiBarang($kodeBarang, $satuan, $qty, $hargaSatuan, $isBonus = 0, $kodeSuplier = null)
     {
         $kodeBarang = trim((string) $kodeBarang);
         $qty = $this->parseNumericInput($qty);
@@ -169,7 +169,9 @@ class C_Order extends CI_Controller
             return $this->validationError('Kolom isi dan kemasan pada master barang belum tersedia');
         }
 
-        $barang = $this->M_Purchase->get_barang_by_kode($kodeBarang);
+        $barang = $kodeSuplier
+            ? $this->M_Purchase->getBarangByKode($kodeBarang, $kodeSuplier)
+            : $this->M_Purchase->get_barang_by_kode($kodeBarang);
 
         if (!$barang) {
             return $this->validationError('Data barang tidak ditemukan');
@@ -322,11 +324,15 @@ class C_Order extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $namabarang = $this->input->post('nama_isi');
         $kdsuplier  = $this->input->post('kd_sup_isi');
+        $isi        = $this->parseNumericInput($this->input->post('isi'));
+        $kemasan    = $this->parseNumericInput($this->input->post('kemasan'));
 
         $dataBarang = array(
             'kode_barang'   => $kdbarang,
             'kd_suplier'    => $kdsuplier,
-            'nama_barang'   => $namabarang
+            'nama_barang'   => $namabarang,
+            'isi'           => $isi,
+            'kemasan'       => $kemasan
         );
 
         $this->M_MasterBarang->insertBarang($dataBarang);
@@ -339,12 +345,16 @@ class C_Order extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $namabarang = $this->input->post('nama_isi');
         $kdsuplier  = $this->input->post('kd_sup_isi');
+        $isi        = $this->parseNumericInput($this->input->post('isi'));
+        $kemasan    = $this->parseNumericInput($this->input->post('kemasan'));
 
         $dataBarang = array(
             'id_barang'     => $idbarang,
             'kode_barang'   => $kdbarang,
             'kd_suplier'    => $kdsuplier,
-            'nama_barang'   => $namabarang
+            'nama_barang'   => $namabarang,
+            'isi'           => $isi,
+            'kemasan'       => $kemasan
         );
 
         $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
@@ -357,12 +367,16 @@ class C_Order extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $namabarang = $this->input->post('nama_isi');
         $kdsuplier  = $this->input->post('kd_sup_isi');
+        $isi        = $this->parseNumericInput($this->input->post('isi'));
+        $kemasan    = $this->parseNumericInput($this->input->post('kemasan'));
 
         $dataBarang = array(
             'id_barang'     => $idbarang,
             'kode_barang'   => $kdbarang,
             'kd_suplier'    => $kdsuplier,
-            'nama_barang'   => $namabarang
+            'nama_barang'   => $namabarang,
+            'isi'           => $isi,
+            'kemasan'       => $kemasan
         );
 
         $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
@@ -390,7 +404,7 @@ class C_Order extends CI_Controller
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
-        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus, $suplier);
 
         if (!$konversi['status']) {
             $this->redirectWithError($konversi['message'], 'purchase/listBarang/' . $suplier);
@@ -610,6 +624,7 @@ class C_Order extends CI_Controller
         $tmpdiskon  = $this->M_Purchase->getTmpDiskonOrder($suplier);
         $tmpnote    = $this->M_Purchase->getTmpNoteOrder($suplier);
         $detailTransaksi = array();
+        $processedTmpIds = array();
         $totalHargaDiskon = 0;
         $hargaPajak = 0;
 
@@ -627,6 +642,14 @@ class C_Order extends CI_Controller
         }
 
         foreach ($tmp as $chart) {
+            $tmpId = isset($chart->id_tmp) ? (int) $chart->id_tmp : 0;
+            if ($tmpId > 0 && isset($processedTmpIds[$tmpId])) {
+                continue;
+            }
+            if ($tmpId > 0) {
+                $processedTmpIds[$tmpId] = true;
+            }
+
             $isBonus = isset($chart->is_bonus) ? (int) $chart->is_bonus : 0;
             $qtyKecil = isset($chart->qty_kecil) && (float) $chart->qty_kecil > 0 ? $chart->qty_kecil : $chart->qty;
             $hargaSatuanKecil = isset($chart->harga_satuan_kecil) && ((float) $chart->harga_satuan_kecil > 0 || $isBonus) ? $chart->harga_satuan_kecil : $chart->harga_satuan;
@@ -1045,7 +1068,7 @@ class C_Order extends CI_Controller
         $hrg_satuan = $isBonus ? 0 : $this->hargaExcludePpn($hargaInput, $ppnMode);
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
-        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus, $supp);
 
         if (!$konversi['status']) {
             $this->redirectWithError($konversi['message'], 'purchase/sup/' . $supp);

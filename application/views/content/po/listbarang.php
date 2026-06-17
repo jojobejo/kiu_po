@@ -32,6 +32,8 @@
                 <thead>
                     <tr>
                         <td>Nama Barang</td>
+                        <td>Isi</td>
+                        <td>Kemasan</td>
                         <td>Aksi</td>
                     </tr>
                 </thead>
@@ -39,6 +41,8 @@
                     <tr>
                         <?php foreach ($barang as $s) : ?>
                             <td><?= $s->nama_barang ?></td>
+                            <td><?= isset($s->isi) ? $s->isi : '-' ?></td>
+                            <td><?= isset($s->kemasan) ? $s->kemasan : '-' ?></td>
                             <td>
                                 <div class="row">
                                     <div class="col-md">

@@ -22,6 +22,18 @@
                         <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="" /></div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="isi">Isi<span class="required">*</span></label>
+                        <div class="col-sm-8"><input class="form-control" type="number" step="any" id="isi" name="isi" value="" /></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-sm-3 control-label text-right" for="kemasan">Kemasan<span class="required">*</span></label>
+                        <div class="col-sm-8"><input class="form-control" type="number" step="any" id="kemasan" name="kemasan" value="" /></div>
+                    </div>
+                </div>
                 <?php foreach ($kode_suplier as $s) ?>
                 <div class="form-group" hidden>
                     <div class="row">
@@ -64,6 +76,18 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Nama Barang<span class="required">*</span></label>
                             <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $i->nama_barang ?>" /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="isi<?= $i->id_barang ?>">Isi<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" step="any" id="isi<?= $i->id_barang ?>" name="isi" value="<?= isset($i->isi) ? $i->isi : '' ?>" /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="kemasan<?= $i->id_barang ?>">Kemasan<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" step="any" id="kemasan<?= $i->id_barang ?>" name="kemasan" value="<?= isset($i->kemasan) ? $i->kemasan : '' ?>" /></div>
                         </div>
                     </div>
                     <?php foreach ($kode_suplier as $s) ?>

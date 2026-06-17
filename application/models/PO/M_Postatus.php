@@ -106,7 +106,7 @@ class M_PoStatus extends CI_Model
         $this->db->from('tb_detail_po a');
         $this->db->join('tb_suplier b', 'b.kd_suplier = a.kd_suplier');
         if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang', 'left');
+            $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang AND c.kd_suplier = a.kd_suplier', 'left');
         }
         $this->db->where('kd_po', $kdpo);
         if ($this->db->field_exists('is_bonus', 'tb_detail_po')) {
@@ -124,7 +124,7 @@ class M_PoStatus extends CI_Model
 
         $this->db->select('c.merk_barang');
         $this->db->from('tb_detail_po a');
-        $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang', 'left');
+        $this->db->join('tb_barang c', 'c.kode_barang = a.kd_barang AND c.kd_suplier = a.kd_suplier', 'left');
         $this->db->where('a.kd_po', $kdpo);
         $this->db->where('c.merk_barang IS NOT NULL', null, false);
         $this->db->where("TRIM(c.merk_barang) <> ''", null, false);
