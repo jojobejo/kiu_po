@@ -33,7 +33,7 @@ if (!function_exists('po_money')) {
 if (!function_exists('po_money_round_up')) {
     function po_money_round_up($value)
     {
-        return 'Rp. ' . number_format(ceil(po_num($value)), 0, ',', '.');
+        return 'Rp. ' . number_format(ceil(po_num($value)), 2, ',', '.');
     }
 }
 

@@ -225,74 +225,47 @@ class M_Purchase extends CI_Model
         $this->db->where('kode_suplier', $id_tmp);
         return $this->db->delete('tb_tmp_item');
     }
+    private function getPoPrefixByUser($kduser)
+    {
+        $kduser = strtoupper(trim((string) $kduser));
+
+        if ($kduser == 'KIUADMIN') {
+            return 'KPO';
+        }
+
+        if ($kduser == 'KEU01' || preg_match('/^KEU01\d+$/', $kduser)) {
+            return 'SKPO';
+        }
+
+        if ($kduser == 'KEU02') {
+            return 'AKPO';
+        }
+
+        if ($kduser == 'KEU03') {
+            return 'NKPO';
+        }
+
+        if ($kduser == 'KEU04') {
+            return 'MKPO';
+        }
+
+        return 'KPO';
+    }
+
     function kdpo($kduser, $kdsuplier)
     {
-        if ($kduser == 'KIUADMIN') {
-            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-            $kd = "";
-            if ($cd->num_rows() > 0) {
-                foreach ($cd->result() as $k) {
-                    $tmp = ((int)$k->kd_max) + 1;
-                    $kd = sprintf("%04s", $tmp);
-                }
-            } else {
-                $kd = "0001";
+        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+        $kd = "0001";
+
+        if ($cd->num_rows() > 0) {
+            foreach ($cd->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd = sprintf("%04s", $tmp);
             }
-            date_default_timezone_set('Asia/Jakarta');
-            return 'KPO' . date('dmy') . $kdsuplier . $kd;
-        } else if ($kduser == 'KEU01') {
-            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-            $kd = "";
-            if ($cd->num_rows() > 0) {
-                foreach ($cd->result() as $k) {
-                    $tmp = ((int)$k->kd_max) + 1;
-                    $kd = sprintf("%04s", $tmp);
-                }
-            } else {
-                $kd = "0001";
-            }
-            date_default_timezone_set('Asia/Jakarta');
-            return 'SKPO' . date('dmy') . $kdsuplier . $kd;
-        } else if ($kduser == 'KEU02') {
-            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-            $kd = "";
-            if ($cd->num_rows() > 0) {
-                foreach ($cd->result() as $k) {
-                    $tmp = ((int)$k->kd_max) + 1;
-                    $kd = sprintf("%04s", $tmp);
-                }
-            } else {
-                $kd = "0001";
-            }
-            date_default_timezone_set('Asia/Jakarta');
-            return 'AKPO' . date('dmy') . $kdsuplier . $kd;
-        } else if ($kduser == 'KEU03') {
-            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-            $kd = "";
-            if ($cd->num_rows() > 0) {
-                foreach ($cd->result() as $k) {
-                    $tmp = ((int)$k->kd_max) + 1;
-                    $kd = sprintf("%04s", $tmp);
-                }
-            } else {
-                $kd = "0001";
-            }
-            date_default_timezone_set('Asia/Jakarta');
-            return 'NKPO' . date('dmy') . $kdsuplier . $kd;
-        } else if ($kduser == 'KEU04') {
-            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-            $kd = "";
-            if ($cd->num_rows() > 0) {
-                foreach ($cd->result() as $k) {
-                    $tmp = ((int)$k->kd_max) + 1;
-                    $kd = sprintf("%04s", $tmp);
-                }
-            } else {
-                $kd = "0001";
-            }
-            date_default_timezone_set('Asia/Jakarta');
-            return 'MKPO' . date('dmy') . $kdsuplier . $kd;
         }
+
+        date_default_timezone_set('Asia/Jakarta');
+        return $this->getPoPrefixByUser($kduser) . date('dmy') . $kdsuplier . $kd;
     }
 
     // NON KOMERSIL

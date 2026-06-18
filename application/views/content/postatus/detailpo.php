@@ -536,10 +536,10 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_final_unit_with_tax']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_after_with_tax']) ?></td>
+                            <td class="text-number"><?= po_money_round_up($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number"><?= po_money_round_up($row['harga_final_unit']) ?></td>
+                            <td class="text-number"><?= po_money_round_up($row['total_before']) ?></td>
+                            <td class="text-number"><?= po_money_round_up($row['total_after']) ?></td>
                             <?php if ($showActionColumn) : ?>
                                 <td>
                                     <div class="action-cell">
@@ -612,23 +612,23 @@
         <div class="po-summary-card">
             <div class="po-summary-row">
                 <span>DPP Sebelum Diskon</span>
-                <strong><?= po_money($poDetailSummary['total_before_discount']) ?></strong>
+                <strong><?= po_money_round_up($poDetailSummary['total_before_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
                 <span>Total Diskon</span>
-                <strong><span class="badge badge-success"><?= po_money($poDetailSummary['total_discount']) ?></span></strong>
+                <strong><span class="badge badge-success"><?= po_money_round_up($poDetailSummary['total_discount']) ?></span></strong>
             </div>
             <div class="po-summary-row">
                 <span>DPP Setelah Diskon</span>
-                <strong><?= po_money($poDetailSummary['total_after_discount']) ?></strong>
+                <strong><?= po_money_round_up($poDetailSummary['total_after_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
                 <span>Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%</span>
-                <strong><?= po_money($poDetailSummary['tax_with_discount']) ?></strong>
+                <strong><?= po_money_round_up($poDetailSummary['tax_with_discount']) ?></strong>
             </div>
             <div class="po-summary-row po-summary-grand">
                 <span>Grand Total Harga Dengan Diskon</span>
-                <span><?= po_money($poDetailSummary['grand_total_with_discount']) ?></span>
+                <span><?= po_money_round_up($poDetailSummary['grand_total_with_discount']) ?></span>
             </div>
         </div>
 
