@@ -127,8 +127,8 @@
                                 if ($row['is_bonus']) {
                                     continue;
                                 }
-                                $supplierUnitPrice = po_include_tax($row['harga_satuan'], $s->tax);
-                                $supplierRowTotal = ceil(round(po_include_tax($row['total_before'], $s->tax), 2));
+                                $supplierUnitPrice = $row['harga_satuan'];
+                                $supplierRowTotal = $row['qty'] * $supplierUnitPrice;
                                 $supplierGrandTotal += $supplierRowTotal;
                                 ?>
                                 <tr>
@@ -173,11 +173,10 @@
                             <?php foreach ($poPrintDiscountRows as $d) : ?>
                                 <?php if (!empty($hideBonusDiscountRows) && $d['is_bonus_item']) continue; ?>
                                 <?php if (!empty($d['label'])) : ?>
-                                    <?php $supplierDiscountValue = po_include_tax($d['total_discount'], $s->tax); ?>
                                     <tr>
                                         <td colspan="4" style="text-align: end;font-weight: bold;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?> : </td>
                                         <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['nominal']) ?></td>
-                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($supplierPrint ? $supplierDiscountValue : $d['total_discount']) ?></td>
+                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['total_discount']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>

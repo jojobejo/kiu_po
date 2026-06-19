@@ -64,8 +64,7 @@ if (!function_exists('po_include_tax')) {
 if (!function_exists('po_discount_exclude_tax')) {
     function po_discount_exclude_tax($value, $taxPercent)
     {
-        $taxRate = po_num($taxPercent) / 100;
-        return $taxRate > 0 ? po_num($value) / (1 + $taxRate) : po_num($value);
+        return po_num($value);
     }
 }
 

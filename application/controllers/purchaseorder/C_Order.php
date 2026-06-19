@@ -94,9 +94,7 @@ class C_Order extends CI_Controller
 
     private function diskonExcludeTax($nominal, $taxPercent)
     {
-        $nominal = $this->parseNumericInput($nominal);
-        $taxRate = $this->parseNumericInput($taxPercent) / 100;
-        return $taxRate > 0 ? $nominal / (1 + $taxRate) : $nominal;
+        return $this->parseNumericInput($nominal);
     }
 
     private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan)
