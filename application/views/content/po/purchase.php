@@ -100,6 +100,17 @@
                     font-size: 16px;
                     font-weight: 700;
                 }
+
+                .po-ppn-switch {
+                    align-items: center;
+                    display: flex;
+                    justify-content: flex-end;
+                    margin: 0 0 .75rem;
+                }
+
+                .po-ppn-switch .custom-control-label {
+                    min-width: 145px;
+                }
             </style>
             <div class="row mb-2">
                 <div class="col-sm-6">
@@ -231,6 +242,7 @@
         unset($poDiscountRow);
         $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
         $poSummary = po_add_tax_summary($poSummary, $tax);
+        $poTaxMultiplier = 1 + ((float) $tax / 100);
         ?>
         <?php if ($poSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -239,6 +251,12 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+        <div class="po-ppn-switch">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input ppn-display-switch" id="ppn_display_purchase" data-po="purchase">
+                <label class="custom-control-label" for="ppn_display_purchase"><span class="ppn-display-mode" data-po="purchase">Exclude PPN</span></label>
+            </div>
+        </div>
         <div class="table-responsive po-table-wrap">
             <table id="table_form_input_po" class="table table-sm table-striped po-input-table">
                 <thead style="background-color: #212529; color:white;">
@@ -248,10 +266,10 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Qty Kecil</td>
-                        <td>Harga Satuan Kecil</td>
-                        <td>Harga Setelah Diskon</td>
-                        <td>Total Harga</td>
-                        <td>Total Harga Setelah Diskon</td>
+                        <td class="ppn-display-label" data-po="purchase" data-exclude="Harga Satuan Kecil (Exclude)" data-include="Harga Satuan Kecil (Include)">Harga Satuan Kecil (Exclude)</td>
+                        <td class="ppn-display-label" data-po="purchase" data-exclude="Harga Setelah Diskon (Exclude)" data-include="Harga Setelah Diskon (Include)">Harga Setelah Diskon (Exclude)</td>
+                        <td class="ppn-display-label" data-po="purchase" data-exclude="Total Harga (Exclude)" data-include="Total Harga (Include)">Total Harga (Exclude)</td>
+                        <td class="ppn-display-label" data-po="purchase" data-exclude="Total Harga Setelah Diskon (Exclude)" data-include="Total Harga Setelah Diskon (Include)">Total Harga Setelah Diskon (Exclude)</td>
                         <td>#</td>
                     </tr>
                 </thead>
@@ -273,10 +291,10 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money($row['harga_final_unit']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money($row['total_after']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['harga_satuan_kecil']) ?>" data-include="<?= po_money($row['harga_satuan_kecil'] * $poTaxMultiplier) ?>"><?= po_money($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['harga_final_unit']) ?>" data-include="<?= po_money($row['harga_final_unit'] * $poTaxMultiplier) ?>"><?= po_money($row['harga_final_unit']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['total_before']) ?>" data-include="<?= po_money($row['total_before'] * $poTaxMultiplier) ?>"><?= po_money($row['total_before']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['total_after']) ?>" data-include="<?= po_money($row['total_after'] * $poTaxMultiplier) ?>"><?= po_money($row['total_after']) ?></td>
                             <td>
                                 <div class="action-cell">
                                     <a href="#" class="btn btn-warning btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $t->id_tmp ?>" title="Edit">
@@ -349,19 +367,19 @@
 
         <div class="po-summary-card">
             <div class="po-summary-row">
-                <span>Total Harga Sebelum Diskon</span>
-                <strong><?= po_money_round_up($poSummary['total_before_discount']) ?></strong>
+                <span class="ppn-display-label" data-po="purchase" data-exclude="Total Harga Sebelum Diskon" data-include="Total Harga Sebelum Diskon (Include PPN)">Total Harga Sebelum Diskon</span>
+                <strong class="ppn-display-value" data-po="purchase" data-exclude="<?= po_money_round_up($poSummary['total_before_discount']) ?>" data-include="<?= po_money_round_up($poSummary['grand_total_without_discount']) ?>"><?= po_money_round_up($poSummary['total_before_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
-                <span>Total Diskon</span>
-                <strong><span class="badge badge-success"><?= po_money_round_up($poSummary['total_discount']) ?></span></strong>
+                <span class="ppn-display-label" data-po="purchase" data-exclude="Total Diskon" data-include="Total Diskon (Include PPN)">Total Diskon</span>
+                <strong><span class="badge badge-success ppn-display-value" data-po="purchase" data-exclude="<?= po_money_round_up($poSummary['total_discount']) ?>" data-include="<?= po_money_round_up($poSummary['total_discount'] * $poTaxMultiplier) ?>"><?= po_money_round_up($poSummary['total_discount']) ?></span></strong>
             </div>
             <div class="po-summary-row">
-                <span>Total Harga Setelah Diskon</span>
-                <strong><?= po_money_round_up($poSummary['total_after_discount']) ?></strong>
+                <span class="ppn-display-label" data-po="purchase" data-exclude="Total Harga Setelah Diskon" data-include="Total Harga Setelah Diskon (Include PPN)">Total Harga Setelah Diskon</span>
+                <strong class="ppn-display-value" data-po="purchase" data-exclude="<?= po_money_round_up($poSummary['total_after_discount']) ?>" data-include="<?= po_money_round_up($poSummary['grand_total_with_discount']) ?>"><?= po_money_round_up($poSummary['total_after_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
-                <span>Tax <?= po_qty($poSummary['tax_percent']) ?>%</span>
+                <span class="ppn-display-label" data-po="purchase" data-exclude="Tax <?= po_qty($poSummary['tax_percent']) ?>%" data-include="PPN sudah termasuk dalam harga">Tax <?= po_qty($poSummary['tax_percent']) ?>%</span>
                 <strong><?= po_money_round_up($poSummary['tax_with_discount']) ?></strong>
             </div>
             <div class="po-summary-row po-summary-grand">
@@ -416,3 +434,29 @@
 
 <!-- /.content-header -->
 </div>
+
+<script>
+    (function() {
+        function setPpnDisplay(includePpn) {
+            var mode = includePpn ? 'include' : 'exclude';
+
+            document.querySelectorAll('.ppn-display-value[data-po="purchase"]').forEach(function(element) {
+                element.textContent = element.getAttribute('data-' + mode);
+            });
+
+            document.querySelectorAll('.ppn-display-label[data-po="purchase"]').forEach(function(element) {
+                element.textContent = element.getAttribute('data-' + mode);
+            });
+
+            document.querySelectorAll('.ppn-display-mode[data-po="purchase"]').forEach(function(element) {
+                element.textContent = includePpn ? 'Include PPN' : 'Exclude PPN';
+            });
+        }
+
+        document.addEventListener('change', function(event) {
+            if (event.target.classList.contains('ppn-display-switch') && event.target.getAttribute('data-po') === 'purchase') {
+                setPpnDisplay(event.target.checked);
+            }
+        });
+    })();
+</script>

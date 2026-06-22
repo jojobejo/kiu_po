@@ -48,11 +48,16 @@ class C_PoStatus extends CI_Controller
     {
         $harga = $this->parseNumericInput($harga);
 
-        if ($ppnMode !== 'include') {
+        if ($ppnMode !== 'exclude') {
             return $harga;
         }
 
         return $this->excludePpn($harga, $taxPercent);
+    }
+
+    private function isTaxElevenPercent($taxPercent)
+    {
+        return abs($this->parseNumericInput($taxPercent) - 11) < 0.00001;
     }
 
     private function diskonExcludeTax($nominal, $taxPercent)
@@ -989,7 +994,7 @@ class C_PoStatus extends CI_Controller
             'hrg_total'     => $hargahasil,
             'hrg_total_diskon' => $hargaSatuanKecilExclude * $konversi['qty_kecil'],
             'is_bonus'      => $isBonus,
-            'keterangan_bonus' => $isBonus ? $bonusNote : null,
+            'keterangan_bonus' => $isBonus ? $bonusNote : '',
         );
 
         $this->M_Postatus->revisiPO($idpo, $data);
@@ -1054,6 +1059,16 @@ class C_PoStatus extends CI_Controller
         $tax        = !empty($status) && isset($status[0]->tax) ? $status[0]->tax : 0;
         $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode')));
         $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+
+        // Kebijakan harga PO: harga exclude PPN hanya dapat digunakan pada PO
+        // dengan PPN 11%. Validasi ini harus berada di server agar tidak dapat
+        // dilewati dengan mengubah request dari browser.
+        if (!$isBonus && $ppnMode === 'exclude' && !$this->isTaxElevenPercent($tax)) {
+            $this->session->set_flashdata('error', 'Harga Exclude PPN wajib menggunakan Tax PO 11%. Ubah Tax menjadi 11% atau gunakan harga Include PPN.');
+            redirect('addBarangRevisi/' . $suplier . '/' . $kdpo);
+            return;
+        }
+
         $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi'));
         $hargaQty   = $isBonus ? 0 : $this->hargaExcludePpnByMode($hargaInput, $ppnMode, $tax);
         $hargahasil = $hargaQty * $qty;
@@ -1086,7 +1101,7 @@ class C_PoStatus extends CI_Controller
             'hrg_total'     => $hargahasil,
             'hrg_total_diskon' => $hargaSatuanKecilExclude * $konversi['qty_kecil'],
             'is_bonus'      => $isBonus,
-            'keterangan_bonus' => $isBonus ? $bonusNote : null,
+            'keterangan_bonus' => $isBonus ? $bonusNote : '',
 
         );
         $this->M_Postatus->addRevisiChart($data);

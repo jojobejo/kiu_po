@@ -72,7 +72,7 @@
                                     <input type="radio" id="ppn_include_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
                                     <label class="custom-control-label" for="ppn_include_<?= $i->id_barang ?>">Include PPN</label>
                                 </div>
-                                <small class="form-text text-muted">Include PPN dihitung menggunakan PPN 11%.</small>
+                                <small class="form-text text-muted">Exclude PPN dihitung menggunakan PPN 11%; Include PPN tidak dihitung ulang.</small>
                             </div>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                             <div class="col-sm-8">
                                 <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_<?= $i->id_barang ?>" value="" readonly />
                                 <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="" />
-                                <small class="form-text text-muted">Nilai exclude PPN ini yang digunakan untuk penyimpanan.</small>
+                                <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
                             </div>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
 
             var inputPrice = parseFloat(rawInput.value);
             var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'include'
+            var calculatedPrice = selectedMode.value === 'exclude'
                 ? inputPrice / (1 + (ppnRate / 100))
                 : inputPrice;
 

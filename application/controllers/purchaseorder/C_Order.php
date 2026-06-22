@@ -85,7 +85,7 @@ class C_Order extends CI_Controller
     {
         $harga = $this->parseNumericInput($harga);
 
-        if ($ppnMode !== 'include') {
+        if ($ppnMode !== 'exclude') {
             return $harga;
         }
 

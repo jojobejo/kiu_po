@@ -97,6 +97,17 @@
                     font-size: 16px;
                     font-weight: 700;
                 }
+
+                .po-ppn-switch {
+                    align-items: center;
+                    display: flex;
+                    justify-content: flex-end;
+                    margin: 0 0 .75rem;
+                }
+
+                .po-ppn-switch .custom-control-label {
+                    min-width: 145px;
+                }
             </style>
             <div class="row mb-2">
                 <div class="col-sm-6">
@@ -492,6 +503,7 @@
                             $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
                             $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
                             $poDetailRows = po_add_tax_to_discounted_item_rows($poDetailRows, $s->tax);
+                            $poDetailTaxMultiplier = 1 + ((float) $s->tax / 100);
         ?>
         <?php if ($poDetailSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -500,6 +512,14 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+        <div class="po-ppn-switch">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input ppn-display-switch" id="ppn_display_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">
+                <label class="custom-control-label" for="ppn_display_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">
+                    <span class="ppn-display-mode" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">Exclude PPN</span>
+                </label>
+            </div>
+        </div>
         <div class="table-responsive po-detail-table-wrap">
             <table class="table table-bordered table-striped po-detail-table">
                 <thead style="background-color: #212529; color:white;">
@@ -509,10 +529,10 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Qty Kecil</td>
-                        <td>Harga Satuan Kecil</td>
-                        <td>Harga Setelah Diskon</td>
-                        <td>Total Harga</td>
-                        <td>Total Harga Setelah Diskon</td>
+                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Harga Satuan Kecil (Exclude)" data-include="Harga Satuan Kecil (Include)">Harga Satuan Kecil (Exclude)</td>
+                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Harga Setelah Diskon (Exclude)" data-include="Harga Setelah Diskon (Include)">Harga Setelah Diskon (Exclude)</td>
+                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Harga (Exclude)" data-include="Total Harga (Include)">Total Harga (Exclude)</td>
+                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Harga Setelah Diskon (Exclude)" data-include="Total Harga Setelah Diskon (Include)">Total Harga Setelah Diskon (Exclude)</td>
                         <?php if ($showActionColumn) : ?>
                             <td>#</td>
                         <?php endif; ?>
@@ -536,10 +556,10 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number"><?= po_money_round_up($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number"><?= po_money_round_up($row['harga_final_unit']) ?></td>
-                            <td class="text-number"><?= po_money_round_up($row['total_before']) ?></td>
-                            <td class="text-number"><?= po_money_round_up($row['total_after']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['harga_satuan_kecil']) ?>" data-include="<?= po_money_round_up($row['harga_satuan_kecil'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['harga_satuan_kecil']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['harga_final_unit']) ?>" data-include="<?= po_money_round_up($row['harga_final_unit'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['harga_final_unit']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['total_before']) ?>" data-include="<?= po_money_round_up($row['total_before'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['total_before']) ?></td>
+                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['total_after']) ?>" data-include="<?= po_money_round_up($row['total_after'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['total_after']) ?></td>
                             <?php if ($showActionColumn) : ?>
                                 <td>
                                     <div class="action-cell">
@@ -611,19 +631,19 @@
 
         <div class="po-summary-card">
             <div class="po-summary-row">
-                <span>DPP Sebelum Diskon</span>
-                <strong><?= po_money_round_up($poDetailSummary['total_before_discount']) ?></strong>
+                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="DPP Sebelum Diskon" data-include="Total Sebelum Diskon (Include PPN)">DPP Sebelum Diskon</span>
+                <strong class="ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_before_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['grand_total_without_discount']) ?>"><?= po_money_round_up($poDetailSummary['total_before_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
-                <span>Total Diskon</span>
-                <strong><span class="badge badge-success"><?= po_money_round_up($poDetailSummary['total_discount']) ?></span></strong>
+                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Diskon" data-include="Total Diskon (Include PPN)">Total Diskon</span>
+                <strong><span class="badge badge-success ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['total_discount'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($poDetailSummary['total_discount']) ?></span></strong>
             </div>
             <div class="po-summary-row">
-                <span>DPP Setelah Diskon</span>
-                <strong><?= po_money_round_up($poDetailSummary['total_after_discount']) ?></strong>
+                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="DPP Setelah Diskon" data-include="Total Setelah Diskon (Include PPN)">DPP Setelah Diskon</span>
+                <strong class="ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_after_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['grand_total_with_discount']) ?>"><?= po_money_round_up($poDetailSummary['total_after_discount']) ?></strong>
             </div>
             <div class="po-summary-row">
-                <span>Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%</span>
+                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%" data-include="PPN sudah termasuk dalam harga">Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%</span>
                 <strong><?= po_money_round_up($poDetailSummary['tax_with_discount']) ?></strong>
             </div>
             <div class="po-summary-row po-summary-grand">
@@ -1226,3 +1246,33 @@
 
 </div>
 <?php endforeach; ?>
+
+<script>
+    (function() {
+        function setPpnDisplay(poCode, includePpn) {
+            var mode = includePpn ? 'include' : 'exclude';
+            var modeLabel = includePpn ? 'Include PPN' : 'Exclude PPN';
+            var selector = '[data-po="' + poCode + '"]';
+
+            document.querySelectorAll('.ppn-display-value' + selector).forEach(function(element) {
+                element.textContent = element.getAttribute('data-' + mode);
+            });
+
+            document.querySelectorAll('.ppn-display-label' + selector).forEach(function(element) {
+                element.textContent = element.getAttribute('data-' + mode);
+            });
+
+            document.querySelectorAll('.ppn-display-mode' + selector).forEach(function(element) {
+                element.textContent = modeLabel;
+            });
+        }
+
+        document.addEventListener('change', function(event) {
+            if (!event.target.classList.contains('ppn-display-switch')) {
+                return;
+            }
+
+            setPpnDisplay(event.target.getAttribute('data-po'), event.target.checked);
+        });
+    })();
+</script>

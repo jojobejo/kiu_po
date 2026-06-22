@@ -94,6 +94,11 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
                         <div class="row">
                             <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
                             <div class="col-sm-8 pt-2">
+                                <div class="alert alert-info py-2 mb-3" role="alert">
+                                    <strong>Kebijakan Harga &amp; PPN</strong><br>
+                                    <span><strong>Exclude PPN</strong> wajib menggunakan Tax PO <strong>11%</strong>.</span><br>
+                                    <span><strong>Include PPN</strong> digunakan bila harga dari vendor sudah termasuk PPN dan tidak dihitung ulang.</span>
+                                </div>
                                 <div class="custom-control custom-radio custom-control-inline">
                                     <input type="radio" id="ppn_exclude_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
                                     <label class="custom-control-label" for="ppn_exclude_revisi_<?= $i->id_barang ?>">Exclude PPN</label>
@@ -102,7 +107,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
                                     <input type="radio" id="ppn_include_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
                                     <label class="custom-control-label" for="ppn_include_revisi_<?= $i->id_barang ?>">Include PPN</label>
                                 </div>
-                                <small class="form-text text-muted">Include PPN dihitung menggunakan PPN <?= htmlspecialchars($ppnRate, ENT_QUOTES, 'UTF-8') ?>%.</small>
+                                <small class="form-text text-muted">Tax PO saat ini: <?= htmlspecialchars($ppnRate, ENT_QUOTES, 'UTF-8') ?>%. Exclude PPN dihitung berdasarkan tarif tersebut; Include PPN tidak dihitung ulang.</small>
                             </div>
                         </div>
                     </div>
@@ -112,7 +117,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
                             <div class="col-sm-8">
                                 <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_revisi_<?= $i->id_barang ?>" value="" readonly />
                                 <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="" />
-                                <small class="form-text text-muted">Nilai exclude PPN ini yang digunakan untuk penyimpanan.</small>
+                                <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
                             </div>
                         </div>
                     </div>
@@ -176,7 +181,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
 
             var inputPrice = parseFloat(rawInput.value);
             var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'include'
+            var calculatedPrice = selectedMode.value === 'exclude'
                 ? inputPrice / (1 + (ppnRate / 100))
                 : inputPrice;
 
@@ -210,6 +215,19 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
         });
 
         document.addEventListener('submit', function(event) {
+            var form = event.target;
+
+            if (form.classList.contains('ppn-price-form')) {
+                var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+                var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+
+                if (selectedMode && selectedMode.value === 'exclude' && Math.abs(ppnRate - 11) > 0.00001) {
+                    event.preventDefault();
+                    alert('Harga Exclude PPN wajib menggunakan Tax PO 11%. Ubah Tax PO menjadi 11% atau pilih Include PPN.');
+                    return;
+                }
+            }
+
             event.target.querySelectorAll('.number-format').forEach(function(input) {
                 var normalized = normalizeNumberInput(input.value);
                 var rawInput = input.parentNode.querySelector('.number-raw');

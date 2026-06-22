@@ -8,6 +8,7 @@
         $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail', $s->tax);
         $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
         $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
+        $supplierTaxMultiplier = 1 + ((float) $poPrintSummary['tax_percent'] / 100);
         $supplierGrandTotal = 0;
         ?>
         <section class="m-4">
@@ -116,8 +117,8 @@
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td>Harga Satuan</td>
-                                <td style="width: <?= $a ?>%;">Total Harga</td>
+                                <td>Harga Satuan<?= $supplierPrint ? ' (Include PPN)' : '' ?></td>
+                                <td style="width: <?= $a ?>%;">Total Harga<?= $supplierPrint ? ' (Include PPN)' : '' ?></td>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,7 +128,9 @@
                                 if ($row['is_bonus']) {
                                     continue;
                                 }
-                                $supplierUnitPrice = $row['harga_satuan'];
+                                $supplierUnitPrice = $supplierPrint
+                                    ? $row['harga_satuan'] * $supplierTaxMultiplier
+                                    : $row['harga_satuan'];
                                 $supplierRowTotal = $row['qty'] * $supplierUnitPrice;
                                 $supplierGrandTotal += $supplierRowTotal;
                                 ?>
@@ -141,7 +144,7 @@
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
-                                <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga<?= $supplierPrint ? ' (Include PPN)' : '' ?></td>
                                 <td style="text-align:end ">&nbsp;<?= $supplierPrint ? po_money($supplierGrandTotal) : po_money($poPrintSummary['total_before_discount']) ?></td>
                             </tr>
                         </tbody>
@@ -192,12 +195,12 @@
                             </tr>
                             <?php if ($supplierPrint) : ?>
                                 <tr>
-                                    <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalAfterDiscount) ?></td>
+                                <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon (Include PPN)</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalHarga) ?></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="5" style="text-align: end;font-weight: bold;">Tax : <?= po_qty($poPrintSummary['tax_percent']) ?>(%)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalTax) ?> </td>
+                                <td colspan="5" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($poPrintSummary['tax_percent']) ?>(%) sudah termasuk</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalTax) ?> </td>
                                 </tr>
                             <?php else : ?>
                                 <tr>
@@ -206,7 +209,7 @@
                                 </tr>
                             <?php endif; ?>
                             <tr>
-                                <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga (Include PPN)</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;<?= $supplierPrint ? po_money_round_up($poGrandTotalHarga) : po_money($poPrintSummary['grand_total_with_discount']) ?></td>
                             </tr>
                         </thead>
