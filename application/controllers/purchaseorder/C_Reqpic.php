@@ -533,7 +533,7 @@ class C_Reqpic extends CI_Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $itempnd        = $this->M_Reqpic->getitemreq($id)->result();
-        $now            = date('Y-m-d h:m:s');
+        $now            = date('Y-m-d H:i:s');
         $now1           = date('Y-m-d');
 
         if ($itempnd) {
@@ -569,7 +569,7 @@ class C_Reqpic extends CI_Controller
         $qty        = $this->input->post('qty_isi');
         $hrgsatuan  = $this->input->post('hrg_isi');
         $itempnd    = $this->M_Reqpic->getitemreq($id)->result();
-        $now        = date('Y-m-d h:m:s');
+        $now        = date('Y-m-d H:i:s');
 
         if ($itempnd) {
             foreach ($itempnd as $i) {
@@ -881,6 +881,7 @@ class C_Reqpic extends CI_Controller
 
     public function acc_req_admin()
     {
+        date_default_timezone_set("Asia/Jakarta");
         //PIC ADMIN
         $useradmin  =  $this->session->userdata('nama_user');
         $kdadmin  =  $this->session->userdata('kode');
@@ -894,8 +895,8 @@ class C_Reqpic extends CI_Controller
         $jmltot     = $this->input->post('jmltot');
         $tjpem      = $this->input->post('tjbuy');
         $trtmp      = $this->M_Reqpic->getlisttmptr($kdreqpo)->result();
-        $now        = date('Y-m-d h:m:s');
-        $now1       = date('Y-m-d');
+        $now1        = date('Y-m-d H:i:s');
+        $now2       = date('Y-m-d');
 
         $insrtpembelianpo = array(
             'jns_po'            => '2',
@@ -1146,7 +1147,7 @@ class C_Reqpic extends CI_Controller
         $nmadmin    = $this->session->userdata('nama_user');
         $kdporeq    = $this->input->post('kdreqpo');
         $kdponk     = $this->input->post('kdponk');
-        $now        = date('Y-m-d h:m:s');
+        $now        = date('Y-m-d H:i:s');
         $now1       = date('Y-m-d');
         $tmp        = $this->M_Reqpic->getdatapobaru($kdponk)->result();
 

@@ -355,7 +355,7 @@ class C_PoStatus extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
         $itemconfirm    = $this->M_Postatus->getitemreq($kdpo)->result();
         $now            = date('Y-m-d');
-        $now1           = date('Y-m-d h:m:s');
+        $now1           = date('Y-m-d H:i:s');
 
         $updatestatus = array(
             'kd_po'     => $kdpo,

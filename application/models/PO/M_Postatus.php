@@ -355,7 +355,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'DONE' AND a.status != 'REJECT' AND a.status != 'PENDING' AND a.status != 'REVISI' AND a.status != 'ON PROGRESS - KADEP' AND a.status != 'ON PROGRESS'
+        WHERE a.status != 'DONE' AND a.status != 'REJECT' AND a.departemen = 'PURCHASING'
             ");
     }
 

@@ -168,7 +168,7 @@
                                     $hargaPajak = $stlhDiskon * $tax;
                                     $hargaAll = $stlhDiskon + $hargaPajak; ?>
                                     <tr>
-                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL s</td>
+                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                                     </tr>
                                     <tr>
                                         <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
