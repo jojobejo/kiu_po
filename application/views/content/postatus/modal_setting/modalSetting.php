@@ -215,60 +215,6 @@
         </div>
     <?php endforeach; ?>
 
-    <?php foreach ($status as $s) : ?>
-        <div class="modal fade" id="modalTax<?= $s->kd_po ?>">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Tambah Tax (Pajak)</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <?php echo form_open_multipart('tambahTax'); ?>
-                        <div class="form-group" hidden>
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">kdpo<span class="required">*</span></label>
-                                <div class="col-sm-8"><input class="form-control" type="text" id="kdpo" name="kdpo" value="<?= $s->kd_po ?>" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" hidden>
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Total Harga<span class="required">*</span></label>
-                                <div class="col-sm-8">
-                                    <?php foreach ($total as $t) : ?>
-                                        <input class="form-control" type="number" id="total_harga" name="total_harga" value="<?= $t->total_harga ?>" />
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="kd_user">Tax(%)<span class="required">*</span></label>
-                                <div class="col-sm-8">
-                                    <select name="tax_isi_status" id="tax_isi_status" class="form-control">
-                                        <?php foreach ($tax as $t) : ?>
-                                            <option value="<?= $t->nm_tax ?>"><?= $t->nm_tax ?> %</option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                    </form>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-        </div>
-    <?php endforeach; ?>
-
     <?php foreach ($diskon as $d) : ?>
         <?php
         $rowMarker = '';
@@ -621,6 +567,7 @@
                     <div class="modal-body">
                         <?php echo form_open('shipment_to'); ?>
                         <input type="hidden" id="kd_po_modal" name="kd_po">
+                        <input type="hidden" id="print_mode_modal" name="print_mode" value="include">
                         <div class="form-group">
                             <label for="template">Pilih Template</label>
                             <select name="template_isi" id="template_isi" class="form-control" required>

@@ -11,6 +11,13 @@
             });
         <?php endif; ?>
 
+        $(document).on('click', '.btn-select-template', function() {
+            var button = $(this);
+            $('#kd_po_modal').val(button.data('kdpo') || '');
+            $('#update_shipment').val(button.data('kdpo') || '');
+            $('#print_mode_modal').val(button.data('print-mode') || 'include');
+        });
+
         $(document).on('click', '.btn-po-confirm', function(event) {
             event.preventDefault();
 

@@ -47,16 +47,6 @@
             return;
         }
 
-        if (tax == "") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Peringatan',
-                text: 'Kolom pajak (Tax) belum terisi!',
-            });
-            return;
-        }
-
-
         Swal.fire({
             title: 'Simpan Data?',
             text: "Pastikan semua data sudah benar.",

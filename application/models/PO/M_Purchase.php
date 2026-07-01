@@ -103,6 +103,24 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_tax', $data);
     }
+    public function set_tmp_tax($kd, $tax)
+    {
+        $this->db->from('tb_tmp_tax');
+        $this->db->where('kd_suplier', $kd);
+        $exists = $this->db->count_all_results() > 0;
+
+        $data = array(
+            'kd_suplier' => $kd,
+            'tax' => $tax
+        );
+
+        if ($exists) {
+            $this->db->where('kd_suplier', $kd);
+            return $this->db->update('tb_tmp_tax', $data);
+        }
+
+        return $this->db->insert('tb_tmp_tax', $data);
+    }
     public function getTmpOrder($kd)
     {
         $this->db->select('a.*');

@@ -29,18 +29,18 @@
             <table class="table table-bordered table-striped" id="list_suplier">
                 <thead>
                     <tr>
-                        <td>Kode Suplier</td>
-                        <td>Kode Barang</td>
                         <td>Nama Barang</td>
+                        <td>Isi</td>
+                        <td>Kemasan</td>
                         <td>Aksi</td>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($barang as $s) : ?>
                         <tr>
-                            <td><?= htmlspecialchars($s->kd_suplier, ENT_QUOTES, 'UTF-8') ?></td>
-                            <td><?= htmlspecialchars($s->kode_barang, ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= htmlspecialchars($s->nama_barang, ENT_QUOTES, 'UTF-8') ?></td>
+                            <td><?= isset($s->isi) ? htmlspecialchars($s->isi, ENT_QUOTES, 'UTF-8') : '-' ?></td>
+                            <td><?= isset($s->kemasan) ? htmlspecialchars($s->kemasan, ENT_QUOTES, 'UTF-8') : '-' ?></td>
                             <td>
                                 <div class="row">
                                     <div class="col-md">

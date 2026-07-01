@@ -2,6 +2,23 @@
     <div class="content-header">
         <div class="container-fluid">
             <?php $this->load->view('content/po/_po_summary_helpers') ?>
+            <?php
+            $poAutoKeteranganHargaPpn = '';
+            if (!empty($tmp)) {
+                foreach ($tmp as $poTmpItem) {
+                    if (!empty($poTmpItem->is_bonus)) {
+                        continue;
+                    }
+
+                    $poTmpPpnMode = isset($poTmpItem->keterangan_harga_ppn) ? strtolower(trim((string) $poTmpItem->keterangan_harga_ppn)) : '';
+                    if (in_array($poTmpPpnMode, array('exclude', 'include'), true)) {
+                        $poAutoKeteranganHargaPpn = $poTmpPpnMode;
+                        break;
+                    }
+                }
+            }
+            $poAutoTaxValue = $poAutoKeteranganHargaPpn === 'exclude' ? 11 : 0;
+            ?>
             <?php if ($this->session->flashdata('error')) : ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
@@ -165,15 +182,6 @@
                     <a href="#" class=" ml-3 btn btn-warning " data-toggle="modal" data-target="#editSuplier<?= $b->id_suplier ?>">
                         <i class="fa fa-solid fa-pencil-alt"></i>
                     </a>
-                    <?php if ((float) $tax > 0) : ?>
-                        <span class="alert alert-success py-1 px-2 mb-0 ml-2">
-                            <strong>Status Tax:</strong> Sudah dipilih <?= htmlspecialchars((string) $tax, ENT_QUOTES, 'UTF-8') ?>%
-                        </span>
-                    <?php else : ?>
-                        <span class="alert alert-warning py-1 px-2 mb-0 ml-2">
-                            <strong>Status Tax:</strong> Belum dipilih
-                        </span>
-                    <?php endif; ?>
             </div>
             <div class="row">
                 <div class="col-md">
@@ -188,23 +196,6 @@
                         Tambah Note Barang
                     </a>
                 </div>
-                <?php foreach ($taxpo as $tp) : ?>
-                    <?php if ($tp->tot == '0') : ?>
-                        <div class="col-md">
-                            <a class="btn btn-primary mb-2 mt-2 btn-block" data-toggle="modal" data-target="#taxsetts">
-                                <i class="fas fa-percent"> </i>
-                                Input Tax (%)
-                            </a>
-                        </div>
-                    <?php else : ?>
-                        <div class="col-md">
-                            <a class="btn btn-primary mb-2 mt-2 btn-block" data-toggle="modal" data-target="#taxsett<?= $kdsuplier ?>">
-                                <i class="fas fa-percent"> </i>
-                                Input Tax (%)
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
                 <div class="col-md">
                     <a class="btn btn-primary mb-2 mt-2 btn-block" data-toggle="modal" data-target="#modaldiskon">
                         <i class="fas fa-tags"> </i>
@@ -262,7 +253,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
                     </div>
-                    <input type="number" class="form-control" id="taxisi_in" name="taxisi_in" value="<?= $tax ?>" readonly hidden>
+                    <input type="number" class="form-control" id="taxisi_in" name="taxisi_in" value="<?= $poAutoTaxValue ?>" readonly hidden>
                 </div>
             </div>
 
@@ -279,14 +270,20 @@
         <?php $this->load->view('content/po/modalpo') ?>
 
         <?php
-        list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp', $tax);
-        $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp', $tax);
+        list($poItemRows, $poSummary) = po_build_item_rows($tmp, $tmpdiskon, 'tmp', $poAutoTaxValue);
+        $poDiscountRows = po_build_discount_rows($tmpdiskon, $poItemRows, 'tmp', $poAutoTaxValue);
         foreach ($poDiscountRows as &$poDiscountRow) {
             $poDiscountRow['label'] = po_remove_item_name_prefix($poDiscountRow['label'], $poItemRows);
         }
         unset($poDiscountRow);
+        $poGlobalDiscountTotal = 0;
+        foreach ($poDiscountRows as $poDiscountRow) {
+            if (po_value($poDiscountRow, 'discount_scope', '') === 'global') {
+                $poGlobalDiscountTotal += po_num(po_value($poDiscountRow, 'total_discount', 0));
+            }
+        }
         $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
-        $poSummary = po_add_tax_summary($poSummary, $tax);
+        $poSummary = po_add_tax_summary($poSummary, $poAutoTaxValue);
         $poKeteranganHargaPpn = '';
         foreach ($poItemRows as $poItemRow) {
             if (!empty($poItemRow['is_bonus'])) {
@@ -300,7 +297,7 @@
                 break;
             }
         }
-        $poPpnConversionPercent = (float) $tax > 0 ? (float) $tax : 11;
+        $poPpnConversionPercent = (float) $poAutoTaxValue > 0 ? (float) $poAutoTaxValue : 11;
         $poPpnConversionMultiplier = 1 + ($poPpnConversionPercent / 100);
         $poPrimaryPpnTab = $poKeteranganHargaPpn === 'include' ? 'include' : 'exclude';
         $poPpnTabModes = $poPrimaryPpnTab === 'include'
@@ -435,10 +432,10 @@
                                                 </a>
                                                 <?php if (!$row['is_bonus']) : ?>
                                                     <a class="btn btn-sm btn-info btn-icon" data-toggle="modal" data-target="#diskonBarangNominal<?= $t->id_tmp ?>" title="Tambah Diskon Nominal">
-                                                        <i class="fas fa-percent"></i>
+                                                        <i class="fas fa-tags"></i>
                                                     </a>
                                                     <a class="btn btn-sm bg-lightblue btn-icon" data-toggle="modal" data-target="#diskonBarangPersen<?= $t->id_tmp ?>" title="Tambah Diskon Persentase">
-                                                        <i class="fas fa-tags"></i>
+                                                        <i class="fas fa-percent"></i>
                                                     </a>
                                                 <?php endif; ?>
                                             </div>
@@ -450,30 +447,32 @@
                     </div>
 
                     <?php
-                    $poTabSummaryDiscount = max($poTabSummaryBefore - $poTabSummaryAfter, 0);
+                    $poTabItemDiscount = max($poTabSummaryBefore - $poTabSummaryAfter, 0);
+                    $poTabSummaryDiscount = $poTabItemDiscount + $poGlobalDiscountTotal;
+                    $poTabSummaryAfter = max($poTabSummaryBefore - $poTabSummaryDiscount, 0);
                     $poTabTaxValue = $poTabSummaryAfter * ($poTabTaxPercent / 100);
                     $poTabGrandTotal = $poTabSummaryAfter + $poTabTaxValue;
                     ?>
                     <div class="po-summary-card">
                         <div class="po-summary-row">
                             <span>Total Harga Sebelum Diskon</span>
-                            <strong><?= po_money_round_up($poTabSummaryBefore) ?></strong>
+                            <strong><?= po_money($poTabSummaryBefore) ?></strong>
                         </div>
                         <div class="po-summary-row">
                             <span>Total Diskon</span>
-                            <strong><span class="badge badge-success"><?= po_money_round_up($poTabSummaryDiscount) ?></span></strong>
+                            <strong><span class="badge badge-success"><?= po_money($poTabSummaryDiscount) ?></span></strong>
                         </div>
                         <div class="po-summary-row">
                             <span>Total Harga Setelah Diskon</span>
-                            <strong><?= po_money_round_up($poTabSummaryAfter) ?></strong>
+                            <strong><?= po_money($poTabSummaryAfter) ?></strong>
                         </div>
                         <div class="po-summary-row">
                             <span>Tax <?= po_qty($poTabTaxPercent) ?>%</span>
-                            <strong><?= po_money_round_up($poTabTaxValue) ?></strong>
+                            <strong><?= po_money($poTabTaxValue) ?></strong>
                         </div>
                         <div class="po-summary-row po-summary-grand">
                             <span>Grand Total Harga</span>
-                            <span><?= po_money_round_up($poTabGrandTotal) ?></span>
+                            <span><?= po_money_round($poTabGrandTotal) ?></span>
                         </div>
                     </div>
                 </div>

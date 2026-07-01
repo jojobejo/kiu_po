@@ -1,8 +1,6 @@
 <!-- MODAL ADD -->
 <?php
 $listOrderKeteranganHargaPpn = '';
-$poTaxAktif = isset($tax_tmp) ? (float) $tax_tmp : 0;
-$poTaxSudahDisetting = $poTaxAktif > 0 ? '1' : '0';
 if (!empty($tmp)) {
     foreach ($tmp as $tmpItem) {
         if (!empty($tmpItem->is_bonus)) {
@@ -28,7 +26,7 @@ if (!empty($tmp)) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('tambahChart', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11', 'data-current-ppn-mode' => $listOrderKeteranganHargaPpn, 'data-tax-ready' => $poTaxSudahDisetting, 'data-current-tax' => $poTaxAktif)); ?>
+                    <?php echo form_open_multipart('tambahChart', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11', 'data-current-ppn-mode' => $listOrderKeteranganHargaPpn, 'data-current-tax' => '11')); ?>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
@@ -185,8 +183,6 @@ if (!empty($tmp)) {
             }
 
             var currentMode = form.getAttribute('data-current-ppn-mode');
-            var taxReady = form.getAttribute('data-tax-ready') === '1';
-            var currentTax = form.getAttribute('data-current-tax') || '';
             var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
             var modeAlert = form.querySelector('.ppn-mode-alert');
 
@@ -195,16 +191,10 @@ if (!empty($tmp)) {
             }
 
             if (currentMode === 'exclude' && selectedMode.value === 'include') {
-                modeAlert.textContent = 'List order ini sudah memakai harga Exclude PPN. Agar nilai PO tetap konsisten, pilih Exclude PPN untuk barang ini.';
+                modeAlert.textContent = 'Data order sudah menggunakan keterangan harga EXCLUDE PPN. Input berikutnya harus menggunakan EXCLUDE PPN juga. Apabila ingin menggunakan INCLUDE PPN, silahkan hapus data sebelumnya.';
                 modeAlert.classList.remove('d-none');
             } else if (currentMode === 'include' && selectedMode.value === 'exclude') {
-                modeAlert.textContent = 'List order ini sudah memakai harga Include PPN. Agar nilai PO tetap konsisten, pilih Include PPN untuk barang ini.';
-                modeAlert.classList.remove('d-none');
-            } else if (!taxReady && selectedMode.value === 'exclude') {
-                modeAlert.textContent = 'Tax PO belum disetting. Pilih Include PPN untuk menyimpan harga tanpa perhitungan tax, atau setting tax terlebih dahulu sebelum memakai Exclude PPN.';
-                modeAlert.classList.remove('d-none');
-            } else if (taxReady && selectedMode.value === 'include') {
-                modeAlert.textContent = 'Tax PO saat ini sudah disetting' + (currentTax !== '' ? ' sebesar ' + currentTax + '%' : '') + '. Jika harga barang belum termasuk PPN, gunakan Exclude PPN agar perhitungan mengikuti setting tax.';
+                modeAlert.textContent = 'Data order sudah menggunakan keterangan harga INCLUDE PPN. Input berikutnya harus menggunakan INCLUDE PPN juga. Apabila ingin menggunakan EXCLUDE PPN, silahkan hapus data sebelumnya.';
                 modeAlert.classList.remove('d-none');
             } else {
                 modeAlert.classList.add('d-none');

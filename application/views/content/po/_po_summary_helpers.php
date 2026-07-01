@@ -37,6 +37,13 @@ if (!function_exists('po_money_round_up')) {
     }
 }
 
+if (!function_exists('po_money_round')) {
+    function po_money_round($value)
+    {
+        return 'Rp. ' . number_format(round(po_num($value)), 2, ',', '.');
+    }
+}
+
 if (!function_exists('po_qty')) {
     function po_qty($value)
     {
@@ -398,6 +405,13 @@ if (!function_exists('po_build_discount_rows')) {
                 $isItemDiscount = true;
             }
 
+            $discountScope = 'global';
+            if ($merkMarker !== null || !empty($matchedMerkItemIds)) {
+                $discountScope = 'merk';
+            } elseif ($isItemDiscount || $matchedItemId !== null) {
+                $discountScope = 'item';
+            }
+
             if ($qtyImpact <= 0 && $isItemDiscount && $rowMarker === null && $merkMarker === null) {
                 $qtyImpact = $totalQty;
             }
@@ -470,6 +484,7 @@ if (!function_exists('po_build_discount_rows')) {
                 'nominal' => $nominalDisplay,
                 'qty_impact' => $qtyImpact,
                 'total_discount' => $totalDiscount,
+                'discount_scope' => $discountScope,
                 'id' => po_value($diskon, $idField, null),
                 'kd_po' => po_value($diskon, 'kd_po', null),
                 'is_bonus_item' => false,
@@ -483,6 +498,7 @@ if (!function_exists('po_build_discount_rows')) {
                     'nominal' => 0,
                     'qty_impact' => $item['qty_kecil'],
                     'total_discount' => 0,
+                    'discount_scope' => 'bonus',
                     'id' => null,
                     'kd_po' => po_value($item['source'], 'kd_po', null),
                     'is_bonus_item' => true,

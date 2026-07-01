@@ -3,13 +3,18 @@
     <!-- Main content -->
     <?php foreach ($status as $s) : ?>
         <?php
+        $printPpnMode = isset($printPpnMode) && strtolower((string) $printPpnMode) === 'exclude' ? 'exclude' : 'include';
+        $printIncludePpn = $printPpnMode === 'include';
+        $printPpnLabel = $printIncludePpn ? 'Include PPN' : 'Exclude PPN';
+        $printTaxPercent = (float) $s->tax > 0 ? (float) $s->tax : 11;
+        $printTaxMultiplier = 1 + ($printTaxPercent / 100);
         list($poPrintRows, $poPrintSummary) = po_build_item_rows($detail, $diskon, 'detail', $s->tax);
         $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail', $s->tax);
         $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
         $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
         $poPrintRows = po_add_tax_to_discounted_item_rows($poPrintRows, $s->tax);
         $poPrintDisplayTaxPercent = $poPrintSummary['tax_percent'];
-        $poPrintGrandTotalHarga = $poPrintSummary['grand_total_with_discount'];
+        $poPrintGrandTotalHarga = $printIncludePpn ? $poPrintSummary['total_after_discount'] * $printTaxMultiplier : $poPrintSummary['total_after_discount'];
         ?>
         <section class="m-4">
             <div class="row">
@@ -67,7 +72,7 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <td colspan="9" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN INTERNAL</td>
+                                <td colspan="9" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN INTERNAL - <?= $printPpnLabel ?></td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td>No</td>
@@ -76,15 +81,21 @@
                                 <td>Qty</td>
                                 <td>Qty Kecil</td>
                                 <td hidden>Harga Satuan</td>
-                                <td>Harga Satuan Kecil</td>
-                                <td>Harga Setelah Diskon</td>
-                                <td>Total Harga</td>
-                                <td>Total Harga Setelah Diskon</td>
+                                <td>Harga Satuan Kecil (<?= $printPpnLabel ?>)</td>
+                                <td>Harga Setelah Diskon (<?= $printPpnLabel ?>)</td>
+                                <td>Total Harga (<?= $printPpnLabel ?>)</td>
+                                <td>Total Harga Setelah Diskon (<?= $printPpnLabel ?>)</td>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no = 1; ?>
                             <?php foreach ($poPrintRows as $row) : ?>
+                                <?php
+                                $displayHargaSatuanKecil = $printIncludePpn ? $row['harga_satuan_kecil'] * $printTaxMultiplier : $row['harga_satuan_kecil'];
+                                $displayHargaFinalUnit = $printIncludePpn ? $row['harga_final_unit'] * $printTaxMultiplier : $row['harga_final_unit'];
+                                $displayTotalBefore = $printIncludePpn ? $row['total_before'] * $printTaxMultiplier : $row['total_before'];
+                                $displayTotalAfter = $printIncludePpn ? $row['total_after'] * $printTaxMultiplier : $row['total_after'];
+                                ?>
                                 <tr>
                                     <td style="text-align: center;"><?= $no++; ?></td>
                                     <td style="word-wrap: break-word;">
@@ -97,16 +108,16 @@
                                     <td style="text-align: center;"><?= po_qty($row['qty']) ?></td>
                                     <td style="text-align: center;"><?= po_qty($row['qty_kecil']) ?></td>
                                     <td hidden style="text-align: end;">&nbsp;<?= po_money($row['harga_satuan']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money($row['harga_satuan_kecil']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money($row['harga_final_unit']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money($row['total_before']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money_round_up($row['total_after_with_tax']) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($displayHargaSatuanKecil) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($displayHargaFinalUnit) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($displayTotalBefore) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money_round_up($displayTotalAfter) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
                                 <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga :</td>
-                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money($poPrintSummary['total_before_discount']) ?></td>
-                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money_round_up($poPrintSummary['grand_total_with_discount']) ?></td>
+                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money($printIncludePpn ? $poPrintSummary['total_before_discount'] * $printTaxMultiplier : $poPrintSummary['total_before_discount']) ?></td>
+                                <td style="text-align:end;font-weight: bold;">&nbsp;<?= po_money_round_up($poPrintGrandTotalHarga) ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -141,29 +152,29 @@
                             <?php foreach ($poPrintDiscountRows as $d) : ?>
                                 <tr>
                                     <td colspan="8" style="text-align: end;font-weight: bold;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?> : </td>
-                                    <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['nominal']) ?></td>
-                                    <td colspan="1" style="text-align:end">&nbsp;<?= po_money($d['total_discount']) ?></td>
+                                    <td colspan="1" style="text-align:end">&nbsp;<?= po_money($printIncludePpn ? $d['nominal'] * $printTaxMultiplier : $d['nominal']) ?></td>
+                                    <td colspan="1" style="text-align:end">&nbsp;<?= po_money($printIncludePpn ? $d['total_discount'] * $printTaxMultiplier : $d['total_discount']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
                                 <td colspan="10" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
                             </tr>
                             <tr>
-                                <td colspan="9" style="text-align: end; font-weight: bold;">Total Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintSummary['total_discount']) ?></td>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Total Diskon (<?= $printPpnLabel ?>)</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($printIncludePpn ? $poPrintSummary['total_discount'] * $printTaxMultiplier : $poPrintSummary['total_discount']) ?></td>
                             </tr>
                             <tr>
-                                <td colspan="9" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintSummary['total_after_discount']) ?></td>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon (<?= $printPpnLabel ?>)</td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($printIncludePpn ? $poPrintSummary['total_after_discount'] * $printTaxMultiplier : $poPrintSummary['total_after_discount']) ?></td>
                             </tr>
-                            <?php if (po_num($poPrintDisplayTaxPercent) > 0) : ?>
+                            <?php if ($printIncludePpn && po_num($printTaxPercent) > 0) : ?>
                                 <tr>
-                                    <td colspan="9" style="text-align: end;font-weight: bold;">Total Pajak : <?= po_qty($poPrintDisplayTaxPercent) ?>(%)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintSummary['tax_with_discount']) ?></td>
+                                    <td colspan="9" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($printTaxPercent) ?>(%) sudah termasuk</td>
+                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintSummary['total_after_discount'] * ($printTaxPercent / 100)) ?></td>
                                 </tr>
                             <?php endif; ?>
                             <tr>
-                                <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga (<?= $printPpnLabel ?>)</td>
                                 <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintGrandTotalHarga) ?></td>
                             </tr>
                         </tbody>

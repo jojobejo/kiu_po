@@ -48,16 +48,48 @@ class C_PoStatus extends CI_Controller
     {
         $harga = $this->parseNumericInput($harga);
 
-        if ($ppnMode !== 'exclude') {
-            return $harga;
-        }
-
-        return $this->excludePpn($harga, $taxPercent);
+        return $ppnMode === 'include' ? $this->excludePpn($harga, $taxPercent) : $harga;
     }
 
     private function isTaxElevenPercent($taxPercent)
     {
         return abs($this->parseNumericInput($taxPercent) - 11) < 0.00001;
+    }
+
+    private function getKeteranganHargaPpnDetailPo($kdpo)
+    {
+        if (!$this->db->field_exists('keterangan_harga_ppn', 'tb_detail_po')) {
+            return '';
+        }
+
+        $this->db->select('keterangan_harga_ppn');
+        $this->db->from('tb_detail_po');
+        $this->db->where('kd_po', $kdpo);
+        $this->db->where("TRIM(COALESCE(keterangan_harga_ppn, '')) <> ''", null, false);
+
+        if ($this->db->field_exists('is_bonus', 'tb_detail_po')) {
+            $this->db->where('COALESCE(is_bonus, 0) = 0', null, false);
+        }
+
+        $this->db->order_by('id_det_po', 'ASC');
+        $this->db->limit(1);
+        $row = $this->db->get()->row();
+        $mode = $row ? strtolower(trim((string) $row->keterangan_harga_ppn)) : '';
+
+        return in_array($mode, array('exclude', 'include'), true) ? $mode : '';
+    }
+
+    private function validateKeteranganHargaPpnDetailPo($kdpo, $ppnMode, $redirectUrl)
+    {
+        $existingMode = $this->getKeteranganHargaPpnDetailPo($kdpo);
+
+        if ($existingMode !== '' && $existingMode !== $ppnMode) {
+            $this->session->set_flashdata('error', 'Data PO sudah menggunakan keterangan harga ' . strtoupper($existingMode) . ' PPN. Barang revisi harus menggunakan ' . strtoupper($existingMode) . ' PPN juga.');
+            redirect($redirectUrl);
+            return false;
+        }
+
+        return true;
     }
 
     private function diskonExcludeTax($nominal, $taxPercent)
@@ -520,10 +552,17 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerprint');
     }
 
-    public function print_po($kdpo)
+    private function normalizePrintPpnMode($mode)
+    {
+        $mode = strtolower(trim((string) $mode));
+        return $mode === 'exclude' ? 'exclude' : 'include';
+    }
+
+    public function print_po($kdpo, $ppnMode = 'include')
     {
         $this->syncDiskonDetailPO($kdpo);
         $data = $this->getPrintOrderData($kdpo, true);
+        $data['printPpnMode'] = $this->normalizePrintPpnMode($ppnMode);
         $data['printSummary'] = $this->buildPrintPoSummary($data['status'], $data['total'], $data['totalDiskon'], $data['detail']);
 
         $this->load->view('partial/header', $data);
@@ -531,12 +570,13 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footerprint');
     }
 
-    public function print_po_supplier($kdpo)
+    public function print_po_supplier($kdpo, $ppnMode = 'include')
     {
         $this->syncDiskonDetailPO($kdpo);
         $data = $this->getPrintOrderData($kdpo, true);
         $data['hideBonusDiscountRows'] = true;
         $data['isSupplierPrint'] = true;
+        $data['printPpnMode'] = $this->normalizePrintPpnMode($ppnMode);
 
         $this->load->view('partial/header', $data);
         $this->load->view('content/postatus/printorder', $data);
@@ -951,6 +991,7 @@ class C_PoStatus extends CI_Controller
     {
         $kddpo          = $this->input->post('update_shipment');
         $shipment_to    = $this->input->post('template_isi');
+        $printMode      = $this->normalizePrintPpnMode($this->input->post('print_mode'));
 
         $dataupdated = array(
             'kd_printout_note'  => $shipment_to
@@ -958,7 +999,7 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->updateshipment($kddpo, $dataupdated);
 
-        redirect('print_po_supplier/' . $kddpo);
+        redirect('print_po_supplier/' . $kddpo . '/' . $printMode);
     }
 
     public function revisiPO()
@@ -1051,6 +1092,7 @@ class C_PoStatus extends CI_Controller
         $data['tax']            = $this->M_Purchase->getTax();
         $data['satuan']         = $this->M_Purchase->getSatuan();
         $data['tmp']            = $this->M_Purchase->getTmpOrder($kdsuplier);
+        $data['detail_po_keterangan_harga_ppn'] = $this->getKeteranganHargaPpnDetailPo($kdpo);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -1077,17 +1119,12 @@ class C_PoStatus extends CI_Controller
         $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode')));
         $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
 
-        // Kebijakan harga PO: harga exclude PPN hanya dapat digunakan pada PO
-        // dengan PPN 11%. Validasi ini harus berada di server agar tidak dapat
-        // dilewati dengan mengubah request dari browser.
-        if (!$isBonus && $ppnMode === 'exclude' && !$this->isTaxElevenPercent($tax)) {
-            $this->session->set_flashdata('error', 'Harga Exclude PPN wajib menggunakan Tax PO 11%. Ubah Tax menjadi 11% atau gunakan harga Include PPN.');
-            redirect('addBarangRevisi/' . $suplier . '/' . $kdpo);
+        if (!$isBonus && !$this->validateKeteranganHargaPpnDetailPo($kdpo, $ppnMode, 'addBarangRevisi/' . $suplier . '/' . $kdpo)) {
             return;
         }
 
         $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi'));
-        $hargaQty   = $isBonus ? 0 : $this->hargaExcludePpnByMode($hargaInput, $ppnMode, $tax);
+        $hargaQty   = $isBonus ? 0 : $hargaInput;
         $hargahasil = $hargaQty * $qty;
         $konversi   = $this->hitungQtyHargaKecil($kdbarang, $suplier, $satuan, $qty, $hargaQty);
 
@@ -1097,8 +1134,9 @@ class C_PoStatus extends CI_Controller
             return;
         }
 
-        $hargaSatuanKecilExclude = $isBonus ? 0 : $konversi['harga_satuan_kecil'];
-        $hargaSatuanExclude = $isBonus ? 0 : $hargaQty;
+        $taxForConversion = (float) $tax > 0 ? $tax : 11;
+        $hargaSatuanKecilExclude = $isBonus ? 0 : $this->hargaExcludePpnByMode($konversi['harga_satuan_kecil'], $ppnMode, $taxForConversion);
+        $hargaSatuanExclude = $isBonus ? 0 : $this->hargaExcludePpnByMode($hargaQty, $ppnMode, $taxForConversion);
 
         $data = array(
             'kd_po'         => $kdpo,

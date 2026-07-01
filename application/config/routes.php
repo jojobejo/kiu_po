@@ -269,7 +269,9 @@ $route['update_printout_po']                            = 'postatus/C_PoStatus/u
 
 $route['onhandpo/(:any)']                               = 'postatus/C_PoStatus/onhandpo/$1';
 $route['onhandpo_ajax']                                 = 'postatus/C_PoStatus/onhandpo_ajax';
+$route['print_po/(:any)/(:any)']                        = 'postatus/C_PoStatus/print_po/$1/$2';
 $route['print_po/(:any)']                               = 'postatus/C_PoStatus/print_po/$1';
+$route['print_po_supplier/(:any)/(:any)']               = 'postatus/C_PoStatus/print_po_supplier/$1/$2';
 $route['print_po_supplier/(:any)']                      = 'postatus/C_PoStatus/print_po_supplier/$1';
 $route['printOrder/(:any)']                             = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrdernk/(:any)']                           = 'postatus/C_PoStatus/printOrdernk/$1';

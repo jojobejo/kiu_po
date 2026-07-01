@@ -4,6 +4,7 @@ $ppnRate = 11;
 if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
     $ppnRate = (float) $status[0]->tax;
 }
+$detailPoKeteranganHargaPpn = isset($detail_po_keterangan_harga_ppn) ? strtolower(trim((string) $detail_po_keterangan_harga_ppn)) : '';
 ?>
 <?php foreach ($barang as $i) : ?>
     <div class="modal fade" id="modalAddItem<?= $i->id_barang ?>">
@@ -16,7 +17,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('tambahBarangRevisi', array('class' => 'ppn-price-form', 'data-ppn-rate' => $ppnRate)); ?>
+                    <?php echo form_open_multipart('tambahBarangRevisi', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11', 'data-current-ppn-mode' => $detailPoKeteranganHargaPpn, 'data-current-tax' => $ppnRate)); ?>
                     <div class="form-group" hidden>
                         <?php foreach ($status as $s) : ?>
                             <div class="row">
@@ -92,32 +93,28 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
+                            <label class="col-sm-3 control-label text-right">Keterangan Harga<span class="required">*</span></label>
                             <div class="col-sm-8 pt-2">
-                                <div class="alert alert-info py-2 mb-3" role="alert">
-                                    <strong>Kebijakan Harga &amp; PPN</strong><br>
-                                    <span><strong>Exclude PPN</strong> wajib menggunakan Tax PO <strong>11%</strong>.</span><br>
-                                    <span><strong>Include PPN</strong> digunakan bila harga dari vendor sudah termasuk PPN dan tidak dihitung ulang.</span>
-                                </div>
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="ppn_exclude_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
+                                    <input type="radio" id="ppn_exclude_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" <?= $detailPoKeteranganHargaPpn !== 'include' ? 'checked' : '' ?>>
                                     <label class="custom-control-label" for="ppn_exclude_revisi_<?= $i->id_barang ?>">Exclude PPN</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="ppn_include_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
+                                    <input type="radio" id="ppn_include_revisi_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input" <?= $detailPoKeteranganHargaPpn === 'include' ? 'checked' : '' ?>>
                                     <label class="custom-control-label" for="ppn_include_revisi_<?= $i->id_barang ?>">Include PPN</label>
                                 </div>
-                                <small class="form-text text-muted">Tax PO saat ini: <?= htmlspecialchars($ppnRate, ENT_QUOTES, 'UTF-8') ?>%. Exclude PPN dihitung berdasarkan tarif tersebut; Include PPN tidak dihitung ulang.</small>
+                                <div class="ppn-mode-alert alert alert-warning py-2 px-3 mt-2 mb-0 d-none">
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_revisi_<?= $i->id_barang ?>">Harga Satuan Hasil Kalkulasi</label>
+                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_revisi_<?= $i->id_barang ?>">Harga Satuan Exclude PPN</label>
                             <div class="col-sm-8">
                                 <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_revisi_<?= $i->id_barang ?>" value="" readonly />
-                                <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="" />
-                                <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
+                                <input type="hidden" class="ppn-calculated-raw" value="" />
+                                <small class="form-text text-muted">Jika Include PPN dipilih, nilai ini dihitung dengan rumus DPP: harga satuan dibagi 1 + tax. Harga input tetap disimpan sesuai nilai yang diisi.</small>
                             </div>
                         </div>
                     </div>
@@ -155,7 +152,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
 
             return value.toLocaleString('id-ID', {
                 minimumFractionDigits: 0,
-                maximumFractionDigits: 4
+                maximumFractionDigits: 3
             });
         }
 
@@ -168,6 +165,7 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
             var displayOutput = form.querySelector('.ppn-calculated-display');
             var rawOutput = form.querySelector('.ppn-calculated-raw');
             var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+            var includeMode = form.querySelector('input[name="ppn_mode"][value="include"]:checked') !== null;
 
             if (!rawInput || !displayOutput || !rawOutput || !selectedMode || rawInput.value === '') {
                 if (displayOutput) {
@@ -180,13 +178,42 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
             }
 
             var inputPrice = parseFloat(rawInput.value);
-            var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'exclude'
-                ? inputPrice / (1 + (ppnRate / 100))
-                : inputPrice;
+            var currentTax = parseFloat(form.getAttribute('data-current-tax'));
+            var defaultTax = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+            var taxRate = isFinite(currentTax) && currentTax > 0 ? currentTax : (defaultTax > 0 ? defaultTax : 11);
+            var calculatedPrice = inputPrice;
+
+            if (includeMode && taxRate > 0) {
+                var taxDecimal = taxRate / 100;
+                calculatedPrice = inputPrice / (1 + taxDecimal);
+            }
 
             displayOutput.value = formatCalculatedPrice(calculatedPrice);
             rawOutput.value = calculatedPrice;
+        }
+
+        function updatePpnModeAlert(form) {
+            if (!form || !form.classList.contains('ppn-price-form')) {
+                return;
+            }
+
+            var currentMode = form.getAttribute('data-current-ppn-mode');
+            var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+            var modeAlert = form.querySelector('.ppn-mode-alert');
+
+            if (!modeAlert || !selectedMode) {
+                return;
+            }
+
+            if (currentMode === 'exclude' && selectedMode.value === 'include') {
+                modeAlert.textContent = 'Data PO sudah menggunakan keterangan harga EXCLUDE PPN. Barang revisi harus menggunakan EXCLUDE PPN juga.';
+                modeAlert.classList.remove('d-none');
+            } else if (currentMode === 'include' && selectedMode.value === 'exclude') {
+                modeAlert.textContent = 'Data PO sudah menggunakan keterangan harga INCLUDE PPN. Barang revisi harus menggunakan INCLUDE PPN juga.';
+                modeAlert.classList.remove('d-none');
+            } else {
+                modeAlert.classList.add('d-none');
+            }
         }
 
         document.addEventListener('input', function(event) {
@@ -210,24 +237,13 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
 
         document.addEventListener('change', function(event) {
             if (event.target.name === 'ppn_mode') {
-                updateCalculatedPrice(event.target.closest('form'));
+                var form = event.target.closest('form');
+                updateCalculatedPrice(form);
+                updatePpnModeAlert(form);
             }
         });
 
         document.addEventListener('submit', function(event) {
-            var form = event.target;
-
-            if (form.classList.contains('ppn-price-form')) {
-                var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
-                var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-
-                if (selectedMode && selectedMode.value === 'exclude' && Math.abs(ppnRate - 11) > 0.00001) {
-                    event.preventDefault();
-                    alert('Harga Exclude PPN wajib menggunakan Tax PO 11%. Ubah Tax PO menjadi 11% atau pilih Include PPN.');
-                    return;
-                }
-            }
-
             event.target.querySelectorAll('.number-format').forEach(function(input) {
                 var normalized = normalizeNumberInput(input.value);
                 var rawInput = input.parentNode.querySelector('.number-raw');
@@ -238,6 +254,11 @@ if (!empty($status) && isset($status[0]->tax) && (float) $status[0]->tax > 0) {
             });
 
             updateCalculatedPrice(event.target);
+        });
+
+        document.querySelectorAll('.ppn-price-form').forEach(function(form) {
+            updateCalculatedPrice(form);
+            updatePpnModeAlert(form);
         });
     })();
 </script>

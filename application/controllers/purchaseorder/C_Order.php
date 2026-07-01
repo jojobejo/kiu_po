@@ -112,6 +112,11 @@ class C_Order extends CI_Controller
         return abs($this->parseNumericInput($taxPercent) - $this->ppnPersen) < 0.00001;
     }
 
+    private function taxByKeteranganHargaPpn($ppnMode)
+    {
+        return strtolower(trim((string) $ppnMode)) === 'exclude' ? $this->ppnPersen : 0;
+    }
+
     private function getKeteranganHargaPpnTmp($kodeSuplier, $excludeIdTmp = 0)
     {
         if (!$this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
@@ -140,21 +145,16 @@ class C_Order extends CI_Controller
 
     private function validateKeteranganHargaPpn($kodeSuplier, $ppnMode, $redirectUrl, $excludeIdTmp = 0)
     {
-        if ($ppnMode === 'exclude' && !$this->isTaxPpnValid($this->M_Purchase->gettmptax($kodeSuplier))) {
-            $this->redirectWithError('Harga satuan Exclude PPN belum sesuai dengan setting PO saat ini.', $redirectUrl);
-            return false;
-        }
-
         $existingMode = $this->getKeteranganHargaPpnTmp($kodeSuplier, $excludeIdTmp);
 
         if ($existingMode !== '' && $existingMode !== $ppnMode) {
             if ($existingMode === 'exclude' && $ppnMode === 'include') {
-                $this->redirectWithError('List order sudah menggunakan harga EXCLUDE PPN. Gunakan keterangan harga EXCLUDE PPN untuk barang ini.', $redirectUrl);
+                $this->redirectWithError('Data order sudah menggunakan keterangan harga EXCLUDE PPN. Input berikutnya harus menggunakan EXCLUDE PPN juga. Apabila ingin menggunakan INCLUDE PPN, silahkan hapus data sebelumnya.', $redirectUrl);
                 return false;
             }
 
             if ($existingMode === 'include' && $ppnMode === 'exclude') {
-                $this->redirectWithError('List order sudah menggunakan harga INCLUDE PPN. Gunakan keterangan harga INCLUDE PPN untuk barang ini.', $redirectUrl);
+                $this->redirectWithError('Data order sudah menggunakan keterangan harga INCLUDE PPN. Input berikutnya harus menggunakan INCLUDE PPN juga. Apabila ingin menggunakan EXCLUDE PPN, silahkan hapus data sebelumnya.', $redirectUrl);
                 return false;
             }
 
@@ -163,6 +163,12 @@ class C_Order extends CI_Controller
         }
 
         return true;
+    }
+
+    private function syncTmpTaxByKeteranganHargaPpn($kodeSuplier)
+    {
+        $existingMode = $this->getKeteranganHargaPpnTmp($kodeSuplier);
+        $this->M_Purchase->set_tmp_tax($kodeSuplier, $this->taxByKeteranganHargaPpn($existingMode));
     }
 
     private function diskonExcludeTax($nominal, $taxPercent)
@@ -306,25 +312,13 @@ class C_Order extends CI_Controller
     public function add_tax_tmp()
     {
         $kdsup  = $this->input->post('kd_suplier_isi');
-        $tax    = $this->input->post('tax_isi_status');
-
-        $tmptax = array(
-            'kd_suplier'    => $kdsup,
-            'tax'           => $tax
-        );
-        $this->M_Purchase->add_tax_tmp($tmptax);
+        $this->syncTmpTaxByKeteranganHargaPpn($kdsup);
         redirect('purchase/sup/' . $kdsup);
     }
     public function update_tax_tmp()
     {
         $kdsup  = $this->input->post('kd_suplier_isi');
-        $tax    = $this->input->post('tax_isi_status');
-
-        $tmptax = array(
-            'kd_suplier'    => $kdsup,
-            'tax'           => $tax
-        );
-        $this->M_Purchase->update_tax_tmp($kdsup, $tmptax);
+        $this->syncTmpTaxByKeteranganHargaPpn($kdsup);
         redirect('purchase/sup/' . $kdsup);
     }
     public function listBarang($kdsuplier)
@@ -477,7 +471,7 @@ class C_Order extends CI_Controller
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
         $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus, $suplier);
-        $taxAktif   = $this->M_Purchase->gettmptax($suplier);
+        $taxAktif   = $this->ppnPersen;
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($suplier, $ppnMode, 'purchase/listBarang/' . $suplier)) {
             return;
@@ -524,6 +518,7 @@ class C_Order extends CI_Controller
 
         $this->db->trans_start();
         $this->M_Purchase->addChart($data);
+        $this->syncTmpTaxByKeteranganHargaPpn($suplier);
         $this->db->trans_complete();
 
         if ($this->db->trans_status() === FALSE) {
@@ -536,7 +531,10 @@ class C_Order extends CI_Controller
 
     public function hapusChart($id, $kdsuplier)
     {
+        $this->db->trans_start();
         $this->M_Purchase->hapusChart($id);
+        $this->syncTmpTaxByKeteranganHargaPpn($kdsuplier);
+        $this->db->trans_complete();
         redirect('purchase/sup/' . $kdsuplier);
     }
 
@@ -721,6 +719,9 @@ class C_Order extends CI_Controller
             echo json_encode(array('msg' => 'empty'));
             return;
         }
+
+        $tax = $this->taxByKeteranganHargaPpn($this->getKeteranganHargaPpnTmp($suplier));
+        $this->M_Purchase->set_tmp_tax($suplier, $tax);
 
         if (!$this->tableColumnsAvailable('tb_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_exclude', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude', 'keterangan_harga_ppn'))) {
             echo json_encode(array(
@@ -1166,7 +1167,7 @@ class C_Order extends CI_Controller
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
         $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus, $supp);
-        $taxAktif   = $this->M_Purchase->gettmptax($supp);
+        $taxAktif   = $this->ppnPersen;
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($supp, $ppnMode, 'purchase/sup/' . $supp, $id)) {
             return;
@@ -1208,6 +1209,7 @@ class C_Order extends CI_Controller
         }
         $this->db->trans_start();
         $this->M_Purchase->edit_chart_tmp($id, $dataedit);
+        $this->syncTmpTaxByKeteranganHargaPpn($supp);
         $this->db->trans_complete();
 
         if ($this->db->trans_status() === FALSE) {

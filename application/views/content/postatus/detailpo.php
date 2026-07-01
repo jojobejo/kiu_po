@@ -39,6 +39,32 @@
                     white-space: normal;
                 }
 
+                .po-print-actions .btn {
+                    align-items: center;
+                    border-radius: .25rem;
+                    display: flex;
+                    font-size: 13px;
+                    font-weight: 600;
+                    gap: .35rem;
+                    justify-content: center;
+                    line-height: 1.15;
+                    min-height: 38px;
+                    padding: .35rem .45rem;
+                    white-space: normal;
+                }
+
+                .po-print-actions [class*="col-"] {
+                    padding-left: .25rem;
+                    padding-right: .25rem;
+                }
+
+                .po-print-actions .btn i {
+                    flex: 0 0 auto;
+                    font-size: 14px;
+                    line-height: 1;
+                    margin-right: 0;
+                }
+
                 .po-detail-table .text-number {
                     text-align: right;
                 }
@@ -190,18 +216,9 @@
 
                                     <?php if ($s->status == 'DONE') : ?>
                                         <div>
-                                            <a href="<?= base_url('print_po/') . $s->kd_po ?>" target="_blank" class="btn btn-primary btn-block mb-2">
-                                                <i class="fas fa-file-invoice"></i> Print PO
+                                            <a class="btn btn-success btn-block mb-2">
+                                                <i class="fas fa-thumbs-up"></i> DONE
                                             </a>
-                                            <?php if ($s->kd_printout_note != '') : ?>
-                                                <a href="<?= base_url('print_po_supplier/') . $s->kd_po ?>" target="_blank" class="btn btn-secondary btn-block">
-                                                    <i class="fas fa-shipping-fast"></i> Print PO - Supplier
-                                                </a>
-                                            <?php elseif ($s->kd_printout_note == '') : ?>
-                                                <a href="#" class="btn btn-secondary btn-block btn-select-template" data-toggle="modal" data-target="#modalSelectTemplate" data-kdpo="<?= $s->kd_po ?>">
-                                                    <i class="fas fa-shipping-fast"></i> Print PO - Supplier
-                                                </a>
-                                            <?php endif; ?>
                                         </div>
 
 
@@ -410,6 +427,58 @@
                                 </a>
                             </div>
                     </div>
+                    <?php if ($this->session->userdata('lv') == '2' && $s->status == 'DONE') : ?>
+                        <div class="row po-print-actions mt-2">
+                            <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                <a href="<?= base_url('print_po/') . $s->kd_po ?>" target="_blank" class="btn btn-outline-primary btn-block btn-sm">
+                                    <i class="fas fa-file-invoice"></i> Print PO
+                                </a>
+                            </div>
+                            <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                <a href="<?= base_url('print_po/') . $s->kd_po . '/include' ?>" target="_blank" class="btn btn-primary btn-block btn-sm">
+                                    <i class="fas fa-file-invoice"></i> Print PO Internal - Include
+                                </a>
+                            </div>
+                            <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                <a href="<?= base_url('print_po/') . $s->kd_po . '/exclude' ?>" target="_blank" class="btn btn-info btn-block btn-sm">
+                                    <i class="fas fa-file-invoice"></i> Print PO Internal - Exclude
+                                </a>
+                            </div>
+                            <?php if ($s->kd_printout_note != '') : ?>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="<?= base_url('print_po_supplier/') . $s->kd_po ?>" target="_blank" class="btn btn-outline-secondary btn-block btn-sm">
+                                        <i class="fas fa-shipping-fast"></i> Print PO - Supplier
+                                    </a>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="<?= base_url('print_po_supplier/') . $s->kd_po . '/include' ?>" target="_blank" class="btn btn-secondary btn-block btn-sm">
+                                        <i class="fas fa-shipping-fast"></i> Print PO Supplier - Include
+                                    </a>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="<?= base_url('print_po_supplier/') . $s->kd_po . '/exclude' ?>" target="_blank" class="btn btn-dark btn-block btn-sm">
+                                        <i class="fas fa-shipping-fast"></i> Print PO Supplier - Exclude
+                                    </a>
+                                </div>
+                            <?php elseif ($s->kd_printout_note == '') : ?>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="#" class="btn btn-outline-secondary btn-block btn-sm btn-select-template" data-toggle="modal" data-target="#modalSelectTemplate" data-kdpo="<?= $s->kd_po ?>" data-print-mode="include">
+                                        <i class="fas fa-shipping-fast"></i> Print PO - Supplier
+                                    </a>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="#" class="btn btn-secondary btn-block btn-sm btn-select-template" data-toggle="modal" data-target="#modalSelectTemplate" data-kdpo="<?= $s->kd_po ?>" data-print-mode="include">
+                                        <i class="fas fa-shipping-fast"></i> Print PO Supplier - Include
+                                    </a>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-6 mb-2">
+                                    <a href="#" class="btn btn-dark btn-block btn-sm btn-select-template" data-toggle="modal" data-target="#modalSelectTemplate" data-kdpo="<?= $s->kd_po ?>" data-print-mode="exclude">
+                                        <i class="fas fa-shipping-fast"></i> Print PO Supplier - Exclude
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -484,12 +553,6 @@
                     <a class="btn btnAtas btn-sm btn-block" href="<?= base_url('addBarangRevisi/') . $s->kd_suplier . '/' . $s->kd_po ?>">
                         <i class="fas fa-plus"> </i>
                         Tambah Barang
-                    </a>
-                </div>
-                <div class="col-md">
-                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#modalTax<?= $s->kd_po ?>">
-                        <i class="fas fa-percent"> </i>
-                        Setting Tax
                     </a>
                 </div>
                 <div class="col-md">
