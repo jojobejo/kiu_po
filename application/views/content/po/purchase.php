@@ -104,8 +104,13 @@
                 .po-ppn-switch {
                     align-items: center;
                     display: flex;
-                    justify-content: flex-end;
+                    justify-content: space-between;
                     margin: 0 0 .75rem;
+                }
+
+                .po-price-flag {
+                    color: #dc3545;
+                    font-weight: 700;
                 }
 
                 .po-ppn-switch .custom-control-label {
@@ -243,6 +248,19 @@
         $poSummary = po_apply_discount_rows_summary($poSummary, $poDiscountRows);
         $poSummary = po_add_tax_summary($poSummary, $tax);
         $poTaxMultiplier = 1 + ((float) $tax / 100);
+        $poKeteranganHargaPpn = '';
+        foreach ($poItemRows as $poItemRow) {
+            if (!empty($poItemRow['is_bonus'])) {
+                continue;
+            }
+
+            $poSource = $poItemRow['source'];
+            $poMode = isset($poSource->keterangan_harga_ppn) ? strtolower(trim((string) $poSource->keterangan_harga_ppn)) : '';
+            if (in_array($poMode, array('exclude', 'include'), true)) {
+                $poKeteranganHargaPpn = $poMode;
+                break;
+            }
+        }
         ?>
         <?php if ($poSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -252,6 +270,11 @@
             </div>
         <?php endif; ?>
         <div class="po-ppn-switch">
+            <div class="po-price-flag">
+                <?php if ($poKeteranganHargaPpn !== '') : ?>
+                    Setting Harga: <?= strtoupper($poKeteranganHargaPpn) ?> PPN
+                <?php endif; ?>
+            </div>
             <div class="custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input ppn-display-switch" id="ppn_display_purchase" data-po="purchase">
                 <label class="custom-control-label" for="ppn_display_purchase"><span class="ppn-display-mode" data-po="purchase">Exclude PPN</span></label>
@@ -266,6 +289,7 @@
                         <td>Satuan</td>
                         <td>Qty</td>
                         <td>Qty Kecil</td>
+                        <td>Harga Satuan</td>
                         <td class="ppn-display-label" data-po="purchase" data-exclude="Harga Satuan Kecil (Exclude)" data-include="Harga Satuan Kecil (Include)">Harga Satuan Kecil (Exclude)</td>
                         <td class="ppn-display-label" data-po="purchase" data-exclude="Harga Setelah Diskon (Exclude)" data-include="Harga Setelah Diskon (Include)">Harga Setelah Diskon (Exclude)</td>
                         <td class="ppn-display-label" data-po="purchase" data-exclude="Total Harga (Exclude)" data-include="Total Harga (Include)">Total Harga (Exclude)</td>
@@ -291,6 +315,7 @@
                             <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td class="text-number"><?= po_qty($row['qty']) ?></td>
                             <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
+                            <td class="text-number"><?= po_money($row['harga_satuan']) ?></td>
                             <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['harga_satuan_kecil']) ?>" data-include="<?= po_money($row['harga_satuan_kecil'] * $poTaxMultiplier) ?>"><?= po_money($row['harga_satuan_kecil']) ?></td>
                             <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['harga_final_unit']) ?>" data-include="<?= po_money($row['harga_final_unit'] * $poTaxMultiplier) ?>"><?= po_money($row['harga_final_unit']) ?></td>
                             <td class="text-number ppn-display-value" data-po="purchase" data-exclude="<?= po_money($row['total_before']) ?>" data-include="<?= po_money($row['total_before'] * $poTaxMultiplier) ?>"><?= po_money($row['total_before']) ?></td>

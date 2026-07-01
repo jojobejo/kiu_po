@@ -62,7 +62,7 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
+                            <label class="col-sm-3 control-label text-right">Keterangan Harga<span class="required">*</span></label>
                             <div class="col-sm-8 pt-2">
                                 <div class="custom-control custom-radio custom-control-inline">
                                     <input type="radio" id="ppn_exclude_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
@@ -72,16 +72,15 @@
                                     <input type="radio" id="ppn_include_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
                                     <label class="custom-control-label" for="ppn_include_<?= $i->id_barang ?>">Include PPN</label>
                                 </div>
-                                <small class="form-text text-muted">Exclude PPN dihitung menggunakan PPN 11%; Include PPN tidak dihitung ulang.</small>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group d-none">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_<?= $i->id_barang ?>">Harga Satuan Hasil Kalkulasi</label>
+                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_<?= $i->id_barang ?>">Harga Kalkulasi</label>
                             <div class="col-sm-8">
                                 <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_<?= $i->id_barang ?>" value="" readonly />
-                                <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="" />
+                                <input type="hidden" class="ppn-calculated-raw" value="" />
                                 <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
                             </div>
                         </div>
@@ -146,8 +145,8 @@
 
             var inputPrice = parseFloat(rawInput.value);
             var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'exclude'
-                ? inputPrice / (1 + (ppnRate / 100))
+            var calculatedPrice = selectedMode.value === 'include'
+                ? inputPrice * (1 + (ppnRate / 100))
                 : inputPrice;
 
             displayOutput.value = formatCalculatedPrice(calculatedPrice);

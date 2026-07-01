@@ -180,38 +180,45 @@
                             </div>
                         </div>
                     <?php else : ?>
+                        <?php
+                        $editPpnMode = isset($t->keterangan_harga_ppn) && in_array(strtolower(trim((string) $t->keterangan_harga_ppn)), array('exclude', 'include'), true)
+                            ? strtolower(trim((string) $t->keterangan_harga_ppn))
+                            : 'exclude';
+                        $editHargaSatuan = (float) $t->harga_satuan;
+                        if ($editPpnMode === 'include') {
+                            $editHargaSatuan = $editHargaSatuan / 1.11;
+                        }
+                        ?>
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="edit_harga_satuan_<?= $t->id_tmp ?>">Harga Satuan<span class="required">*</span></label>
                                 <div class="col-sm-8">
-                                    <input class="form-control number-format ppn-price-input" type="text" inputmode="decimal" id="edit_harga_satuan_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 12, ',', '.'), '0'), ',') ?>" autocomplete="off" />
-                                    <input type="hidden" name="hrg_isi" class="number-raw ppn-price-raw" value="<?= $t->harga_satuan ?>" />
+                                    <input class="form-control number-format ppn-price-input" type="text" inputmode="decimal" id="edit_harga_satuan_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format($editHargaSatuan, 12, ',', '.'), '0'), ',') ?>" autocomplete="off" />
+                                    <input type="hidden" name="hrg_isi" class="number-raw ppn-price-raw" value="<?= $editHargaSatuan ?>" />
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-3 control-label text-right">Harga PPN<span class="required">*</span></label>
+                                <label class="col-sm-3 control-label text-right">Keterangan Harga<span class="required">*</span></label>
                                 <div class="col-sm-8 pt-2">
                                     <div class="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="edit_ppn_exclude_<?= $t->id_tmp ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
+                                        <input type="radio" id="edit_ppn_exclude_<?= $t->id_tmp ?>" name="ppn_mode" value="exclude" class="custom-control-input" <?= $editPpnMode === 'exclude' ? 'checked' : '' ?>>
                                         <label class="custom-control-label" for="edit_ppn_exclude_<?= $t->id_tmp ?>">Exclude PPN</label>
                                     </div>
                                     <div class="custom-control custom-radio custom-control-inline">
-                                        <input type="radio" id="edit_ppn_include_<?= $t->id_tmp ?>" name="ppn_mode" value="include" class="custom-control-input">
+                                        <input type="radio" id="edit_ppn_include_<?= $t->id_tmp ?>" name="ppn_mode" value="include" class="custom-control-input" <?= $editPpnMode === 'include' ? 'checked' : '' ?>>
                                         <label class="custom-control-label" for="edit_ppn_include_<?= $t->id_tmp ?>">Include PPN</label>
                                     </div>
-                                    <small class="form-text text-muted">Exclude PPN dihitung menggunakan PPN 11%; Include PPN tidak dihitung ulang.</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group d-none">
                             <div class="row">
-                                <label class="col-sm-3 control-label text-right" for="edit_harga_hasil_ppn_<?= $t->id_tmp ?>">Harga Satuan Hasil Kalkulasi</label>
+                                <label class="col-sm-3 control-label text-right" for="edit_harga_hasil_ppn_<?= $t->id_tmp ?>">Harga Kalkulasi</label>
                                 <div class="col-sm-8">
                                     <input class="form-control ppn-calculated-display" type="text" id="edit_harga_hasil_ppn_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 4, ',', '.'), '0'), ',') ?>" readonly />
-                                    <input type="hidden" name="hrg_hasil_ppn" class="ppn-calculated-raw" value="<?= $t->harga_satuan ?>" />
-                                    <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
+                                    <input type="hidden" class="ppn-calculated-raw" value="<?= $t->harga_satuan ?>" />
                                 </div>
                             </div>
                         </div>
@@ -271,8 +278,8 @@
 
             var inputPrice = parseFloat(rawInput.value);
             var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'exclude'
-                ? inputPrice / (1 + (ppnRate / 100))
+            var calculatedPrice = selectedMode.value === 'include'
+                ? inputPrice * (1 + (ppnRate / 100))
                 : inputPrice;
 
             displayOutput.value = formatCalculatedPrice(calculatedPrice);
