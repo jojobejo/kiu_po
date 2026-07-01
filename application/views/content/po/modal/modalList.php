@@ -1,4 +1,22 @@
 <!-- MODAL ADD -->
+<?php
+$listOrderKeteranganHargaPpn = '';
+$poTaxAktif = isset($tax_tmp) ? (float) $tax_tmp : 0;
+$poTaxSudahDisetting = $poTaxAktif > 0 ? '1' : '0';
+if (!empty($tmp)) {
+    foreach ($tmp as $tmpItem) {
+        if (!empty($tmpItem->is_bonus)) {
+            continue;
+        }
+
+        $tmpPpnMode = isset($tmpItem->keterangan_harga_ppn) ? strtolower(trim((string) $tmpItem->keterangan_harga_ppn)) : '';
+        if (in_array($tmpPpnMode, array('exclude', 'include'), true)) {
+            $listOrderKeteranganHargaPpn = $tmpPpnMode;
+            break;
+        }
+    }
+}
+?>
 <?php foreach ($barang as $i) : ?>
     <div class="modal fade" id="modalAddItem<?= $i->id_barang ?>">
         <div class="modal-dialog modal-lg">
@@ -10,7 +28,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <?php echo form_open_multipart('tambahChart', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11')); ?>
+                    <?php echo form_open_multipart('tambahChart', array('class' => 'ppn-price-form', 'data-ppn-rate' => '11', 'data-current-ppn-mode' => $listOrderKeteranganHargaPpn, 'data-tax-ready' => $poTaxSudahDisetting, 'data-current-tax' => $poTaxAktif)); ?>
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
@@ -65,23 +83,25 @@
                             <label class="col-sm-3 control-label text-right">Keterangan Harga<span class="required">*</span></label>
                             <div class="col-sm-8 pt-2">
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="ppn_exclude_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" checked>
+                                    <input type="radio" id="ppn_exclude_<?= $i->id_barang ?>" name="ppn_mode" value="exclude" class="custom-control-input" <?= $listOrderKeteranganHargaPpn !== 'include' ? 'checked' : '' ?>>
                                     <label class="custom-control-label" for="ppn_exclude_<?= $i->id_barang ?>">Exclude PPN</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="ppn_include_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input">
+                                    <input type="radio" id="ppn_include_<?= $i->id_barang ?>" name="ppn_mode" value="include" class="custom-control-input" <?= $listOrderKeteranganHargaPpn === 'include' ? 'checked' : '' ?>>
                                     <label class="custom-control-label" for="ppn_include_<?= $i->id_barang ?>">Include PPN</label>
+                                </div>
+                                <div class="ppn-mode-alert alert alert-warning py-2 px-3 mt-2 mb-0 d-none">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group d-none">
+                    <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_<?= $i->id_barang ?>">Harga Kalkulasi</label>
+                            <label class="col-sm-3 control-label text-right" for="harga_hasil_ppn_<?= $i->id_barang ?>">Harga Satuan Exclude PPN</label>
                             <div class="col-sm-8">
                                 <input class="form-control ppn-calculated-display" type="text" id="harga_hasil_ppn_<?= $i->id_barang ?>" value="" readonly />
                                 <input type="hidden" class="ppn-calculated-raw" value="" />
-                                <small class="form-text text-muted">Nilai harga setelah perhitungan PPN yang digunakan untuk penyimpanan.</small>
+                                <small class="form-text text-muted">Jika Include PPN dipilih, nilai ini dihitung dengan rumus DPP: harga satuan dibagi 1 + tax. Harga input tetap disimpan sesuai nilai yang diisi.</small>
                             </div>
                         </div>
                     </div>
@@ -119,7 +139,7 @@
 
             return value.toLocaleString('id-ID', {
                 minimumFractionDigits: 0,
-                maximumFractionDigits: 4
+                maximumFractionDigits: 3
             });
         }
 
@@ -132,6 +152,7 @@
             var displayOutput = form.querySelector('.ppn-calculated-display');
             var rawOutput = form.querySelector('.ppn-calculated-raw');
             var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+            var includeMode = form.querySelector('input[name="ppn_mode"][value="include"]:checked') !== null;
 
             if (!rawInput || !displayOutput || !rawOutput || !selectedMode || rawInput.value === '') {
                 if (displayOutput) {
@@ -144,13 +165,50 @@
             }
 
             var inputPrice = parseFloat(rawInput.value);
-            var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'include'
-                ? inputPrice * (1 + (ppnRate / 100))
-                : inputPrice;
+            var currentTax = parseFloat(form.getAttribute('data-current-tax'));
+            var defaultTax = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+            var taxRate = isFinite(currentTax) && currentTax > 0 ? currentTax : (defaultTax > 0 ? defaultTax : 11);
+            var calculatedPrice = inputPrice;
+
+            if (includeMode && taxRate > 0) {
+                var taxDecimal = taxRate / 100;
+                calculatedPrice = inputPrice / (1 + taxDecimal);
+            }
 
             displayOutput.value = formatCalculatedPrice(calculatedPrice);
             rawOutput.value = calculatedPrice;
+        }
+
+        function updatePpnModeAlert(form) {
+            if (!form || !form.classList.contains('ppn-price-form')) {
+                return;
+            }
+
+            var currentMode = form.getAttribute('data-current-ppn-mode');
+            var taxReady = form.getAttribute('data-tax-ready') === '1';
+            var currentTax = form.getAttribute('data-current-tax') || '';
+            var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+            var modeAlert = form.querySelector('.ppn-mode-alert');
+
+            if (!modeAlert || !selectedMode) {
+                return;
+            }
+
+            if (currentMode === 'exclude' && selectedMode.value === 'include') {
+                modeAlert.textContent = 'List order ini sudah memakai harga Exclude PPN. Agar nilai PO tetap konsisten, pilih Exclude PPN untuk barang ini.';
+                modeAlert.classList.remove('d-none');
+            } else if (currentMode === 'include' && selectedMode.value === 'exclude') {
+                modeAlert.textContent = 'List order ini sudah memakai harga Include PPN. Agar nilai PO tetap konsisten, pilih Include PPN untuk barang ini.';
+                modeAlert.classList.remove('d-none');
+            } else if (!taxReady && selectedMode.value === 'exclude') {
+                modeAlert.textContent = 'Tax PO belum disetting. Pilih Include PPN untuk menyimpan harga tanpa perhitungan tax, atau setting tax terlebih dahulu sebelum memakai Exclude PPN.';
+                modeAlert.classList.remove('d-none');
+            } else if (taxReady && selectedMode.value === 'include') {
+                modeAlert.textContent = 'Tax PO saat ini sudah disetting' + (currentTax !== '' ? ' sebesar ' + currentTax + '%' : '') + '. Jika harga barang belum termasuk PPN, gunakan Exclude PPN agar perhitungan mengikuti setting tax.';
+                modeAlert.classList.remove('d-none');
+            } else {
+                modeAlert.classList.add('d-none');
+            }
         }
 
         document.addEventListener('input', function(event) {
@@ -174,7 +232,9 @@
 
         document.addEventListener('change', function(event) {
             if (event.target.name === 'ppn_mode') {
-                updateCalculatedPrice(event.target.closest('form'));
+                var form = event.target.closest('form');
+                updateCalculatedPrice(form);
+                updatePpnModeAlert(form);
             }
         });
 
@@ -189,6 +249,11 @@
             });
 
             updateCalculatedPrice(event.target);
+        });
+
+        document.querySelectorAll('.ppn-price-form').forEach(function(form) {
+            updateCalculatedPrice(form);
+            updatePpnModeAlert(form);
         });
     })();
 </script>

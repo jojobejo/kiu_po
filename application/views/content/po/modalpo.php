@@ -185,9 +185,9 @@
                             ? strtolower(trim((string) $t->keterangan_harga_ppn))
                             : 'exclude';
                         $editHargaSatuan = (float) $t->harga_satuan;
-                        if ($editPpnMode === 'include') {
-                            $editHargaSatuan = $editHargaSatuan / 1.11;
-                        }
+                        $editHargaSatuanExclude = isset($t->harga_satuan_exclude) && (float) $t->harga_satuan_exclude > 0
+                            ? (float) $t->harga_satuan_exclude
+                            : $editHargaSatuan;
                         ?>
                         <div class="form-group">
                             <div class="row">
@@ -217,8 +217,8 @@
                             <div class="row">
                                 <label class="col-sm-3 control-label text-right" for="edit_harga_hasil_ppn_<?= $t->id_tmp ?>">Harga Kalkulasi</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control ppn-calculated-display" type="text" id="edit_harga_hasil_ppn_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format((float) $t->harga_satuan, 4, ',', '.'), '0'), ',') ?>" readonly />
-                                    <input type="hidden" class="ppn-calculated-raw" value="<?= $t->harga_satuan ?>" />
+                                    <input class="form-control ppn-calculated-display" type="text" id="edit_harga_hasil_ppn_<?= $t->id_tmp ?>" value="<?= rtrim(rtrim(number_format($editHargaSatuanExclude, 4, ',', '.'), '0'), ',') ?>" readonly />
+                                    <input type="hidden" class="ppn-calculated-raw" value="<?= $editHargaSatuanExclude ?>" />
                                 </div>
                             </div>
                         </div>
@@ -258,7 +258,7 @@
 
             return value.toLocaleString('id-ID', {
                 minimumFractionDigits: 0,
-                maximumFractionDigits: 4
+                maximumFractionDigits: 3
             });
         }
 
@@ -271,16 +271,21 @@
             var displayOutput = form.querySelector('.ppn-calculated-display');
             var rawOutput = form.querySelector('.ppn-calculated-raw');
             var selectedMode = form.querySelector('input[name="ppn_mode"]:checked');
+            var includeMode = form.querySelector('input[name="ppn_mode"][value="include"]:checked') !== null;
 
             if (!rawInput || !displayOutput || !rawOutput || !selectedMode || rawInput.value === '') {
                 return;
             }
 
             var inputPrice = parseFloat(rawInput.value);
-            var ppnRate = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
-            var calculatedPrice = selectedMode.value === 'include'
-                ? inputPrice * (1 + (ppnRate / 100))
-                : inputPrice;
+            var currentTax = parseFloat(form.getAttribute('data-current-tax'));
+            var defaultTax = parseFloat(form.getAttribute('data-ppn-rate')) || 0;
+            var taxRate = isFinite(currentTax) && currentTax > 0 ? currentTax : defaultTax;
+            var calculatedPrice = inputPrice;
+
+            if (includeMode && taxRate > 0) {
+                calculatedPrice = inputPrice / (1 + (taxRate / 100));
+            }
 
             displayOutput.value = formatCalculatedPrice(calculatedPrice);
             rawOutput.value = calculatedPrice;

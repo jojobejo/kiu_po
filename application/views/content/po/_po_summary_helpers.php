@@ -48,8 +48,13 @@ if (!function_exists('po_qty')) {
 if (!function_exists('po_exclude_ppn')) {
     function po_exclude_ppn($value, $taxPercent)
     {
+        $value = po_num($value);
         $taxRate = po_num($taxPercent) / 100;
-        return $taxRate > 0 ? po_num($value) / (1 + $taxRate) : po_num($value);
+        if ($taxRate <= 0) {
+            $taxRate = 0.11;
+        }
+
+        return $value / (1 + $taxRate);
     }
 }
 
@@ -259,8 +264,17 @@ if (!function_exists('po_build_item_rows')) {
             $isBonus = (int) po_value($item, 'is_bonus', 0) === 1;
             $qty = po_num(po_value($item, 'qty', 0));
             $qtyKecil = po_num(po_value($item, 'qty_kecil', $qty));
-            $hargaSatuan = po_num(po_value($item, $isTmp ? 'harga_satuan' : 'hrg_satuan', 0));
-            $hargaSatuanKecil = po_num(po_value($item, 'harga_satuan_kecil', $hargaSatuan));
+            $hargaSatuanSimpan = po_num(po_value($item, $isTmp ? 'harga_satuan' : 'hrg_satuan', 0));
+            $hargaSatuanKecilSimpan = po_num(po_value($item, 'harga_satuan_kecil', $hargaSatuanSimpan));
+            $hargaSatuanExcludeSimpan = po_num(po_value($item, 'harga_satuan_exclude', 0));
+            $hargaSatuanKecilExcludeSimpan = po_num(po_value($item, 'harga_satuan_kecil_exclude', 0));
+            $keteranganHargaPpn = strtolower(trim((string) po_value($item, 'keterangan_harga_ppn', '')));
+            $hargaSatuan = $keteranganHargaPpn === 'include'
+                ? ($hargaSatuanExcludeSimpan > 0 ? $hargaSatuanExcludeSimpan : po_exclude_ppn($hargaSatuanSimpan, $taxPercent))
+                : $hargaSatuanSimpan;
+            $hargaSatuanKecil = $keteranganHargaPpn === 'include'
+                ? ($hargaSatuanKecilExcludeSimpan > 0 ? $hargaSatuanKecilExcludeSimpan : po_exclude_ppn($hargaSatuanKecilSimpan, $taxPercent))
+                : $hargaSatuanKecilSimpan;
             $totalBefore = $isBonus ? 0 : ($qtyKecil * $hargaSatuanKecil);
             $diskonPerUnit = $isBonus ? 0 : po_diskon_per_unit($item, $diskonList, $mode, $hargaSatuanKecil, $taxPercent);
             $hargaFinalUnit = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerUnit, 0);
@@ -294,7 +308,11 @@ if (!function_exists('po_build_item_rows')) {
                 'isi' => po_num(po_value($item, 'isi', 0)),
                 'kemasan' => po_num(po_value($item, 'kemasan', 0)),
                 'harga_satuan' => $hargaSatuan,
+                'harga_satuan_simpan' => $hargaSatuanSimpan,
+                'harga_satuan_exclude_simpan' => $hargaSatuanExcludeSimpan,
                 'harga_satuan_kecil' => $hargaSatuanKecil,
+                'harga_satuan_kecil_simpan' => $hargaSatuanKecilSimpan,
+                'harga_satuan_kecil_exclude_simpan' => $hargaSatuanKecilExcludeSimpan,
                 'diskon_per_unit' => $diskonPerUnit,
                 'harga_final_unit' => $hargaFinalUnit,
                 'total_before' => $totalBefore,

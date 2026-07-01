@@ -429,13 +429,27 @@ class M_PoStatus extends CI_Model
     }
     public function addRevisiChart($data)
     {
-        $this->db->insert('tb_detail_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_detail_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        $this->db->insert('tb_detail_po', $filteredData);
     }
 
     function revisiPO($id, $data)
     {
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_detail_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
         $this->db->where('id_det_po', $id);
-        return $this->db->update('tb_detail_po', $data);
+        return $this->db->update('tb_detail_po', $filteredData);
     }
     function updateLog($data)
     {
@@ -886,7 +900,14 @@ class M_PoStatus extends CI_Model
     }
     public function inputDetailPO($data)
     {
-        $this->db->insert('tb_detail_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tb_detail_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        $this->db->insert('tb_detail_po', $filteredData);
     }
     public function input_diskon($data)
     {

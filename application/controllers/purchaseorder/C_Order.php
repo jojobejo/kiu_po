@@ -85,11 +85,26 @@ class C_Order extends CI_Controller
     {
         $harga = $this->parseNumericInput($harga);
 
-        if ($ppnMode !== 'include') {
-            return $harga;
+        return $harga;
+    }
+
+    private function hargaDppDariInclude($harga, $taxPercent)
+    {
+        $harga = $this->parseNumericInput($harga);
+        $taxRate = $this->parseNumericInput($taxPercent) / 100;
+
+        if ($taxRate <= 0) {
+            $taxRate = $this->ppnPersen / 100;
         }
 
-        return $harga * (1 + ($this->ppnPersen / 100));
+        return $harga / (1 + $taxRate);
+    }
+
+    private function hargaKalkulasiExcludeByMode($harga, $ppnMode, $taxPercent)
+    {
+        return $ppnMode === 'include'
+            ? $this->hargaDppDariInclude($harga, $taxPercent)
+            : $this->parseNumericInput($harga);
     }
 
     private function isTaxPpnValid($taxPercent)
@@ -126,13 +141,23 @@ class C_Order extends CI_Controller
     private function validateKeteranganHargaPpn($kodeSuplier, $ppnMode, $redirectUrl, $excludeIdTmp = 0)
     {
         if ($ppnMode === 'exclude' && !$this->isTaxPpnValid($this->M_Purchase->gettmptax($kodeSuplier))) {
-            $this->redirectWithError('Harga satuan Exclude PPN wajib menggunakan setting Tax PO 11%.', $redirectUrl);
+            $this->redirectWithError('Harga satuan Exclude PPN belum sesuai dengan setting PO saat ini.', $redirectUrl);
             return false;
         }
 
         $existingMode = $this->getKeteranganHargaPpnTmp($kodeSuplier, $excludeIdTmp);
 
         if ($existingMode !== '' && $existingMode !== $ppnMode) {
+            if ($existingMode === 'exclude' && $ppnMode === 'include') {
+                $this->redirectWithError('List order sudah menggunakan harga EXCLUDE PPN. Gunakan keterangan harga EXCLUDE PPN untuk barang ini.', $redirectUrl);
+                return false;
+            }
+
+            if ($existingMode === 'include' && $ppnMode === 'exclude') {
+                $this->redirectWithError('List order sudah menggunakan harga INCLUDE PPN. Gunakan keterangan harga INCLUDE PPN untuk barang ini.', $redirectUrl);
+                return false;
+            }
+
             $this->redirectWithError('Keterangan harga harus sama dengan item PO sebelumnya. PO ini sudah menggunakan ' . ucfirst($existingMode) . ' PPN.', $redirectUrl);
             return false;
         }
@@ -308,6 +333,7 @@ class C_Order extends CI_Controller
         $data['kode_suplier']   = $this->M_Purchase->Suplier($kdsuplier)->result();
         $data['barang']         = $this->M_Purchase->getBarangSup($kdsuplier)->result();
         $data['tax']            = $this->M_Purchase->getTax();
+        $data['tax_tmp']        = $this->M_Purchase->gettmptax($kdsuplier);
         $data['satuan']         = $this->M_Purchase->getSatuan();
         $data['tmp']            = $this->M_Purchase->getTmpOrder($kdsuplier);
 
@@ -451,6 +477,7 @@ class C_Order extends CI_Controller
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
         $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus, $suplier);
+        $taxAktif   = $this->M_Purchase->gettmptax($suplier);
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($suplier, $ppnMode, 'purchase/listBarang/' . $suplier)) {
             return;
@@ -482,6 +509,14 @@ class C_Order extends CI_Controller
             'is_bonus'      => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : '',
         );
+
+        if ($this->db->field_exists('harga_satuan_exclude', 'tb_tmp_item')) {
+            $data['harga_satuan_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($hargaQty, $ppnMode, $taxAktif);
+        }
+
+        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tb_tmp_item')) {
+            $data['harga_satuan_kecil_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($konversi['harga_satuan_kecil'], $ppnMode, $taxAktif);
+        }
 
         if ($this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
             $data['keterangan_harga_ppn'] = $isBonus ? '' : $ppnMode;
@@ -687,10 +722,10 @@ class C_Order extends CI_Controller
             return;
         }
 
-        if (!$this->tableColumnsAvailable('tb_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude'))) {
+        if (!$this->tableColumnsAvailable('tb_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_exclude', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude', 'keterangan_harga_ppn'))) {
             echo json_encode(array(
                 'msg' => 'error',
-                'message' => 'Kolom konversi pada tb_detail_po belum tersedia'
+                'message' => 'Kolom konversi dan PPN pada tb_detail_po belum tersedia'
             ));
             return;
         }
@@ -706,7 +741,14 @@ class C_Order extends CI_Controller
 
             $isBonus = isset($chart->is_bonus) ? (int) $chart->is_bonus : 0;
             $qtyKecil = isset($chart->qty_kecil) && (float) $chart->qty_kecil > 0 ? $chart->qty_kecil : $chart->qty;
-            $hargaSatuanKecil = isset($chart->harga_satuan_kecil) && ((float) $chart->harga_satuan_kecil > 0 || $isBonus) ? $chart->harga_satuan_kecil : $chart->harga_satuan;
+            $hargaSatuanKecilSimpan = isset($chart->harga_satuan_kecil) && ((float) $chart->harga_satuan_kecil > 0 || $isBonus) ? $chart->harga_satuan_kecil : $chart->harga_satuan;
+            $keteranganHargaPpn = isset($chart->keterangan_harga_ppn) ? strtolower(trim((string) $chart->keterangan_harga_ppn)) : '';
+            $hargaSatuanExclude = isset($chart->harga_satuan_exclude) && (float) $chart->harga_satuan_exclude > 0
+                ? $chart->harga_satuan_exclude
+                : ($keteranganHargaPpn === 'include' ? $this->hargaDppDariInclude($chart->harga_satuan, $tax) : $chart->harga_satuan);
+            $hargaSatuanKecil = $keteranganHargaPpn === 'include'
+                ? $this->hargaDppDariInclude($hargaSatuanKecilSimpan, $tax)
+                : $hargaSatuanKecilSimpan;
             $merkBarang = isset($chart->merk_barang) ? $chart->merk_barang : '';
             $diskonResult = $isBonus
                 ? array('diskon_per_satuan' => 0, 'metadata' => array('id_diskon_merk' => null, 'satuan_diskon' => null, 'nominal_diskon' => 0, 'diskon_satuan_kecil' => 0))
@@ -714,7 +756,6 @@ class C_Order extends CI_Controller
             $diskonPerSatuan = $diskonResult['diskon_per_satuan'];
             $diskonMetadata = $diskonResult['metadata'];
             $hargaDiskonInclude = $isBonus ? 0 : max($hargaSatuanKecil - $diskonPerSatuan, 0);
-            // Harga dari modal adalah harga dasar sebelum tax dan harus disimpan apa adanya.
             $hargaSatuanKecilExclude = $isBonus ? 0 : $hargaSatuanKecil;
             $hargaDiskon = $isBonus ? 0 : $hargaDiskonInclude;
             $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
@@ -733,7 +774,8 @@ class C_Order extends CI_Controller
                 'kemasan'           => isset($chart->kemasan) ? $chart->kemasan : 0,
                 'qty_kecil'         => $qtyKecil,
                 'hrg_satuan'        => $chart->harga_satuan,
-                'harga_satuan_kecil' => $hargaSatuanKecil,
+                'harga_satuan_exclude' => $isBonus ? 0 : $hargaSatuanExclude,
+                'harga_satuan_kecil' => $hargaSatuanKecilSimpan,
                 'harga_satuan_kecil_exclude' => $hargaSatuanKecilExclude,
                 'hrg_diskon'        => $hargaDiskon,
                 'hrg_total'         => $chart->total_harga,
@@ -1124,6 +1166,7 @@ class C_Order extends CI_Controller
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
         $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus, $supp);
+        $taxAktif   = $this->M_Purchase->gettmptax($supp);
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($supp, $ppnMode, 'purchase/sup/' . $supp, $id)) {
             return;
@@ -1151,6 +1194,14 @@ class C_Order extends CI_Controller
             'is_bonus' => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : ''
         );
+
+        if ($this->db->field_exists('harga_satuan_exclude', 'tb_tmp_item')) {
+            $dataedit['harga_satuan_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($hrg_satuan, $ppnMode, $taxAktif);
+        }
+
+        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tb_tmp_item')) {
+            $dataedit['harga_satuan_kecil_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($konversi['harga_satuan_kecil'], $ppnMode, $taxAktif);
+        }
 
         if ($this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
             $dataedit['keterangan_harga_ppn'] = $isBonus ? '' : $ppnMode;

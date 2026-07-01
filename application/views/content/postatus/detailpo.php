@@ -98,15 +98,50 @@
                     font-weight: 700;
                 }
 
-                .po-ppn-switch {
-                    align-items: center;
-                    display: flex;
-                    justify-content: flex-end;
+                .po-price-flag {
+                    color: #dc3545;
+                    font-weight: 700;
                     margin: 0 0 .75rem;
                 }
 
-                .po-ppn-switch .custom-control-label {
-                    min-width: 145px;
+                .po-price-stack {
+                    line-height: 1.25;
+                    white-space: nowrap;
+                }
+
+                .po-price-main {
+                    display: block;
+                    font-weight: 600;
+                }
+
+                .po-price-sub {
+                    color: #6c757d;
+                    display: block;
+                    font-size: 12px;
+                    margin-top: 2px;
+                }
+
+                .po-mode-badge {
+                    display: inline-block;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0;
+                    padding: .2rem .4rem;
+                }
+
+                .po-ppn-tabs {
+                    margin: 0 0 .75rem;
+                }
+
+                .po-ppn-tabs .nav-link {
+                    border-radius: 6px 6px 0 0;
+                    color: #495057;
+                    font-weight: 700;
+                    letter-spacing: 0;
+                }
+
+                .po-ppn-tabs .nav-link.active {
+                    color: #007bff;
                 }
             </style>
             <div class="row mb-2">
@@ -502,8 +537,29 @@
                             $poDetailDiscountRows = po_build_discount_rows($diskon, $poDetailRows, 'detail', $s->tax);
                             $poDetailSummary = po_apply_discount_rows_summary($poDetailSummary, $poDetailDiscountRows);
                             $poDetailSummary = po_add_tax_summary($poDetailSummary, $s->tax);
-                            $poDetailRows = po_add_tax_to_discounted_item_rows($poDetailRows, $s->tax);
-                            $poDetailTaxMultiplier = 1 + ((float) $s->tax / 100);
+                            $poDetailKeteranganHargaPpn = '';
+                            foreach ($poDetailRows as $poDetailRow) {
+                                if (!empty($poDetailRow['is_bonus'])) {
+                                    continue;
+                                }
+
+                                $poDetailSource = $poDetailRow['source'];
+                                $poDetailMode = isset($poDetailSource->keterangan_harga_ppn) ? strtolower(trim((string) $poDetailSource->keterangan_harga_ppn)) : '';
+                                if (in_array($poDetailMode, array('exclude', 'include'), true)) {
+                                    $poDetailKeteranganHargaPpn = $poDetailMode;
+                                    break;
+                                }
+                            }
+                            $poDetailPpnConversionPercent = (float) $s->tax > 0 ? (float) $s->tax : 11;
+                            $poDetailPpnConversionMultiplier = 1 + ($poDetailPpnConversionPercent / 100);
+                            $poDetailPrimaryPpnTab = $poDetailKeteranganHargaPpn === 'include' ? 'include' : 'exclude';
+                            $poDetailPpnTabModes = $poDetailPrimaryPpnTab === 'include'
+                                ? array('include', 'exclude')
+                                : array('exclude', 'include');
+                            $poDetailPpnTabLabels = array(
+                                'include' => 'INCLUDE',
+                                'exclude' => 'EXCLUDE',
+                            );
         ?>
         <?php if ($poDetailSummary['has_validation_error']) : ?>
             <div class="alert alert-danger">
@@ -512,80 +568,172 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-        <div class="po-ppn-switch">
-            <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input ppn-display-switch" id="ppn_display_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">
-                <label class="custom-control-label" for="ppn_display_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">
-                    <span class="ppn-display-mode" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">Exclude PPN</span>
-                </label>
+        <?php if ($poDetailKeteranganHargaPpn !== '') : ?>
+            <div class="po-price-flag">
+                Keterangan: Data order ini menggunakan harga <?= strtoupper($poDetailKeteranganHargaPpn) ?> PPN
             </div>
-        </div>
-        <div class="table-responsive po-detail-table-wrap">
-            <table class="table table-bordered table-striped po-detail-table">
-                <thead style="background-color: #212529; color:white;">
-                    <tr>
-                        <td>No</td>
-                        <td>Nama Barang</td>
-                        <td>Satuan</td>
-                        <td>Qty</td>
-                        <td>Qty Kecil</td>
-                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Harga Satuan Kecil (Exclude)" data-include="Harga Satuan Kecil (Include)">Harga Satuan Kecil (Exclude)</td>
-                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Harga Setelah Diskon (Exclude)" data-include="Harga Setelah Diskon (Include)">Harga Setelah Diskon (Exclude)</td>
-                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Harga (Exclude)" data-include="Total Harga (Include)">Total Harga (Exclude)</td>
-                        <td class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Harga Setelah Diskon (Exclude)" data-include="Total Harga Setelah Diskon (Include)">Total Harga Setelah Diskon (Exclude)</td>
-                        <?php if ($showActionColumn) : ?>
-                            <td>#</td>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $noDetailRow = 1; ?>
-                    <?php foreach ($poDetailRows as $row) : ?>
-                        <?php $d = $row['source']; ?>
-                        <tr>
-                            <td class="text-center"><?= $noDetailRow++; ?></td>
-                            <td class="col-item" title="<?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>">
-                                <?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>
-                                <?php if ($row['is_bonus']) : ?>
-                                    <span class="badge badge-primary ml-1">BONUS</span>
-                                    <?php if ($row['bonus_note'] !== '') : ?>
-                                        <span class="po-muted"><?= htmlspecialchars($row['bonus_note'], ENT_QUOTES, 'UTF-8') ?></span>
+        <?php endif; ?>
+        <ul class="nav nav-tabs po-ppn-tabs" id="poDetailPpnTab_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" role="tablist">
+            <?php foreach ($poDetailPpnTabModes as $poDetailTabIndex => $poDetailPpnTabMode) : ?>
+                <li class="nav-item">
+                    <a class="nav-link <?= $poDetailTabIndex === 0 ? 'active' : '' ?>" id="po-detail-ppn-<?= htmlspecialchars($s->kd_po . '-' . $poDetailPpnTabMode, ENT_QUOTES, 'UTF-8') ?>-tab" data-toggle="tab" href="#po-detail-ppn-<?= htmlspecialchars($s->kd_po . '-' . $poDetailPpnTabMode, ENT_QUOTES, 'UTF-8') ?>" role="tab" aria-controls="po-detail-ppn-<?= htmlspecialchars($s->kd_po . '-' . $poDetailPpnTabMode, ENT_QUOTES, 'UTF-8') ?>" aria-selected="<?= $poDetailTabIndex === 0 ? 'true' : 'false' ?>">
+                        <?= $poDetailPpnTabLabels[$poDetailPpnTabMode] ?> PPN
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <div class="tab-content" id="poDetailPpnTabContent_<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>">
+            <?php foreach ($poDetailPpnTabModes as $poDetailTabIndex => $poDetailPpnTabMode) : ?>
+                <?php
+                $poDetailIsIncludeTab = $poDetailPpnTabMode === 'include';
+                $poDetailTabTaxPercent = $poDetailIsIncludeTab ? 0 : $poDetailPpnConversionPercent;
+                $poDetailTabSummaryBefore = 0;
+                $poDetailTabSummaryAfter = 0;
+                ?>
+                <div class="tab-pane fade <?= $poDetailTabIndex === 0 ? 'show active' : '' ?>" id="po-detail-ppn-<?= htmlspecialchars($s->kd_po . '-' . $poDetailPpnTabMode, ENT_QUOTES, 'UTF-8') ?>" role="tabpanel" aria-labelledby="po-detail-ppn-<?= htmlspecialchars($s->kd_po . '-' . $poDetailPpnTabMode, ENT_QUOTES, 'UTF-8') ?>-tab">
+                    <div class="table-responsive po-detail-table-wrap">
+                        <table class="table table-bordered table-striped po-detail-table">
+                            <thead style="background-color: #212529; color:white;">
+                                <tr>
+                                    <td>No</td>
+                                    <td>Nama Barang</td>
+                                    <td>Keterangan Harga</td>
+                                    <td>Satuan</td>
+                                    <td>Qty</td>
+                                    <td>Qty Kecil</td>
+                                    <td>Harga Input Tersimpan</td>
+                                    <td>Harga Satuan</td>
+                                    <td>Harga Satuan Kecil</td>
+                                    <td>Harga Setelah Diskon</td>
+                                    <td>Total Harga</td>
+                                    <td>Total Harga Setelah Diskon</td>
+                                    <?php if ($showActionColumn) : ?>
+                                        <td>#</td>
                                     <?php endif; ?>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
-                            <td class="text-number"><?= po_qty($row['qty']) ?></td>
-                            <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
-                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['harga_satuan_kecil']) ?>" data-include="<?= po_money_round_up($row['harga_satuan_kecil'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['harga_satuan_kecil']) ?></td>
-                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['harga_final_unit']) ?>" data-include="<?= po_money_round_up($row['harga_final_unit'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['harga_final_unit']) ?></td>
-                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['total_before']) ?>" data-include="<?= po_money_round_up($row['total_before'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['total_before']) ?></td>
-                            <td class="text-number ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($row['total_after']) ?>" data-include="<?= po_money_round_up($row['total_after'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($row['total_after']) ?></td>
-                            <?php if ($showActionColumn) : ?>
-                                <td>
-                                    <div class="action-cell">
-                                        <a class="btn btn-success btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>" title="Edit" aria-label="Edit">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <?php if ($showAction) : ?>
-                                            <a class="btn btn-danger btn-sm btn-icon" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>" title="Hapus" aria-label="Hapus">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
-                                            <?php if (!$row['is_bonus']) : ?>
-                                                <a class="btn btn-sm btn-info btn-icon color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>" title="Tambah Diskon" aria-label="Tambah Diskon">
-                                                    <i class="fas fa-percent"></i>
-                                                </a>
-                                                <a class="btn btn-sm bg-lightblue btn-icon color-palette" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>" title="Diskon Barang" aria-label="Diskon Barang">
-                                                    <i class="fas fa-tags"></i>
-                                                </a>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $noDetailRow = 1; ?>
+                                <?php foreach ($poDetailRows as $row) : ?>
+                                    <?php $d = $row['source']; ?>
+                                    <?php
+                                    $poDetailRowPpnMode = isset($d->keterangan_harga_ppn) ? strtolower(trim((string) $d->keterangan_harga_ppn)) : '';
+                                    if (!in_array($poDetailRowPpnMode, array('exclude', 'include'), true)) {
+                                        $poDetailRowPpnMode = $row['is_bonus'] ? '' : 'exclude';
+                                    }
+
+                                    $poDetailRowModeLabel = $poDetailRowPpnMode !== '' ? strtoupper($poDetailRowPpnMode) . ' PPN' : '-';
+                                    $poDetailRowModeClass = $poDetailRowPpnMode === 'include' ? 'badge-info' : ($poDetailRowPpnMode === 'exclude' ? 'badge-warning' : 'badge-secondary');
+                                    $poDetailRowHargaSatuanInput = $row['harga_satuan_simpan'];
+                                    $poDetailRowHargaSatuanKecilInput = $row['harga_satuan_kecil_simpan'];
+                                    if ($poDetailIsIncludeTab) {
+                                        if ($poDetailRowPpnMode === 'include') {
+                                            $poDetailRowHargaSatuanView = $poDetailRowHargaSatuanInput;
+                                            $poDetailRowHargaSatuanKecilView = $poDetailRowHargaSatuanKecilInput;
+                                        } else {
+                                            $poDetailRowHargaSatuanView = $row['harga_satuan'] * $poDetailPpnConversionMultiplier;
+                                            $poDetailRowHargaSatuanKecilView = $row['harga_satuan_kecil'] * $poDetailPpnConversionMultiplier;
+                                        }
+                                        $poDetailRowDiskonPerUnitView = $row['diskon_per_unit'] * $poDetailPpnConversionMultiplier;
+                                    } else {
+                                        $poDetailRowHargaSatuanView = $row['harga_satuan'];
+                                        $poDetailRowHargaSatuanKecilView = $row['harga_satuan_kecil'];
+                                        $poDetailRowDiskonPerUnitView = $row['diskon_per_unit'];
+                                    }
+                                    $poDetailRowHargaFinalView = $row['is_bonus'] ? 0 : max($poDetailRowHargaSatuanKecilView - $poDetailRowDiskonPerUnitView, 0);
+                                    $poDetailRowTotalBeforeView = $row['is_bonus'] ? 0 : ($row['qty_kecil'] * $poDetailRowHargaSatuanKecilView);
+                                    $poDetailRowTotalAfterView = $row['is_bonus'] ? 0 : ($row['qty_kecil'] * $poDetailRowHargaFinalView);
+                                    $poDetailTabSummaryBefore += $poDetailRowTotalBeforeView;
+                                    $poDetailTabSummaryAfter += $poDetailRowTotalAfterView;
+                                    $poDetailRowInputNote = $poDetailRowPpnMode === 'include'
+                                        ? 'Tersimpan Include'
+                                        : ($poDetailRowPpnMode === 'exclude' ? 'Tersimpan Exclude' : 'Bonus');
+                                    ?>
+                                    <tr>
+                                        <td class="text-center"><?= $noDetailRow++; ?></td>
+                                        <td class="col-item" title="<?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?>
+                                            <?php if ($row['is_bonus']) : ?>
+                                                <span class="badge badge-primary ml-1">BONUS</span>
+                                                <?php if ($row['bonus_note'] !== '') : ?>
+                                                    <span class="po-muted"><?= htmlspecialchars($row['bonus_note'], ENT_QUOTES, 'UTF-8') ?></span>
+                                                <?php endif; ?>
                                             <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge po-mode-badge <?= $poDetailRowModeClass ?>"><?= htmlspecialchars($poDetailRowModeLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                                        </td>
+                                        <td><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td class="text-number"><?= po_qty($row['qty']) ?></td>
+                                        <td class="text-number"><?= po_qty($row['qty_kecil']) ?></td>
+                                        <td class="text-number">
+                                            <span class="po-price-stack">
+                                                <span class="po-price-main"><?= po_money_round_up($poDetailRowHargaSatuanInput) ?></span>
+                                                <span class="po-price-sub"><?= htmlspecialchars($poDetailRowInputNote, ENT_QUOTES, 'UTF-8') ?></span>
+                                            </span>
+                                        </td>
+                                        <td class="text-number"><?= po_money_round_up($poDetailRowHargaSatuanView) ?></td>
+                                        <td class="text-number"><?= po_money_round_up($poDetailRowHargaSatuanKecilView) ?></td>
+                                        <td class="text-number"><?= po_money_round_up($poDetailRowHargaFinalView) ?></td>
+                                        <td class="text-number"><?= po_money_round_up($poDetailRowTotalBeforeView) ?></td>
+                                        <td class="text-number"><?= po_money_round_up($poDetailRowTotalAfterView) ?></td>
+                                        <?php if ($showActionColumn) : ?>
+                                            <td>
+                                                <div class="action-cell">
+                                                    <a class="btn btn-success btn-sm btn-icon" data-toggle="modal" data-target="#modalEdit<?= $d->id_det_po ?>" title="Edit" aria-label="Edit">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </a>
+                                                    <?php if ($showAction) : ?>
+                                                        <a class="btn btn-danger btn-sm btn-icon" href="<?= base_url('hapusBarangPO/') . $d->id_det_po . '/' . $d->kd_po ?>" title="Hapus" aria-label="Hapus">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                        <?php if (!$row['is_bonus']) : ?>
+                                                            <a class="btn btn-sm btn-info btn-icon color-palette" data-toggle="modal" data-target="#diskonbarangs<?= $d->id_det_po ?>" title="Tambah Diskon" aria-label="Tambah Diskon">
+                                                                <i class="fas fa-percent"></i>
+                                                            </a>
+                                                            <a class="btn btn-sm bg-lightblue btn-icon color-palette" data-toggle="modal" data-target="#diskonbarang<?= $d->id_det_po ?>" title="Diskon Barang" aria-label="Diskon Barang">
+                                                                <i class="fas fa-tags"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
                                         <?php endif; ?>
-                                    </div>
-                                </td>
-                            <?php endif; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <?php
+                    $poDetailTabSummaryDiscount = max($poDetailTabSummaryBefore - $poDetailTabSummaryAfter, 0);
+                    $poDetailTabTaxValue = $poDetailTabSummaryAfter * ($poDetailTabTaxPercent / 100);
+                    $poDetailTabGrandTotal = $poDetailTabSummaryAfter + $poDetailTabTaxValue;
+                    ?>
+                    <div class="po-summary-card">
+                        <div class="po-summary-row">
+                            <span>Total Harga Sebelum Diskon</span>
+                            <strong><?= po_money_round_up($poDetailTabSummaryBefore) ?></strong>
+                        </div>
+                        <div class="po-summary-row">
+                            <span>Total Diskon</span>
+                            <strong><span class="badge badge-success"><?= po_money_round_up($poDetailTabSummaryDiscount) ?></span></strong>
+                        </div>
+                        <div class="po-summary-row">
+                            <span>Total Harga Setelah Diskon</span>
+                            <strong><?= po_money_round_up($poDetailTabSummaryAfter) ?></strong>
+                        </div>
+                        <div class="po-summary-row">
+                            <span>Tax <?= po_qty($poDetailTabTaxPercent) ?>%</span>
+                            <strong><?= po_money_round_up($poDetailTabTaxValue) ?></strong>
+                        </div>
+                        <div class="po-summary-row po-summary-grand">
+                            <span>Grand Total Harga</span>
+                            <span><?= po_money_round_up($poDetailTabGrandTotal) ?></span>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <div class="table-responsive">
@@ -627,29 +775,6 @@
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
-
-        <div class="po-summary-card">
-            <div class="po-summary-row">
-                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="DPP Sebelum Diskon" data-include="Total Sebelum Diskon (Include PPN)">DPP Sebelum Diskon</span>
-                <strong class="ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_before_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['grand_total_without_discount']) ?>"><?= po_money_round_up($poDetailSummary['total_before_discount']) ?></strong>
-            </div>
-            <div class="po-summary-row">
-                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Total Diskon" data-include="Total Diskon (Include PPN)">Total Diskon</span>
-                <strong><span class="badge badge-success ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['total_discount'] * $poDetailTaxMultiplier) ?>"><?= po_money_round_up($poDetailSummary['total_discount']) ?></span></strong>
-            </div>
-            <div class="po-summary-row">
-                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="DPP Setelah Diskon" data-include="Total Setelah Diskon (Include PPN)">DPP Setelah Diskon</span>
-                <strong class="ppn-display-value" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="<?= po_money_round_up($poDetailSummary['total_after_discount']) ?>" data-include="<?= po_money_round_up($poDetailSummary['grand_total_with_discount']) ?>"><?= po_money_round_up($poDetailSummary['total_after_discount']) ?></strong>
-            </div>
-            <div class="po-summary-row">
-                <span class="ppn-display-label" data-po="<?= htmlspecialchars($s->kd_po, ENT_QUOTES, 'UTF-8') ?>" data-exclude="Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%" data-include="PPN sudah termasuk dalam harga">Tax <?= po_qty($poDetailSummary['tax_percent']) ?>%</span>
-                <strong><?= po_money_round_up($poDetailSummary['tax_with_discount']) ?></strong>
-            </div>
-            <div class="po-summary-row po-summary-grand">
-                <span>Grand Total Harga Dengan Diskon</span>
-                <span><?= po_money_round_up($poDetailSummary['grand_total_with_discount']) ?></span>
-            </div>
         </div>
 
         <div class="row mb-2">
@@ -1246,33 +1371,3 @@
 
 </div>
 <?php endforeach; ?>
-
-<script>
-    (function() {
-        function setPpnDisplay(poCode, includePpn) {
-            var mode = includePpn ? 'include' : 'exclude';
-            var modeLabel = includePpn ? 'Include PPN' : 'Exclude PPN';
-            var selector = '[data-po="' + poCode + '"]';
-
-            document.querySelectorAll('.ppn-display-value' + selector).forEach(function(element) {
-                element.textContent = element.getAttribute('data-' + mode);
-            });
-
-            document.querySelectorAll('.ppn-display-label' + selector).forEach(function(element) {
-                element.textContent = element.getAttribute('data-' + mode);
-            });
-
-            document.querySelectorAll('.ppn-display-mode' + selector).forEach(function(element) {
-                element.textContent = modeLabel;
-            });
-        }
-
-        document.addEventListener('change', function(event) {
-            if (!event.target.classList.contains('ppn-display-switch')) {
-                return;
-            }
-
-            setPpnDisplay(event.target.getAttribute('data-po'), event.target.checked);
-        });
-    })();
-</script>

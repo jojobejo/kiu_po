@@ -426,6 +426,11 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->addNote($updatenote);
         if ($tmp) {
             foreach ($tmp as $chart) {
+                $chartPpnMode = isset($chart->keterangan_harga_ppn) ? strtolower(trim((string) $chart->keterangan_harga_ppn)) : '';
+                $chartTaxForConversion = (float) $tax > 0 ? $tax : 11;
+                $chartHargaSatuanExclude = isset($chart->harga_satuan_exclude) && (float) $chart->harga_satuan_exclude > 0
+                    ? $chart->harga_satuan_exclude
+                    : ($chartPpnMode === 'include' ? $this->excludePpn($chart->hrg_satuan, $chartTaxForConversion) : $chart->hrg_satuan);
                 $listTransaksi = array(
                     'no_po'         => $nopo,
                     'kd_po'         => $kdpo,
@@ -439,13 +444,15 @@ class C_PoStatus extends CI_Controller
                     'kemasan'       => isset($chart->kemasan) ? $chart->kemasan : 0,
                     'qty_kecil'     => isset($chart->qty_kecil) ? $chart->qty_kecil : $chart->qty,
                     'hrg_satuan'    => $chart->hrg_satuan,
+                    'harga_satuan_exclude' => $chartHargaSatuanExclude,
                     'harga_satuan_kecil' => isset($chart->harga_satuan_kecil) ? $chart->harga_satuan_kecil : $chart->hrg_satuan,
-                    'harga_satuan_kecil_exclude' => isset($chart->harga_satuan_kecil_exclude) ? $chart->harga_satuan_kecil_exclude : $this->excludePpn(isset($chart->harga_satuan_kecil) ? $chart->harga_satuan_kecil : $chart->hrg_satuan, $tax),
+                    'harga_satuan_kecil_exclude' => isset($chart->harga_satuan_kecil_exclude) ? $chart->harga_satuan_kecil_exclude : $this->excludePpn(isset($chart->harga_satuan_kecil) ? $chart->harga_satuan_kecil : $chart->hrg_satuan, $chartTaxForConversion),
                     'hrg_diskon'    => isset($chart->hrg_diskon) ? $chart->hrg_diskon : $chart->hrg_satuan,
                     'hrg_total'     => $chart->hrg_total,
                     'hrg_total_diskon' => isset($chart->hrg_total_diskon) ? $chart->hrg_total_diskon : $chart->hrg_total,
                     'is_bonus'      => isset($chart->is_bonus) ? $chart->is_bonus : 0,
                     'keterangan_bonus' => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : null,
+                    'keterangan_harga_ppn' => isset($chart->keterangan_harga_ppn) ? $chart->keterangan_harga_ppn : '',
                 );
 
                 $this->M_Postatus->inputDetailPO($listTransaksi);
@@ -967,6 +974,9 @@ class C_PoStatus extends CI_Controller
         $oldItem    = $this->M_Postatus->getDetailItemById($idpo);
         $status     = $this->M_Postatus->getdataStatus($kdpo);
         $tax        = !empty($status) && isset($status[0]->tax) ? $status[0]->tax : 0;
+        $taxForConversion = (float) $tax > 0 ? $tax : 11;
+        $ppnMode = $oldItem && isset($oldItem->keterangan_harga_ppn) ? strtolower(trim((string) $oldItem->keterangan_harga_ppn)) : '';
+        $ppnMode = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
         $konversi   = $oldItem ? $this->hitungQtyHargaKecil($oldItem->kd_barang, $oldItem->kd_suplier, $satuan, $qty, $hargaQty) : array(
             'success' => true,
             'qty_kecil' => $qty,
@@ -979,7 +989,8 @@ class C_PoStatus extends CI_Controller
             return;
         }
 
-        $hargaSatuanKecilExclude = $isBonus ? 0 : $this->excludePpn($konversi['harga_satuan_kecil'], $tax);
+        $hargaSatuanExclude = $isBonus ? 0 : ($ppnMode === 'include' ? $this->excludePpn($hargaQty, $taxForConversion) : $hargaQty);
+        $hargaSatuanKecilExclude = $isBonus ? 0 : ($ppnMode === 'include' ? $this->excludePpn($konversi['harga_satuan_kecil'], $taxForConversion) : $konversi['harga_satuan_kecil']);
 
         $data = array(
             'satuan'        => $satuan,
@@ -988,6 +999,7 @@ class C_PoStatus extends CI_Controller
             'isi'           => isset($konversi['isi']) ? $konversi['isi'] : 0,
             'kemasan'       => isset($konversi['kemasan']) ? $konversi['kemasan'] : 0,
             'hrg_satuan'    => $hargaQty,
+            'harga_satuan_exclude' => $hargaSatuanExclude,
             'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'harga_satuan_kecil_exclude' => $hargaSatuanKecilExclude,
             'hrg_diskon'    => $hargaSatuanKecilExclude,
@@ -1007,19 +1019,24 @@ class C_PoStatus extends CI_Controller
                 'qty' => $oldItem->qty,
                 'qty_kecil' => isset($oldItem->qty_kecil) ? $oldItem->qty_kecil : $oldItem->qty,
                 'hrg_satuan' => $oldItem->hrg_satuan,
+                'harga_satuan_exclude' => isset($oldItem->harga_satuan_exclude) ? $oldItem->harga_satuan_exclude : null,
                 'harga_satuan_kecil' => isset($oldItem->harga_satuan_kecil) ? $oldItem->harga_satuan_kecil : $oldItem->hrg_satuan,
+                'harga_satuan_kecil_exclude' => isset($oldItem->harga_satuan_kecil_exclude) ? $oldItem->harga_satuan_kecil_exclude : null,
                 'is_bonus' => isset($oldItem->is_bonus) ? $oldItem->is_bonus : 0,
                 'keterangan_bonus' => isset($oldItem->keterangan_bonus) ? $oldItem->keterangan_bonus : null,
+                'keterangan_harga_ppn' => isset($oldItem->keterangan_harga_ppn) ? $oldItem->keterangan_harga_ppn : null,
             ) : null,
             array(
                 'satuan' => $satuan,
                 'qty' => $qty,
                 'qty_kecil' => $konversi['qty_kecil'],
                 'hrg_satuan' => $hargaQty,
+                'harga_satuan_exclude' => $hargaSatuanExclude,
                 'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
                 'harga_satuan_kecil_exclude' => $hargaSatuanKecilExclude,
                 'is_bonus' => $isBonus,
                 'keterangan_bonus' => $isBonus ? $bonusNote : null,
+                'keterangan_harga_ppn' => $ppnMode,
             )
         );
         redirect('detailPO/' . $kdpo);
@@ -1081,6 +1098,7 @@ class C_PoStatus extends CI_Controller
         }
 
         $hargaSatuanKecilExclude = $isBonus ? 0 : $konversi['harga_satuan_kecil'];
+        $hargaSatuanExclude = $isBonus ? 0 : $hargaQty;
 
         $data = array(
             'kd_po'         => $kdpo,
@@ -1095,6 +1113,7 @@ class C_PoStatus extends CI_Controller
             'isi'           => isset($konversi['isi']) ? $konversi['isi'] : 0,
             'kemasan'       => isset($konversi['kemasan']) ? $konversi['kemasan'] : 0,
             'hrg_satuan'    => $hargaQty,
+            'harga_satuan_exclude' => $hargaSatuanExclude,
             'harga_satuan_kecil' => $konversi['harga_satuan_kecil'],
             'harga_satuan_kecil_exclude' => $hargaSatuanKecilExclude,
             'hrg_diskon'    => $hargaSatuanKecilExclude,
@@ -1102,6 +1121,7 @@ class C_PoStatus extends CI_Controller
             'hrg_total_diskon' => $hargaSatuanKecilExclude * $konversi['qty_kecil'],
             'is_bonus'      => $isBonus,
             'keterangan_bonus' => $isBonus ? $bonusNote : '',
+            'keterangan_harga_ppn' => $isBonus ? '' : $ppnMode,
 
         );
         $this->M_Postatus->addRevisiChart($data);
@@ -1399,13 +1419,21 @@ class C_PoStatus extends CI_Controller
         $diskon = $this->M_Postatus->getDiskon($kdpo);
         $status = $this->M_Postatus->getdataStatus($kdpo);
         $tax = !empty($status) && isset($status[0]->tax) ? $status[0]->tax : 0;
+        $taxForConversion = (float) $tax > 0 ? $tax : 11;
         $totalHarga = 0;
         $totalHargaDiskon = 0;
 
         foreach ($detail as $item) {
             $isBonus = isset($item->is_bonus) ? (int) $item->is_bonus : 0;
             $qtyKecil = isset($item->qty_kecil) && (float) $item->qty_kecil > 0 ? $item->qty_kecil : $item->qty;
-            $hargaSatuanKecil = isset($item->harga_satuan_kecil) && ((float) $item->harga_satuan_kecil > 0 || $isBonus) ? $item->harga_satuan_kecil : $item->hrg_satuan;
+            $keteranganHargaPpn = isset($item->keterangan_harga_ppn) ? strtolower(trim((string) $item->keterangan_harga_ppn)) : '';
+            $hargaSatuanExclude = isset($item->harga_satuan_exclude) && ((float) $item->harga_satuan_exclude > 0 || $isBonus)
+                ? $item->harga_satuan_exclude
+                : ($keteranganHargaPpn === 'include' ? $this->excludePpn($item->hrg_satuan, $taxForConversion) : $item->hrg_satuan);
+            $hargaSatuanKecilSimpan = isset($item->harga_satuan_kecil) && ((float) $item->harga_satuan_kecil > 0 || $isBonus) ? $item->harga_satuan_kecil : $item->hrg_satuan;
+            $hargaSatuanKecil = isset($item->harga_satuan_kecil_exclude) && ((float) $item->harga_satuan_kecil_exclude > 0 || $isBonus)
+                ? $item->harga_satuan_kecil_exclude
+                : ($keteranganHargaPpn === 'include' ? $this->excludePpn($hargaSatuanKecilSimpan, $taxForConversion) : $hargaSatuanKecilSimpan);
             $merkBarang = isset($item->merk_barang) ? $item->merk_barang : '';
             $diskonResult = $isBonus
                 ? array('diskon_per_satuan' => 0, 'metadata' => array('id_diskon_merk' => null, 'satuan_diskon' => null, 'nominal_diskon' => 0, 'diskon_satuan_kecil' => 0))
@@ -1420,6 +1448,7 @@ class C_PoStatus extends CI_Controller
             $totalHargaDiskon += $hargaTotalDiskon;
 
             $this->M_Postatus->update_diskon_item($item->id_det_po, array(
+                'harga_satuan_exclude' => $isBonus ? 0 : $hargaSatuanExclude,
                 'harga_satuan_kecil_exclude' => $hargaSatuanKecilExclude,
                 'hrg_diskon' => $hargaDiskon,
                 'hrg_total_diskon' => $hargaTotalDiskon,
