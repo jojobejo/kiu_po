@@ -62,14 +62,150 @@
 
             var tableStock = $stockTable.DataTable({
                 "responsive": true,
+                "processing": true,
+                "serverSide": true,
                 "lengthChange": false,
                 "autoWidth": false,
                 "aaSorting": [],
+                "ajax": {
+                    "url": ajaxUrl,
+                    "type": "GET",
+                    "data": function(d) {
+                        d.lokasi = $("#filter_lokasi").val();
+                        d.status_stock = $("#filter_status_stock").val();
+                    }
+                },
+                "columns": isAdminView ? [
+                    {
+                        "data": "kode_barang",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "nama_barang",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "deskripsi",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": null,
+                        "render": function(_, __, row) {
+                            return buildQtyCell(row.qty_ready, row.status_stock);
+                        }
+                    },
+                    {
+                        "data": "minimum_stock",
+                        "render": function(data) {
+                            return escHtml(formatQty(data));
+                        }
+                    },
+                    {
+                        "data": "qty_saran_po",
+                        "render": function(data) {
+                            return escHtml(formatQty(data));
+                        }
+                    },
+                    {
+                        "data": "status_stock",
+                        "render": function(data) {
+                            return buildStatusCell(data);
+                        }
+                    },
+                    {
+                        "data": "satuan",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "nama_lokasi",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": null,
+                        "orderable": false,
+                        "searchable": false,
+                        "render": function(_, __, row) {
+                            return '<a href="' + detailBaseUrl + encodeURIComponent(row.kode_barangs) + '" id="btndetailbrs" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>' +
+                                '<button type="button" class="btn btn-block btn-warning btn-lokasi" data-toggle="modal" data-target="#modalUpdateLokasi" data-kode-barang="' + escHtml(row.kode_barang) + '" data-nama-barang="' + escHtml(row.nama_barang) + '" data-id-lokasi="' + escHtml(row.id_lokasi) + '"><i class="fas fa-map-marker-alt"></i></button>' +
+                                '<button type="button" class="btn btn-block btn-info btn-minimum-stock" data-toggle="modal" data-target="#modalMinimumStock" data-kode-barang="' + escHtml(row.kode_barangs) + '" data-nama-barang="' + escHtml(row.nama_barang) + '" data-minimum-stock="' + escHtml(row.minimum_stock) + '"><i class="fas fa-boxes"></i></button>';
+                        }
+                    }
+                ] : [
+                    {
+                        "data": "kode_barang",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "nama_barang",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "deskripsi",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": null,
+                        "render": function(_, __, row) {
+                            return buildQtyCell(row.qty_ready, row.status_stock);
+                        }
+                    },
+                    {
+                        "data": "minimum_stock",
+                        "render": function(data) {
+                            return escHtml(formatQty(data));
+                        }
+                    },
+                    {
+                        "data": "qty_saran_po",
+                        "render": function(data) {
+                            return escHtml(formatQty(data));
+                        }
+                    },
+                    {
+                        "data": "status_stock",
+                        "render": function(data) {
+                            return buildStatusCell(data);
+                        }
+                    },
+                    {
+                        "data": "satuan",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    },
+                    {
+                        "data": "nama_lokasi",
+                        "render": function(data) {
+                            return escHtml(data);
+                        }
+                    }
+                ],
                 "language": {
                     "emptyTable": "Memuat data...",
                     "zeroRecords": "Memuat data...",
                     "processing": "Memuat data..."
                 }
+            });
+
+            $stockTable.on("processing.dt", function(_, __, processing) {
+                toggleStockLoading(processing);
+                $("#btn_reload_stock").prop("disabled", processing).text(processing ? "Loading..." : "Reload Cepat");
             });
 
             function escHtml(text) {
@@ -103,72 +239,8 @@
                 return Number.isInteger(value) ? value.toString() : value.toFixed(2);
             }
 
-            function renderRows(rows) {
-                tableStock.clear();
-
-                $.each(rows, function(_, s) {
-                    if (isAdminView) {
-                        tableStock.row.add([
-                            escHtml(s.kode_barang),
-                            escHtml(s.nama_barang),
-                            escHtml(s.deskripsi),
-                            buildQtyCell(s.qty_ready, s.status_stock),
-                            escHtml(formatQty(s.minimum_stock)),
-                            escHtml(formatQty(s.qty_saran_po)),
-                            buildStatusCell(s.status_stock),
-                            escHtml(s.satuan),
-                            escHtml(s.nama_lokasi),
-                            '<a href="' + detailBaseUrl + s.kode_barangs + '" id="btndetailbrs" class="btn btn-block btn-primary"><i class="fas fa-eye"></i></a>' +
-                            '<button type="button" class="btn btn-block btn-warning btn-lokasi" data-toggle="modal" data-target="#modalUpdateLokasi" data-kode-barang="' + escHtml(s.kode_barang) + '" data-nama-barang="' + escHtml(s.nama_barang) + '" data-id-lokasi="' + escHtml(s.id_lokasi) + '"><i class="fas fa-map-marker-alt"></i></button>' +
-                            '<button type="button" class="btn btn-block btn-info btn-minimum-stock" data-toggle="modal" data-target="#modalMinimumStock" data-kode-barang="' + escHtml(s.kode_barangs) + '" data-nama-barang="' + escHtml(s.nama_barang) + '" data-minimum-stock="' + escHtml(s.minimum_stock) + '"><i class="fas fa-boxes"></i></button>'
-                        ]);
-                    } else {
-                        tableStock.row.add([
-                            escHtml(s.kode_barang),
-                            escHtml(s.nama_barang),
-                            escHtml(s.deskripsi),
-                            buildQtyCell(s.qty_ready, s.status_stock),
-                            escHtml(formatQty(s.minimum_stock)),
-                            escHtml(formatQty(s.qty_saran_po)),
-                            buildStatusCell(s.status_stock),
-                            escHtml(s.satuan),
-                            escHtml(s.nama_lokasi)
-                        ]);
-                    }
-                });
-
-                tableStock.draw(false);
-            }
-
             function loadStockData() {
-                var lokasi = $("#filter_lokasi").val();
-                var statusStock = $("#filter_status_stock").val();
-                $("#btn_reload_stock").prop("disabled", true).text("Loading...");
-                toggleStockLoading(true);
-
-                $.ajax({
-                    url: ajaxUrl,
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        lokasi: lokasi,
-                        status_stock: statusStock
-                    },
-                    success: function(res) {
-                        if (res && res.status && Array.isArray(res.data)) {
-                            renderRows(res.data);
-                        } else {
-                            renderRows([]);
-                        }
-                    },
-                    error: function() {
-                        renderRows([]);
-                    },
-                    complete: function() {
-                        $("#btn_reload_stock").prop("disabled", false).text("filter");
-                        toggleStockLoading(false);
-                    }
-                });
+                tableStock.ajax.reload(null, true);
             }
 
             $("#filter_lokasi").on("change", loadStockData);
@@ -199,7 +271,7 @@
                     success: function(res) {
                         if (res && res.status) {
                             $("#modalMinimumStock").modal("hide");
-                            loadStockData();
+                            tableStock.ajax.reload(null, false);
                         } else {
                             alert("Gagal update minimum stock.");
                         }
@@ -236,7 +308,7 @@
                     success: function(res) {
                         if (res && res.status) {
                             $("#modalUpdateLokasi").modal("hide");
-                            loadStockData();
+                            tableStock.ajax.reload(null, false);
                         } else {
                             alert("Gagal update lokasi.");
                         }
@@ -250,7 +322,6 @@
                 });
             });
 
-            loadStockData();
         } else if ($("#list_stocknonkomersil").length) {
             $("#list_stocknonkomersil").DataTable({
                 "responsive": true,

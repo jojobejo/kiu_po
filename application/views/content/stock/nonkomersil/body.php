@@ -98,7 +98,7 @@
                                 </select>
                             </div>
                             <div class="col-md-5 d-flex align-items-end">
-                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload Cepat</button>
+                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload</button>
                                 <button type="button" id="btn_reset_filter" class="btn btn-light">Reset</button>
                             </div>
                         </form>

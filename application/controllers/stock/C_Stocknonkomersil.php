@@ -334,6 +334,36 @@ class C_Stocknonkomersil extends CI_Controller
     {
         $lokasi = trim((string)$this->input->get('lokasi', true));
         $status_stock = trim((string)$this->input->get('status_stock', true));
+        $draw = $this->input->get('draw');
+
+        if ($draw !== null) {
+            $order = $this->input->get('order');
+            $search = $this->input->get('search');
+            $length = (int)$this->input->get('length');
+
+            $params = [
+                'lokasi' => $lokasi,
+                'status_stock' => $status_stock,
+                'search' => is_array($search) && isset($search['value']) ? trim((string)$search['value']) : '',
+                'start' => max(0, (int)$this->input->get('start')),
+                'length' => ($length > 0 && $length <= 100) ? $length : 10,
+                'order_column' => is_array($order) && isset($order[0]['column']) ? (int)$order[0]['column'] : 0,
+                'order_dir' => is_array($order) && isset($order[0]['dir']) ? (string)$order[0]['dir'] : 'asc'
+            ];
+
+            $result = $this->M_Stocknonkomersil->get_stock_datatable($params);
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'draw' => (int)$draw,
+                    'recordsTotal' => $result['records_total'],
+                    'recordsFiltered' => $result['records_filtered'],
+                    'data' => $result['data']
+                ]));
+            return;
+        }
+
         $stock = $this->M_Stocknonkomersil->v_stock($lokasi, $status_stock);
 
         $this->output

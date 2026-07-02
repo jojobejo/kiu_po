@@ -532,21 +532,13 @@ class M_PoStatus extends CI_Model
 
     public function ponkgetAllNK_keu_purchasing($kd)
     {
-        if ($kd != 'KEU111') {
-            return $this->db->query("SELECT *,
-                a.status
-                FROM tb_po_nk a
-                JOIN tb_user b ON b.kode_user = a.kd_user
-                WHERE a.status != 'DONE'
-                AND a.kd_user = '$kd' ");
-        } else {
-            return $this->db->query("SELECT *,
-                a.status
-                FROM tb_po_nk a
-                JOIN tb_user b ON b.kode_user = a.kd_user
-                WHERE a.status != 'DONE'
-                AND a.kd_user = 'KEU011' || a.kd_user = 'KEU111'");
-        }
+        return $this->db->query("SELECT *,
+            a.status
+            FROM tb_po_nk a
+            JOIN tb_user b ON b.kode_user = a.kd_user
+            WHERE a.status != 'DONE'
+            AND a.status != 'REJECT'
+                ");
     }
 
     public function getAllNK_kar($kduser)
@@ -555,8 +547,7 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.kd_user = '$kduser'
-        AND a.status != 'DONE'
+        WHERE a.status != 'DONE'
         AND a.status != 'REJECT'
             ");
     }

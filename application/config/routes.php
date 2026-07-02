@@ -88,6 +88,7 @@ $route['update_tax_tmp']                                = 'purchaseorder/C_Order
 
 //MASTER BARANG NON KOMERSIL
 $route['masterbarangnk']                                = 'master_barang/C_MasterBarang';
+$route['masterbarangnk/check-kode']                     = 'master_barang/C_MasterBarang/cek_kode_barangnk';
 $route['add_mbarang']                                   = 'master_barang/C_MasterBarang/add_mbarang';
 $route['edit_mbarangnk']                                = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk']                                  = 'master_barang/C_MasterBarang/delmbarangnk';

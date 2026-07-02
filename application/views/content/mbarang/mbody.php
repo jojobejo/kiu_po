@@ -1,6 +1,14 @@
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
+            <?php if ($this->session->flashdata('error')) : ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata('error'), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">
@@ -48,6 +56,14 @@
 
                             $str    = $brnk->nama_barang;
                             $strnew = str_replace(' ', '', $str);
+                            $idBarang = htmlspecialchars((string) $brnk->id_brg_nk, ENT_QUOTES, 'UTF-8');
+                            $kodeAdm = htmlspecialchars((string) $brnk->kd_br_adm, ENT_QUOTES, 'UTF-8');
+                            $katBarang = htmlspecialchars((string) $brnk->kat_barang, ENT_QUOTES, 'UTF-8');
+                            $namaBarang = htmlspecialchars((string) $brnk->nama_barang, ENT_QUOTES, 'UTF-8');
+                            $descBarang = htmlspecialchars((string) $brnk->descnk, ENT_QUOTES, 'UTF-8');
+                            $satuanBarang = htmlspecialchars((string) $brnk->id_satuan, ENT_QUOTES, 'UTF-8');
+                            $minimumStock = htmlspecialchars((string) $brnk->minimum_stock, ENT_QUOTES, 'UTF-8');
+                            $gbrBarang = htmlspecialchars((string) $brnk->gbr_barang, ENT_QUOTES, 'UTF-8');
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
@@ -69,17 +85,17 @@
                                 <td>
                                     <div class="row">
                                         <div class="col">
-                                            <a href="#" class="btn btn-block btn-warning btn-sm " data-toggle="modal" data-target="#editbarang<?= $brnk->id_brg_nk ?>">
+                                            <a href="#" class="btn btn-block btn-warning btn-sm js-edit-barang" data-toggle="modal" data-target="#editbarang" data-id="<?= $idBarang ?>" data-kd-adm="<?= $kodeAdm ?>" data-kategori="<?= $katBarang ?>" data-nama="<?= $namaBarang ?>" data-desc="<?= $descBarang ?>" data-satuan="<?= $satuanBarang ?>" data-minimum-stock="<?= $minimumStock ?>">
                                                 <i class="fa fa-solid fa-pencil-alt"></i>
                                             </a>
                                         </div>
                                         <div class="col-md">
-                                            <a href="#" class="btn btn-block btn-danger btn-sm " data-toggle="modal" data-target="#hapusbarang<?= $brnk->id_brg_nk ?>">
+                                            <a href="#" class="btn btn-block btn-danger btn-sm js-delete-barang" data-toggle="modal" data-target="#hapusbarang" data-id="<?= $idBarang ?>" data-nama="<?= $namaBarang ?>">
                                                 <i class="fa fa-solid fa-trash-alt"></i>
                                             </a>
                                         </div>
                                         <div class="col-md">
-                                            <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#uploadmbrang<?= $brnk->id_brg_nk ?>">
+                                            <a href="#" class="btn btn-block btn-success btn-sm js-upload-barang" data-toggle="modal" data-target="#uploadmbrang" data-id="<?= $idBarang ?>" data-file="<?= $gbrBarang ?>" data-kd-adm="<?= $kodeAdm ?>">
                                                 <i class="fas fa-camera"></i>
                                             </a>
                                         </div>
