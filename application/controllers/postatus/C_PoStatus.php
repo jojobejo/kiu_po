@@ -1996,6 +1996,42 @@ class C_PoStatus extends CI_Controller
         return $this->responseJson(true, 'Data berhasil diperbarui');
     }
 
+    private function validatePonkForAjax($kd_po_req)
+    {
+        $kd_po_req = trim((string) $kd_po_req);
+        if ($kd_po_req === '') {
+            return array(false, null, 'Kode pengajuan tidak boleh kosong');
+        }
+
+        if (!$this->session->userdata('kode')) {
+            return array(false, null, 'Sesi login sudah berakhir, silakan login ulang');
+        }
+
+        $ponk = $this->M_Postatus->get_ponk_by_req($kd_po_req);
+        if (!$ponk) {
+            return array(false, null, 'Data pengajuan tidak ditemukan');
+        }
+
+        $blockedStatuses = array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN');
+        if (in_array($ponk->status, $blockedStatuses, true)) {
+            return array(false, null, 'Data dengan status ' . $ponk->status . ' tidak dapat diubah');
+        }
+
+        return array(true, $ponk, '');
+    }
+
+    private function responseJson($status, $message, $httpStatus = 200)
+    {
+        $this->output
+            ->set_status_header($httpStatus)
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'status' => (bool) $status,
+                'message' => $message
+            )));
+        return;
+    }
+
     public function historidone($lv, $user)
     {
         $data['title'] = 'PO Status';
