@@ -351,6 +351,9 @@ $route['addconfirmsos']                                 = 'settings/C_Appsrated/
 //API
 $route['get_po']                                        = 'api/C_Api/get_po';
 $route['get_data_pre_po_erp']                           = 'api/C_Api/get_data_pre_po_erp';
+$route['get_lpb_po_komersil_erp']                       = 'api/C_Api/get_lpb_po_komersil_erp';
+$route['get_data_lpb_po_komersil_erp']                  = 'api/C_Api/get_data_lpb_po_komersil_erp';
+$route['api/lpb-po-komersil']                           = 'api/C_Api/get_data_lpb_po_komersil_erp';
 
 
 $route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';

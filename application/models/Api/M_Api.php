@@ -3,6 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class M_Api extends CI_Model
 {
+    const LPB_PONK_DEFAULT_LIMIT = 500;
+    const LPB_PONK_MAX_LIMIT = 1000;
+    const LPB_PO_KOMERSIL_DEFAULT_LIMIT = 500;
+    const LPB_PO_KOMERSIL_MAX_LIMIT = 1000;
+
     public function get_data_pre_po_erp()
     {
         $rows = $this->db
@@ -86,5 +91,89 @@ class M_Api extends CI_Model
         }
 
         return $map;
+    }
+
+    public function get_data_lpb_po_komersil_erp(array $filters = array())
+    {
+        $limit = isset($filters['limit']) ? (int) $filters['limit'] : self::LPB_PO_KOMERSIL_DEFAULT_LIMIT;
+        if ($limit <= 0) {
+            $limit = self::LPB_PO_KOMERSIL_DEFAULT_LIMIT;
+        }
+        $limit = min($limit, self::LPB_PO_KOMERSIL_MAX_LIMIT);
+
+        $status = isset($filters['status']) ? strtoupper(trim((string) $filters['status'])) : 'DONE';
+
+        $this->db
+            ->select("
+                'PO_KOMERSIL' AS sumber_data,
+                CONCAT(p.kd_po, '-', d.id_det_po) AS kode_sync,
+                p.kd_po AS kode_faktur,
+                p.kd_po,
+                NULLIF(p.no_po, '-') AS nomor_po,
+                NULL AS nomor_invoice,
+                p.tgl_transaksi AS tanggal_po,
+                p.status,
+                p.kd_suplier AS kode_suplier,
+                sp.nama_suplier,
+                d.id_det_po AS id_detail_source,
+                d.kd_barang AS kode_barang,
+                d.nama_barang,
+                d.satuan,
+                d.qty,
+                d.isi,
+                d.kemasan,
+                d.qty_kecil,
+                d.is_bonus,
+                d.keterangan_bonus,
+                d.kd_user AS kode_user_input,
+                d.create_at AS detail_updated_at,
+                p.create_at AS po_updated_at
+            ", false)
+            ->from('tb_detail_po d')
+            ->join('tb_po p', 'p.kd_po = d.kd_po', 'inner')
+            ->join('tb_suplier sp', 'sp.kd_suplier = p.kd_suplier', 'left')
+            ->where('p.kd_po IS NOT NULL', null, false)
+            ->where("TRIM(p.kd_po) <>", '')
+            ->order_by('p.create_at', 'DESC')
+            ->order_by('d.id_det_po', 'ASC')
+            ->limit($limit);
+
+        if ($status !== '' && $status !== 'ALL') {
+            $this->db->where('p.status', $status);
+        }
+
+        if (!empty($filters['kd_po'])) {
+            $this->db->where('p.kd_po', $filters['kd_po']);
+        }
+
+        if (!empty($filters['no_po'])) {
+            $this->db->where('p.no_po', $filters['no_po']);
+        }
+
+        if (!empty($filters['kd_suplier'])) {
+            $this->db->where('p.kd_suplier', $filters['kd_suplier']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $this->db->where('p.tgl_transaksi >=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $this->db->where('p.tgl_transaksi <=', $filters['date_to']);
+        }
+
+        if (!empty($filters['updated_since'])) {
+            $this->db->group_start();
+            $this->db->where('p.create_at >=', $filters['updated_since']);
+            $this->db->or_where('d.create_at >=', $filters['updated_since']);
+            $this->db->group_end();
+        }
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_data_lpb_ponk_erp(array $filters = array())
+    {
+        return $this->get_data_lpb_po_komersil_erp($filters);
     }
 }
