@@ -58,7 +58,7 @@ if (!function_exists('po_exclude_ppn')) {
         $value = po_num($value);
         $taxRate = po_num($taxPercent) / 100;
         if ($taxRate <= 0) {
-            $taxRate = 0.11;
+            return $value;
         }
 
         return $value / (1 + $taxRate);
@@ -255,7 +255,7 @@ if (!function_exists('po_diskon_per_unit')) {
 }
 
 if (!function_exists('po_build_item_rows')) {
-    function po_build_item_rows($items, $diskonList, $mode, $taxPercent = 0)
+    function po_build_item_rows($items, $diskonList, $mode, $taxPercent = 0, $keepIncludePrice = false)
     {
         $rows = array();
         $summary = array(
@@ -276,10 +276,10 @@ if (!function_exists('po_build_item_rows')) {
             $hargaSatuanExcludeSimpan = po_num(po_value($item, 'harga_satuan_exclude', 0));
             $hargaSatuanKecilExcludeSimpan = po_num(po_value($item, 'harga_satuan_kecil_exclude', 0));
             $keteranganHargaPpn = strtolower(trim((string) po_value($item, 'keterangan_harga_ppn', '')));
-            $hargaSatuan = $keteranganHargaPpn === 'include'
+            $hargaSatuan = $keteranganHargaPpn === 'include' && !$keepIncludePrice
                 ? ($hargaSatuanExcludeSimpan > 0 ? $hargaSatuanExcludeSimpan : po_exclude_ppn($hargaSatuanSimpan, $taxPercent))
                 : $hargaSatuanSimpan;
-            $hargaSatuanKecil = $keteranganHargaPpn === 'include'
+            $hargaSatuanKecil = $keteranganHargaPpn === 'include' && !$keepIncludePrice
                 ? ($hargaSatuanKecilExcludeSimpan > 0 ? $hargaSatuanKecilExcludeSimpan : po_exclude_ppn($hargaSatuanKecilSimpan, $taxPercent))
                 : $hargaSatuanKecilSimpan;
             $totalBefore = $isBonus ? 0 : ($qtyKecil * $hargaSatuanKecil);

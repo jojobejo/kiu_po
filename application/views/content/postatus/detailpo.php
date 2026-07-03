@@ -769,7 +769,16 @@
                     </div>
 
                     <?php
-                    $poDetailTabSummaryDiscount = max($poDetailTabSummaryBefore - $poDetailTabSummaryAfter, 0);
+                    $poDetailTabSummaryDiscount = 0;
+                    foreach ($poDetailDiscountRows as $poDetailDiscountRow) {
+                        $poDetailTabSummaryDiscount += po_num(po_value($poDetailDiscountRow, 'total_discount', 0));
+                    }
+                    if ($poDetailKeteranganHargaPpn === 'include' && !$poDetailIsIncludeTab) {
+                        $poDetailTabSummaryDiscount = po_exclude_ppn($poDetailTabSummaryDiscount, $poDetailPpnConversionPercent);
+                    } elseif ($poDetailKeteranganHargaPpn === 'exclude' && $poDetailIsIncludeTab) {
+                        $poDetailTabSummaryDiscount = po_include_tax($poDetailTabSummaryDiscount, $poDetailPpnConversionPercent);
+                    }
+                    $poDetailTabSummaryAfter = max($poDetailTabSummaryBefore - $poDetailTabSummaryDiscount, 0);
                     $poDetailTabTaxValue = $poDetailTabSummaryAfter * ($poDetailTabTaxPercent / 100);
                     $poDetailTabGrandTotal = $poDetailTabSummaryAfter + $poDetailTabTaxValue;
                     ?>
@@ -792,7 +801,7 @@
                         </div>
                         <div class="po-summary-row po-summary-grand">
                             <span>Grand Total Harga</span>
-                            <span><?= po_money_round_up($poDetailTabGrandTotal) ?></span>
+                            <span><?= po_money_round($poDetailTabGrandTotal) ?></span>
                         </div>
                     </div>
                 </div>
