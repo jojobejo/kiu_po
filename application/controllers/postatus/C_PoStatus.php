@@ -1938,6 +1938,63 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/datatables');
     }
+    
+    public function cancel_pengajuan_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_req);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'PO CANCEL - PENGAJUAN DIBATALKAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+    
+    public function update_tujuan_pembelian_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        $tujuan_pembelian = trim((string) $this->input->post('tujuan_pembelian', true));
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        if ($tujuan_pembelian === '') {
+            return $this->responseJson(false, 'Tujuan pembelian tidak boleh kosong');
+        }
+
+        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_req, $tujuan_pembelian);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'EDIT DATA TUJUAN PEMBELIAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
 
     public function historidone($lv, $user)
     {
