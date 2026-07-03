@@ -1761,7 +1761,7 @@
 
         var $ = window.jQuery;
         var cancelPengajuanUrl = '<?= base_url('cancel_pengajuan_ponk') ?>';
-        var updateTujuanUrl = '<?= base_url('update_tujuan_pembelian_ponk') ?>';
+        var updateTujuanUrl = '<?= site_url('postatusnk/update-tujuan-pembelian') ?>';
 
         function showPonkAlert(icon, message, callback) {
             if (typeof Swal !== 'undefined') {

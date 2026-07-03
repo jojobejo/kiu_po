@@ -711,7 +711,7 @@
 
         var $ = window.jQuery;
         var cancelUrl = '<?= base_url('cancel_pengajuan_ponk') ?>';
-        var updateUrl = '<?= base_url('update_tujuan_pembelian_ponk') ?>';
+        var updateUrl = '<?= site_url('postatusnk/update-tujuan-pembelian') ?>';
         var $editModal = $('#modalEditTujuanPembelianPonk');
 
         $editModal.appendTo('body');

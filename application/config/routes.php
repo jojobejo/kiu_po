@@ -199,6 +199,7 @@ $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/s
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
 $route['cancel_pengajuan_ponk']                         = 'postatus/C_PoStatus/cancel_pengajuan_ponk';
+$route['postatusnk/update-tujuan-pembelian']            = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 $route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 $route['add_faktur_item_nk']                            = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['listbarangnk/1/2/3/(:any)']                     = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
