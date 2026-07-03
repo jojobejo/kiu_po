@@ -547,7 +547,8 @@ class M_PoStatus extends CI_Model
         a.status
         FROM tb_po_nk a
         JOIN tb_user b ON b.kode_user = a.kd_user
-        WHERE a.status != 'DONE'
+        WHERE a.kd_user = '$kduser'
+        AND a.status != 'DONE'
         AND a.status != 'REJECT'
             ");
     }
@@ -712,23 +713,39 @@ class M_PoStatus extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_po_nk');
         $this->db->where('kd_po_req', $kd_po_req);
+        $this->db->order_by('id_po_nk', 'DESC');
         return $this->db->get()->row();
     }
 
     function cancel_pengajuan_ponk($kd_po_req)
     {
+        $this->db->trans_start();
         $this->db->where('kd_po_req', $kd_po_req);
-        return $this->db->update('tb_po_nk', array(
+        $this->db->where_not_in('status', array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN'));
+        $this->db->update('tb_po_nk', array(
             'status' => 'PENGAJUAN DIBATALKAN'
         ));
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
     }
 
     function update_tujuan_pembelian_ponk($kd_po_req, $tujuan_pembelian)
     {
+        $this->db->trans_start();
         $this->db->where('kd_po_req', $kd_po_req);
-        return $this->db->update('tb_po_nk', array(
+        $this->db->where_not_in('status', array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN'));
+        $this->db->update('tb_po_nk', array(
             'tj_pembelian' => $tujuan_pembelian
         ));
+
+        $this->db->where('kd_po_nk', $kd_po_req);
+        $this->db->update('tb_req_nk', array(
+            'tj_pembelian' => $tujuan_pembelian
+        ));
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
     }
 
     function flupload($kdpo)

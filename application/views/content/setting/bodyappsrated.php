@@ -102,7 +102,7 @@
                                 $kduser = $this->session->userdata('kode');
                                 $nmuser = $this->session->userdata('nama_user');
                                 date_default_timezone_set("Asia/Jakarta");
-                                $now    = date('Y-m-d h:i:sa');
+                                $now    = date('Y-m-d H:i:s');
                                 ?>
                                 <input type="text" name="kduser" value="<?= $kduser ?>" readonly hidden>
                                 <input type="text" name="nmuser" value="<?= $nmuser ?>" readonly hidden>

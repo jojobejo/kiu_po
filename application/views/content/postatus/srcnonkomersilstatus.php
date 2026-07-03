@@ -97,11 +97,6 @@
                                                     <i class="fas fa-times"></i>&nbsp;
                                                     <?= $p->status ?>
                                                 </a>
-                                            <?php elseif ($p->status == 'PENGAJUAN DIBATALKAN') : ?>
-                                                <a class="btn btn-block btn-danger btn-sm">
-                                                    <i class="fas fa-times-circle"></i>&nbsp;
-                                                    <?= $p->status ?>
-                                                </a>
                                             <?php elseif ($p->status == 'PO REVISI') : ?>
                                                 <a class="btn btn-block btn-warning btn-sm">
                                                     <i class="fas fa-undo"></i>&nbsp;
@@ -263,11 +258,6 @@
                                                     <i class="fas fa-times"></i>&nbsp;
                                                     <?= $p->status ?>
                                                 </a>
-                                            <?php elseif ($p->status == 'PENGAJUAN DIBATALKAN') : ?>
-                                                <a class="btn btn-block btn-danger btn-sm">
-                                                    <i class="fas fa-times-circle"></i>&nbsp;
-                                                    <?= $p->status ?>
-                                                </a>
                                             <?php elseif ($p->status == 'PO REVISI') : ?>
                                                 <a class="btn btn-block btn-warning btn-sm">
                                                     <i class="fas fa-undo"></i>&nbsp;
@@ -423,11 +413,6 @@
                                             <?php elseif ($p1->status == 'REJECT') : ?>
                                                 <a class="btn btn-block btn-danger btn-sm">
                                                     <i class="fas fa-times"></i>&nbsp;
-                                                    <?= $p1->status ?>
-                                                </a>
-                                            <?php elseif ($p1->status == 'PENGAJUAN DIBATALKAN') : ?>
-                                                <a class="btn btn-block btn-danger btn-sm">
-                                                    <i class="fas fa-times-circle"></i>&nbsp;
                                                     <?= $p1->status ?>
                                                 </a>
                                             <?php elseif ($p1->status == 'PO REVISI') : ?>

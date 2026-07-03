@@ -46,23 +46,6 @@ class M_Purchase extends CI_Model
         $query = $this->db->get();
         return $query;
     }
-    public function getBarangByKode($kodeBarang, $kodeSuplier)
-    {
-        $this->db->select('*');
-        $this->db->from('tb_barang');
-        $this->db->where('kode_barang', $kodeBarang);
-        $this->db->where('kd_suplier', $kodeSuplier);
-        return $this->db->get()->row();
-    }
-    public function get_barang_by_kode($kode_barang)
-    {
-        return $this->db
-            ->select('kode_barang, nama_barang, isi, kemasan')
-            ->from('tb_barang')
-            ->where('kode_barang', $kode_barang)
-            ->get()
-            ->row();
-    }
     public function gettaxposup($kd)
     {
         $this->db->select('COUNT(a.id_tmp_tax) as tot');
@@ -103,90 +86,13 @@ class M_Purchase extends CI_Model
     {
         $this->db->insert('tb_tmp_tax', $data);
     }
-    public function set_tmp_tax($kd, $tax)
-    {
-        $this->db->from('tb_tmp_tax');
-        $this->db->where('kd_suplier', $kd);
-        $exists = $this->db->count_all_results() > 0;
-
-        $data = array(
-            'kd_suplier' => $kd,
-            'tax' => $tax
-        );
-
-        if ($exists) {
-            $this->db->where('kd_suplier', $kd);
-            return $this->db->update('tb_tmp_tax', $data);
-        }
-
-        return $this->db->insert('tb_tmp_tax', $data);
-    }
     public function getTmpOrder($kd)
     {
-        $this->db->select('a.*');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->select('b.merk_barang');
-        }
-        $this->db->from('tb_tmp_item a');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
-        }
-        $this->db->where('a.kode_suplier', $kd);
-        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
-            $this->db->order_by('COALESCE(a.is_bonus, 0)', 'ASC', false);
-        }
-        $this->db->order_by('a.id_tmp', 'ASC');
+        $this->db->select('*');
+        $this->db->from('tb_tmp_item');
+        $this->db->where('kode_suplier', $kd);
         $query = $this->db->get()->result();
         return $query;
-    }
-
-    public function getMerkBarangTmpOrder($kd)
-    {
-        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
-            return array();
-        }
-
-        $this->db->select('b.merk_barang');
-        $this->db->from('tb_tmp_item a');
-        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
-        $this->db->where('a.kode_suplier', $kd);
-        $this->db->where('b.merk_barang IS NOT NULL', null, false);
-        $this->db->where("TRIM(b.merk_barang) <> ''", null, false);
-        $this->db->group_by('b.merk_barang');
-        $this->db->order_by('b.merk_barang', 'ASC');
-        return $this->db->get()->result();
-    }
-
-    public function getTmpItemsByMerk($kdSuplier, $merkBarang)
-    {
-        if (!$this->db->field_exists('merk_barang', 'tb_barang')) {
-            return array();
-        }
-
-        $this->db->select('a.*, b.merk_barang');
-        $this->db->from('tb_tmp_item a');
-        $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
-        $this->db->where('a.kode_suplier', $kdSuplier);
-        $this->db->where('b.merk_barang', $merkBarang);
-        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
-            $this->db->where('COALESCE(a.is_bonus, 0) = 0', null, false);
-        }
-        $this->db->order_by('a.id_tmp', 'ASC');
-        return $this->db->get()->result();
-    }
-
-    public function getTmpItemById($idTmp)
-    {
-        $this->db->select('a.*');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->select('b.merk_barang');
-        }
-        $this->db->from('tb_tmp_item a');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
-        }
-        $this->db->where('a.id_tmp', $idTmp);
-        return $this->db->get()->row();
     }
     function sumTransaksiPenjualan($id_tmp)
     {
@@ -205,19 +111,8 @@ class M_Purchase extends CI_Model
 
     public function get_tmp($id_tmp)
     {
-        $this->db->select('a.*');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->select('b.merk_barang');
-        }
-        $this->db->from('tb_tmp_item a');
-        if ($this->db->field_exists('merk_barang', 'tb_barang')) {
-            $this->db->join('tb_barang b', 'b.kode_barang = a.kode_barang AND b.kd_suplier = a.kode_suplier', 'left');
-        }
-        $this->db->where('a.kode_suplier', $id_tmp);
-        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
-            $this->db->order_by('COALESCE(a.is_bonus, 0)', 'ASC', false);
-        }
-        $this->db->order_by('a.id_tmp', 'ASC');
+        $this->db->from('tb_tmp_item');
+        $this->db->where('kode_suplier', $id_tmp);
         return $this->db->get()->result();
     }
 
@@ -227,63 +122,108 @@ class M_Purchase extends CI_Model
     }
     public function inputDetailPO($data)
     {
-        $filteredData = array();
-        foreach ($data as $field => $value) {
-            if ($this->db->field_exists($field, 'tb_detail_po')) {
-                $filteredData[$field] = $value;
-            }
-        }
-
-        $data = $filteredData;
         $this->db->insert('tb_detail_po', $data);
-        return $this->db->insert_id();
     }
     public function hapusTmp($id_tmp)
     {
         $this->db->where('kode_suplier', $id_tmp);
         return $this->db->delete('tb_tmp_item');
     }
-    private function getPoPrefixByUser($kduser)
-    {
-        $kduser = strtoupper(trim((string) $kduser));
-
-        if ($kduser == 'KIUADMIN') {
-            return 'KPO';
-        }
-
-        if ($kduser == 'KEU01' || preg_match('/^KEU01\d+$/', $kduser)) {
-            return 'SKPO';
-        }
-
-        if ($kduser == 'KEU02') {
-            return 'AKPO';
-        }
-
-        if ($kduser == 'KEU03') {
-            return 'NKPO';
-        }
-
-        if ($kduser == 'KEU04') {
-            return 'MKPO';
-        }
-
-        return 'KPO';
-    }
-
     function kdpo($kduser, $kdsuplier)
     {
-        $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
-        $kd = "0001";
-
-        if ($cd->num_rows() > 0) {
-            foreach ($cd->result() as $k) {
-                $tmp = ((int)$k->kd_max) + 1;
-                $kd = sprintf("%04s", $tmp);
+        if ($kduser == 'KIUADMIN') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
             }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'KPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU01') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'SKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU02') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'AKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU03') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'NKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU170626') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'LKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU111') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'NVKPO' . date('dmy') . $kdsuplier . $kd;
         }
-
-        date_default_timezone_set('Asia/Jakarta');
-        return $this->getPoPrefixByUser($kduser) . date('dmy') . $kdsuplier . $kd;
+        else if ($kduser == 'KEU04') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'MKPO' . date('dmy') . $kdsuplier . $kd;
+        }
     }
 
     // NON KOMERSIL
@@ -427,7 +367,6 @@ class M_Purchase extends CI_Model
         $this->db->select('*');
         $this->db->from('tb_tmp_diskon');
         $this->db->where('kd_suplier', $kd);
-        $this->db->order_by('id_tmp_diskon', 'ASC');
         $query = $this->db->get()->result();
         return $query;
     }

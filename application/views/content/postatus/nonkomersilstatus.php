@@ -117,9 +117,9 @@
                         <?php
                         $no = 1;
                         foreach ($ponk as $p) : ?>
-                            <tr data-status-order="<?= $p->status ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p->status, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
-                                <td><?= $p->nopo ?></td>
+                                <td><?= htmlspecialchars($p->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="row">
                                         <div class="col-md">
@@ -217,10 +217,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= $p->tgl_transaksi ?>"><?= $p->tgl_transaksi ?></td>
-                                <td><?= $p->nama_user ?></td>
-                                <td><?= $p->departement ?></td>
-                                <td><?= $p->tj_pembelian ?></td>
+                                <td data-order="<?= htmlspecialchars($p->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p->departement, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="d-flex flex-wrap align-items-center ponk-action-buttons">
                                         <div>
@@ -298,9 +298,9 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr data-status-order="<?= $p1->status ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
-                                <td><?= $p1->nopo ?></td>
+                                <td><?= htmlspecialchars($p1->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="row">
                                         <div class="col-md">
@@ -398,10 +398,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= $p1->tgl_transaksi ?>"><?= $p1->tgl_transaksi ?></td>
-                                <td><?= $p1->nama_user ?></td>
-                                <td><?= $p1->departement ?></td>
-                                <td><?= $p1->tj_pembelian ?></td>
+                                <td data-order="<?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->departement, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="d-flex flex-wrap align-items-center ponk-action-buttons">
                                         <div>
@@ -479,9 +479,9 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr data-status-order="<?= $p1->status ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
-                                <td><?= $p1->nopo ?></td>
+                                <td><?= htmlspecialchars($p1->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="row">
                                         <div class="col-md">
@@ -579,10 +579,10 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= $p1->tgl_transaksi ?>"><?= $p1->tgl_transaksi ?></td>
-                                <td><?= $p1->nama_user ?></td>
-                                <td><?= $p1->departemen ?></td>
-                                <td><?= $p1->tj_pembelian ?></td>
+                                <td data-order="<?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->departemen, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($p1->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <div class="d-flex flex-wrap align-items-center ponk-action-buttons">
                                         <div>

@@ -1,21 +1,6 @@
-<?php $this->load->view('content/po/_po_summary_helpers') ?>
 <div class="wrapper">
     <!-- Main content -->
     <?php foreach ($status as $s) : ?>
-        <?php
-        $supplierPrint = !empty($isSupplierPrint);
-        $printPpnMode = isset($printPpnMode) && strtolower((string) $printPpnMode) === 'exclude' ? 'exclude' : 'include';
-        $supplierPpnMode = $supplierPrint ? $printPpnMode : 'exclude';
-        $supplierIncludePpn = $supplierPrint && $supplierPpnMode === 'include';
-        $supplierPpnLabel = $supplierIncludePpn ? 'Include PPN' : 'Exclude PPN';
-        list($poPrintRows, $poPrintSummary) = po_build_item_rows($detail, $diskon, 'detail', $s->tax);
-        $poPrintDiscountRows = po_build_discount_rows($diskon, $poPrintRows, 'detail', $s->tax);
-        $poPrintSummary = po_apply_discount_rows_summary($poPrintSummary, $poPrintDiscountRows);
-        $poPrintSummary = po_add_tax_summary($poPrintSummary, $s->tax);
-        $supplierTaxPercent = (float) $poPrintSummary['tax_percent'] > 0 ? (float) $poPrintSummary['tax_percent'] : 11;
-        $supplierTaxMultiplier = 1 + ($supplierTaxPercent / 100);
-        $supplierGrandTotal = 0;
-        ?>
         <section class="m-4">
             <!-- title row -->
             <div class="row">
@@ -115,43 +100,37 @@
                     <table class="table-bordered text-s listdb">
                         <thead>
                             <tr>
-                                <td colspan="6" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN<?= $supplierPrint ? ' - ' . $supplierPpnLabel : '' ?></td>
+                                <td colspan="8" class="bg-black" style="font-weight: bold; font-size: medium; text-align: center;">FORM PEMESANAN</td>
                             </tr>
                             <tr style="text-align: center;">
                                 <td style="width: 1%;">No</td>
                                 <td>Nama Barang</td>
                                 <td>Satuan</td>
                                 <td style="width: 10%;">Qty</td>
-                                <td>Harga Satuan<?= $supplierPrint ? ' (' . $supplierPpnLabel . ')' : '' ?></td>
-                                <td style="width: <?= $a ?>%;">Total Harga<?= $supplierPrint ? ' (' . $supplierPpnLabel . ')' : '' ?></td>
+                                <td>Harga</td>
+                                <td colspan="7" style="width: <?= $a ?>%;">Total Harga</td>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; ?>
-                            <?php foreach ($poPrintRows as $row) : ?>
-                                <?php
-                                if ($row['is_bonus']) {
-                                    continue;
-                                }
-                                $supplierUnitPrice = $supplierIncludePpn
-                                    ? $row['harga_satuan'] * $supplierTaxMultiplier
-                                    : $row['harga_satuan'];
-                                $supplierRowTotal = $row['qty'] * $supplierUnitPrice;
-                                $supplierGrandTotal += $supplierRowTotal;
-                                ?>
+                            <?php
+                            $no = 1;
+                            foreach ($detail as $d) : ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
-                                    <td><?= htmlspecialchars($row['nama_barang'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td style="text-align: center;"><?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td style="text-align: center;"><?= po_qty($row['qty']) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= $supplierPrint ? po_money($supplierUnitPrice) : po_money($row['harga_satuan']) ?></td>
-                                    <td style="text-align:end">&nbsp;<?= $supplierPrint ? po_money($supplierRowTotal) : po_money($row['total_before']) ?></td>
+                                    <td><?= $d->nama_barang ?></td>
+                                    <td style="text-align: center;"><?= $d->satuan ?></td>
+                                    <td style="text-align: center;"><?= $d->qty ?></td>
+                                    <td style="text-align: center;"> &nbsp;Rp. <?= number_format($d->hrg_satuan, 2) ?></td>
+                                    <td colspan="7" style="text-align:end">&nbsp;Rp. <?= number_format($d->hrg_total, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                            <tr>
-                                <td colspan="5" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga<?= $supplierPrint ? ' (' . $supplierPpnLabel . ')' : '' ?></td>
-                                <td style="text-align:end ">&nbsp;<?= $supplierPrint ? po_money($supplierGrandTotal) : po_money($poPrintSummary['total_before_discount']) ?></td>
-                            </tr>
+                            <?php
+                            foreach ($total as $t) : ?>
+                                <tr>
+                                    <td colspan="7" style="text-align: end; padding-right:5%; font-weight: bold;">Total Harga</td>
+                                    <td style="text-align:end ">&nbsp;Rp. <?= number_format($t->total_harga) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%;">
@@ -171,57 +150,40 @@
                     <table class="table-bordered text-s listdb" style="width: 100%;">
                         <thead>
                             <tr>
-                                <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
+                                <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">LIST DISKON</td>
                             </tr>
-                            <tr>
-                                <td colspan="4" style="text-align: center; font-weight: bold;">Deskripsi Diskon</td>
-                                <td style="text-align: center; font-weight: bold;">Nominal</td>
-                                <td style="text-align: center; font-weight: bold;">Value</td>
-                            </tr>
-                            <?php foreach ($poPrintDiscountRows as $d) : ?>
-                                <?php if (!empty($hideBonusDiscountRows) && $d['is_bonus_item']) continue; ?>
-                                <?php if (!empty($d['label'])) : ?>
+                            <?php foreach ($diskon as $d) : ?>
+                                <?php if ($diskon > 0) : ?>
                                     <tr>
-                                        <td colspan="4" style="text-align: end;font-weight: bold;"><?= htmlspecialchars($d['label'], ENT_QUOTES, 'UTF-8') ?> : </td>
-                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($supplierIncludePpn ? $d['nominal'] * $supplierTaxMultiplier : $d['nominal']) ?></td>
-                                        <td colspan="1" style="text-align:end">&nbsp;<?= po_money($supplierIncludePpn ? $d['total_discount'] * $supplierTaxMultiplier : $d['total_discount']) ?></td>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;"><?= $d->keterangan ?> : </td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp. <?= number_format($d->nominal, 2) ?></td>
                                     </tr>
                                 <?php endif; ?>
                             <?php endforeach; ?>
 
-                            <?php
-                            $poGrandTotalAfterDiscount = $supplierIncludePpn ? $poPrintSummary['total_after_discount'] * $supplierTaxMultiplier : $poPrintSummary['total_after_discount'];
-                            $poGrandTotalTax = $supplierIncludePpn ? $poPrintSummary['total_after_discount'] * ($supplierTaxPercent / 100) : $poPrintSummary['tax_with_discount'];
-                            $poGrandTotalHarga = $supplierPrint ? $poGrandTotalAfterDiscount : $poPrintSummary['grand_total_with_discount'];
-                            ?>
-
-                            <tr>
-                                <td colspan="6" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
-                            </tr>
-                            <?php if ($supplierPrint && $supplierIncludePpn) : ?>
-                                <tr>
-                                <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon (Include PPN)</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalHarga) ?></td>
-                                </tr>
-                                <tr>
-                                <td colspan="5" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($supplierTaxPercent) ?>(%) sudah termasuk</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalTax) ?> </td>
-                                </tr>
-                            <?php elseif ($supplierPrint) : ?>
-                                <tr>
-                                    <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon (Exclude PPN)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalAfterDiscount) ?></td>
-                                </tr>
-                            <?php else : ?>
-                                <tr>
-                                    <td colspan="5" style="text-align: end;font-weight: bold;">Tax : <?= po_qty($poPrintSummary['tax_percent']) ?>(%)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintSummary['tax_with_discount']) ?> </td>
-                                </tr>
-                            <?php endif; ?>
-                            <tr>
-                                <td colspan="5" style="text-align: end; font-weight: bold;">Grand Total Harga<?= $supplierPrint ? ' (' . $supplierPpnLabel . ')' : ' (Include PPN)' ?></td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= $supplierPrint ? po_money_round_up($poGrandTotalHarga) : po_money($poPrintSummary['grand_total_with_discount']) ?></td>
-                            </tr>
+                            <?php foreach ($total as $t) :
+                                foreach ($totalDiskon as $d) :
+                                    $stlhDiskon = $t->total_harga - $d->total_diskon;
+                                    $tax = $s->tax / 100;
+                                    $hargaPajak = $stlhDiskon * $tax;
+                                    $hargaAll = $stlhDiskon + $hargaPajak; ?>
+                                    <tr>
+                                        <td colspan="8" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">GRAND TOTAL</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;">Total Harga Setelah Diskon :</td>
+                                        <td colspan="1" style="text-align:end">&nbsp;Rp.<?= number_format($stlhDiskon) ?> </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: end;font-weight: bold;">Tax : <?= $s->tax ?>(%)</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaPajak) ?> </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
+                                        <td colspan="1" style="text-align:end;">&nbsp;Rp. <?= number_format($hargaAll) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endforeach; ?>
                         </thead>
                     </table>
                     <table class="table-bordered text-s listdb" style="width: 100%; border-color: black;">
@@ -277,11 +239,10 @@
                                     JIKA EXP DATE KURANG DARI 2 THN<br>
                                     DARI TGL PENGIRIMAN
                                 </td>
-                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
+                                <td colspan="2"></td>
                             </tr>
                             <tr>
-                                <?php $noteRows = count($notesuplier) > 0 ? count($notesuplier) : 1; ?>
-                                <td rowspan="<?= $noteRows ?>" style="text-align: justify; background-color: yellow;width: 50%;">
+                                <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
                                     * SHIP TO : <br>
                                     KARISMA INDOAGRO UNIVERSAL <br>
                                     &nbsp;&nbsp;&nbsp;<?= $s->shipment_to ?><br>
@@ -291,16 +252,10 @@
                                     &nbsp;&nbsp;&nbsp;<?= $s->no_cp ?> <br>
                                     <?= nl2br($s->ket_1) ?><br>
                                 </td>
-                                <?php if (count($notesuplier) > 0) : ?>
-                                    <td colspan="2" class="bg-orange"><?= nl2br($notesuplier[0]->isi_note); ?></td>
-                                <?php else : ?>
-                                    <td colspan="2" class="bg-orange">&nbsp;</td>
-                                <?php endif; ?>
+                                <td colspan="2" class="bg-black color-palette" style="text-align: center; font-weight: bolder;">NOTE UNTUK SUPLIER</td>
                             </tr>
-                            <?php foreach ($notesuplier as $index => $ns) : ?>
-                                <?php if ($index === 0) : ?>
-                                    <?php continue; ?>
-                                <?php endif; ?>
+                            <?php foreach ($notesuplier as $ns) :
+                            ?>
                                 <tr>
                                     <td colspan="2" class="bg-orange"><?= nl2br($ns->isi_note); ?></td>
                                 </tr>

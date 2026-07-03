@@ -60,8 +60,8 @@
  * APPLICATION TIMEZONE
  *---------------------------------------------------------------
  *
- * Keep all PHP-generated dates, create_at, and input_at values on
- * Western Indonesia Time across controllers, models, helpers, and views.
+ * Keep all PHP date/time calls aligned with Jakarta time for CRUD,
+ * reports, generated codes, uploads, and logs.
  */
 	date_default_timezone_set('Asia/Jakarta');
 

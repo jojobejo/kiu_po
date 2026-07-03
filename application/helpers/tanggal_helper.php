@@ -178,22 +178,14 @@ function bulan($bln)
 
 function shortdate_indo($tgl)
 {
-    $ubah = gmdate($tgl, time() + 60 * 60 * 8);
-    $pecah = explode("-", $ubah);
-    $tanggal = $pecah[2];
-    $bulan = short_bulan($pecah[1]);
-    $tahun = $pecah[0];
-    return $tanggal . '/' . $bulan . '/' . $tahun;
+    $date = new DateTime($tgl, new DateTimeZone('Asia/Jakarta'));
+    return $date->format('d/m/Y');
 }
 
 function date_indo($tgl)
 {
-    $ubah = gmdate($tgl, time() + 60 * 60 * 8);
-    $pecah = explode("-", $ubah);
-    $tanggal = $pecah[2];
-    $bulan = bulan($pecah[1]);
-    $tahun = $pecah[0];
-    return $tanggal . '-' . $bulan . '-' . $tahun;
+    $date = new DateTime($tgl, new DateTimeZone('Asia/Jakarta'));
+    return $date->format('d') . '-' . bulan($date->format('n')) . '-' . $date->format('Y');
 }
 
 // if (!function_exists('bulan')) {
@@ -210,7 +202,7 @@ function date_indo($tgl)
 // if (!function_exists('mediumdate_indo')) {
 //     function mediumdate_indo($tgl)
 //     {
-//         $ubah = gmdate($tgl, time() + 60 * 60 * 8);
+//         $ubah = date($tgl);
 //         $pecah = explode("-", $ubah);
 //         $tanggal = $pecah[2];
 //         $bulan = medium_bulan($pecah[1]);
@@ -267,7 +259,7 @@ function date_indo($tgl)
 // if (!function_exists('longdate_indo')) {
 //     function longdate_indo($tanggal)
 //     {
-//         $ubah = gmdate($tanggal, time() + 60 * 60 * 8);
+//         $ubah = date($tanggal);
 //         $pecah = explode("-", $ubah);
 //         $tgl = $pecah[2];
 //         $bln = $pecah[1];

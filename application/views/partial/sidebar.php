@@ -217,16 +217,6 @@
               </p>
             </a>
           </li>
-          <?php if ($this->session->userdata('departemen') == 'KEUANGAN' && $this->session->userdata('lv') == '2') : ?>
-            <li class="nav-item">
-              <a href="<?= base_url('formulapo') ?>" class="nav-link">
-                <i class="nav-icon fa fa-calculator"></i>
-                <p>
-                  Formula PO
-                </p>
-              </a>
-            </li>
-          <?php endif; ?>
           <li class="nav-item">
             <a href="<?= base_url('usersetting') ?>" class="nav-link">
               <i class="nav-icon fas fa-cogs"></i>

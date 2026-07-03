@@ -127,7 +127,7 @@ class M_Reqpic extends CI_Model
     }
     function input_detail_po_nk($data)
     {
-        return $this->db->insert('tb_detail_req', $data);
+        $this->db->insert('tb_detail_req', $data);
     }
     function inputponew($data)
     {
@@ -430,14 +430,7 @@ class M_Reqpic extends CI_Model
 
     public function inputreq($data)
     {
-        return $this->db->insert('tb_req_nk', $data);
-    }
-
-    public function is_kdponk_exists($kdponk)
-    {
-        $this->db->from('tb_req_nk');
-        $this->db->where('kd_po_nk', $kdponk);
-        return $this->db->count_all_results() > 0;
+        $this->db->insert('tb_req_nk', $data);
     }
 
     public function editedreqpic($id, $data)
@@ -736,7 +729,7 @@ class M_Reqpic extends CI_Model
     }
     function generatekdponk($data)
     {
-        return $this->db->insert('tb_generate_kd_ponk', $data);
+        $this->db->insert('tb_generate_kd_ponk', $data);
     }
     function kdnonkomersial()
     {

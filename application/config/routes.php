@@ -88,8 +88,8 @@ $route['update_tax_tmp']                                = 'purchaseorder/C_Order
 
 //MASTER BARANG NON KOMERSIL
 $route['masterbarangnk']                                = 'master_barang/C_MasterBarang';
-$route['masterbarangnk/check-kode']                     = 'master_barang/C_MasterBarang/cek_kode_barangnk';
 $route['add_mbarang']                                   = 'master_barang/C_MasterBarang/add_mbarang';
+$route['masterbarangnk/check-kode']                     = 'master_barang/C_MasterBarang/cek_kode_barangnk';
 $route['edit_mbarangnk']                                = 'master_barang/C_MasterBarang/edit_mbarangnk';
 $route['delmbarangnk']                                  = 'master_barang/C_MasterBarang/delmbarangnk';
 $route['uploadmbarangnk']                               = 'master_barang/C_MasterBarang/uploadgbrbarang';
@@ -236,7 +236,6 @@ $route['hapus_note_tmp_barang']                         = 'purchaseorder/C_Order
 $route['add_diskon_po']                                 = 'purchaseorder/C_Order/add_diskon_po';
 $route['edit_diskon_po']                                = 'purchaseorder/C_Order/edit_diskon_po';
 $route['hapus_diskon_po']                               = 'purchaseorder/C_Order/hapus_diskon_po';
-$route['add_diskon_merk_tmp']                           = 'purchaseorder/C_Order/add_diskon_merk_tmp';
 $route['add_diskon_barang_tmp']                         = 'purchaseorder/C_Order/add_diskon_barang_tmp';
 $route['add_diskon_barangs_tmp']                        = 'purchaseorder/C_Order/add_diskon_barangs_tmp';
 $route['unpostponk/(:any)']                             = 'postatus/C_PoStatus/unpostponk/$1';
@@ -270,11 +269,6 @@ $route['detailPO/(:any)']                               = 'postatus/C_PoStatus/d
 $route['update_printout_po']                            = 'postatus/C_PoStatus/update_printout_po';
 
 $route['onhandpo/(:any)']                               = 'postatus/C_PoStatus/onhandpo/$1';
-$route['onhandpo_ajax']                                 = 'postatus/C_PoStatus/onhandpo_ajax';
-$route['print_po/(:any)/(:any)']                        = 'postatus/C_PoStatus/print_po/$1/$2';
-$route['print_po/(:any)']                               = 'postatus/C_PoStatus/print_po/$1';
-$route['print_po_supplier/(:any)/(:any)']               = 'postatus/C_PoStatus/print_po_supplier/$1/$2';
-$route['print_po_supplier/(:any)']                      = 'postatus/C_PoStatus/print_po_supplier/$1';
 $route['printOrder/(:any)']                             = 'postatus/C_PoStatus/printOrder/$1';
 $route['printOrdernk/(:any)']                           = 'postatus/C_PoStatus/printOrdernk/$1';
 $route['konfirmasiOrder/(:any)/(:any)']                 = 'postatus/C_PoStatus/konfirmasiOrder/$1/$2';
@@ -304,7 +298,6 @@ $route['addDiskon']                                     = 'postatus/C_PoStatus/t
 $route['diskonEdit']                                    = 'postatus/C_PoStatus/editDiskon';
 $route['hapusDiskon/(:any)/(:any)']                     = 'postatus/C_PoStatus/hapusDiskon/$1/$2';
 $route['hapusDiskonNk/(:any)/(:any)']                   = 'postatus/C_PoStatus/hapusDiskonNK/$1/$2';
-$route['add_diskon_merk']                               = 'postatus/C_PoStatus/add_diskon_merk';
 $route['add_diskon_barang']                             = 'postatus/C_PoStatus/add_diskon_barang';
 $route['add_diskon_barangs']                            = 'postatus/C_PoStatus/add_diskon_barangs';
 $route['shipment_to']                                   = 'postatus/C_PoStatus/shipment_to';
@@ -326,9 +319,6 @@ $route['notetemplate']                                  = 'settings/C_NoteSettin
 $route['addnotetemplate']                               = 'settings/C_NoteSetting/add_note_template';
 $route['notetemplate/(:any)']                           = 'settings/C_NoteSetting/detail_note_template/$1';
 $route['updateisinote']                                 = 'settings/C_NoteSetting/update_note_template';
-
-//setting-formula-po
-$route['formulapo']                                     = 'settings/C_Formulapo';
 
 //LAPORAN PEMBELIAN NON KOMERSIL
 $route['lap_nonkomersil']                               = 'laporan/C_Laporan';
@@ -352,8 +342,8 @@ $route['addconfirmsos']                                 = 'settings/C_Appsrated/
 
 //API
 $route['get_po']                                        = 'api/C_Api/get_po';
-$route['get_data_pre_po_erp']                           = 'api/C_Api/get_data_pre_po_erp';
-
 
 $route['stockkomersil']                                 = 'stock/C_Stockkomersil/api_stock_komersil';
 $route['api/stockkomersil']                             = 'stock/C_Stockkomersil/api_stock_komersil';
+
+
