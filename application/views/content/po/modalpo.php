@@ -153,12 +153,25 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Satuan<span class="required">*</span></label>
                             <div class="col-sm-8">
-                                <select name="satuan_isi" id="satuan_isi" class="form-control">
+                                <select name="satuan_isi" id="satuan_isi" class="form-control satuan-isi-select">
                                     <option value="">-- QTY --</option>
                                     <?php foreach ($satuan as $s) : ?>
                                         <option value="<?= $s->nm_satuan ?>" <?= $s->nm_satuan == $t->satuan ? 'selected' : '' ?>> <?= $s->nm_satuan ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group kg-formula-row d-none">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right">Rumus Kg</label>
+                            <div class="col-sm-8 pt-2">
+                                <input type="hidden" name="use_rumus_kg" value="0">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="edit_use_rumus_kg_<?= $t->id_tmp ?>" name="use_rumus_kg" value="1" class="custom-control-input kg-formula-checkbox" checked>
+                                    <label class="custom-control-label" for="edit_use_rumus_kg_<?= $t->id_tmp ?>">Gunakan rumus Kg</label>
+                                </div>
+                                <small class="form-text text-muted">Jika tidak dicentang, qty kecil dan harga satuan kecil dihitung seperti satuan pcs.</small>
                             </div>
                         </div>
                     </div>
@@ -291,6 +304,30 @@
             rawOutput.value = calculatedPrice;
         }
 
+        function updateKgFormulaControl(select) {
+            var form = select ? select.closest('form') : null;
+            var formulaRow = form ? form.querySelector('.kg-formula-row') : null;
+            var checkbox = form ? form.querySelector('.kg-formula-checkbox') : null;
+            var satuan = select && select.value ? select.value.trim().toLowerCase() : '';
+
+            if (!formulaRow) {
+                return;
+            }
+
+            if (satuan === 'kg') {
+                formulaRow.classList.remove('d-none');
+                if (checkbox && !checkbox.hasAttribute('data-user-touched')) {
+                    checkbox.checked = true;
+                }
+            } else {
+                formulaRow.classList.add('d-none');
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.removeAttribute('data-user-touched');
+                }
+            }
+        }
+
         document.addEventListener('input', function(event) {
             if (!event.target.classList.contains('number-format')) {
                 return;
@@ -313,6 +350,10 @@
         document.addEventListener('change', function(event) {
             if (event.target.name === 'ppn_mode') {
                 updateCalculatedPrice(event.target.closest('form'));
+            } else if (event.target.name === 'satuan_isi') {
+                updateKgFormulaControl(event.target);
+            } else if (event.target.classList.contains('kg-formula-checkbox')) {
+                event.target.setAttribute('data-user-touched', '1');
             }
         });
 
@@ -328,6 +369,8 @@
 
             updateCalculatedPrice(event.target);
         });
+
+        document.querySelectorAll('.satuan-isi-select').forEach(updateKgFormulaControl);
     })();
 </script>
 

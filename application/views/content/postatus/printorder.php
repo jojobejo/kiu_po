@@ -240,20 +240,20 @@
                             <?php if ($supplierPrint && $supplierIncludePpn) : ?>
                                 <tr>
                                 <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalHarga) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poGrandTotalHarga) ?></td>
                                 </tr>
                                 <tr>
                                 <td colspan="5" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($supplierTaxPercent) ?>(%) sudah termasuk</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalTax) ?> </td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poGrandTotalTax) ?> </td>
                                 </tr>
                             <?php elseif ($supplierPrint) : ?>
                                 <tr>
                                     <td colspan="5" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalAfterDiscount) ?></td>
+                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poGrandTotalAfterDiscount) ?></td>
                                 </tr>
                                 <tr>
                                     <td colspan="5" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($supplierTaxPercent) ?>(%)</td>
-                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poGrandTotalTax) ?> </td>
+                                    <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poGrandTotalTax) ?> </td>
                                 </tr>
                             <?php else : ?>
                                 <tr>

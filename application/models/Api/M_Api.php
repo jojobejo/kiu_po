@@ -22,9 +22,9 @@ class M_Api extends CI_Model
                 a.hrg_total AS total_harga,
                 a.hrg_total_diskon AS total_harga_diskon,
                 COALESCE(p.tax, 0) AS tax,
-                ROUND((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total_diskon, 0), 0) AS tax_diskon,
-                ROUND(COALESCE(a.hrg_total, 0) + ((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total, 0)), 0) AS grand_total,
-                ROUND(COALESCE(a.hrg_total_diskon, 0) + ((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total_diskon, 0)), 0) AS grand_total_diskon
+                ((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total_diskon, 0)) AS tax_diskon,
+                (COALESCE(a.hrg_total, 0) + ((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total, 0))) AS grand_total,
+                (COALESCE(a.hrg_total_diskon, 0) + ((COALESCE(p.tax, 0) / 100) * COALESCE(a.hrg_total_diskon, 0))) AS grand_total_diskon
             ')
             ->from('tb_detail_po a')
             ->join('tb_po p', 'p.kd_po = a.kd_po', 'left')

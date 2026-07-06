@@ -176,7 +176,7 @@ class C_Order extends CI_Controller
         return $this->parseNumericInput($nominal);
     }
 
-    private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan)
+    private function hitung_qty_harga_kecil($satuan, $qty, $harga_satuan, $isi, $kemasan, $useRumusKg = true)
     {
         $satuan = strtolower(trim((string) $satuan));
         $qty = $this->parseNumericInput($qty);
@@ -194,7 +194,7 @@ class C_Order extends CI_Controller
 
             $qty_kecil = $qty * $isi;
             $harga_satuan_kecil = $harga_satuan / $isi;
-        } elseif ($satuan == 'ltr' || $satuan == 'kg') {
+        } elseif ($satuan == 'ltr' || ($satuan == 'kg' && $useRumusKg)) {
             if ($kemasan <= 0) {
                 return $this->validationError('Data kemasan barang tidak valid');
             }
@@ -220,7 +220,7 @@ class C_Order extends CI_Controller
         );
     }
 
-    private function prepareKonversiBarang($kodeBarang, $satuan, $qty, $hargaSatuan, $isBonus = 0, $kodeSuplier = null)
+    private function prepareKonversiBarang($kodeBarang, $satuan, $qty, $hargaSatuan, $isBonus = 0, $kodeSuplier = null, $useRumusKg = true)
     {
         $kodeBarang = trim((string) $kodeBarang);
         $qty = $this->parseNumericInput($qty);
@@ -256,7 +256,7 @@ class C_Order extends CI_Controller
 
         $isi = isset($barang->isi) ? $this->parseNumericInput($barang->isi) : 0;
         $kemasan = isset($barang->kemasan) ? $this->parseNumericInput($barang->kemasan) : 0;
-        $konversi = $this->hitung_qty_harga_kecil($satuan, $qty, $hargaSatuan, $isi, $kemasan);
+        $konversi = $this->hitung_qty_harga_kecil($satuan, $qty, $hargaSatuan, $isi, $kemasan, $useRumusKg);
 
         if (!$konversi['status']) {
             return $konversi;
@@ -465,12 +465,14 @@ class C_Order extends CI_Controller
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
         $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode', TRUE)));
         $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+        $useRumusKgInput = $this->input->post('use_rumus_kg');
+        $useRumusKg = $useRumusKgInput === null ? true : $useRumusKgInput === '1';
         $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
         $hargaQty   = $isBonus ? 0 : $this->hargaKalkulasiByKeteranganPpn($hargaInput, $ppnMode);
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $user       = $this->session->userdata('kode');
         $hargahasil = $hargaQty * $qty;
-        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus, $suplier);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hargaQty, $isBonus, $suplier, $useRumusKg);
         $taxAktif   = $this->ppnPersen;
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($suplier, $ppnMode, 'purchase/listBarang/' . $suplier)) {
@@ -1162,11 +1164,13 @@ class C_Order extends CI_Controller
         $isBonus    = $this->isBonusInput($this->input->post('is_bonus'));
         $ppnMode    = strtolower(trim((string) $this->input->post('ppn_mode', TRUE)));
         $ppnMode    = in_array($ppnMode, array('exclude', 'include'), true) ? $ppnMode : 'exclude';
+        $useRumusKgInput = $this->input->post('use_rumus_kg');
+        $useRumusKg = $useRumusKgInput === null ? true : $useRumusKgInput === '1';
         $hargaInput = $this->parseNumericInput($this->input->post('hrg_isi', TRUE));
         $hrg_satuan = $isBonus ? 0 : $this->hargaKalkulasiByKeteranganPpn($hargaInput, $ppnMode);
         $bonusNote  = trim((string) $this->input->post('bonus_keterangan', TRUE));
         $total      = $qty * $hrg_satuan;
-        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus, $supp);
+        $konversi   = $this->prepareKonversiBarang($kdbarang, $satuan, $qty, $hrg_satuan, $isBonus, $supp, $useRumusKg);
         $taxAktif   = $this->ppnPersen;
 
         if (!$isBonus && !$this->validateKeteranganHargaPpn($supp, $ppnMode, 'purchase/sup/' . $supp, $id)) {

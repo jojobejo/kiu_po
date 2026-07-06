@@ -739,7 +739,7 @@
                                         <td class="text-number"><?= po_money_round_up($poDetailRowHargaSatuanKecilView) ?></td>
                                         <td class="text-number"><?= po_money_round_up($poDetailRowHargaFinalView) ?></td>
                                         <td class="text-number"><?= po_money_round_up($poDetailRowTotalBeforeView) ?></td>
-                                        <td class="text-number"><?= po_money_round_up($poDetailRowTotalAfterView) ?></td>
+                                        <td class="text-number"><?= po_money($poDetailRowTotalAfterView) ?></td>
                                         <?php if ($showActionColumn) : ?>
                                             <td>
                                                 <div class="action-cell">
@@ -793,11 +793,11 @@
                         </div>
                         <div class="po-summary-row">
                             <span>Total Harga Setelah Diskon</span>
-                            <strong><?= po_money_round_up($poDetailTabSummaryAfter) ?></strong>
+                            <strong><?= po_money($poDetailTabSummaryAfter) ?></strong>
                         </div>
                         <div class="po-summary-row">
                             <span>Tax <?= po_qty($poDetailTabTaxPercent) ?>%</span>
-                            <strong><?= po_money_round_up($poDetailTabTaxValue) ?></strong>
+                            <strong><?= po_money($poDetailTabTaxValue) ?></strong>
                         </div>
                         <div class="po-summary-row po-summary-grand">
                             <span>Grand Total Harga</span>

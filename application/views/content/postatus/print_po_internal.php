@@ -176,7 +176,7 @@
                                     <td style="text-align: end;">&nbsp;<?= po_money($displayHargaSatuanKecil) ?></td>
                                     <td style="text-align: end;">&nbsp;<?= po_money($displayHargaFinalUnit) ?></td>
                                     <td style="text-align: end;">&nbsp;<?= po_money($displayTotalBefore) ?></td>
-                                    <td style="text-align: end;">&nbsp;<?= po_money_round_up($displayTotalAfter) ?></td>
+                                    <td style="text-align: end;">&nbsp;<?= po_money($displayTotalAfter) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
@@ -241,11 +241,11 @@
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Total Harga Setelah Diskon</td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintDisplayTotalAfter) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintDisplayTotalAfter) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end;font-weight: bold;">PPN : <?= po_qty($printTaxPercent) ?>(%)<?= $printIncludePpn ? ' sudah termasuk' : '' ?></td>
-                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money_round_up($poPrintDisplayTaxValue) ?></td>
+                                <td colspan="1" style="text-align:end;">&nbsp;<?= po_money($poPrintDisplayTaxValue) ?></td>
                             </tr>
                             <tr>
                                 <td colspan="9" style="text-align: end; font-weight: bold;">Grand Total Harga</td>
