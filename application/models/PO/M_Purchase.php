@@ -38,11 +38,24 @@ class M_Purchase extends CI_Model
     {
         return $this->db->get('tb_satuan')->result();
     }
-    public function getBarangSup($kd)
+    public function getBarangSup($kd, $kodeAwal = null)
     {
         $this->db->select('*');
         $this->db->from('tb_barang');
         $this->db->where('kd_suplier', $kd);
+
+        if ($kodeAwal !== null) {
+            $kodeAwal = strtoupper(trim((string) $kodeAwal));
+            $allowedKodeAwal = array('Q', 'A', 'Z', 'C', 'X');
+            if (!in_array($kodeAwal, $allowedKodeAwal, true)) {
+                $kodeAwal = 'Q';
+            }
+
+            $this->db->like('kode_barang', $kodeAwal, 'after');
+        }
+
+        $this->db->order_by('kode_barang', 'ASC');
+        $this->db->order_by('nama_barang', 'ASC');
         $query = $this->db->get();
         return $query;
     }
@@ -72,6 +85,27 @@ class M_Purchase extends CI_Model
         $this->db->where('kd_suplier', $kd);
         $query = $this->db->get();
         return $query;
+    }
+    public function nomorPoExists($noPo)
+    {
+        $this->db->from('tb_po');
+        $this->db->where('no_po', trim((string) $noPo));
+        return $this->db->count_all_results() > 0;
+    }
+    public function getNextNomorPoSupplier($kdSuplier)
+    {
+        $this->db->select("MAX(CAST(SUBSTRING_INDEX(no_po, '/', 1) AS UNSIGNED)) AS nomor_akhir", false);
+        $this->db->from('tb_po');
+        $this->db->where('kd_suplier', $kdSuplier);
+        $this->db->like('no_po', '/KIU/', 'both');
+        $query = $this->db->get();
+        $nomorAkhir = 0;
+
+        if ($query->num_rows() > 0) {
+            $nomorAkhir = (int) $query->row()->nomor_akhir;
+        }
+
+        return $nomorAkhir + 1;
     }
     public function Suplier($kd)
     {

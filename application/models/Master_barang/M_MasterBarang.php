@@ -29,8 +29,213 @@ class M_MasterBarang extends CI_Model
 
     public function hapusBarang($id)
     {
-        $this->db->where('id_barang', $id);
+        $idColumn = $this->get_barang_id_column();
+        $this->db->where($idColumn, $id);
         return $this->db->delete('tb_barang');
+    }
+
+    private function get_barang_id_column()
+    {
+        return $this->db->field_exists('id_barang', 'tb_barang') ? 'id_barang' : 'id';
+    }
+
+    private function get_barang_bahan_aktif_column()
+    {
+        return $this->db->field_exists('bahan_aktif', 'tb_barang') ? 'bahan_aktif' : 'bhn_aktif';
+    }
+
+    private function get_barang_select_sql()
+    {
+        $idColumn = $this->get_barang_id_column();
+        $bahanAktifColumn = $this->get_barang_bahan_aktif_column();
+        $hasSatuanQty = $this->db->field_exists('satuan_qty', 'tb_barang');
+        $hasHasilDimensi = $this->db->field_exists('hasil_dimensi', 'tb_barang');
+
+        $select = array(
+            "a.$idColumn AS id_barang",
+            'a.kode_barang',
+            'a.kd_suplier',
+            'c.nama_suplier',
+            'a.nama_barang',
+            "a.$bahanAktifColumn AS bahan_aktif",
+            $hasSatuanQty ? 'a.satuan_qty' : 'NULL AS satuan_qty',
+            $hasSatuanQty ? 'b.nm_satuan' : 'COALESCE(b.nm_satuan, a.satuan) AS nm_satuan',
+            $this->db->field_exists('satuan', 'tb_barang') ? 'a.satuan' : 'NULL AS satuan',
+            'a.panjang',
+            'a.lebar',
+            'a.tinggi',
+            $hasHasilDimensi ? 'a.hasil_dimensi' : '(a.panjang * a.lebar * a.tinggi) AS hasil_dimensi',
+            $this->db->field_exists('berat', 'tb_barang') ? 'a.berat' : '0 AS berat',
+            $this->db->field_exists('isi', 'tb_barang') ? 'a.isi' : '0 AS isi',
+            $this->db->field_exists('kemasan', 'tb_barang') ? 'a.kemasan' : '0 AS kemasan',
+            $this->db->field_exists('stock_minimum', 'tb_barang') ? 'a.stock_minimum' : '0 AS stock_minimum',
+            $this->db->field_exists('merk_barang', 'tb_barang') ? 'a.merk_barang' : "'' AS merk_barang",
+            $this->db->field_exists('kelompok_barang', 'tb_barang') ? 'a.kelompok_barang' : "'' AS kelompok_barang",
+            $this->db->field_exists('kategori_barang', 'tb_barang') ? 'a.kategori_barang' : "'' AS kategori_barang",
+            $this->db->field_exists('produk_fokus', 'tb_barang') ? 'a.produk_fokus' : "'' AS produk_fokus",
+            $this->db->field_exists('is_active', 'tb_barang') ? 'a.is_active' : "'T' AS is_active",
+            $this->db->field_exists('is_lot', 'tb_barang') ? 'a.is_lot' : "'F' AS is_lot"
+        );
+
+        return implode(",\n", $select);
+    }
+
+    private function barang_komersil_base_sql()
+    {
+        $hasSatuanQty = $this->db->field_exists('satuan_qty', 'tb_barang');
+        $joinSatuan = $hasSatuanQty
+            ? 'LEFT JOIN tb_satuan b ON b.id_satuan = a.satuan_qty'
+            : 'LEFT JOIN tb_satuan b ON b.nm_satuan = a.satuan';
+
+        return "SELECT
+            {$this->get_barang_select_sql()}
+        FROM tb_barang a
+        {$joinSatuan}
+        LEFT JOIN tb_suplier c ON c.kd_suplier = a.kd_suplier";
+    }
+
+    private function barang_komersil_filter_sql($search, &$binds)
+    {
+        $search = trim((string)$search);
+        if ($search === '') {
+            return '';
+        }
+
+        $like = '%' . $search . '%';
+        $where = '(barang.kode_barang LIKE ? OR barang.nama_barang LIKE ? OR barang.bahan_aktif LIKE ? OR barang.nm_satuan LIKE ? OR barang.nama_suplier LIKE ?)';
+        array_push($binds, $like, $like, $like, $like, $like);
+
+        return ' WHERE ' . $where;
+    }
+
+    private function barang_komersil_order_sql($column, $direction)
+    {
+        $columns = array(
+            0 => 'barang.kode_barang',
+            1 => 'barang.nama_barang',
+            2 => 'barang.bahan_aktif',
+            3 => 'barang.nm_satuan',
+            4 => 'barang.nama_suplier',
+            5 => 'barang.panjang',
+            6 => 'barang.lebar',
+            7 => 'barang.tinggi',
+            8 => 'barang.stock_minimum'
+        );
+
+        $orderColumn = isset($columns[$column]) ? $columns[$column] : $columns[0];
+        $orderDir = strtolower((string)$direction) === 'desc' ? 'DESC' : 'ASC';
+
+        return " ORDER BY {$orderColumn} {$orderDir}";
+    }
+
+    public function get_masterbarang_komersil_datatable($params)
+    {
+        $binds = array();
+        $baseSql = $this->barang_komersil_base_sql();
+        $filterSql = $this->barang_komersil_filter_sql(isset($params['search']) ? $params['search'] : '', $binds);
+        $orderSql = $this->barang_komersil_order_sql(
+            isset($params['order_column']) ? (int)$params['order_column'] : 0,
+            isset($params['order_dir']) ? $params['order_dir'] : 'asc'
+        );
+        $start = isset($params['start']) ? max(0, (int)$params['start']) : 0;
+        $length = isset($params['length']) ? (int)$params['length'] : 10;
+        $length = ($length > 0 && $length <= 100) ? $length : 10;
+
+        $dataSql = "SELECT barang.* FROM ({$baseSql}) barang{$filterSql}{$orderSql} LIMIT ?, ?";
+        $dataBinds = array_merge($binds, array($start, $length));
+        $countSql = "SELECT COUNT(*) AS total FROM ({$baseSql}) barang{$filterSql}";
+        $totalSql = 'SELECT COUNT(*) AS total FROM tb_barang';
+
+        $recordsTotal = (int)$this->db->query($totalSql)->row()->total;
+        $recordsFiltered = trim((string)(isset($params['search']) ? $params['search'] : '')) !== ''
+            ? (int)$this->db->query($countSql, $binds)->row()->total
+            : $recordsTotal;
+
+        return array(
+            'records_total' => $recordsTotal,
+            'records_filtered' => $recordsFiltered,
+            'data' => $this->db->query($dataSql, $dataBinds)->result()
+        );
+    }
+
+    public function get_masterbarang_komersil_by_id($id)
+    {
+        $baseSql = $this->barang_komersil_base_sql();
+        $id = (int)$id;
+
+        return $this->db
+            ->query("SELECT barang.* FROM ({$baseSql}) barang WHERE barang.id_barang = ? LIMIT 1", array($id))
+            ->row();
+    }
+
+    public function get_masterbarang_komersil_by_kode($kodeBarang, $excludeId = null)
+    {
+        $idColumn = $this->get_barang_id_column();
+        $this->db->from('tb_barang');
+        $this->db->where('kode_barang', trim((string)$kodeBarang));
+        if ($excludeId !== null) {
+            $this->db->where($idColumn . ' !=', (int)$excludeId);
+        }
+
+        return $this->db->limit(1)->get()->row();
+    }
+
+    private function filter_barang_komersil_payload($data)
+    {
+        $allowed = array(
+            'kode_barang',
+            'kd_suplier',
+            'nama_barang',
+            'satuan',
+            'satuan_qty',
+            'panjang',
+            'lebar',
+            'tinggi',
+            'hasil_dimensi',
+            'berat',
+            'isi',
+            'kemasan',
+            'stock_minimum',
+            'merk_barang',
+            'kelompok_barang',
+            'kategori_barang',
+            'produk_fokus',
+            'is_active',
+            'is_lot',
+            'bahan_aktif',
+            'bhn_aktif'
+        );
+
+        $payload = array();
+        foreach ($allowed as $column) {
+            if (array_key_exists($column, $data) && $this->db->field_exists($column, 'tb_barang')) {
+                $payload[$column] = $data[$column];
+            }
+        }
+
+        return $payload;
+    }
+
+    public function insert_masterbarang_komersil($data)
+    {
+        $payload = $this->filter_barang_komersil_payload($data);
+        if (!$payload) {
+            return false;
+        }
+
+        return $this->db->insert('tb_barang', $payload);
+    }
+
+    public function update_masterbarang_komersil($id, $data)
+    {
+        $payload = $this->filter_barang_komersil_payload($data);
+        if (!$payload) {
+            return false;
+        }
+
+        $idColumn = $this->get_barang_id_column();
+        $this->db->where($idColumn, (int)$id);
+        return $this->db->update('tb_barang', $payload);
     }
 
     // 
@@ -218,21 +423,34 @@ class M_MasterBarang extends CI_Model
 
     public function allmasterbarang()
     {
-        return $this->db->query("SELECT
-        a.id_barang,
-        a.kode_barang,
-        c.nama_suplier,
-        a.nama_barang,
-        a.bahan_aktif,
-        b.nm_satuan,
-        a.panjang,
-        a.lebar,
-        a.tinggi,
-        a.hasil_dimensi
-        FROM tb_barang a
-        JOIN tb_satuan b ON b.id_satuan = a.satuan_qty
-        JOIN tb_suplier c ON c.kd_suplier = a.kd_suplier
-        ");
+        $idColumn = $this->db->field_exists('id_barang', 'tb_barang') ? 'id_barang' : 'id';
+        $bahanAktifColumn = $this->db->field_exists('bahan_aktif', 'tb_barang') ? 'bahan_aktif' : 'bhn_aktif';
+        $hasSatuanQty = $this->db->field_exists('satuan_qty', 'tb_barang');
+        $hasHasilDimensi = $this->db->field_exists('hasil_dimensi', 'tb_barang');
+
+        $select = array(
+            "a.$idColumn AS id_barang",
+            'a.kode_barang',
+            'c.nama_suplier',
+            'a.nama_barang',
+            "a.$bahanAktifColumn AS bahan_aktif",
+            $hasSatuanQty ? 'b.nm_satuan' : 'COALESCE(b.nm_satuan, a.satuan) AS nm_satuan',
+            'a.panjang',
+            'a.lebar',
+            'a.tinggi',
+            $hasHasilDimensi ? 'a.hasil_dimensi' : '(a.panjang * a.lebar * a.tinggi) AS hasil_dimensi'
+        );
+
+        $this->db->select(implode(",\n", $select), false);
+        $this->db->from('tb_barang a');
+        if ($hasSatuanQty) {
+            $this->db->join('tb_satuan b', 'b.id_satuan = a.satuan_qty', 'left');
+        } else {
+            $this->db->join('tb_satuan b', 'b.nm_satuan = a.satuan', 'left');
+        }
+        $this->db->join('tb_suplier c', 'c.kd_suplier = a.kd_suplier', 'left');
+
+        return $this->db->get();
     }
 
     public function getsuplierall()

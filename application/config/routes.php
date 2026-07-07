@@ -82,6 +82,7 @@ $route['addchart']                                      = 'purchase/C_Order/addC
 $route['hapusBarang/(:any)/(:any)']                     = 'purchaseorder/C_Order/hapusBarang/$1/$2';
 $route['hapusChart/(:any)/(:any)']                      = 'purchaseorder/C_Order/hapusChart/$1/$2';
 $route['rekam_po']                                      = 'purchaseorder/C_Order/rekam_po';
+$route['purchase/check-nomor-po']                       = 'purchaseorder/C_Order/checkNomorPo';
 $route['edit_barang_tmp']                               = 'purchaseorder/C_Order/edit_barang_tmp';
 $route['add_tax_tmp']                                   = 'purchaseorder/C_Order/add_tax_tmp';
 $route['update_tax_tmp']                                = 'purchaseorder/C_Order/update_tax_tmp';
@@ -101,6 +102,11 @@ $route['vrequestmbarang']                               = 'master_barang/C_Maste
 
 //MASTER BARANG KOMERSIL                                        
 $route['masterbarangkomersil']                          = 'master_barang/C_MasterBarang/masterbarangkomersil';
+$route['masterbarangkomersil/data']                     = 'master_barang/C_MasterBarang/ajax_masterbarangkomersil';
+$route['masterbarangkomersil/detail/(:num)']            = 'master_barang/C_MasterBarang/detailmasterbarangkomersil/$1';
+$route['masterbarangkomersil/get/(:num)']                = 'master_barang/C_MasterBarang/ajax_get_masterbarangkomersil/$1';
+$route['masterbarangkomersil/save']                     = 'master_barang/C_MasterBarang/ajax_save_masterbarangkomersil';
+$route['masterbarangkomersil/delete']                   = 'master_barang/C_MasterBarang/ajax_delete_masterbarangkomersil';
 
 // PO-Non-Komersil - PO JASA
 $route['pononkomersiljasa']                             = 'purchaseorder/pojasa/C_Pojasa';
