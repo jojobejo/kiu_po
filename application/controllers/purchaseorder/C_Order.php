@@ -281,6 +281,34 @@ class C_Order extends CI_Controller
         $this->load->view('content/po/datatables');
     }
 
+    private function bulanRomawi($bulan)
+    {
+        $bulanRomawi = array(
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII',
+        );
+
+        $bulan = (int) $bulan;
+        return isset($bulanRomawi[$bulan]) ? $bulanRomawi[$bulan] : '';
+    }
+
+    private function formatNomorPoSupplier($kdSuplier)
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        $nomorUrut = $this->M_Purchase->getNextNomorPoSupplier($kdSuplier);
+        return sprintf('%03d/KIU/%s/%s', $nomorUrut, $this->bulanRomawi(date('n')), date('Y'));
+    }
+
     public function purchaseSuplier($kdsuplier)
     {
         $data['title'] = 'Purchase Order';
@@ -300,6 +328,7 @@ class C_Order extends CI_Controller
         $data['tax']    = $this->M_Purchase->gettmptax($kdsuplier);
         $data['taxx']    = $this->M_Purchase->getTax();
         $data['taxpo'] = $this->M_Purchase->gettaxposup($kdsuplier)->result();
+        $data['nomor_po_otomatis'] = $this->formatNomorPoSupplier($kdsuplier);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -307,6 +336,14 @@ class C_Order extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/po/datatables');
         $this->load->view('content/po/ajaxPO');
+    }
+
+    public function checkNomorPo()
+    {
+        $noPo = $this->input->post('no_po', TRUE);
+        echo json_encode(array(
+            'exists' => $this->M_Purchase->nomorPoExists($noPo),
+        ));
     }
 
     public function add_tax_tmp()
@@ -323,9 +360,17 @@ class C_Order extends CI_Controller
     }
     public function listBarang($kdsuplier)
     {
+        $kodeFilterOptions = array('Q', 'A', 'Z', 'C', 'X');
+        $kodeFilterAktif = strtoupper(trim((string) $this->input->get('kode_awal', TRUE)));
+        if (!in_array($kodeFilterAktif, $kodeFilterOptions, true)) {
+            $kodeFilterAktif = 'Q';
+        }
+
         $data['title']          = 'Add Item List';
         $data['kode_suplier']   = $this->M_Purchase->Suplier($kdsuplier)->result();
-        $data['barang']         = $this->M_Purchase->getBarangSup($kdsuplier)->result();
+        $data['barang']         = $this->M_Purchase->getBarangSup($kdsuplier, $kodeFilterAktif)->result();
+        $data['kode_filter_options'] = $kodeFilterOptions;
+        $data['kode_filter_aktif'] = $kodeFilterAktif;
         $data['tax']            = $this->M_Purchase->getTax();
         $data['tax_tmp']        = $this->M_Purchase->gettmptax($kdsuplier);
         $data['satuan']         = $this->M_Purchase->getSatuan();
@@ -719,6 +764,22 @@ class C_Order extends CI_Controller
 
         if (!$tmp) {
             echo json_encode(array('msg' => 'empty'));
+            return;
+        }
+
+        if (!preg_match('/^\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}$/', $nopo)) {
+            echo json_encode(array(
+                'msg' => 'error',
+                'message' => 'Format Nomor PO harus seperti 001/KIU/VII/2026'
+            ));
+            return;
+        }
+
+        if ($this->M_Purchase->nomorPoExists($nopo)) {
+            echo json_encode(array(
+                'msg' => 'error',
+                'message' => 'Nomor PO sudah digunakan'
+            ));
             return;
         }
 

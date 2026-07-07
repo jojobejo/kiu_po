@@ -220,8 +220,9 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Nomor PO" value="" name="po_isi" id="po_isi">
+                    <input type="text" class="form-control" placeholder="Nomor PO" value="<?= isset($nomor_po_otomatis) ? html_escape($nomor_po_otomatis) : '' ?>" name="po_isi" id="po_isi" data-nomor-po-awal="<?= isset($nomor_po_otomatis) ? html_escape($nomor_po_otomatis) : '' ?>">
                 </div>
+                <small id="po_isi_feedback" class="form-text text-danger" style="display:none;"></small>
             </div>
             <div class="col-md">
                 <div class="input-group">

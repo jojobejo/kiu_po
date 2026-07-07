@@ -1,5 +1,89 @@
 <script>
+    var nomorPoDuplikat = false;
+    var nomorPoTimer = null;
+
+    function formatNomorPoInput(value) {
+        var parts = String(value || '').toUpperCase().replace(/\s+/g, '').split('/');
+        var nomor = parts[0] || '';
+        nomor = nomor.replace(/\D/g, '');
+
+        if (nomor !== '') {
+            nomor = ('000' + nomor.slice(0, 3)).slice(-3);
+        }
+
+        if (parts.length === 1 && nomor !== '') {
+            var defaultParts = String($('#po_isi').data('nomor-po-awal') || '').split('/');
+            return nomor + '/KIU/' + (defaultParts[2] || '') + '/' + (defaultParts[3] || '');
+        }
+
+        if (parts.length >= 4) {
+            return nomor + '/KIU/' + (parts[2] || '').replace(/[^IVXLCDM]/g, '') + '/' + (parts[3] || '').replace(/\D/g, '').slice(0, 4);
+        }
+
+        return String(value || '').toUpperCase().replace(/\s+/g, '');
+    }
+
+    function setNomorPoInvalid(message) {
+        nomorPoDuplikat = true;
+        $('#po_isi').addClass('is-invalid').css({
+            'border-color': '#dc3545',
+            'background-color': '#fff5f5'
+        });
+        $('#po_isi_feedback').text(message).show();
+    }
+
+    function clearNomorPoInvalid() {
+        nomorPoDuplikat = false;
+        $('#po_isi').removeClass('is-invalid').css({
+            'border-color': '',
+            'background-color': ''
+        });
+        $('#po_isi_feedback').hide().text('');
+    }
+
+    function cekNomorPoDuplikat() {
+        var nopo = $('#po_isi').val();
+        var polaNomorPo = /^\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}$/;
+
+        if (nopo === '') {
+            clearNomorPoInvalid();
+            return;
+        }
+
+        if (!polaNomorPo.test(nopo)) {
+            setNomorPoInvalid('Format Nomor PO harus seperti 001/KIU/VII/2026.');
+            return;
+        }
+
+        $.ajax({
+            url: "<?= base_url('purchase/check-nomor-po') ?>",
+            type: "POST",
+            data: {
+                no_po: nopo
+            },
+            dataType: "JSON",
+            cache: false,
+            success: function(data) {
+                if (data.exists) {
+                    setNomorPoInvalid('Nomor PO sudah digunakan. Silakan gunakan nomor berikutnya.');
+                } else {
+                    clearNomorPoInvalid();
+                }
+            }
+        });
+    }
+
     $(document).ready(function() {
+
+        $("#po_isi").on("input blur", function() {
+            var formatted = formatNomorPoInput($(this).val());
+            $(this).val(formatted);
+
+            clearTimeout(nomorPoTimer);
+            nomorPoTimer = setTimeout(cekNomorPoDuplikat, 300);
+        });
+
+        cekNomorPoDuplikat();
 
         $("#tax_isi").on("input", function() {
             var ppn = $(this).val();
@@ -34,6 +118,15 @@
                 icon: 'warning',
                 title: 'Peringatan',
                 text: 'Nomor PO belum terisi!',
+            });
+            return;
+        }
+
+        if (nomorPoDuplikat) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Nomor PO Tidak Valid',
+                text: $("#po_isi_feedback").text() || 'Nomor PO sudah digunakan atau formatnya belum sesuai.',
             });
             return;
         }
