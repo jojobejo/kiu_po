@@ -77,10 +77,10 @@ File: `application/controllers/purchaseorder/C_Order.php`
 Perubahan utama:
 
 - Menambahkan helper perhitungan DPP dari harga Include PPN.
-- Menyimpan `harga_satuan_exclude` dan `harga_satuan_kecil_exclude` pada `tb_tmp_item` jika kolom tersedia.
+- Menyimpan `harga_satuan_exclude` dan `harga_satuan_kecil_exclude` pada `tbpo_tmp_item` jika kolom tersedia.
 - Menambahkan `tax_tmp` ke data view agar modal mengetahui status Tax PO supplier aktif.
 - Memperketat validasi keterangan harga agar satu list order tidak mencampur Include dan Exclude.
-- Saat checkout/finalisasi ke `tb_detail_po`, sistem membawa:
+- Saat checkout/finalisasi ke `tbpo_detail_po`, sistem membawa:
   - `harga_satuan_exclude`
   - `harga_satuan_kecil_exclude`
   - `keterangan_harga_ppn`
@@ -91,7 +91,7 @@ File: `application/controllers/postatus/C_PoStatus.php`
 
 Perubahan utama:
 
-- Saat PO disetujui atau dipindahkan dari temporary/revisi ke detail, data PPN ikut dibawa ke `tb_detail_po`.
+- Saat PO disetujui atau dipindahkan dari temporary/revisi ke detail, data PPN ikut dibawa ke `tbpo_detail_po`.
 - Revisi item menjaga mode PPN lama dari item tersebut.
 - Jika item Include PPN belum punya nilai exclude tersimpan, sistem menghitung ulang DPP menggunakan tax aktif atau fallback 11%.
 - Perhitungan diskon dan total memakai basis exclude agar nilai DPP, diskon, tax, dan grand total tetap konsisten.
@@ -102,7 +102,7 @@ File: `application/models/PO/M_Postatus.php`
 
 Perubahan utama:
 
-- Insert/update `tb_detail_po` sekarang memfilter field berdasarkan kolom yang benar-benar tersedia di database.
+- Insert/update `tbpo_detail_po` sekarang memfilter field berdasarkan kolom yang benar-benar tersedia di database.
 - Tujuannya agar aplikasi tetap berjalan pada database yang belum semua migration-nya diterapkan.
 - Area yang dibuat defensif:
   - `addRevisiChart()`

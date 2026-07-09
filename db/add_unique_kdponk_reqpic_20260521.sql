@@ -7,9 +7,9 @@
 -- Jalankan pengecekan duplicate sebelum menambahkan UNIQUE KEY.
 
 SELECT kd_po_nk, COUNT(*) AS total
-FROM tb_req_nk
+FROM tbpo_req_nk
 GROUP BY kd_po_nk
 HAVING COUNT(*) > 1;
 
-ALTER TABLE tb_req_nk
+ALTER TABLE tbpo_req_nk
 ADD UNIQUE KEY uk_tb_req_nk_kd_po_nk (kd_po_nk);

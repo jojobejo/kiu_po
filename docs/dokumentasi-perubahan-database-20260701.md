@@ -22,7 +22,7 @@ Urutan yang disarankan:
 
 ## Perubahan Tabel
 
-### 1. Tabel `tb_tmp_item`
+### 1. Tabel `tbpo_tmp_item`
 
 Tabel ini dipakai saat item masih berada di daftar order sementara.
 
@@ -44,7 +44,7 @@ Backfill data:
 - Jika `harga_satuan_exclude` masih `0`, sistem mengisi dari `harga_satuan`.
 - Jika `harga_satuan_kecil_exclude` masih `0`, sistem mengisi dari `harga_satuan_kecil`.
 
-### 2. Tabel `tb_detail_po`
+### 2. Tabel `tbpo_detail_po`
 
 Tabel ini dipakai saat PO sudah direkam sebagai detail permanen.
 
@@ -70,8 +70,8 @@ Backfill data:
 
 Menambahkan kolom `keterangan_harga_ppn` ke:
 
-- `tb_tmp_item`
-- `tb_detail_po`
+- `tbpo_tmp_item`
+- `tbpo_detail_po`
 
 ### `add_tmp_item_ppn_calculation_fields_20260701.sql`
 
@@ -81,7 +81,7 @@ Menambahkan kolom:
 - `harga_satuan_kecil_exclude`
 - `keterangan_harga_ppn`
 
-ke tabel `tb_tmp_item`.
+ke tabel `tbpo_tmp_item`.
 
 ### `add_detail_po_ppn_calculation_fields_20260701.sql`
 
@@ -91,7 +91,7 @@ Menambahkan kolom:
 - `harga_satuan_kecil_exclude`
 - `keterangan_harga_ppn`
 
-ke tabel `tb_detail_po`.
+ke tabel `tbpo_detail_po`.
 
 ## Catatan Teknis Penting
 

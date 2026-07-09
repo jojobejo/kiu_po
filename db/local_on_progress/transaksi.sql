@@ -1,4 +1,4 @@
-INSERT INTO tb_transaksi 
+INSERT INTO tbpo_transaksi 
   (id_transnk,kd_akun,kd_po_nk,kd_barang,kd_barangsys,keterangan,kat_barang,tr_qty,satuan,inputer,tgl_transaksi,create_at,last_updated_by,update_at) 
 VALUES 
   (1,11511,'PONK3108240001','QKREBES1','PONK3007240001','-','KATBR002',20,11,'KEU2','2024-08-31','2024-08-31','KEU2','2024-08-31'),

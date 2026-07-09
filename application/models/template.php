@@ -12,17 +12,17 @@ class M_User extends CI_Model
 
     public function getAll()
     {
-        return $this->db->get('tb_user')->result();
+        return $this->db->get('tbpo_user')->result();
     }
 
     public function addUser($data)
     {
-        return $this->db->insert('tb_user', $data);
+        return $this->db->insert('tbpo_user', $data);
     }
 
     public function editUser($iduser, $data)
     {
         $this->db->where('id_user', $iduser);
-        return $this->db->update('tb_user', $data);
+        return $this->db->update('tbpo_user', $data);
     }
 }

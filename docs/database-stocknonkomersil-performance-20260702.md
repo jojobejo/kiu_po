@@ -12,17 +12,17 @@ Migrasi ini disiapkan untuk production agar modul `stocknonkomersil` memiliki de
 
 ## Perubahan Database
 
-1. Memastikan kolom `tb_barang_nk.minimum_stock` tersedia.
+1. Memastikan kolom `tbpo_barang_nk.minimum_stock` tersedia.
 2. Jika kolom sudah ada, struktur kolom dinormalisasi menjadi:
    - `DECIMAL(18,2)`
    - `NOT NULL`
    - `DEFAULT 0`
 3. Data `minimum_stock` yang `NULL` dinormalisasi menjadi `0`.
 4. Menambahkan index idempotent:
-   - `tb_barang_nk.idx_barang_nk_kd_barang` pada `kd_barang`
-   - `tb_barang_nk.idx_barang_nk_kd_lokasi` pada `kd_lokasi`
-   - `tb_transaksi.idx_transaksi_barang_akun` pada `kd_barang`, `kd_akun`
-   - `tb_transaksi.idx_transaksi_barang_tanggal` pada `kd_barang`, `tgl_transaksi(10)`
+   - `tbpo_barang_nk.idx_barang_nk_kd_barang` pada `kd_barang`
+   - `tbpo_barang_nk.idx_barang_nk_kd_lokasi` pada `kd_lokasi`
+   - `tbpo_transaksi.idx_transaksi_barang_akun` pada `kd_barang`, `kd_akun`
+   - `tbpo_transaksi.idx_transaksi_barang_tanggal` pada `kd_barang`, `tgl_transaksi(10)`
 
 ## Catatan Saran PO
 
@@ -39,9 +39,9 @@ Default `Saran PO` dibuat menjadi `0` di layer aplikasi selama `minimum_stock` m
 2. Upload file `db/2026/stocknonkomersil_defaults_indexes_20260702.sql`.
 3. Jalankan SQL pada database production yang aktif.
 4. Setelah migrasi, cek struktur:
-   - `SHOW COLUMNS FROM tb_barang_nk LIKE 'minimum_stock';`
-   - `SHOW INDEX FROM tb_barang_nk;`
-   - `SHOW INDEX FROM tb_transaksi;`
+   - `SHOW COLUMNS FROM tbpo_barang_nk LIKE 'minimum_stock';`
+   - `SHOW INDEX FROM tbpo_barang_nk;`
+   - `SHOW INDEX FROM tbpo_transaksi;`
 5. Buka route `stocknonkomersil` dan pastikan tabel/filter memuat data.
 
 ## Perintah Lokal yang Dipakai
@@ -58,5 +58,5 @@ Get-Content db\2026\stocknonkomersil_defaults_indexes_20260702.sql | C:\xampp\my
   - `idx_barang_nk_kd_lokasi`
   - `idx_transaksi_barang_akun`
   - `idx_transaksi_barang_tanggal`
-- Karena `tb_transaksi.tgl_transaksi` bertipe `text`, index tanggal memakai prefix `tgl_transaksi(10)` agar kompatibel dengan batas panjang key MySQL/MariaDB.
+- Karena `tbpo_transaksi.tgl_transaksi` bertipe `text`, index tanggal memakai prefix `tgl_transaksi(10)` agar kompatibel dengan batas panjang key MySQL/MariaDB.
 

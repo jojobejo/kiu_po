@@ -6,7 +6,7 @@ Tanggal: 2026-07-07
 
 Database lokal yang dicek: `kiucoid_po`
 
-Struktur aktif `tb_barang` pada database lokal:
+Struktur aktif `tbpo_barang` pada database lokal:
 
 - `id_barang` int primary key auto increment
 - `kode_barang` varchar(25)
@@ -68,18 +68,18 @@ Query list barang berubah secara aplikasi menjadi:
 
 Tabel PO komersil yang tetap dipakai:
 
-- `tb_tmp_item`
-- `tb_detail_po`
-- `tb_barang`
+- `tbpo_tmp_item`
+- `tbpo_detail_po`
+- `tbpo_barang`
 
 Kolom penting untuk keamanan kode barang:
 
-- `tb_tmp_item.kode_barang`
-- `tb_tmp_item.kode_suplier`
-- `tb_detail_po.kd_barang`
-- `tb_detail_po.kd_suplier`
-- `tb_barang.kode_barang`
-- `tb_barang.kd_suplier`
+- `tbpo_tmp_item.kode_barang`
+- `tbpo_tmp_item.kode_suplier`
+- `tbpo_detail_po.kd_barang`
+- `tbpo_detail_po.kd_suplier`
+- `tbpo_barang.kode_barang`
+- `tbpo_barang.kd_suplier`
 
 Kontrak ini aman untuk nama barang yang sama selama pemilihan dan proses simpan tetap memakai kode barang.
 

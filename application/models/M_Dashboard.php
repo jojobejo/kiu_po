@@ -13,14 +13,14 @@ class M_Dashboard extends CI_Model
     function totalAll($kduser)
     {
         return $this->db->query("SELECT COUNT(a.id_po_nk)AS total
-        FROM tb_po_nk a 
+        FROM tbpo_po_nk a 
         WHERE a.kd_user = '$kduser'
         ");
     }
     function totalDone($kduser)
     {
         return $this->db->query("SELECT COUNT(a.id_po_nk)as tdone
-        FROM tb_po_nk a
+        FROM tbpo_po_nk a
         WHERE a.status = 'DONE'
         AND a.kd_user = '$kduser'
         ");
@@ -28,7 +28,7 @@ class M_Dashboard extends CI_Model
     function totalOnProgress($kduser)
     {
         return $this->db->query("SELECT COUNT(a.id_po_nk) as tprogress
-        FROM tb_po_nk a
+        FROM tbpo_po_nk a
         WHERE a.status = 'ON PROGRESS'
         AND a.kd_user = '$kduser'
         ");
@@ -36,7 +36,7 @@ class M_Dashboard extends CI_Model
     function totalReject($kduser)
     {
         return $this->db->query("SELECT COUNT(a.id_po_nk) as treject
-        FROM tb_po_nk a
+        FROM tbpo_po_nk a
         WHERE a.status = 'REJECT'
         AND a.kd_user = '$kduser'
         ");
@@ -53,7 +53,7 @@ class M_Dashboard extends CI_Model
     {
         return $this->db->query("SELECT
         COUNT(a.id_reqmbarang) AS totreq
-        FROM tb_req_masterbarang a
+        FROM tbpo_req_masterbarang a
         ");
     }
 }

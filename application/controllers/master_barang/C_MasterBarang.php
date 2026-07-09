@@ -32,6 +32,8 @@ class C_MasterBarang extends CI_Controller
     public function masterbarangkomersil()
     {
         $data['title']      = 'Master Barang - Komersil';
+        $data['supplier'] = $this->M_MasterBarang->getsuplierall()->result();
+        $data['satuan'] = $this->M_MasterBarang->getsatuanbr();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -80,6 +82,8 @@ class C_MasterBarang extends CI_Controller
         $lebar = max(0, (float)$this->input->post('lebar', true));
         $tinggi = max(0, (float)$this->input->post('tinggi', true));
         $bahanAktif = trim((string)$this->input->post('bahan_aktif', true));
+        $satuan = trim((string)$this->input->post('satuan', true));
+        $satuanQty = trim((string)$this->input->post('satuan_qty', true));
 
         return array(
             'kode_barang' => trim((string)$this->input->post('kode_barang', true)),
@@ -87,7 +91,8 @@ class C_MasterBarang extends CI_Controller
             'nama_barang' => trim((string)$this->input->post('nama_barang', true)),
             'bahan_aktif' => $bahanAktif,
             'bhn_aktif' => $bahanAktif,
-            'satuan' => trim((string)$this->input->post('satuan', true)),
+            'satuan' => $satuan,
+            'satuan_qty' => $satuanQty !== '' ? $satuanQty : $this->M_MasterBarang->get_satuan_id_by_name($satuan),
             'panjang' => $panjang,
             'lebar' => $lebar,
             'tinggi' => $tinggi,

@@ -11,12 +11,12 @@ Tidak ada perubahan struktur database untuk fitur pilihan rumus Kg.
 
 Pilihan `Gunakan rumus Kg` hanya memengaruhi hasil perhitungan saat item disimpan atau diedit. Data hasil akhirnya tetap memakai kolom existing:
 
-- `tb_tmp_item.qty_kecil`
-- `tb_tmp_item.harga_satuan_kecil`
-- `tb_tmp_item.harga_satuan_kecil_exclude`
-- `tb_detail_po.qty_kecil`
-- `tb_detail_po.harga_satuan_kecil`
-- `tb_detail_po.harga_satuan_kecil_exclude`
+- `tbpo_tmp_item.qty_kecil`
+- `tbpo_tmp_item.harga_satuan_kecil`
+- `tbpo_tmp_item.harga_satuan_kecil_exclude`
+- `tbpo_detail_po.qty_kecil`
+- `tbpo_detail_po.harga_satuan_kecil`
+- `tbpo_detail_po.harga_satuan_kecil_exclude`
 
 Tidak diperlukan kolom baru karena module downstream sudah membaca nilai hasil konversi tersebut, bukan membaca jenis rumus secara terpisah.
 

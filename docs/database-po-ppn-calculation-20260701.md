@@ -17,7 +17,7 @@ Migration baru pada pekerjaan aktif:
 
 ## Tabel Yang Berubah
 
-### 1. `tb_tmp_item`
+### 1. `tbpo_tmp_item`
 
 File migration:
 
@@ -36,7 +36,7 @@ Backfill data lama:
 - `harga_satuan_exclude` diisi dari `harga_satuan` jika masih `0`.
 - `harga_satuan_kecil_exclude` diisi dari `harga_satuan_kecil` jika masih `0`.
 
-### 2. `tb_detail_po`
+### 2. `tbpo_detail_po`
 
 File migration:
 
@@ -92,7 +92,7 @@ Get-Content "database\archive\db\2026\add_detail_po_ppn_calculation_fields_20260
 SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, COLUMN_DEFAULT
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME IN ('tb_tmp_item', 'tb_detail_po')
+  AND TABLE_NAME IN ('tbpo_tmp_item', 'tbpo_detail_po')
   AND COLUMN_NAME IN (
     'harga_satuan_exclude',
     'harga_satuan_kecil_exclude',
@@ -109,7 +109,7 @@ Temporary item:
 SELECT id_tmp, kode_barang, harga_satuan, harga_satuan_exclude,
        harga_satuan_kecil, harga_satuan_kecil_exclude,
        keterangan_harga_ppn
-FROM tb_tmp_item
+FROM tbpo_tmp_item
 ORDER BY id_tmp DESC
 LIMIT 20;
 ```
@@ -120,16 +120,16 @@ Detail PO:
 SELECT id_det_po, kd_po, kd_barang, hrg_satuan, harga_satuan_exclude,
        harga_satuan_kecil, harga_satuan_kecil_exclude,
        keterangan_harga_ppn
-FROM tb_detail_po
+FROM tbpo_detail_po
 ORDER BY id_det_po DESC
 LIMIT 20;
 ```
 
 ## Relasi Dengan Logic Aplikasi
 
-- `tb_tmp_item` dipakai saat user menyusun list item PO.
-- `tb_detail_po` dipakai setelah PO menjadi detail permanen atau masuk proses approval/status.
-- Saat finalisasi, aplikasi membawa nilai PPN dari `tb_tmp_item` ke `tb_detail_po`.
+- `tbpo_tmp_item` dipakai saat user menyusun list item PO.
+- `tbpo_detail_po` dipakai setelah PO menjadi detail permanen atau masuk proses approval/status.
+- Saat finalisasi, aplikasi membawa nilai PPN dari `tbpo_tmp_item` ke `tbpo_detail_po`.
 - Field `harga_satuan_exclude` dan `harga_satuan_kecil_exclude` menjadi sumber nilai DPP untuk perhitungan diskon dan total.
 - Field `keterangan_harga_ppn` menjadi penentu tampilan tab Include/Exclude dan validasi konsistensi mode harga.
 
@@ -146,12 +146,12 @@ LIMIT 20;
 Rollback tidak disarankan jika aplikasi sudah memakai field baru. Jika benar-benar harus rollback sebelum data production dipakai, kolom dapat dihapus dengan risiko kehilangan data kalkulasi PPN:
 
 ```sql
-ALTER TABLE tb_tmp_item
+ALTER TABLE tbpo_tmp_item
   DROP COLUMN harga_satuan_exclude,
   DROP COLUMN harga_satuan_kecil_exclude,
   DROP COLUMN keterangan_harga_ppn;
 
-ALTER TABLE tb_detail_po
+ALTER TABLE tbpo_detail_po
   DROP COLUMN harga_satuan_exclude,
   DROP COLUMN harga_satuan_kecil_exclude,
   DROP COLUMN keterangan_harga_ppn;

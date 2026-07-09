@@ -131,7 +131,10 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-2 control-label text-right" for="kd_user">No Po<span class="required">*</span></label>
-                            <div class="col-sm-9"><input class="form-control" type="text" id="nopo" name="nopo" value="<?= $s->no_po ?>"></div>
+                            <div class="col-sm-9">
+                                <input class="form-control text-uppercase" type="text" id="nopo<?= $s->id_po ?>" name="nopo" value="<?= $s->no_po ?>" pattern="[QA][0-9]{3}/KIU/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)/[0-9]{4}[A-Z]?" title="Format Nomor PO harus seperti Q001/KIU/VII/2026 atau Q001/KIU/VII/2026A" required>
+                                <small class="form-text text-muted">Format: Q001/KIU/VII/2026 atau Q001/KIU/VII/2026A</small>
+                            </div>
                         </div>
                     </div>
                 </div>

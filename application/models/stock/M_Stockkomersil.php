@@ -73,18 +73,18 @@ class M_Stockkomersil extends CI_Model
 
     public function getAll()
     {
-        return $this->db->get('tb_user')->result();
+        return $this->db->get('tbpo_user')->result();
     }
 
     public function addUser($data)
     {
-        return $this->db->insert('tb_user', $data);
+        return $this->db->insert('tbpo_user', $data);
     }
 
     public function editUser($iduser, $data)
     {
         $this->db->where('id_user', $iduser);
-        return $this->db->update('tb_user', $data);
+        return $this->db->update('tbpo_user', $data);
     }
     public function getdetbr($id)
     {
@@ -94,9 +94,9 @@ class M_Stockkomersil extends CI_Model
         a.nama_barang AS nmbarang,
         C.nm_satuan AS qtysatuan,
         a.qty_min AS qtymin
-        FROM tb_barang a
-        JOIN tb_suplier b ON b.kd_suplier = a.kd_suplier
-        JOIN tb_satuan c ON c.id_satuan = a.satuan_qty
+        FROM tbpo_barang a
+        JOIN tbpo_suplier b ON b.kd_suplier = a.kd_suplier
+        JOIN tbpo_satuan c ON c.id_satuan = a.satuan_qty
         WHERE a.id_barang = '$id'
         ");
     }
@@ -113,12 +113,12 @@ class M_Stockkomersil extends CI_Model
         d.nm_satuan,
         e.no_po,
         f.nama_user
-        FROM tb_transaksi a
-        JOIN tb_barang b ON b.kode_barang = a.kd_barang
-        JOIN tb_suplier c ON c.kd_suplier = b.kd_suplier
-        JOIN tb_satuan d ON d.id_satuan = b.satuan_qty
-        JOIN tb_po e ON e.kd_po =a.kd_po_nk
-        JOIN tb_user f ON f.kode_user = a.inputer 
+        FROM tbpo_transaksi a
+        JOIN tbpo_barang b ON b.kode_barang = a.kd_barang
+        JOIN tbpo_suplier c ON c.kd_suplier = b.kd_suplier
+        JOIN tbpo_satuan d ON d.id_satuan = b.satuan_qty
+        JOIN tbpo_po e ON e.kd_po =a.kd_po_nk
+        JOIN tbpo_user f ON f.kode_user = a.inputer 
         WHERE a.kd_akun = '11411' AND a.kd_barang = '$id'
         ");
     }

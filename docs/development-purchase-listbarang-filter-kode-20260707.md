@@ -19,14 +19,14 @@ Alur route aktual:
 2. `C_Order::listBarang()` mengambil supplier, barang, tax, satuan, dan temporary item.
 3. Data barang komersil diambil melalui `M_Purchase::getBarangSup()`.
 4. Item yang dipilih masuk ke chart lewat `C_Order::addChart()`.
-5. Simpan PO komersil memakai `C_Order::rekam_po()` dan menyalin data dari `tb_tmp_item` ke `tb_detail_po`.
+5. Simpan PO komersil memakai `C_Order::rekam_po()` dan menyalin data dari `tbpo_tmp_item` ke `tbpo_detail_po`.
 
 ## Perubahan Development
 
 1. `C_Order::listBarang()` sekarang membaca query string `kode_awal`.
 2. Nilai filter yang diperbolehkan hanya `Q`, `A`, `Z`, `C`, dan `X`.
 3. Jika filter kosong atau tidak valid, sistem otomatis memakai default `Q`.
-4. `M_Purchase::getBarangSup()` sekarang memfilter `tb_barang.kode_barang` berdasarkan awalan kode aktif.
+4. `M_Purchase::getBarangSup()` sekarang memfilter `tbpo_barang.kode_barang` berdasarkan awalan kode aktif.
 5. Daftar barang diurutkan berdasarkan `kode_barang`, lalu `nama_barang`.
 6. View `listbarang.php` menampilkan select filter kode barang.
 7. Tabel list barang sekarang menampilkan kolom `Kode Barang` sebelum `Nama Barang`.
@@ -43,10 +43,10 @@ Alur route aktual:
 
 ## Catatan Keamanan Proses PO Komersil
 
-Proses PO komersil tetap aman terhadap struktur `tb_barang` baru karena:
+Proses PO komersil tetap aman terhadap struktur `tbpo_barang` baru karena:
 
-- Temporary item menyimpan kode barang pada `tb_tmp_item.kode_barang`.
-- Final PO menyimpan kode barang pada `tb_detail_po.kd_barang`.
+- Temporary item menyimpan kode barang pada `tbpo_tmp_item.kode_barang`.
+- Final PO menyimpan kode barang pada `tbpo_detail_po.kd_barang`.
 - Validasi konversi barang menggunakan `M_Purchase::getBarangByKode($kodeBarang, $kodeSuplier)`, sehingga lookup memakai kombinasi kode barang dan supplier.
 - Join temporary/final PO ke master barang memakai pasangan kode barang dan supplier, bukan nama barang.
 - Filter baru hanya membatasi daftar pilihan di halaman list, tidak mengubah kontrak penyimpanan PO.

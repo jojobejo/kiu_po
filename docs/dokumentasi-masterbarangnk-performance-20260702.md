@@ -21,7 +21,7 @@ Sebelum perubahan, file `modalmbarang.php` melakukan `foreach ($barangnk as $brn
 - modal hapus,
 - modal upload gambar.
 
-Dampaknya, jika data berisi 1.000 barang, halaman mengirim ribuan blok modal/form ke browser sebelum user melakukan aksi apa pun. Pada database lokal yang dicek tanggal 2 Juli 2026, `tb_barang_nk` berisi 875 barang; pola lama berarti sekitar 3.500 modal/form tambahan. Biaya render HTML, parsing DOM, dan inisialisasi modal menjadi besar.
+Dampaknya, jika data berisi 1.000 barang, halaman mengirim ribuan blok modal/form ke browser sebelum user melakukan aksi apa pun. Pada database lokal yang dicek tanggal 2 Juli 2026, `tbpo_barang_nk` berisi 875 barang; pola lama berarti sekitar 3.500 modal/form tambahan. Biaya render HTML, parsing DOM, dan inisialisasi modal menjadi besar.
 
 ## Perubahan Development
 
@@ -36,7 +36,7 @@ Dampaknya, jika data berisi 1.000 barang, halaman mengirim ribuan blok modal/for
    - upload: `uploadmbarangnk`
    - generate QR: `genqrcode/...`
 6. Modal tambah barang diberi scanning kode barang pada field `kd_adm`.
-7. Endpoint `masterbarangnk/check-kode` mengecek `tb_barang_nk.kd_barang` dan mengembalikan nama barang jika kode sudah dipakai.
+7. Endpoint `masterbarangnk/check-kode` mengecek `tbpo_barang_nk.kd_barang` dan mengembalikan nama barang jika kode sudah dipakai.
 8. Submit tambah barang diberi guard server-side agar kode duplikat tidak tersimpan jika user melewati validasi browser.
 
 ## Dampak
@@ -53,9 +53,9 @@ Tidak ada perubahan struktur database.
 
 Perubahan query hanya membatasi kolom hasil select dari tabel:
 
-- `tb_barang_nk`
-- `tb_satuan`
-- `tb_kat_br`
+- `tbpo_barang_nk`
+- `tbpo_satuan`
+- `tbpo_kat_br`
 
 Tidak ada perubahan struktur database untuk fitur scanning kode barang.
 

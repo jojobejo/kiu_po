@@ -218,6 +218,12 @@
             <div class="col-md">
                 <div class="input-group">
                     <div class="input-group-prepend">
+                        <select class="custom-select" id="kode_po_isi" name="kode_po_isi" style="max-width: 80px;">
+                            <option value="Q" selected>Q</option>
+                            <option value="A">A</option>
+                        </select>
+                    </div>
+                    <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-clipboard"></i></span>
                     </div>
                     <input type="text" class="form-control" placeholder="Nomor PO" value="<?= isset($nomor_po_otomatis) ? html_escape($nomor_po_otomatis) : '' ?>" name="po_isi" id="po_isi" data-nomor-po-awal="<?= isset($nomor_po_otomatis) ? html_escape($nomor_po_otomatis) : '' ?>">

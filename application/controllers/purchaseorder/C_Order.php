@@ -119,16 +119,16 @@ class C_Order extends CI_Controller
 
     private function getKeteranganHargaPpnTmp($kodeSuplier, $excludeIdTmp = 0)
     {
-        if (!$this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
+        if (!$this->db->field_exists('keterangan_harga_ppn', 'tbpo_tmp_item')) {
             return '';
         }
 
         $this->db->select('keterangan_harga_ppn');
-        $this->db->from('tb_tmp_item');
+        $this->db->from('tbpo_tmp_item');
         $this->db->where('kode_suplier', $kodeSuplier);
         $this->db->where("TRIM(COALESCE(keterangan_harga_ppn, '')) <> ''", null, false);
 
-        if ($this->db->field_exists('is_bonus', 'tb_tmp_item')) {
+        if ($this->db->field_exists('is_bonus', 'tbpo_tmp_item')) {
             $this->db->where('COALESCE(is_bonus, 0) = 0', null, false);
         }
 
@@ -242,7 +242,7 @@ class C_Order extends CI_Controller
             return $this->validationError('Harga satuan harus lebih besar dari 0');
         }
 
-        if (!$this->db->field_exists('isi', 'tb_barang') || !$this->db->field_exists('kemasan', 'tb_barang')) {
+        if (!$this->db->field_exists('isi', 'tbpo_barang') || !$this->db->field_exists('kemasan', 'tbpo_barang')) {
             return $this->validationError('Kolom isi dan kemasan pada master barang belum tersedia');
         }
 
@@ -302,11 +302,26 @@ class C_Order extends CI_Controller
         return isset($bulanRomawi[$bulan]) ? $bulanRomawi[$bulan] : '';
     }
 
-    private function formatNomorPoSupplier($kdSuplier)
+    private function formatNomorPoSupplier($kdSuplier, $kodePo = 'Q')
     {
         date_default_timezone_set('Asia/Jakarta');
-        $nomorUrut = $this->M_Purchase->getNextNomorPoSupplier($kdSuplier);
-        return sprintf('%03d/KIU/%s/%s', $nomorUrut, $this->bulanRomawi(date('n')), date('Y'));
+        $kodePo = strtoupper(trim((string) $kodePo));
+        if (!in_array($kodePo, array('Q', 'A'), true)) {
+            $kodePo = 'Q';
+        }
+
+        $nomorUrut = $this->M_Purchase->getNextNomorPoSupplier($kdSuplier, $kodePo);
+        $bulanRomawi = $this->bulanRomawi(date('n'));
+        $tahun = date('Y');
+
+        for ($i = $nomorUrut; $i <= 999; $i++) {
+            $nomorPo = $this->M_Purchase->getAvailableNomorPoSupplier($kodePo, $i, $bulanRomawi, $tahun, $kdSuplier);
+            if ($nomorPo !== null) {
+                return $nomorPo;
+            }
+        }
+
+        return sprintf('%s%03d/KIU/%s/%s', $kodePo, $nomorUrut, $bulanRomawi, $tahun);
     }
 
     public function purchaseSuplier($kdsuplier)
@@ -341,8 +356,15 @@ class C_Order extends CI_Controller
     public function checkNomorPo()
     {
         $noPo = $this->input->post('no_po', TRUE);
+        $kdSuplier = $this->input->post('kd_suplier', TRUE);
+        $kodePo = $this->input->post('kode_po', TRUE);
+        $sameSupplier = $kdSuplier !== null && $kdSuplier !== ''
+            ? $this->M_Purchase->nomorPoBaseSupplierExists($noPo, $kdSuplier)
+            : false;
         echo json_encode(array(
             'exists' => $this->M_Purchase->nomorPoExists($noPo),
+            'same_supplier' => $sameSupplier,
+            'suggested' => $kdSuplier !== null && $kdSuplier !== '' ? $this->formatNomorPoSupplier($kdSuplier, $kodePo) : null,
         ));
     }
 
@@ -529,8 +551,8 @@ class C_Order extends CI_Controller
             return;
         }
 
-        if (!$this->tableColumnsAvailable('tb_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
-            $this->redirectWithError('Kolom konversi pada tb_tmp_item belum tersedia', 'purchase/listBarang/' . $suplier);
+        if (!$this->tableColumnsAvailable('tbpo_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
+            $this->redirectWithError('Kolom konversi pada tbpo_tmp_item belum tersedia', 'purchase/listBarang/' . $suplier);
             return;
         }
 
@@ -551,15 +573,15 @@ class C_Order extends CI_Controller
             'keterangan_bonus' => $isBonus ? $bonusNote : '',
         );
 
-        if ($this->db->field_exists('harga_satuan_exclude', 'tb_tmp_item')) {
+        if ($this->db->field_exists('harga_satuan_exclude', 'tbpo_tmp_item')) {
             $data['harga_satuan_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($hargaQty, $ppnMode, $taxAktif);
         }
 
-        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tb_tmp_item')) {
+        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tbpo_tmp_item')) {
             $data['harga_satuan_kecil_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($konversi['harga_satuan_kecil'], $ppnMode, $taxAktif);
         }
 
-        if ($this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
+        if ($this->db->field_exists('keterangan_harga_ppn', 'tbpo_tmp_item')) {
             $data['keterangan_harga_ppn'] = $isBonus ? '' : $ppnMode;
         }
 
@@ -767,10 +789,18 @@ class C_Order extends CI_Controller
             return;
         }
 
-        if (!preg_match('/^\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}$/', $nopo)) {
+        if (!preg_match('/^[QA]\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}[A-Z]?$/', $nopo)) {
             echo json_encode(array(
                 'msg' => 'error',
-                'message' => 'Format Nomor PO harus seperti 001/KIU/VII/2026'
+                'message' => 'Format Nomor PO harus seperti Q001/KIU/VII/2026 atau Q001/KIU/VII/2026A'
+            ));
+            return;
+        }
+
+        if ($this->M_Purchase->nomorPoBaseSupplierExists($nopo, $suplier)) {
+            echo json_encode(array(
+                'msg' => 'error',
+                'message' => 'Nomor PO sudah digunakan supplier ini. Silakan gunakan nomor berikutnya.'
             ));
             return;
         }
@@ -778,7 +808,7 @@ class C_Order extends CI_Controller
         if ($this->M_Purchase->nomorPoExists($nopo)) {
             echo json_encode(array(
                 'msg' => 'error',
-                'message' => 'Nomor PO sudah digunakan'
+                'message' => 'Nomor PO sudah digunakan. Silakan gunakan nomor berikutnya atau suffix alfabet yang tersedia.'
             ));
             return;
         }
@@ -786,10 +816,10 @@ class C_Order extends CI_Controller
         $tax = $this->taxByKeteranganHargaPpn($this->getKeteranganHargaPpnTmp($suplier));
         $this->M_Purchase->set_tmp_tax($suplier, $tax);
 
-        if (!$this->tableColumnsAvailable('tb_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_exclude', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude', 'keterangan_harga_ppn'))) {
+        if (!$this->tableColumnsAvailable('tbpo_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_exclude', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude', 'keterangan_harga_ppn'))) {
             echo json_encode(array(
                 'msg' => 'error',
-                'message' => 'Kolom konversi dan PPN pada tb_detail_po belum tersedia'
+                'message' => 'Kolom konversi dan PPN pada tbpo_detail_po belum tersedia'
             ));
             return;
         }
@@ -1243,8 +1273,8 @@ class C_Order extends CI_Controller
             return;
         }
 
-        if (!$this->tableColumnsAvailable('tb_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
-            $this->redirectWithError('Kolom konversi pada tb_tmp_item belum tersedia', 'purchase/sup/' . $supp);
+        if (!$this->tableColumnsAvailable('tbpo_tmp_item', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_kecil'))) {
+            $this->redirectWithError('Kolom konversi pada tbpo_tmp_item belum tersedia', 'purchase/sup/' . $supp);
             return;
         }
 
@@ -1261,15 +1291,15 @@ class C_Order extends CI_Controller
             'keterangan_bonus' => $isBonus ? $bonusNote : ''
         );
 
-        if ($this->db->field_exists('harga_satuan_exclude', 'tb_tmp_item')) {
+        if ($this->db->field_exists('harga_satuan_exclude', 'tbpo_tmp_item')) {
             $dataedit['harga_satuan_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($hrg_satuan, $ppnMode, $taxAktif);
         }
 
-        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tb_tmp_item')) {
+        if ($this->db->field_exists('harga_satuan_kecil_exclude', 'tbpo_tmp_item')) {
             $dataedit['harga_satuan_kecil_exclude'] = $isBonus ? 0 : $this->hargaKalkulasiExcludeByMode($konversi['harga_satuan_kecil'], $ppnMode, $taxAktif);
         }
 
-        if ($this->db->field_exists('keterangan_harga_ppn', 'tb_tmp_item')) {
+        if ($this->db->field_exists('keterangan_harga_ppn', 'tbpo_tmp_item')) {
             $dataedit['keterangan_harga_ppn'] = $isBonus ? '' : $ppnMode;
         }
         $this->db->trans_start();

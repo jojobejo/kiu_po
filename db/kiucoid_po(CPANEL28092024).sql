@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_barang`
+-- Struktur dari tabel `tbpo_barang`
 --
 
-CREATE TABLE `tb_barang` (
+CREATE TABLE `tbpo_barang` (
   `id_barang` int(11) NOT NULL,
   `kode_barang` varchar(25) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
@@ -35,10 +35,10 @@ CREATE TABLE `tb_barang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_barang`
+-- Dumping data untuk tabel `tbpo_barang`
 --
 
-INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
+INSERT INTO `tbpo_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
 (1, 'QABAC01', 'EXCEL01', 'Abacell 18 EC 10 X 1 ltr'),
 (2, 'QABAC02', 'EXCEL01', 'Abacell 18 EC 100 X 100 ml (tdk terpakai)'),
 (3, 'QABAC03', 'EXCEL01', 'Abacell 18 EC 20 X 500 ml'),
@@ -911,7 +911,7 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 (870, 'QEQUA01', 'DUPON01', 'Equation Pro 52 WG 10 X 20 X 30 gr'),
 (871, 'QEQUA02', 'DUPON01', 'Equation Pro 52 WG 10 X 5 X 100 gr'),
 (872, 'QEROS01', 'CATUR01', 'Eros Gold 0.75/30 DF 50 X 100 gr');
-INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
+INSERT INTO `tbpo_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
 (873, 'QEROS02', 'CATUR01', 'Eros Gold 0.75/30 DF 40 X 250 gr'),
 (874, 'QETHR01', 'BAYER01', 'Ethrel 40 PRG 100 X 100 ml'),
 (875, 'QETHR02', 'BAYER01', 'Ethrel 480 SL 100 X 100 ml'),
@@ -1755,7 +1755,7 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 (1714, 'QMULS03', 'TOMAN01', 'Mulsa HP Karisma Super (Madya) 120 x 5.5 kg'),
 (1715, 'QMULS04', 'JAVAK01', 'Mulsa Karisma Kuda 60 cm X 18 kg'),
 (1716, 'QMULS05', 'JAVAK01', 'Mulsa Karisma Kuda 60 cm X 9 kg');
-INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
+INSERT INTO `tbpo_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
 (1717, 'QMULS06', 'JAVAK01', 'Mulsa Karisma Kuda 70 cm X 18 kg'),
 (1718, 'QMULS07', 'JAVAK01', 'Mulsa Karisma Kuda 70 cm X 9 kg'),
 (1719, 'QMULS08', 'JAVAK01', 'Mulsa Karisma Kuda 60 cm X 9 kg (Roll)'),
@@ -2566,7 +2566,7 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 (2525, 'QSAWI32', 'BENIH01', 'Sawi Dora'),
 (2526, 'QSAWI33', 'BISII01', 'Sawi Gardena 20 X 12 X 15 gr'),
 (2527, 'QSAWI34', 'BENIH01', 'Sawi Dora 3 kg');
-INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
+INSERT INTO `tbpo_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
 (2528, 'QSAWI35', 'BENIH01', 'Sawi Puteri 12 X 15 X 25 gr'),
 (2529, 'QSAWI36', 'BENIH01', 'Sawi Dora 500 gr'),
 (2530, 'QSCOR01', 'SYNGE01', 'Score 250 EC 10 X 20 X 10 ml'),
@@ -3418,7 +3418,7 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 (3384, 'QGOLD19', 'MAJUM01', 'GG Akar 70 X 15 ml (M2U)'),
 (3385, 'QZNUR01', 'SAPRO03', 'ZNURECOTE 50 kg  '),
 (3386, 'QPRIM23', 'PRIMA03', 'Prima-Clink 50 X 100 ml');
-INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
+INSERT INTO `tbpo_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`) VALUES
 (3387, 'QPRIM24', 'PRIMA03', 'Prima-Clink 20 X 250 ml'),
 (3388, 'QKLOP03', 'AGRON01', 'Kloper 500 SL 40 X 250 ml'),
 (3389, 'CSPRA01', 'TANIA04', 'Sprayer Eelektrik Solusi Type 4 16 ltr'),
@@ -3556,10 +3556,10 @@ INSERT INTO `tb_barang` (`id_barang`, `kode_barang`, `kd_suplier`, `nama_barang`
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_detail_po`
+-- Struktur dari tabel `tbpo_detail_po`
 --
 
-CREATE TABLE `tb_detail_po` (
+CREATE TABLE `tbpo_detail_po` (
   `id_det_po` int(11) NOT NULL,
   `kd_po` varchar(255) NOT NULL,
   `no_po` varchar(255) NOT NULL,
@@ -3576,10 +3576,10 @@ CREATE TABLE `tb_detail_po` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_detail_po`
+-- Dumping data untuk tabel `tbpo_detail_po`
 --
 
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (1, 'MKPO010424JAWAA010001', '012/KIU/IV/2024', '0000-00-00', 'JAWAA01', 'QPINA010', 'Pinamec 20 EC 50 X 100 ml (Hitam)', 'Box', 25, 725000, 18125000, '', '0000-00-00 00:00:00'),
 (2, 'MKPO010424JAWAA010001', '012/KIU/IV/2024', '0000-00-00', 'JAWAA01', 'QPINA011', 'Pinamec 20 EC 40 X 250 ml (Hitam)', 'Box', 25, 1200000, 30000000, '', '0000-00-00 00:00:00'),
 (3, 'MKPO010424JAWAA010001', '012/KIU/IV/2024', '0000-00-00', 'JAWAA01', 'QPINA012', 'Pinamec 20 EC 20 X 500 ml (Hitam)', 'Box', 25, 1050000, 26250000, '', '0000-00-00 00:00:00'),
@@ -3867,7 +3867,7 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 (285, 'NKPO140524MITRA250002', '005/KIU/V/2024', '0000-00-00', 'MITRA25', 'QMANO01', 'Manohara 20 X 1 kg', 'Box', 250, 272260, 68065000, '', '0000-00-00 00:00:00'),
 (286, 'NKPO140524SAPRO030003', '019/KIU/V/2024', '0000-00-00', 'SAPRO03', 'QZAPA01', 'ZA Pak Tani 50 kg', 'Kg', 30000, 3500, 105000000, '', '0000-00-00 00:00:00'),
 (287, 'MKPO140524KERTO010004', '002/KIU/V/2024', '0000-00-00', 'KERTO01', 'QNPKB11', 'NPK Boost 324 10 X 5 kg', 'Kg', 3000, 13950, 41850000, '', '0000-00-00 00:00:00');
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (288, 'MKPO140524KERTO010004', '002/KIU/V/2024', '0000-00-00', 'KERTO01', 'CNPKB01', 'NPK Boost 324 50 kg', 'Kg', 3000, 13200, 39600000, '', '0000-00-00 00:00:00'),
 (289, 'MKPO140524KERTO010004', '002/KIU/V/2024', '0000-00-00', 'KERTO01', 'QNPKC11', 'NPK Cap Tawon 16-16-16 20 X 1 kg', 'Kg', 7000, 14000, 98000000, '', '0000-00-00 00:00:00'),
 (290, 'MKPO140524KERTO010004', '002/KIU/V/2024', '0000-00-00', 'KERTO01', 'QNPKC07', 'NPK Cap Tawon 16-16-16 + Boron 50 kg', 'Kg', 5000, 12700, 63500000, '', '0000-00-00 00:00:00'),
@@ -4154,7 +4154,7 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 (607, 'NKPO200624WAHAN010001', '003/KIU/VI/2024', '2024-06-20', 'WAHAN01', 'QBIOC02', 'Biochem Padi/Tikus 20 X 1 ltr', 'Box', 10, 144300, 1443000, '', '2024-06-20 01:41:37'),
 (608, 'NKPO200624QTMM0002', '003/KIU/VI/2024', '2024-06-20', 'QTMM', 'QBERN06', 'Bernice 5 SL 25 X 200 ml', 'Box', 20, 1875000, 37500000, '', '2024-06-20 02:15:27'),
 (609, 'NKPO200624QTMM0002', '003/KIU/VI/2024', '2024-06-20', 'QTMM', 'QTINK01', 'Tinker 400 SC 40 X 200 ml', 'Box', 20, 3400000, 68000000, '', '2024-06-20 02:15:27');
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (610, 'NKPO200624BAYER010003', '021/KIU/VI/2024', '2024-06-20', 'BAYER01', 'QNATI02', 'Nativo 75 WG 50 X 2 X 50 gr', 'Box', 50, 6048500, 302425000, '', '2024-06-20 04:30:58'),
 (611, 'NKPO200624INTIE010004', '004/KIU/V/2024', '2024-06-20', 'INTIE01', 'QMETI02', 'Metindo 40 SP 40 X 200 gr', 'Box', 100, 1600000, 160000000, '', '2024-06-20 06:59:46'),
 (612, 'NKPO200624INTIE010004', '004/KIU/V/2024', '2024-06-20', 'INTIE01', 'QMETI07', 'Metindo 40 SP 40 X 400 gr', 'Box', 100, 3152000, 315200000, '', '2024-06-20 06:59:46'),
@@ -4439,7 +4439,7 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 (907, 'NKPO220724SARAN040004', '015/KIU/VII/2024', '2024-07-22', 'SARAN04', 'QSPRA15', 'Sprayer Elektrik Quda Karisma 16 ltr', 'Pcs', 100, 358000, 35800000, '', '2024-07-22 07:30:59'),
 (908, 'NKPO220724SARAN040004', '015/KIU/VII/2024', '2024-07-22', 'SARAN04', 'QSPRA48', 'Sprayer Quda Karisma Double Fungsi 16 ltr', 'Pcs', 400, 390000, 156000000, '', '2024-07-22 07:30:59'),
 (909, 'KPOREV2207240005', '015/KIU/VII/2024/REV', '2024-07-22', 'SARAN04', 'QSPRA15', 'Sprayer Elektrik Quda Karisma 16 ltr', 'Pcs', 1100, 358000, 393800000, '', '2024-07-22 07:50:36');
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (910, 'KPOREV2207240005', '015/KIU/VII/2024/REV', '2024-07-22', 'SARAN04', 'QSPRA48', 'Sprayer Quda Karisma Double Fungsi 16 ltr', 'Pcs', 400, 390000, 156000000, '', '2024-07-22 07:50:29'),
 (911, 'KPOREV2207240006', '015/KIU/VII/2024/REV', '2024-07-22', 'SARAN04', 'QSPRA15', 'Sprayer Elektrik Quda Karisma 16 ltr', 'Pcs', 1100, 358000, 393800000, '', '2024-07-22 07:59:48'),
 (912, 'KPOREV2207240006', '015/KIU/VII/2024/REV', '2024-07-22', 'SARAN04', 'QSPRA48', 'Sprayer Quda Karisma Double Fungsi 16 ltr', 'Pcs', 400, 390000, 156000000, '', '2024-07-22 07:59:48'),
@@ -4723,7 +4723,7 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 (1220, 'NKPO020924SINAR010001', '019/KIU/VIII/2024', '2024-09-02', 'SINAR01', 'QREAC06', 'Reactive 490 SL 4 X 5 ltr', 'Ltr', 500, 42000, 21000000, '', '2024-09-02 02:05:22'),
 (1221, 'NKPO020924SINAR010001', '019/KIU/VIII/2024', '2024-09-02', 'SINAR01', 'QREAC01', 'Reactive 490 SL 20 ltr', 'Ltr', 2000, 41000, 82000000, '', '2024-09-02 02:05:22'),
 (1222, 'KPOREV0209240002', '019/KIU/IX/2024', '2024-09-02', 'SINAR01', 'QASTA02', 'Astana 85 WP 50 X 100 gr', 'Kg', 125, 500000, 62500000, '', '2024-09-02 02:07:25');
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (1223, 'KPOREV0209240002', '019/KIU/IX/2024', '2024-09-02', 'SINAR01', 'QHEXA08', 'Hexacar 100 SC 100 X 100 ml', 'Ltr', 250, 115000, 28750000, '', '2024-09-02 02:07:25'),
 (1224, 'KPOREV0209240002', '019/KIU/IX/2024', '2024-09-02', 'SINAR01', 'QLOGA03', 'Logamate 440 EC 20 x 500 ml', 'Ltr', 1000, 109000, 109000000, '', '2024-09-02 02:07:25'),
 (1225, 'KPOREV0209240002', '019/KIU/IX/2024', '2024-09-02', 'SINAR01', 'QLOGA07', 'Logamate 440 EC 40 x 250 ml', 'Ltr', 500, 113000, 56500000, '', '2024-09-02 02:07:25'),
@@ -5008,7 +5008,7 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 (1530, 'NKPO280924ADVAN010003', '016/KIU/IX/2024', '2024-09-28', 'ADVAN01', 'QAGUS02', 'Agus 500 SC 40 X 250 ml', 'Box', 150, 5372400, 805860000, '', '2024-09-28 05:40:39'),
 (1531, 'NKPO280924ADVAN010003', '016/KIU/IX/2024', '2024-09-28', 'ADVAN01', 'QABEN01', 'Abenz 22 EC 100 X 100 ml', 'Box', 100, 6549000, 654900000, '', '2024-09-28 05:40:39'),
 (1532, 'NKPO280924ADVAN010003', '016/KIU/IX/2024', '2024-09-28', 'ADVAN01', 'QABEN02', 'Abenz 22 EC 40 X 250 ml', 'Box', 100, 5487840, 548784000, '', '2024-09-28 05:40:39');
-INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `kd_barang`, `nama_barang`, `satuan`, `qty`, `hrg_satuan`, `hrg_total`, `kd_user`, `create_at`) VALUES
 (1534, 'KPOREV2809240004', '022/KIU/IX/2024/REV', '2024-09-28', 'MAJUM01', 'QGOLD18', 'GG Akar 80 X 5 ml (M2U)', 'Pack', 5000, 4000, 20000000, '', '2024-09-28 05:46:20'),
 (1535, 'NKPO280924MAJUM010005', '023/KIU/IX/2024', '2024-09-28', 'MAJUM01', 'QANET08', 'Aneto 50 EC 50 X 250 ml + Neptune 8 gr (M2U)', 'Box', 50, 3135000, 156750000, '', '2024-09-28 07:03:14'),
 (1536, 'NKPO280924MAJUM010005', '023/KIU/IX/2024', '2024-09-28', 'MAJUM01', 'QBAME03', 'Bamex 18 EC 20 X 200 ml (M2U)', 'Box', 100, 2700000, 270000000, '', '2024-09-28 07:03:14'),
@@ -5027,10 +5027,10 @@ INSERT INTO `tb_detail_po` (`id_det_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_detail_po_nk`
+-- Struktur dari tabel `tbpo_detail_po_nk`
 --
 
-CREATE TABLE `tb_detail_po_nk` (
+CREATE TABLE `tbpo_detail_po_nk` (
   `id_det_po_nk` int(11) NOT NULL,
   `kd_po_nk` varchar(25) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
@@ -5049,10 +5049,10 @@ CREATE TABLE `tb_detail_po_nk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_detail_po_nk`
+-- Dumping data untuk tabel `tbpo_detail_po_nk`
 --
 
-INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `hrg_nyata`, `total_harga`, `total_nyata`, `gbr_produk`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `hrg_nyata`, `total_harga`, `total_nyata`, `gbr_produk`, `create_at`) VALUES
 (3, 'NKPO1005240002', 'KARYAWAN3', '2024-05-10', 'PONK1005240003', 'Troli Barang', '', 'Troli untuk pengambilan barang di gudang', 3, 3850000, 0, 11550000, 0, '', '2024-05-14 02:50:23'),
 (4, 'NKPO1005240002', 'KARYAWAN3', '2024-05-10', 'PONK1005240006', 'Sapu rumah', '', 'Inventaris gudang untuk penunjang kebersihan gudang', 7, 15000, 0, 105000, 0, '', '2024-05-14 02:50:56'),
 (6, 'NKPO1005240002', 'KARYAWAN3', '2024-05-10', 'PONK1005240010', 'Cikrak rumahan', '', 'Inventaris gudang untuk penunjang kebersihan gudang', 8, 9000, 0, 72000, 0, '', '2024-05-14 02:51:26'),
@@ -5301,7 +5301,7 @@ INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_trans
 (461, 'NKPO2207240002', 'KARYAWAN5', '2024-07-22', 'PONK2207240014', 'X Banner', 'X Banner', 'Multiprint/Lintas Printing', 60, 75000, 0, 4500000, 0, 'Karisma.png', '2024-07-22 08:23:50'),
 (462, 'NKPO2207240002', 'KARYAWAN5', '2024-07-22', 'PONK2207240015', 'Meja Display', 'Meja Display untuk\r\nukuran atas 80 x 29 cm\r\nukuran bawah 81 x 85 cm', 'Lintas printing', 6, 800000, 0, 4800000, 0, '2024071721638900.jpg', '2024-07-23 01:38:26'),
 (463, 'NKPO2207240002', 'KARYAWAN5', '2024-07-22', 'PONK2207240017', 'umbul umbul', 'umbul umbul', 'MultiPrint/Lintas printing', 50, 115000, 0, 5750000, 0, '2024071721638913.jpg', '2024-07-22 09:01:53');
-INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `hrg_nyata`, `total_harga`, `total_nyata`, `gbr_produk`, `create_at`) VALUES
+INSERT INTO `tbpo_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_transaksi`, `kd_barang`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `hrg_nyata`, `total_harga`, `total_nyata`, `gbr_produk`, `create_at`) VALUES
 (464, 'NKPO2207240003', 'KARYAWAN2', '2024-07-22', 'PONK2207240019', 'Maintenance CCTV', 'service dan pergantian komponen yang rusak', 'Vendor - Wahyu', 13, 250000, 0, 3250000, 0, 'Karisma.png', '2024-07-22 08:53:36'),
 (465, 'NKPO2307240003', 'KARYAWAN4', '2024-07-23', 'PONK2307240001', 'Beras Menir', 'Beras Menir', 'Beras Menir untuk campuran pakan Anjing, kebutuhan 100kg, Terakhir PO tanggal 14 Mei 2024.', 100, 9000, 0, 900000, 0, 'Karisma.png', '2024-07-23 04:23:08'),
 (466, 'NKPO2307240004', 'KARYAWAN2', '2024-07-23', 'PONK2307240002', 'DeepCool - Thermal Paste   ', 'DM9 , 1.5G , Professional Grade Thermal Paste', 'Digunakan maintenance Processor PC', 5, 70000, 0, 350000, 0, '2024071721708661.jpg', '2024-07-23 04:24:21'),
@@ -5449,10 +5449,10 @@ INSERT INTO `tb_detail_po_nk` (`id_det_po_nk`, `kd_po_nk`, `kd_user`, `tgl_trans
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_diskon`
+-- Struktur dari tabel `tbpo_diskon`
 --
 
-CREATE TABLE `tb_diskon` (
+CREATE TABLE `tbpo_diskon` (
   `id_diskon` int(11) NOT NULL,
   `kd_po` varchar(255) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
@@ -5461,10 +5461,10 @@ CREATE TABLE `tb_diskon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_diskon`
+-- Dumping data untuk tabel `tbpo_diskon`
 --
 
-INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nominal`) VALUES
+INSERT INTO `tbpo_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nominal`) VALUES
 (1, 'SKPO300823SYNGE010001', 'SYNGE01', 'Diskon Barang - Agrimec 18 EC 100 X 50 ml (5%)', 125000),
 (2, 'SKPO300823SYNGE010001', 'SYNGE01', 'Agrimec 18 EC 100 X 50 ml - Diskon Per Botol', 35000),
 (3, 'AKPO010923SYNGE010001', 'SYNGE01', 'Diskon Barang - Agrimec 18 EC 100 X 50 ml (10%)', 100000),
@@ -6107,7 +6107,7 @@ INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nomi
 (710, 'NKPO240924AGRIM010002', 'AGRIM01', 'SD 5%', 20000000),
 (711, 'NKPO240924AGRIM010002', 'AGRIM01', 'CBD 3%', 11400000),
 (712, 'NKPO240924SAPRO030003', 'SAPRO03', 'Disc. qty 3 ton Rp. 2.500/pack', 75000000);
-INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nominal`) VALUES
+INSERT INTO `tbpo_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nominal`) VALUES
 (713, 'NKPO240924SAPRO030003', 'SAPRO03', 'Disc. tambahan Rp. 2.250/kg', 6750000),
 (714, 'NKPO250924KALAT010001', 'KALAT01', 'Dekamon Disc. 3%', 22302000),
 (715, 'NKPO250924BASFI010002', 'BASFI01', 'Disc. 2%', 63056400),
@@ -6123,10 +6123,10 @@ INSERT INTO `tb_diskon` (`id_diskon`, `kd_po`, `kd_suplier`, `keterangan`, `nomi
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_file_bukti_beli`
+-- Struktur dari tabel `tbpo_file_bukti_beli`
 --
 
-CREATE TABLE `tb_file_bukti_beli` (
+CREATE TABLE `tbpo_file_bukti_beli` (
   `id_fk_bukti` int(11) NOT NULL,
   `kd_po_nk` varchar(255) NOT NULL,
   `keterangan` text NOT NULL,
@@ -6137,10 +6137,10 @@ CREATE TABLE `tb_file_bukti_beli` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_file_bukti_beli`
+-- Dumping data untuk tabel `tbpo_file_bukti_beli`
 --
 
-INSERT INTO `tb_file_bukti_beli` (`id_fk_bukti`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
+INSERT INTO `tbpo_file_bukti_beli` (`id_fk_bukti`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
 (1, 'NKPO0909240001', '-', 'KEU01', '2024091725850629', '2024091725850629.jpeg', '2024-09-09 02:57:09'),
 (2, 'NKPO0309240001', 'Suda dibelikan 5/9/24', 'KEU02', '2024091725854734', '2024091725854734.jpeg', '2024-09-09 04:05:34'),
 (3, 'NKPO0409240003', 'Suda diambil tgl 5/9/24', 'KEU02', '2024091725855501', '2024091725855501.jpeg', '2024-09-09 04:18:21'),
@@ -6150,10 +6150,10 @@ INSERT INTO `tb_file_bukti_beli` (`id_fk_bukti`, `kd_po_nk`, `keterangan`, `user
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_file_nk`
+-- Struktur dari tabel `tbpo_file_nk`
 --
 
-CREATE TABLE `tb_file_nk` (
+CREATE TABLE `tbpo_file_nk` (
   `id_file_nk` int(11) NOT NULL,
   `kd_po_nk` varchar(255) NOT NULL,
   `keterangan` text NOT NULL,
@@ -6164,10 +6164,10 @@ CREATE TABLE `tb_file_nk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_file_nk`
+-- Dumping data untuk tabel `tbpo_file_nk`
 --
 
-INSERT INTO `tb_file_nk` (`id_file_nk`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
+INSERT INTO `tbpo_file_nk` (`id_file_nk`, `kd_po_nk`, `keterangan`, `user_upload`, `file_name`, `file_uploaded`, `create_at`) VALUES
 (1, 'NKPO1107240002', 'a', 'KARYAWAN2', '2024071720662093', '2024071720662093.png', '2024-07-11 01:41:33'),
 (2, 'NKPO1107240001', 'Penawaran Pengecatan Pagar BRC', 'KARYAWAN4', '2024071720662385', '2024071720662385.png', '2024-07-11 01:46:25'),
 (3, 'NKPO1107240003', 'Surat Penawaran', 'KARYAWAN4', '2024071720664485', '2024071720664485.JPG', '2024-07-11 02:21:25'),
@@ -6195,20 +6195,20 @@ INSERT INTO `tb_file_nk` (`id_file_nk`, `kd_po_nk`, `keterangan`, `user_upload`,
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_generate_kd`
+-- Struktur dari tabel `tbpo_generate_kd`
 --
 
-CREATE TABLE `tb_generate_kd` (
+CREATE TABLE `tbpo_generate_kd` (
   `id` int(11) NOT NULL,
   `kd_barang` varchar(25) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_generate_kd`
+-- Dumping data untuk tabel `tbpo_generate_kd`
 --
 
-INSERT INTO `tb_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
+INSERT INTO `tbpo_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
 (1, 'PONK0812230001', '2023-12-08 06:21:24'),
 (2, 'PONK1005240001', '2024-05-10 02:22:01'),
 (3, 'PONK1005240002', '2024-05-10 02:22:47'),
@@ -6629,10 +6629,10 @@ INSERT INTO `tb_generate_kd` (`id`, `kd_barang`, `create_at`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_notetemplate`
+-- Struktur dari tabel `tbpo_notetemplate`
 --
 
-CREATE TABLE `tb_notetemplate` (
+CREATE TABLE `tbpo_notetemplate` (
   `id_nt_template` int(12) NOT NULL,
   `kd_nt_template` varchar(255) NOT NULL,
   `nama_note` text NOT NULL,
@@ -6646,10 +6646,10 @@ CREATE TABLE `tb_notetemplate` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_notetemplate`
+-- Dumping data untuk tabel `tbpo_notetemplate`
 --
 
-INSERT INTO `tb_notetemplate` (`id_nt_template`, `kd_nt_template`, `nama_note`, `shipment_to`, `alamat_ship`, `cp_shipment`, `no_cp`, `ket_1`, `ket_2`, `create_at`) VALUES
+INSERT INTO `tbpo_notetemplate` (`id_nt_template`, `kd_nt_template`, `nama_note`, `shipment_to`, `alamat_ship`, `cp_shipment`, `no_cp`, `ket_1`, `ket_2`, `create_at`) VALUES
 (1, 'KDNT2410230001', 'Format Karisma Jember', 'PT Karisma Indoagro Universal', 'Jl. Semeru No. 89, Ajung, Jember', 'Nandang Ernoko', '081 131 361 66 / 081 252 151 314', '* Apabila ada perubahan kemasan, isi, ataupun logo, mohon di informasikan\r\n* Kedatangan barang maksimal: \r\nSenin s/d Jumat maksimal Jam 14:00 ,\r\nSabtu maksimal Jam 11:00\r\n* Maksimal terdiri dari 2 No. Batch\r\n* Mohon info terlebih dahulu,\r\njika Exp. date kurang dari 2 tahun sejak PO ini diterbitkan.tks\r\n', '', '2023-11-06 03:10:53'),
 (2, 'KDNT2410230002', 'Format Karisma Cabang Kalimantan', 'CABANG KALIMANTAN SELATAN', 'Pergudangan BIZPARK Blok A1 No. 1 Jl. Gubernur Subarjo - BANJARMASIN', 'Indra Setiawan ', '082-231-372-038', 'Tolong Sertakan Data Nomor Batch / Lot, dan Tanggal Kadaluarsa Produk Pada Setiap Surat Pengiriman / Muat Barang.\r\n', '', '2023-11-06 03:13:53'),
 (3, 'KDNT1411230001', 'Ship To BTM', 'Berkah Tani Mukti (GUDANG BERKAH TANI MUKTI JATILENGGER)', 'Jl. Raya Kediri-Blitar (Hotel Ilhami Kec. Ponggok ke Timur 100 m, posisi utara jalan, banyak pohon palem)-082112390126', 'Bpk. Michael Permadi ', '082179798181', '* Mohon konfirmasi dahulu jika Exp. Date kurang dari 2 tahun sejak PO ini diterbitkan, maksimal terdiri dari 2 No. Batch', '', '2024-01-31 08:43:11'),
@@ -6669,10 +6669,10 @@ INSERT INTO `tb_notetemplate` (`id_nt_template`, `kd_nt_template`, `nama_note`, 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_note_barang`
+-- Struktur dari tabel `tbpo_note_barang`
 --
 
-CREATE TABLE `tb_note_barang` (
+CREATE TABLE `tbpo_note_barang` (
   `id_nt_barang` int(25) NOT NULL,
   `kd_po` varchar(25) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
@@ -6682,10 +6682,10 @@ CREATE TABLE `tb_note_barang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_note_barang`
+-- Dumping data untuk tabel `tbpo_note_barang`
 --
 
-INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
+INSERT INTO `tbpo_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
 (1, 'MKPO010424JAWAA010001', 'JAWAA01', '*Harga Include PPN 11%\n*Bonus Kaos Pinamec, 1 L = 1 kaos (1375 pcs)', '', '0000-00-00 00:00:00'),
 (2, 'KPOREV0104240003', 'JAWAA01', '*Revisi isi per box pinamec 1 ltr & bonus kaos\n*Harga Include PPN 11%\r\n*Bonus Kaos Pinamec, 1 L = 1 kaos (1625 pcs)', '', '0000-00-00 00:00:00'),
 (3, 'NKPO010424WINON010004', 'WINON01', '*Mohon Label Expired Date sudah tertempel di tiap-tiap Pack\n*Barang terdiri dari 1 nomor Lot, dengan tgl expired terpanjang', '', '0000-00-00 00:00:00'),
@@ -6983,7 +6983,7 @@ INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`,
 (298, 'KPOREV2606240005', 'PETRO01', '*REVISI ke-3\r\n*Mohon dikirim dahulu barang2 sbb :\r\n1. Applaud 400 gr : 150 box\r\n2. Petrokum 100 gr : 120 box\r\n3. Topsin 200 ml : 50 box\r\n4. Topsin 500 ml : 100 box\r\n* TOP 30 hari sejak barang masuk gudang kami\r\n* Sisa pending jangan dikirim dahulu, pengriman menunggu konfirmasi\r\ndari kami, jika dikirim tanpa konfirmasi mohon maaf tidak bisa kami\r\nterima,tks.', '', '2024-06-26 07:19:07'),
 (299, 'MKPO260624KARUN030007', 'KARUN03', '* Harga Include PPN 11%\r\n* 2x pengiriman  @200 box setiap minggu', '', '2024-06-26 07:41:44'),
 (300, 'NKPO260624SAPRO030008', 'SAPRO03', '* Harga per box include PPN 11%\r\n* Bonus kaos 500 pcs', '', '2024-06-26 07:46:55');
-INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
+INSERT INTO `tbpo_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
 (301, 'MKPO260624BEHNM010010', 'BEHNM01', '*Harga per box include PPN 11%\r\n* Apabila terdapat ketidaksesuaian, mohon konfirmasi dahulu sebelum\r\nkirim barang.\r\n* dikirim Ekspedisi dari Behn Meyer, Free Ongkir', '', '2024-06-26 08:11:16'),
 (302, 'KPOREV2606240011', 'ROYAL01', '* REVISI\r\n* Karisma dianggap tercapai target Q2 dan semester 1 2024 dan berhak akan insentifnya\r\n* Mohon dikirimkan dulu \r\n1. Agil 100 ml : 100 box\r\n2. Agil 250 ml : 100 box\r\n3. Remazole 100 ml : 25 box\r\nsisanya itip gudang Royal, pengiriman selanjutnya menunggu informasi dari KIU\r\n* Apabila ada yang tidak sesuai, tidak cocok dan tidak setuju dengan yang tertulis di PO ini, mohon di info kepada kami dulu, jangan langsung dikirimkan', '', '2024-06-26 08:26:47'),
 (303, 'MKPO260624JAWAA010012', 'JAWAA01', '*Harga Include PPN 11%', '', '2024-06-26 08:24:37'),
@@ -7219,7 +7219,7 @@ INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`,
 (544, 'NKPO020924SONGG020004', 'SONGG02', '* Barang + Bonus 12 dos TANI SHIP TO :\r\n(di Surat Jalan jangan ditulis Bonus)\r\nBERKAH TANI MUKTI - Gudang JATILENGGER\r\nUp: Mbak Krsitin +62 821-4089-1026\r\n* Mohon dikirim segera\r\n', '', '2024-09-02 04:15:46'),
 (545, 'KPOREV0209240005', 'SINAR01', '* REVISI (qty Reactive)\r\n* Harga per kg/ltr include PPN11%\r\n* Pogram :\r\n- Astana Rp. 1.000\r\n- Hexacar Rp. 2.000\r\n- Logamate Rp. 2.000\r\n- Metachlor Rp. 3.000\r\n- Reactive Rp. 1.000', '', '2024-09-02 04:54:07'),
 (546, 'NKPO020924TEGUH030006', 'TEGUH03', '* Harga per box include PPN 11%\r\n* LOCO Jember\r\n* Exp. date 2029', '', '2024-09-02 08:28:02');
-INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
+INSERT INTO `tbpo_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`, `color_box`, `create_at`) VALUES
 (547, 'NKPO040924KALAT010001', 'KALAT01', '* Harga per box', '', '2024-09-04 02:37:38'),
 (548, 'NKPO040924BAYER010002', 'BAYER01', '* Harga per box', '', '2024-09-04 03:22:04'),
 (549, 'NKPO040924KALAT010003', 'KALAT01', '* Harga per box\r\n* Mohon diaturkan kirim\r\nPengiriman 1\r\n- Gandasil  B 500 gr : 1.000 box\r\n- Gandasil D 500 gr : 1.000 box\r\nPengiriman 2\r\n-Gandasil B 500 gr : 1.000 box\r\n*dikirim menggunakan \"Tronton Threeway\" , sebelum kirim konfirmasi tanggal kirim dahulu ke Pak Nandang', '', '2024-09-04 06:43:54'),
@@ -7333,10 +7333,10 @@ INSERT INTO `tb_note_barang` (`id_nt_barang`, `kd_po`, `kd_suplier`, `isi_note`,
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_note_direktur`
+-- Struktur dari tabel `tbpo_note_direktur`
 --
 
-CREATE TABLE `tb_note_direktur` (
+CREATE TABLE `tbpo_note_direktur` (
   `id_note` int(11) NOT NULL,
   `kd_po` varchar(25) NOT NULL,
   `isi_note` text NOT NULL,
@@ -7348,10 +7348,10 @@ CREATE TABLE `tb_note_direktur` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_note_direktur`
+-- Dumping data untuk tabel `tbpo_note_direktur`
 --
 
-INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
+INSERT INTO `tbpo_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
 (1, 'MKPO010424JAWAA010001', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-04-01 01:42:00'),
 (2, 'MKPO010424JAWAA010001', 'PO ACCEPT', 'KIUDIREKTUR01', 'Agoes Santoso', 1, 1, '2024-04-01 01:45:00'),
 (3, 'MKPO010424AGRIM010002', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-04-01 02:21:00'),
@@ -7843,7 +7843,7 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (493, 'NKPO220524SYNER010005', 'PO ACCEPT', 'KIUDIREKTUR03', 'Yuanita Setiawati', 1, 1, '2024-05-22 06:48:02'),
 (494, 'NKPO220524SARIK020006', 'PO ACCEPT', 'KIUDIREKTUR03', 'Yuanita Setiawati', 1, 1, '2024-05-22 06:48:05'),
 (495, 'NKPO220524SARIK020007', 'PO ACCEPT', 'KIUDIREKTUR03', 'Yuanita Setiawati', 1, 1, '2024-05-22 06:48:08');
-INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
+INSERT INTO `tbpo_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
 (496, 'MKPO220524ASIAN010008', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-05-22 07:11:04'),
 (497, 'MKPO220524ASIAN010008', 'PO ACCEPT', 'KIUDIREKTUR03', 'Yuanita Setiawati', 1, 1, '2024-05-22 07:51:15'),
 (498, 'NKPO2005240005', 'SEDANG DIAJUKAN', 'KEU02', 'Arini', 1, 1, '2024-05-22 07:51:56'),
@@ -8336,7 +8336,7 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (985, 'NKPO290624MEGA010002', 'PO ACCEPT', 'KIUDIREKTUR02', 'Annelia Kartika', 1, 1, '2024-06-29 06:31:29'),
 (986, 'MKPO010724CATUR010001', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-07-01 01:31:29'),
 (987, 'MKPO010724CATUR010001', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-07-01 01:34:52');
-INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
+INSERT INTO `tbpo_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
 (988, 'MKPO010724CATUR010001', 'PO ACCEPT', 'KIUDIREKTUR02', 'Annelia Kartika', 1, 1, '2024-07-01 02:40:17'),
 (989, 'KPOREV0107240002', 'Revisi PO', 'KEU04', 'Tarizqa', 1, 1, '2024-07-01 02:58:32'),
 (990, 'MKPO010724CATUR010002', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-07-01 03:05:10'),
@@ -8824,7 +8824,7 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (2555, 'NKPO0208240002', 'Purchase Order Baru', 'KARYAWAN4', 'Arif', 1, 1, '2024-08-02 03:43:10'),
 (2556, 'NKPO0208240002', 'SEDANG DIAJUKAN - KADEP', 'KARYAWAN4', 'Arif', 1, 1, '2024-08-02 03:45:14'),
 (2557, 'MKPO020824KALAT010001', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-08-02 03:46:08');
-INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
+INSERT INTO `tbpo_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
 (2558, 'MKPO020824EXCEL010002', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-08-02 03:56:07'),
 (2559, 'NKPO0208240001', 'SEDANG DIAJUKAN', 'KEU02', 'Arini', 1, 1, '2024-08-02 03:56:58'),
 (2560, 'MKPO020824KARUN030003', 'Purchase Order Baru', 'KEU04', 'Tarizqa', 1, 1, '2024-08-02 04:03:47'),
@@ -9310,7 +9310,7 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 (3040, 'NKPO0409240003', 'PROSES PEMBELIAN', 'KEU02', 'Arini', 1, 1, '2024-09-09 04:18:21'),
 (3041, 'NKPO0409240003', 'BARANG DI TERIMA', 'KARYAWAN4', 'Arif', 1, 1, '2024-09-09 04:20:10'),
 (3042, 'NKPO0309240001', 'BARANG DI TERIMA', 'KARYAWAN4', 'Arif', 1, 1, '2024-09-09 04:20:18');
-INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
+INSERT INTO `tbpo_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama_user`, `note_for`, `update_status`, `log_create`) VALUES
 (3043, 'NKPO0309240002', 'PROSES PEMBELIAN', 'KEU02', 'Arini', 1, 1, '2024-09-09 04:21:53'),
 (3044, 'KPOREV0909240003', 'Revisi PO', 'KEU03', 'Nadia', 1, 1, '2024-09-09 04:29:46'),
 (3045, 'KPOREV0909240003', 'PO ACCEPT', 'KIUDIREKTUR01', 'Agoes Santoso', 1, 1, '2024-09-09 04:33:04'),
@@ -9601,10 +9601,10 @@ INSERT INTO `tb_note_direktur` (`id_note`, `kd_po`, `isi_note`, `kd_user`, `nama
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_note_pembelian`
+-- Struktur dari tabel `tbpo_note_pembelian`
 --
 
-CREATE TABLE `tb_note_pembelian` (
+CREATE TABLE `tbpo_note_pembelian` (
   `id_nt_pembelian` int(11) NOT NULL,
   `kd_po` varchar(25) NOT NULL,
   `keterangan` text NOT NULL,
@@ -9613,10 +9613,10 @@ CREATE TABLE `tb_note_pembelian` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_note_pembelian`
+-- Dumping data untuk tabel `tbpo_note_pembelian`
 --
 
-INSERT INTO `tb_note_pembelian` (`id_nt_pembelian`, `kd_po`, `keterangan`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_note_pembelian` (`id_nt_pembelian`, `kd_po`, `keterangan`, `kd_user`, `create_at`) VALUES
 (1, 'NKPO1305240001', 'harga belum ongkir', 'KARYAWAN2', '2024-05-13 03:08:44'),
 (2, 'NKPO1005240002', 'Harga berdasarkan pembelian terakhir\r\n\r\ntroli 15/6/17\r\nsapu 18/2/22\r\ncikrak 19/2/24', '', '2024-05-14 02:52:30'),
 (3, 'NKPO1405240008', 'harga terakhir beli di toko serba jaya 1/4/24', '', '2024-05-14 07:45:49'),
@@ -9733,10 +9733,10 @@ INSERT INTO `tb_note_pembelian` (`id_nt_pembelian`, `kd_po`, `keterangan`, `kd_u
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_nt_tmp_pembelian`
+-- Struktur dari tabel `tbpo_nt_tmp_pembelian`
 --
 
-CREATE TABLE `tb_nt_tmp_pembelian` (
+CREATE TABLE `tbpo_nt_tmp_pembelian` (
   `id_tmp_nt_pembelian` int(12) NOT NULL,
   `keterangan` text NOT NULL,
   `kd_user` varchar(25) NOT NULL,
@@ -9744,19 +9744,19 @@ CREATE TABLE `tb_nt_tmp_pembelian` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_nt_tmp_pembelian`
+-- Dumping data untuk tabel `tbpo_nt_tmp_pembelian`
 --
 
-INSERT INTO `tb_nt_tmp_pembelian` (`id_tmp_nt_pembelian`, `keterangan`, `kd_user`, `create_at`) VALUES
+INSERT INTO `tbpo_nt_tmp_pembelian` (`id_tmp_nt_pembelian`, `keterangan`, `kd_user`, `create_at`) VALUES
 (7, 'Pemeliharaan Gedung', 'KEU02', '2024-06-21 06:19:12');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_po`
+-- Struktur dari tabel `tbpo_po`
 --
 
-CREATE TABLE `tb_po` (
+CREATE TABLE `tbpo_po` (
   `id_po` int(11) NOT NULL,
   `kd_po` varchar(255) NOT NULL,
   `no_po` varchar(255) NOT NULL,
@@ -9775,10 +9775,10 @@ CREATE TABLE `tb_po` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_po`
+-- Dumping data untuk tabel `tbpo_po`
 --
 
-INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
+INSERT INTO `tbpo_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
 (1, 'MKPO300324CATUR010006', '007/KIU/III/2024', '2024-03-30', 'CATUR01', 1, 1812850000, 'CANCEL', 11, 0, 90, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '0000-00-00 00:00:00'),
 (2, 'MKPO010424JAWAA010001', '012/KIU/IV/2024', '2024-04-01', 'JAWAA01', 4, 145625000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '0000-00-00 00:00:00'),
 (3, 'MKPO010424AGRIM010002', '006/KIU/IV/2024', '2024-04-01', 'AGRIM01', 1, 400000000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '0000-00-00 00:00:00'),
@@ -10066,7 +10066,7 @@ INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `
 (294, 'KPOREV2106240010', '003/KIU/VI/2024/REV', '2024-06-21', 'WAHAN01', 2, 5050500, 'DONE', 0, 0, 30, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '2024-06-21 04:21:16'),
 (295, 'NKPO210624MEGA010011', '002/KIU/VI/2024', '2024-06-21', 'MEGA01', 1, 261600000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '2024-06-21 06:27:05'),
 (296, 'MKPO210624AGRIM010012', '012/KIU/VI/2024', '2024-06-21', 'AGRIM01', 1, 3750000000, 'DONE', 0, 0, 30, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '2024-06-21 06:46:04');
-INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
+INSERT INTO `tbpo_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
 (297, 'MKPO210624BEHNM010013', '008/KIU/VI/2024', '2024-06-21', 'BEHNM01', 2, 19200000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-06-21 08:09:54'),
 (298, 'MKPO210624KARUN030014', '013/KIU/VI/2024', '2024-06-21', 'KARUN03', 1, 355000000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-06-21 08:29:02'),
 (299, 'NKPO220624BAYER010001', '023/KIU/VI/2024', '2024-06-22', 'BAYER01', 1, 124900000, 'DONE', 11, 0, 90, 'Jember', 'KIUDIREKTUR02', 'KDNT2410230001', '2024-06-22 01:40:39'),
@@ -10351,7 +10351,7 @@ INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `
 (641, 'NKPO050924SARAN040004', '020/KIU/IX/2024', '2024-09-05', 'SARAN04', 1, 2300000, 'DONE', 0, 0, 90, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-09-05 07:34:37'),
 (644, 'NKPO050924BENIH010005', '022/KIU/IX/2024', '2024-09-05', 'BENIH01', 1, 1068000000, 'DONE', 0, 0, 0, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-09-05 07:34:42'),
 (645, 'NKPO050924DANKE010006', '003/KIU/IX/2024', '2024-09-05', 'DANKE01', 2, 295050000, 'DONE', 11, 0, 60, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-09-05 08:02:09');
-INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
+INSERT INTO `tbpo_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `jml_item`, `total_harga`, `status`, `tax`, `hrg_pajak`, `tmpo_pembayaran`, `gdg_pengiriman`, `acc_with`, `kd_printout_note`, `create_at`) VALUES
 (646, 'KPOREV0509240007', '022/KIU/IX/2024', '2024-09-05', 'KALAT01', 4, 1849500000, 'DONE', 11, 0, 30, 'Magetan', 'KIUDIREKTUR01', 'KDNT1803240001', '2024-09-05 08:23:58'),
 (647, 'NKPO060924QTMM0001', '006/KIU/IX/2024', '2024-09-06', 'QTMM', 1, 300000000, 'DONE', 11, 0, 90, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-09-06 05:49:17'),
 (648, 'NKPO060924KENSO010002', '011/KIU/IX/2024', '2024-09-06', 'KENSO01', 1, 24000000, 'DONE', 11, 0, 90, 'Jember', 'KIUDIREKTUR01', 'KDNT2410230001', '2024-09-06 06:53:02'),
@@ -10458,10 +10458,10 @@ INSERT INTO `tb_po` (`id_po`, `kd_po`, `no_po`, `tgl_transaksi`, `kd_suplier`, `
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_po_nk`
+-- Struktur dari tabel `tbpo_po_nk`
 --
 
-CREATE TABLE `tb_po_nk` (
+CREATE TABLE `tbpo_po_nk` (
   `id_po_nk` int(12) NOT NULL,
   `kd_po_nk` varchar(25) NOT NULL,
   `nopo` text NOT NULL,
@@ -10483,10 +10483,10 @@ CREATE TABLE `tb_po_nk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_po_nk`
+-- Dumping data untuk tabel `tbpo_po_nk`
 --
 
-INSERT INTO `tb_po_nk` (`id_po_nk`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `tax`, `hrg_pajak`, `hrg_nyata`, `status_hrg_nyata`, `acc_with`, `acc_with_kadep`, `create_at`) VALUES
+INSERT INTO `tbpo_po_nk` (`id_po_nk`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `tgl_transaksi`, `jml_item`, `total_harga`, `status`, `departemen`, `tj_pembelian`, `tax`, `hrg_pajak`, `hrg_nyata`, `status_hrg_nyata`, `acc_with`, `acc_with_kadep`, `create_at`) VALUES
 (2, 'NKPO1005240002', '001/10/05/2024', 'KARYAWAN3', 'Bayu', '2024-05-10', 8, 0, 'DONE', 'LOGISTIK', 'Kebutuhan Inventaris Gudang Mei 2024', 0, 0, 0, 0, 'KIUDIREKTUR02', 'KADEP03', '2024-05-14 08:45:47'),
 (3, 'NKPO1005240003', '004/10/05/2024', 'KARYAWAN5', 'Nita', '2024-05-10', 11, 0, 'DONE', 'SALES', 'Kebutuhan ATK Mei 2024', 0, 0, 0, 0, 'KIUDIREKTUR03', 'KADEP02', '2024-05-17 03:23:14'),
 (7, 'NKPO1005240005', '003/10/05/2024', 'KARYAWAN1', 'Ika', '2024-05-10', 4, 92500, 'DONE', 'KEAUANGAN', 'untuk arsip Dokumen(Adhin)', 0, 0, 0, 0, 'KIUDIREKTUR02', 'KADEP01', '2024-05-14 08:45:34'),
@@ -10650,19 +10650,19 @@ INSERT INTO `tb_po_nk` (`id_po_nk`, `kd_po_nk`, `nopo`, `kd_user`, `nm_user`, `t
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_satuan`
+-- Struktur dari tabel `tbpo_satuan`
 --
 
-CREATE TABLE `tb_satuan` (
+CREATE TABLE `tbpo_satuan` (
   `id_satuan` int(5) NOT NULL,
   `nm_satuan` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_satuan`
+-- Dumping data untuk tabel `tbpo_satuan`
 --
 
-INSERT INTO `tb_satuan` (`id_satuan`, `nm_satuan`) VALUES
+INSERT INTO `tbpo_satuan` (`id_satuan`, `nm_satuan`) VALUES
 (1, 'Btl'),
 (2, 'Pcs'),
 (3, 'Box'),
@@ -10680,10 +10680,10 @@ INSERT INTO `tb_satuan` (`id_satuan`, `nm_satuan`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_set_note`
+-- Struktur dari tabel `tbpo_set_note`
 --
 
-CREATE TABLE `tb_set_note` (
+CREATE TABLE `tbpo_set_note` (
   `id_set_note` int(5) NOT NULL,
   `note` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -10691,19 +10691,19 @@ CREATE TABLE `tb_set_note` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_set_tax`
+-- Struktur dari tabel `tbpo_set_tax`
 --
 
-CREATE TABLE `tb_set_tax` (
+CREATE TABLE `tbpo_set_tax` (
   `id_tax` int(5) NOT NULL,
   `nm_tax` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_set_tax`
+-- Dumping data untuk tabel `tbpo_set_tax`
 --
 
-INSERT INTO `tb_set_tax` (`id_tax`, `nm_tax`) VALUES
+INSERT INTO `tbpo_set_tax` (`id_tax`, `nm_tax`) VALUES
 (1, 0),
 (2, 20),
 (3, 11);
@@ -10711,10 +10711,10 @@ INSERT INTO `tb_set_tax` (`id_tax`, `nm_tax`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_suplier`
+-- Struktur dari tabel `tbpo_suplier`
 --
 
-CREATE TABLE `tb_suplier` (
+CREATE TABLE `tbpo_suplier` (
   `id_suplier` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `nama_suplier` text NOT NULL,
@@ -10726,10 +10726,10 @@ CREATE TABLE `tb_suplier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_suplier`
+-- Dumping data untuk tabel `tbpo_suplier`
 --
 
-INSERT INTO `tb_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`, `alamat_suplier`, `no_telpon`, `no_fax`, `email`, `gbr_logo`) VALUES
+INSERT INTO `tbpo_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`, `alamat_suplier`, `no_telpon`, `no_fax`, `email`, `gbr_logo`) VALUES
 (1, 'SAPRO01', ' CV .Saprotan Utama', 'Bangkong Plaza C-7', '-', '-', '-', '-'),
 (2, 'SUMBE15', ' CV.Sumber Bahagia', 'Jl. Dorowati Timur No. 51 RT. 01 / RW. 08 Mulyoarjo', '-', '-', '-', '-'),
 (3, 'ADITY01', ' CV.Aditya Sentana Agro', 'Jl. Kertanegara No. 87 Karangploso', '0341 461 647', '0341 461 647', '-', '-'),
@@ -10999,10 +10999,10 @@ INSERT INTO `tb_suplier` (`id_suplier`, `kd_suplier`, `nama_suplier`, `alamat_su
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tmp_diskon`
+-- Struktur dari tabel `tbpo_tmp_diskon`
 --
 
-CREATE TABLE `tb_tmp_diskon` (
+CREATE TABLE `tbpo_tmp_diskon` (
   `id_tmp_diskon` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `nama_diskon` text NOT NULL,
@@ -11011,19 +11011,19 @@ CREATE TABLE `tb_tmp_diskon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_tmp_diskon`
+-- Dumping data untuk tabel `tbpo_tmp_diskon`
 --
 
-INSERT INTO `tb_tmp_diskon` (`id_tmp_diskon`, `kd_suplier`, `nama_diskon`, `nominal`, `create_at`) VALUES
+INSERT INTO `tbpo_tmp_diskon` (`id_tmp_diskon`, `kd_suplier`, `nama_diskon`, `nominal`, `create_at`) VALUES
 (26, 'ADVAN02', 'Disc. R1 5%', 592500, '2024-08-15 02:24:28');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tmp_item`
+-- Struktur dari tabel `tbpo_tmp_item`
 --
 
-CREATE TABLE `tb_tmp_item` (
+CREATE TABLE `tbpo_tmp_item` (
   `id_tmp` int(11) NOT NULL,
   `kode_barang` varchar(255) NOT NULL,
   `kd_user` varchar(25) NOT NULL,
@@ -11036,10 +11036,10 @@ CREATE TABLE `tb_tmp_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_tmp_item`
+-- Dumping data untuk tabel `tbpo_tmp_item`
 --
 
-INSERT INTO `tb_tmp_item` (`id_tmp`, `kode_barang`, `kd_user`, `nama_barang`, `kode_suplier`, `satuan`, `qty`, `harga_satuan`, `total_harga`) VALUES
+INSERT INTO `tbpo_tmp_item` (`id_tmp`, `kode_barang`, `kd_user`, `nama_barang`, `kode_suplier`, `satuan`, `qty`, `harga_satuan`, `total_harga`) VALUES
 (1135, 'QBLAS01', '', 'Blast 200 SC 20 X 500 ml', 'AGRIC01', 'Box', 100, 1248000, 124800000),
 (1940, 'QFLAS01', '', 'Flash 40 X 100 ml', 'GOLDE02', 'Box', 25, 1420000, 35500000),
 (2588, 'QCABE67', '', 'Cabe Rawit Shima 10 X 10 x 10 gr', 'ADVAN02', 'Box', 2, 5000000, 10000000),
@@ -11048,10 +11048,10 @@ INSERT INTO `tb_tmp_item` (`id_tmp`, `kode_barang`, `kd_user`, `nama_barang`, `k
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tmp_item_nk`
+-- Struktur dari tabel `tbpo_tmp_item_nk`
 --
 
-CREATE TABLE `tb_tmp_item_nk` (
+CREATE TABLE `tbpo_tmp_item_nk` (
   `id_tmp_nk` int(11) NOT NULL,
   `nama_barang` text NOT NULL,
   `deskripsi` text NOT NULL,
@@ -11066,20 +11066,20 @@ CREATE TABLE `tb_tmp_item_nk` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_tmp_item_nk`
+-- Dumping data untuk tabel `tbpo_tmp_item_nk`
 --
 
-INSERT INTO `tb_tmp_item_nk` (`id_tmp_nk`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `total_harga`, `kd_barang`, `kd_user`, `gbr_produk`, `create_at`) VALUES
+INSERT INTO `tbpo_tmp_item_nk` (`id_tmp_nk`, `nama_barang`, `deskripsi`, `keterangan`, `qty`, `hrg_satuan`, `total_harga`, `kd_barang`, `kd_user`, `gbr_produk`, `create_at`) VALUES
 (200, 'Pengecatan Pintu Gudang ', '10 pintu', 'Vendor : DNY Printing, PIC Vendor : Fandy, Waktu Pengerjaan: Juli 2024', 0, 3400000, 0, 'PONK2106240001', 'KEU02', '', '2024-06-21 06:23:21'),
 (301, 'Tipe X kertas kecil', '', '', 0, 11, 0, 'PONK2307240024', 'KEU02', 'Karisma.png', '2024-07-23 07:31:33');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tmp_note_barang`
+-- Struktur dari tabel `tbpo_tmp_note_barang`
 --
 
-CREATE TABLE `tb_tmp_note_barang` (
+CREATE TABLE `tbpo_tmp_note_barang` (
   `id_nt_tmp_barang` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `isi_note` text NOT NULL,
@@ -11087,30 +11087,30 @@ CREATE TABLE `tb_tmp_note_barang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_tmp_note_barang`
+-- Dumping data untuk tabel `tbpo_tmp_note_barang`
 --
 
-INSERT INTO `tb_tmp_note_barang` (`id_nt_tmp_barang`, `kd_suplier`, `isi_note`, `create_at`) VALUES
+INSERT INTO `tbpo_tmp_note_barang` (`id_nt_tmp_barang`, `kd_suplier`, `isi_note`, `create_at`) VALUES
 (385, 'KHARI01', '', '2024-01-13 01:55:52'),
 (1043, 'ADVAN02', '*Revisi discount\r\n\r\n*Pemberitahuan Libur Karisma Gathering 2024:\r\n- 13 Agustus 2024 = Kegiatan terakhir bongkar-muat barang PT. Karisma\r\nIndoagro Universal\r\n- 19 Agustus 2024 = Kegiatan operasional perusahaan aktif kembali', '2024-08-15 02:25:01');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tmp_tax`
+-- Struktur dari tabel `tbpo_tmp_tax`
 --
 
-CREATE TABLE `tb_tmp_tax` (
+CREATE TABLE `tbpo_tmp_tax` (
   `id_tmp_tax` int(11) NOT NULL,
   `kd_suplier` varchar(25) NOT NULL,
   `tax` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Dumping data untuk tabel `tb_tmp_tax`
+-- Dumping data untuk tabel `tbpo_tmp_tax`
 --
 
-INSERT INTO `tb_tmp_tax` (`id_tmp_tax`, `kd_suplier`, `tax`) VALUES
+INSERT INTO `tbpo_tmp_tax` (`id_tmp_tax`, `kd_suplier`, `tax`) VALUES
 (442, 'KHARI01', 0),
 (867, 'GOLDE02', 11),
 (1190, 'ADVAN02', 0);
@@ -11118,10 +11118,10 @@ INSERT INTO `tb_tmp_tax` (`id_tmp_tax`, `kd_suplier`, `tax`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_tracking_po`
+-- Struktur dari tabel `tbpo_tracking_po`
 --
 
-CREATE TABLE `tb_tracking_po` (
+CREATE TABLE `tbpo_tracking_po` (
   `id_po_tracking` int(11) NOT NULL,
   `kd_po` varchar(255) NOT NULL,
   `status` text NOT NULL,
@@ -11131,10 +11131,10 @@ CREATE TABLE `tb_tracking_po` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_user`
+-- Struktur dari tabel `tbpo_user`
 --
 
-CREATE TABLE `tb_user` (
+CREATE TABLE `tbpo_user` (
   `id_user` int(12) NOT NULL,
   `kode_user` varchar(25) NOT NULL,
   `nama_user` text NOT NULL,
@@ -11145,10 +11145,10 @@ CREATE TABLE `tb_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `tb_user`
+-- Dumping data untuk tabel `tbpo_user`
 --
 
-INSERT INTO `tb_user` (`id_user`, `kode_user`, `nama_user`, `username`, `password`, `aksess_lv`, `departement`) VALUES
+INSERT INTO `tbpo_user` (`id_user`, `kode_user`, `nama_user`, `username`, `password`, `aksess_lv`, `departement`) VALUES
 (1, 'KIUADMIN', 'Admin', 'admin', '$2y$10$seJv4qBUldBZQUjvoWUxGuJvtNsO.cLzT.9IGqshkdla6QLxladGW', 1, 'Admin'),
 (4, 'KEU01', 'Supriyanto', 'keuangan1', '$2y$10$sCheJ3KQmaL2uUEOKLvmLuC2ixXcq6r5L9TN37eGZzAehKfDoBKvC', 2, 'KEUANGAN'),
 (5, 'KIUDIREKTUR01', 'Agoes Santoso', 'direktur1', '$2y$10$fKtWlc8KmnuSxrq7p98k8.WCGk7vS38md0A1AY5gyskiMrE8z5zIK', 3, 'DIREKTUR'),
@@ -11178,153 +11178,153 @@ INSERT INTO `tb_user` (`id_user`, `kode_user`, `nama_user`, `username`, `passwor
 --
 
 --
--- Indeks untuk tabel `tb_barang`
+-- Indeks untuk tabel `tbpo_barang`
 --
-ALTER TABLE `tb_barang`
+ALTER TABLE `tbpo_barang`
   ADD PRIMARY KEY (`id_barang`);
 
 --
--- Indeks untuk tabel `tb_detail_po`
+-- Indeks untuk tabel `tbpo_detail_po`
 --
-ALTER TABLE `tb_detail_po`
+ALTER TABLE `tbpo_detail_po`
   ADD PRIMARY KEY (`id_det_po`);
 
 --
--- Indeks untuk tabel `tb_detail_po_nk`
+-- Indeks untuk tabel `tbpo_detail_po_nk`
 --
-ALTER TABLE `tb_detail_po_nk`
+ALTER TABLE `tbpo_detail_po_nk`
   ADD PRIMARY KEY (`id_det_po_nk`);
 
 --
--- Indeks untuk tabel `tb_diskon`
+-- Indeks untuk tabel `tbpo_diskon`
 --
-ALTER TABLE `tb_diskon`
+ALTER TABLE `tbpo_diskon`
   ADD PRIMARY KEY (`id_diskon`);
 
 --
--- Indeks untuk tabel `tb_file_bukti_beli`
+-- Indeks untuk tabel `tbpo_file_bukti_beli`
 --
-ALTER TABLE `tb_file_bukti_beli`
+ALTER TABLE `tbpo_file_bukti_beli`
   ADD PRIMARY KEY (`id_fk_bukti`);
 
 --
--- Indeks untuk tabel `tb_file_nk`
+-- Indeks untuk tabel `tbpo_file_nk`
 --
-ALTER TABLE `tb_file_nk`
+ALTER TABLE `tbpo_file_nk`
   ADD PRIMARY KEY (`id_file_nk`);
 
 --
--- Indeks untuk tabel `tb_generate_kd`
+-- Indeks untuk tabel `tbpo_generate_kd`
 --
-ALTER TABLE `tb_generate_kd`
+ALTER TABLE `tbpo_generate_kd`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_notetemplate`
+-- Indeks untuk tabel `tbpo_notetemplate`
 --
-ALTER TABLE `tb_notetemplate`
+ALTER TABLE `tbpo_notetemplate`
   ADD PRIMARY KEY (`id_nt_template`);
 
 --
--- Indeks untuk tabel `tb_note_barang`
+-- Indeks untuk tabel `tbpo_note_barang`
 --
-ALTER TABLE `tb_note_barang`
+ALTER TABLE `tbpo_note_barang`
   ADD PRIMARY KEY (`id_nt_barang`);
 
 --
--- Indeks untuk tabel `tb_note_direktur`
+-- Indeks untuk tabel `tbpo_note_direktur`
 --
-ALTER TABLE `tb_note_direktur`
+ALTER TABLE `tbpo_note_direktur`
   ADD PRIMARY KEY (`id_note`);
 
 --
--- Indeks untuk tabel `tb_note_pembelian`
+-- Indeks untuk tabel `tbpo_note_pembelian`
 --
-ALTER TABLE `tb_note_pembelian`
+ALTER TABLE `tbpo_note_pembelian`
   ADD PRIMARY KEY (`id_nt_pembelian`);
 
 --
--- Indeks untuk tabel `tb_nt_tmp_pembelian`
+-- Indeks untuk tabel `tbpo_nt_tmp_pembelian`
 --
-ALTER TABLE `tb_nt_tmp_pembelian`
+ALTER TABLE `tbpo_nt_tmp_pembelian`
   ADD PRIMARY KEY (`id_tmp_nt_pembelian`);
 
 --
--- Indeks untuk tabel `tb_po`
+-- Indeks untuk tabel `tbpo_po`
 --
-ALTER TABLE `tb_po`
+ALTER TABLE `tbpo_po`
   ADD PRIMARY KEY (`id_po`);
 
 --
--- Indeks untuk tabel `tb_po_nk`
+-- Indeks untuk tabel `tbpo_po_nk`
 --
-ALTER TABLE `tb_po_nk`
+ALTER TABLE `tbpo_po_nk`
   ADD PRIMARY KEY (`id_po_nk`);
 
 --
--- Indeks untuk tabel `tb_satuan`
+-- Indeks untuk tabel `tbpo_satuan`
 --
-ALTER TABLE `tb_satuan`
+ALTER TABLE `tbpo_satuan`
   ADD PRIMARY KEY (`id_satuan`);
 
 --
--- Indeks untuk tabel `tb_set_note`
+-- Indeks untuk tabel `tbpo_set_note`
 --
-ALTER TABLE `tb_set_note`
+ALTER TABLE `tbpo_set_note`
   ADD PRIMARY KEY (`id_set_note`);
 
 --
--- Indeks untuk tabel `tb_set_tax`
+-- Indeks untuk tabel `tbpo_set_tax`
 --
-ALTER TABLE `tb_set_tax`
+ALTER TABLE `tbpo_set_tax`
   ADD PRIMARY KEY (`id_tax`);
 
 --
--- Indeks untuk tabel `tb_suplier`
+-- Indeks untuk tabel `tbpo_suplier`
 --
-ALTER TABLE `tb_suplier`
+ALTER TABLE `tbpo_suplier`
   ADD PRIMARY KEY (`id_suplier`);
 
 --
--- Indeks untuk tabel `tb_tmp_diskon`
+-- Indeks untuk tabel `tbpo_tmp_diskon`
 --
-ALTER TABLE `tb_tmp_diskon`
+ALTER TABLE `tbpo_tmp_diskon`
   ADD PRIMARY KEY (`id_tmp_diskon`);
 
 --
--- Indeks untuk tabel `tb_tmp_item`
+-- Indeks untuk tabel `tbpo_tmp_item`
 --
-ALTER TABLE `tb_tmp_item`
+ALTER TABLE `tbpo_tmp_item`
   ADD PRIMARY KEY (`id_tmp`);
 
 --
--- Indeks untuk tabel `tb_tmp_item_nk`
+-- Indeks untuk tabel `tbpo_tmp_item_nk`
 --
-ALTER TABLE `tb_tmp_item_nk`
+ALTER TABLE `tbpo_tmp_item_nk`
   ADD PRIMARY KEY (`id_tmp_nk`);
 
 --
--- Indeks untuk tabel `tb_tmp_note_barang`
+-- Indeks untuk tabel `tbpo_tmp_note_barang`
 --
-ALTER TABLE `tb_tmp_note_barang`
+ALTER TABLE `tbpo_tmp_note_barang`
   ADD PRIMARY KEY (`id_nt_tmp_barang`);
 
 --
--- Indeks untuk tabel `tb_tmp_tax`
+-- Indeks untuk tabel `tbpo_tmp_tax`
 --
-ALTER TABLE `tb_tmp_tax`
+ALTER TABLE `tbpo_tmp_tax`
   ADD PRIMARY KEY (`id_tmp_tax`);
 
 --
--- Indeks untuk tabel `tb_tracking_po`
+-- Indeks untuk tabel `tbpo_tracking_po`
 --
-ALTER TABLE `tb_tracking_po`
+ALTER TABLE `tbpo_tracking_po`
   ADD PRIMARY KEY (`id_po_tracking`);
 
 --
--- Indeks untuk tabel `tb_user`
+-- Indeks untuk tabel `tbpo_user`
 --
-ALTER TABLE `tb_user`
+ALTER TABLE `tbpo_user`
   ADD PRIMARY KEY (`id_user`);
 
 --
@@ -11332,153 +11332,153 @@ ALTER TABLE `tb_user`
 --
 
 --
--- AUTO_INCREMENT untuk tabel `tb_barang`
+-- AUTO_INCREMENT untuk tabel `tbpo_barang`
 --
-ALTER TABLE `tb_barang`
+ALTER TABLE `tbpo_barang`
   MODIFY `id_barang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3524;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_detail_po`
+-- AUTO_INCREMENT untuk tabel `tbpo_detail_po`
 --
-ALTER TABLE `tb_detail_po`
+ALTER TABLE `tbpo_detail_po`
   MODIFY `id_det_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1549;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_detail_po_nk`
+-- AUTO_INCREMENT untuk tabel `tbpo_detail_po_nk`
 --
-ALTER TABLE `tb_detail_po_nk`
+ALTER TABLE `tbpo_detail_po_nk`
   MODIFY `id_det_po_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=614;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_diskon`
+-- AUTO_INCREMENT untuk tabel `tbpo_diskon`
 --
-ALTER TABLE `tb_diskon`
+ALTER TABLE `tbpo_diskon`
   MODIFY `id_diskon` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=724;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_file_bukti_beli`
+-- AUTO_INCREMENT untuk tabel `tbpo_file_bukti_beli`
 --
-ALTER TABLE `tb_file_bukti_beli`
+ALTER TABLE `tbpo_file_bukti_beli`
   MODIFY `id_fk_bukti` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_file_nk`
+-- AUTO_INCREMENT untuk tabel `tbpo_file_nk`
 --
-ALTER TABLE `tb_file_nk`
+ALTER TABLE `tbpo_file_nk`
   MODIFY `id_file_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_generate_kd`
+-- AUTO_INCREMENT untuk tabel `tbpo_generate_kd`
 --
-ALTER TABLE `tb_generate_kd`
+ALTER TABLE `tbpo_generate_kd`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=623;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_notetemplate`
+-- AUTO_INCREMENT untuk tabel `tbpo_notetemplate`
 --
-ALTER TABLE `tb_notetemplate`
+ALTER TABLE `tbpo_notetemplate`
   MODIFY `id_nt_template` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_note_barang`
+-- AUTO_INCREMENT untuk tabel `tbpo_note_barang`
 --
-ALTER TABLE `tb_note_barang`
+ALTER TABLE `tbpo_note_barang`
   MODIFY `id_nt_barang` int(25) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=662;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_note_direktur`
+-- AUTO_INCREMENT untuk tabel `tbpo_note_direktur`
 --
-ALTER TABLE `tb_note_direktur`
+ALTER TABLE `tbpo_note_direktur`
   MODIFY `id_note` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3329;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_note_pembelian`
+-- AUTO_INCREMENT untuk tabel `tbpo_note_pembelian`
 --
-ALTER TABLE `tb_note_pembelian`
+ALTER TABLE `tbpo_note_pembelian`
   MODIFY `id_nt_pembelian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_nt_tmp_pembelian`
+-- AUTO_INCREMENT untuk tabel `tbpo_nt_tmp_pembelian`
 --
-ALTER TABLE `tb_nt_tmp_pembelian`
+ALTER TABLE `tbpo_nt_tmp_pembelian`
   MODIFY `id_tmp_nt_pembelian` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_po`
+-- AUTO_INCREMENT untuk tabel `tbpo_po`
 --
-ALTER TABLE `tb_po`
+ALTER TABLE `tbpo_po`
   MODIFY `id_po` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=754;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_po_nk`
+-- AUTO_INCREMENT untuk tabel `tbpo_po_nk`
 --
-ALTER TABLE `tb_po_nk`
+ALTER TABLE `tbpo_po_nk`
   MODIFY `id_po_nk` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=240;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_satuan`
+-- AUTO_INCREMENT untuk tabel `tbpo_satuan`
 --
-ALTER TABLE `tb_satuan`
+ALTER TABLE `tbpo_satuan`
   MODIFY `id_satuan` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_set_note`
+-- AUTO_INCREMENT untuk tabel `tbpo_set_note`
 --
-ALTER TABLE `tb_set_note`
+ALTER TABLE `tbpo_set_note`
   MODIFY `id_set_note` int(5) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_set_tax`
+-- AUTO_INCREMENT untuk tabel `tbpo_set_tax`
 --
-ALTER TABLE `tb_set_tax`
+ALTER TABLE `tbpo_set_tax`
   MODIFY `id_tax` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_suplier`
+-- AUTO_INCREMENT untuk tabel `tbpo_suplier`
 --
-ALTER TABLE `tb_suplier`
+ALTER TABLE `tbpo_suplier`
   MODIFY `id_suplier` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=266;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tmp_diskon`
+-- AUTO_INCREMENT untuk tabel `tbpo_tmp_diskon`
 --
-ALTER TABLE `tb_tmp_diskon`
+ALTER TABLE `tbpo_tmp_diskon`
   MODIFY `id_tmp_diskon` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tmp_item`
+-- AUTO_INCREMENT untuk tabel `tbpo_tmp_item`
 --
-ALTER TABLE `tb_tmp_item`
+ALTER TABLE `tbpo_tmp_item`
   MODIFY `id_tmp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2979;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tmp_item_nk`
+-- AUTO_INCREMENT untuk tabel `tbpo_tmp_item_nk`
 --
-ALTER TABLE `tb_tmp_item_nk`
+ALTER TABLE `tbpo_tmp_item_nk`
   MODIFY `id_tmp_nk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=422;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tmp_note_barang`
+-- AUTO_INCREMENT untuk tabel `tbpo_tmp_note_barang`
 --
-ALTER TABLE `tb_tmp_note_barang`
+ALTER TABLE `tbpo_tmp_note_barang`
   MODIFY `id_nt_tmp_barang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1204;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tmp_tax`
+-- AUTO_INCREMENT untuk tabel `tbpo_tmp_tax`
 --
-ALTER TABLE `tb_tmp_tax`
+ALTER TABLE `tbpo_tmp_tax`
   MODIFY `id_tmp_tax` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1362;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_tracking_po`
+-- AUTO_INCREMENT untuk tabel `tbpo_tracking_po`
 --
-ALTER TABLE `tb_tracking_po`
+ALTER TABLE `tbpo_tracking_po`
   MODIFY `id_po_tracking` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_user`
+-- AUTO_INCREMENT untuk tabel `tbpo_user`
 --
-ALTER TABLE `tb_user`
+ALTER TABLE `tbpo_user`
   MODIFY `id_user` int(12) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 COMMIT;
 

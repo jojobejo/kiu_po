@@ -5,16 +5,16 @@ Tanggal: 2026-07-02
 ## Modul
 
 - Route: `postatusnk/`
-- Tabel utama: `tb_po_nk`
-- Tabel referensi user: `tb_user`
+- Tabel utama: `tbpo_po_nk`
+- Tabel referensi user: `tbpo_user`
 
 ## Sumber Data
 
 Halaman `postatusnk/` mengambil data dari:
 
 ```sql
-FROM tb_po_nk a
-JOIN tb_user b ON b.kode_user = a.kd_user
+FROM tbpo_po_nk a
+JOIN tbpo_user b ON b.kode_user = a.kd_user
 ```
 
 ## Perubahan Query
@@ -47,4 +47,4 @@ Tidak ada tabel baru, kolom baru, index baru, atau migrasi SQL yang diperlukan u
 
 ## Catatan Operasional
 
-Kolom `nama_user` dari `tb_user` tetap ditampilkan sebagai informasi pembuat PO, tetapi tidak lagi menjadi dasar filter data pada halaman `postatusnk/`.
+Kolom `nama_user` dari `tbpo_user` tetap ditampilkan sebagai informasi pembuat PO, tetapi tidak lagi menjadi dasar filter data pada halaman `postatusnk/`.

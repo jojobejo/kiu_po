@@ -5,12 +5,12 @@ Tanggal: 2026-07-07
 ## Tabel Utama
 
 - Database lokal: `kiucoid_po`
-- Tabel: `tb_barang`
+- Tabel: `tbpo_barang`
 - Route pengguna: `masterbarangkomersil/`
 
 ## Struktur Kolom yang Dipakai
 
-Berdasarkan pengecekan live database, kolom `tb_barang` yang dipakai halaman ini adalah:
+Berdasarkan pengecekan live database, kolom `tbpo_barang` yang dipakai halaman ini adalah:
 
 - `id`
 - `kode_barang`
@@ -24,8 +24,8 @@ Berdasarkan pengecekan live database, kolom `tb_barang` yang dipakai halaman ini
 
 Kolom pendukung:
 
-- `tb_suplier.kd_suplier`
-- `tb_suplier.nama_suplier`
+- `tbpo_suplier.kd_suplier`
+- `tbpo_suplier.nama_suplier`
 
 ## Catatan Perbedaan Schema
 
@@ -53,7 +53,7 @@ Alasan: permintaan adalah menyesuaikan aplikasi dengan database tabel sekarang. 
 
 Tanggal update: 2026-07-07
 
-Tidak ada perubahan struktur database untuk fitur CRUD detail. Fitur baru memakai tabel aktif `tb_barang`, relasi baca ke `tb_suplier`, dan relasi baca ke `tb_satuan`.
+Tidak ada perubahan struktur database untuk fitur CRUD detail. Fitur baru memakai tabel aktif `tbpo_barang`, relasi baca ke `tbpo_suplier`, dan relasi baca ke `tbpo_satuan`.
 
 Kolom yang ditulis saat tambah/edit, jika tersedia pada schema aktif:
 
@@ -76,36 +76,36 @@ Kolom yang ditulis saat tambah/edit, jika tersedia pada schema aktif:
 - `is_active`
 - `is_lot`
 
-Primary key yang dipakai untuk halaman detail, update, dan delete adalah `tb_barang.id_barang` pada database aktif.
+Primary key yang dipakai untuk halaman detail, update, dan delete adalah `tbpo_barang.id_barang` pada database aktif.
 
 Catatan satuan:
 
-- `tb_barang.satuan` tetap menyimpan teks nama satuan.
-- Opsi edit satuan dibaca dari `tb_satuan.nm_satuan`.
-- Query list/detail melakukan `LEFT JOIN tb_satuan ON tb_satuan.nm_satuan = tb_barang.satuan`.
+- `tbpo_barang.satuan` tetap menyimpan teks nama satuan.
+- Opsi edit satuan dibaca dari `tbpo_satuan.nm_satuan`.
+- Query list/detail melakukan `LEFT JOIN tbpo_satuan ON tbpo_satuan.nm_satuan = tbpo_barang.satuan`.
 - Nilai yang dikirim saat edit tetap `nm_satuan`, bukan `id_satuan`.
 
 ## Catatan Performance Query
 
 Endpoint DataTables server-side membaca data dengan pola:
 
-1. `COUNT(*)` dari `tb_barang` untuk total data.
+1. `COUNT(*)` dari `tbpo_barang` untuk total data.
 2. Query halaman aktif dengan `LIMIT start, length`.
 3. Search pada `kode_barang`, `nama_barang`, bahan aktif, satuan, dan nama supplier.
-4. Join ke `tb_suplier` memakai `tb_suplier.kd_suplier = tb_barang.kd_suplier`.
+4. Join ke `tbpo_suplier` memakai `tbpo_suplier.kd_suplier = tbpo_barang.kd_suplier`.
 
 Index yang sudah ada dan relevan:
 
-- `tb_barang.idx_kode_barang`
-- `tb_barang.idx_kd_suplier`
+- `tbpo_barang.idx_kode_barang`
+- `tbpo_barang.idx_kd_suplier`
 
 ## Query Validasi
 
 Gunakan query berikut jika perlu memvalidasi struktur:
 
 ```sql
-SHOW COLUMNS FROM tb_barang;
-SHOW COLUMNS FROM tb_suplier;
+SHOW COLUMNS FROM tbpo_barang;
+SHOW COLUMNS FROM tbpo_suplier;
 ```
 
 Contoh query data yang setara dengan halaman:
@@ -122,6 +122,6 @@ SELECT
     a.lebar,
     a.tinggi,
     (a.panjang * a.lebar * a.tinggi) AS hasil_dimensi
-FROM tb_barang a
-LEFT JOIN tb_suplier c ON c.kd_suplier = a.kd_suplier;
+FROM tbpo_barang a
+LEFT JOIN tbpo_suplier c ON c.kd_suplier = a.kd_suplier;
 ```

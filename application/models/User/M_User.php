@@ -12,22 +12,22 @@ class M_User extends CI_Model
 
     public function getAll()
     {
-        return $this->db->get('tb_user')->result();
+        return $this->db->get('tbpo_user')->result();
     }
     public function addUser($data)
     {
-        return $this->db->insert('tb_user', $data);
+        return $this->db->insert('tbpo_user', $data);
     }
 
     public function editUser($iduser, $data)
     {
         $this->db->where('id_user', $iduser);
-        return $this->db->update('tb_user', $data);
+        return $this->db->update('tbpo_user', $data);
     }
     public function getInfoUser($kduser)
     {
         $this->db->select('*');
-        $this->db->from('tb_user');
+        $this->db->from('tbpo_user');
         $this->db->where('kode_user', $kduser);
         $query = $this->db->get();
         return $query;
@@ -35,6 +35,6 @@ class M_User extends CI_Model
     public function editPassword($kd_user, $data)
     {
         $this->db->where('kode_user', $kd_user);
-        return $this->db->update('tb_user', $data);
+        return $this->db->update('tbpo_user', $data);
     }
 }

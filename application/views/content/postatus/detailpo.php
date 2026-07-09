@@ -11,6 +11,14 @@
                     </button>
                 </div>
             <?php endif; ?>
+            <?php if ($this->session->flashdata('success')) : ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata('success'), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
             <style>
                 .po-detail-table-wrap {
                     overflow-x: auto;
@@ -345,7 +353,7 @@
                                             <div hidden>
                                                 <input type="text" name="kd_lama" id="kd_lama" value="<?= $s->kd_po ?>">
                                                 <input type="text" name="kdpoisi" id="kdpoisi" value="<?= $kdpo ?>">
-                                                <input type="text" name="nopoisi" id="nopoisi" value="<?= $s->no_po ?>/REV">
+                                                <input type="text" name="nopoisi" id="nopoisi" value="<?= $s->no_po ?>">
                                                 <input type="text" name="tgltisi" id="tgltisi" value="<?= date("Y-m-d") ?>">
                                                 <input type="text" name="kdsupisi" id="kdsupisi" value="<?= $s->kd_suplier ?>">
                                                 <input type="text" name="jmlitemisi" id="jmlitemisi" value="<?= $s->jml_item ?>">

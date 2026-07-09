@@ -10,11 +10,11 @@ Perubahan hanya menghapus pembulatan pada query pembacaan data API komersil di `
 
 Tabel sumber utama:
 
-- `tb_detail_po`
+- `tbpo_detail_po`
   - `hrg_total`
   - `hrg_total_diskon`
 
-- `tb_po`
+- `tbpo_po`
   - `tax`
 
 Field output API yang terdampak:

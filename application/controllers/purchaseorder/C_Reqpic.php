@@ -508,7 +508,7 @@ class C_Reqpic extends CI_Controller
             $prefix = 'GA';
         }
 
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tbpo_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
         $kd1 = "0001";
 
         if ($cd1->num_rows() > 0) {

@@ -4,20 +4,33 @@
 
     function formatNomorPoInput(value) {
         var parts = String(value || '').toUpperCase().replace(/\s+/g, '').split('/');
-        var nomor = parts[0] || '';
-        nomor = nomor.replace(/\D/g, '');
+        var kodePo = ($('#kode_po_isi').val() || 'Q').toUpperCase();
+        var nomorBagian = parts[0] || '';
+        var suffix = '';
+        var tahun = parts[3] || '';
 
-        if (nomor !== '') {
-            nomor = ('000' + nomor.slice(0, 3)).slice(-3);
+        if (parts.length >= 4) {
+            var tahunMatch = tahun.match(/^(\d{4})([A-Z]?)$/);
+            suffix = tahunMatch ? tahunMatch[2] : '';
+            tahun = tahun.replace(/\D/g, '').slice(0, 4);
+        } else {
+            suffix = (nomorBagian.match(/[A-Z]$/) || [''])[0];
         }
 
-        if (parts.length === 1 && nomor !== '') {
+        nomorBagian = nomorBagian.replace(/^[QA]/, '').replace(/\D/g, '');
+
+        if (nomorBagian !== '') {
+            nomorBagian = kodePo + ('000' + nomorBagian.slice(0, 3)).slice(-3);
+        }
+
+        if (parts.length === 1 && nomorBagian !== '') {
             var defaultParts = String($('#po_isi').data('nomor-po-awal') || '').split('/');
-            return nomor + '/KIU/' + (defaultParts[2] || '') + '/' + (defaultParts[3] || '');
+            var defaultYear = (defaultParts[3] || '').replace(/\D/g, '').slice(0, 4);
+            return nomorBagian + '/KIU/' + (defaultParts[2] || '') + '/' + defaultYear + suffix;
         }
 
         if (parts.length >= 4) {
-            return nomor + '/KIU/' + (parts[2] || '').replace(/[^IVXLCDM]/g, '') + '/' + (parts[3] || '').replace(/\D/g, '').slice(0, 4);
+            return nomorBagian + '/KIU/' + (parts[2] || '').replace(/[^IVXLCDM]/g, '') + '/' + tahun + suffix;
         }
 
         return String(value || '').toUpperCase().replace(/\s+/g, '');
@@ -43,7 +56,7 @@
 
     function cekNomorPoDuplikat() {
         var nopo = $('#po_isi').val();
-        var polaNomorPo = /^\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}$/;
+        var polaNomorPo = /^[QA]\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}[A-Z]?$/;
 
         if (nopo === '') {
             clearNomorPoInvalid();
@@ -51,7 +64,7 @@
         }
 
         if (!polaNomorPo.test(nopo)) {
-            setNomorPoInvalid('Format Nomor PO harus seperti 001/KIU/VII/2026.');
+            setNomorPoInvalid('Format Nomor PO harus seperti Q001/KIU/VII/2026 atau Q001/KIU/VII/2026A.');
             return;
         }
 
@@ -59,13 +72,21 @@
             url: "<?= base_url('purchase/check-nomor-po') ?>",
             type: "POST",
             data: {
-                no_po: nopo
+                no_po: nopo,
+                kd_suplier: $('#kdsuplier').val(),
+                kode_po: $('#kode_po_isi').val()
             },
             dataType: "JSON",
             cache: false,
             success: function(data) {
-                if (data.exists) {
-                    setNomorPoInvalid('Nomor PO sudah digunakan. Silakan gunakan nomor berikutnya.');
+                if (data.same_supplier) {
+                    setNomorPoInvalid('Nomor PO sudah digunakan supplier ini. Silakan gunakan nomor berikutnya.');
+                } else if (data.exists) {
+                    var pesan = 'Nomor PO sudah digunakan. Silakan gunakan nomor berikutnya.';
+                    if (data.suggested) {
+                        pesan = 'Nomor PO sudah digunakan supplier lain. Gunakan suffix alfabet, contoh: ' + data.suggested + '.';
+                    }
+                    setNomorPoInvalid(pesan);
                 } else {
                     clearNomorPoInvalid();
                 }
@@ -74,6 +95,28 @@
     }
 
     $(document).ready(function() {
+
+        $("#kode_po_isi").on("change", function() {
+            $.ajax({
+                url: "<?= base_url('purchase/check-nomor-po') ?>",
+                type: "POST",
+                data: {
+                    no_po: $('#po_isi').val(),
+                    kd_suplier: $('#kdsuplier').val(),
+                    kode_po: $('#kode_po_isi').val()
+                },
+                dataType: "JSON",
+                cache: false,
+                success: function(data) {
+                    if (data.suggested) {
+                        $('#po_isi').val(data.suggested).data('nomor-po-awal', data.suggested);
+                    } else {
+                        $('#po_isi').val(formatNomorPoInput($('#po_isi').val()));
+                    }
+                    cekNomorPoDuplikat();
+                }
+            });
+        });
 
         $("#po_isi").on("input blur", function() {
             var formatted = formatNomorPoInput($(this).val());

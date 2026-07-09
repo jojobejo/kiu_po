@@ -24,7 +24,7 @@ class M_Reqpic extends CI_Model
         a.qty_ready,
         a.id_satuan
         FROM v_stockbarangnk a
-        JOIN tb_satuan b ON b.id_satuan = a.id_satuan
+        JOIN tbpo_satuan b ON b.id_satuan = a.id_satuan
         ");
     }
 
@@ -33,7 +33,7 @@ class M_Reqpic extends CI_Model
         return $this->db->query("SELECT
         a.id_satuan AS id,
         a.nm_satuan AS nm_satuan
-        FROM tb_satuan a
+        FROM tbpo_satuan a
     ");
     }
 
@@ -42,7 +42,7 @@ class M_Reqpic extends CI_Model
 
         $cd1 = $this->db->query("SELECT 
         COUNT(a.id_tmp_nk) as tot
-        FROM tb_tmp_item_nk a
+        FROM tbpo_tmp_item_nk a
         WHERE a.jnis_po = '$lv' AND a.kd_user = '$kd' ");
 
         foreach ($cd1->result() as $d) {
@@ -61,9 +61,9 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.id_tmp_nk , b.nama_barang , b.descnk , a.keterangan , a.qty , c.nm_satuan , a.kd_bsys
-        FROM tb_tmp_item_nk a
-        JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
-        JOIN tb_satuan c ON c.id_satuan = b.satuan 
+        FROM tbpo_tmp_item_nk a
+        JOIN tbpo_barang_nk b ON b.kd_barang = a.kd_barang
+        JOIN tbpo_satuan c ON c.id_satuan = b.satuan 
         WHERE a.jnis_po = '1' AND a.kd_user = '$kd'
         ");
     }
@@ -72,7 +72,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.kd_user = '$kd' 
         AND a.status != 'DONE' AND a.status != 'PENDING'
         ");
@@ -82,7 +82,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.departemen = 'PROMOSI SEED'
         AND a.status != 'DONE' AND a.status != 'PENDING'
         ");
@@ -92,7 +92,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.departemen = 'PROMOSI CP'
         AND a.status != 'DONE' AND a.status != 'PENDING'
         ");
@@ -102,7 +102,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.kd_user = '$user' 
         AND a.status = 'PENDING'
         ");
@@ -111,7 +111,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.kd_user = '$kd' 
         AND a.status = 'DONE'
         ");
@@ -120,23 +120,23 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*
-        FROM tb_req_nk a
+        FROM tbpo_req_nk a
         WHERE a.kd_user = '$kd' 
         AND a.status = 'PENDING'
         ");
     }
     function input_detail_po_nk($data)
     {
-        $this->db->insert('tb_detail_req', $data);
+        $this->db->insert('tbpo_detail_req', $data);
     }
     function inputponew($data)
     {
-        $this->db->insert('tb_po_nk', $data);
+        $this->db->insert('tbpo_po_nk', $data);
     }
     public function getrequestbypic($kd)
     {
         $this->db->select('*');
-        $this->db->from('tb_req_nk');
+        $this->db->from('tbpo_req_nk');
         $this->db->where('kd_po_nk', $kd);
         $query = $this->db->get()->result();
         return $query;
@@ -147,7 +147,7 @@ class M_Reqpic extends CI_Model
         COUNT(a.id_det_po_nk) AS total,
         SUM(CASE WHEN a.status = '1' THEN 1 ELSE 0 END) tot_yes,
         SUM(CASE WHEN a.status = '4' THEN 1 ELSE 0 END) tot_no
-        FROM tb_detail_req a
+        FROM tbpo_detail_req a
         WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -155,7 +155,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT
         SUM(a.tr_qty*a.hrg_satuan) AS hrg
-        FROM tb_transaksi_tmp a
+        FROM tbpo_transaksi_tmp a
         WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -171,9 +171,9 @@ class M_Reqpic extends CI_Model
             c.nm_satuan AS nm_satuan,
             COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock,
             a.status as sts
-            FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
-            JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            FROM tbpo_detail_req a
+            JOIN tbpo_barang_nk b ON b.kd_barang = a.kd_bsys
+            JOIN tbpo_satuan c ON c.id_satuan = b.satuan 
             LEFT JOIN (
                 SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
                 FROM v_stockbarangnk
@@ -193,9 +193,9 @@ class M_Reqpic extends CI_Model
             c.nm_satuan AS nm_satuan,
             COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock,
             a.status as sts
-            FROM tb_detail_req a
-            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
-            JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            FROM tbpo_detail_req a
+            JOIN tbpo_barang_nk b ON b.kd_br_adm = a.kd_bsys
+            JOIN tbpo_satuan c ON c.id_satuan = b.satuan 
             LEFT JOIN (
                 SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
                 FROM v_stockbarangnk
@@ -216,9 +216,9 @@ class M_Reqpic extends CI_Model
             a.qty AS qty,
             c.nm_satuan AS nmsatuan,
             COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock
-            FROM tb_detail_req a 
-            JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
-            JOIN tb_satuan c ON c.id_satuan = a.satuan
+            FROM tbpo_detail_req a 
+            JOIN tbpo_barang_nk b ON b.kd_br_adm = a.kd_bsys
+            JOIN tbpo_satuan c ON c.id_satuan = a.satuan
             LEFT JOIN (
                 SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
                 FROM v_stockbarangnk
@@ -258,15 +258,15 @@ class M_Reqpic extends CI_Model
                 a.status,
                 f.nm_satuan,
                 stock.qty_ready_stock,
-                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_tmp,
-                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_transaksi,
-                (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barang = a.kd_barang AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
-                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barang = a.kd_barang AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m,
-                (SELECT SUM(i.tr_qty) FROM tb_transaksi i WHERE i.kd_barang = a.kd_barang AND i.kd_akun = '11514' GROUP BY a.kd_bsys) AS qty_transaksi_mad,
-                (SELECT SUM(j.tr_qty) FROM tb_transaksi j WHERE j.kd_barang = a.kd_barang AND j.kd_akun = '11513' GROUP BY a.kd_bsys) AS qty_transaksi_pad
-                FROM tb_detail_req a 
-                JOIN tb_barang_nk e ON e.kd_br_adm = a.kd_bsys
-                JOIN tb_satuan f ON f.id_satuan = e.satuan 
+                (SELECT SUM(c.tr_qty) FROM tbpo_transaksi_tmp c WHERE c.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_tmp,
+                (SELECT SUM(d.tr_qty) FROM tbpo_transaksi d WHERE d.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_transaksi,
+                (SELECT SUM(g.tr_qty) FROM tbpo_transaksi g WHERE g.kd_barang = a.kd_barang AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
+                (SELECT SUM(h.tr_qty) FROM tbpo_transaksi h WHERE h.kd_barang = a.kd_barang AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m,
+                (SELECT SUM(i.tr_qty) FROM tbpo_transaksi i WHERE i.kd_barang = a.kd_barang AND i.kd_akun = '11514' GROUP BY a.kd_bsys) AS qty_transaksi_mad,
+                (SELECT SUM(j.tr_qty) FROM tbpo_transaksi j WHERE j.kd_barang = a.kd_barang AND j.kd_akun = '11513' GROUP BY a.kd_bsys) AS qty_transaksi_pad
+                FROM tbpo_detail_req a 
+                JOIN tbpo_barang_nk e ON e.kd_br_adm = a.kd_bsys
+                JOIN tbpo_satuan f ON f.id_satuan = e.satuan 
                 LEFT JOIN (
                     SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
                     FROM v_stockbarangnk
@@ -305,13 +305,13 @@ class M_Reqpic extends CI_Model
                 a.status,
                 f.nm_satuan,
                 stock.qty_ready_stock,
-                (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
-                (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
-                (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
-                (SELECT SUM(h.tr_qty) FROM tb_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m
-                FROM tb_detail_req a 
-                JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
-                JOIN tb_satuan f ON f.id_satuan = e.satuan 
+                (SELECT SUM(c.tr_qty) FROM tbpo_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
+                (SELECT SUM(d.tr_qty) FROM tbpo_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
+                (SELECT SUM(g.tr_qty) FROM tbpo_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
+                (SELECT SUM(h.tr_qty) FROM tbpo_transaksi h WHERE h.kd_barangsys = a.kd_bsys AND h.kd_akun = '11512' GROUP BY a.kd_bsys) AS qty_transaksi_m
+                FROM tbpo_detail_req a 
+                JOIN tbpo_barang_nk e ON e.kd_barang = a.kd_bsys
+                JOIN tbpo_satuan f ON f.id_satuan = e.satuan 
                 LEFT JOIN (
                     SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
                     FROM v_stockbarangnk
@@ -325,13 +325,13 @@ class M_Reqpic extends CI_Model
     function hapus_tmp_nk($id)
     {
         $this->db->where('kd_user', $id);
-        return $this->db->delete('tb_tmp_item_nk');
+        return $this->db->delete('tbpo_tmp_item_nk');
     }
 
     public function getlistpic()
     {
         return $this->db->query("SELECT a.*
-            FROM tb_req_nk a
+            FROM tbpo_req_nk a
             WHERE a.status = 'ON PROGRESS' OR a.status = 'PO REVISI'
             ORDER BY a.tgl_transaksi DESC;
             ");
@@ -347,9 +347,9 @@ class M_Reqpic extends CI_Model
         a.tj_pembelian AS tj_pembelian,
         a.status AS status,
         COALESCE(b.status,0) AS status_po
-        FROM tb_req_nk a
-        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
-        LEFT JOIN tb_user c ON c.kode_user = a.kd_user
+        FROM tbpo_req_nk a
+        LEFT JOIN tbpo_po_nk b ON b.kd_po_req = a.kd_po_nk
+        LEFT JOIN tbpo_user c ON c.kode_user = a.kd_user
         WHERE a.departemen = 'KEUANGAN' AND a.status != 'DONE' AND c.aksess_lv = '2' 
         ORDER BY a.tgl_transaksi DESC
         ");
@@ -365,26 +365,26 @@ class M_Reqpic extends CI_Model
         a.tj_pembelian AS tj_pembelian,
         a.status AS status,
         COALESCE(b.status,0) AS status_po
-        FROM tb_req_nk a
-        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        FROM tbpo_req_nk a
+        LEFT JOIN tbpo_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.status = 'REQUEST ACC'
         ORDER BY a.tgl_transaksi DESC;");
     }
 
     public function getlistready()
     {
-        // return $this->db->get('tb_req_nk')->result();
+        // return $this->db->get('tbpo_req_nk')->result();
         return $this->db->query("SELECT a.*
-            FROM tb_req_nk a
+            FROM tbpo_req_nk a
             WHERE a.status = 'BARANG TERSEDIA';
             ");
     }
 
     public function getlistdone()
     {
-        // return $this->db->get('tb_req_nk')->result();
+        // return $this->db->get('tbpo_req_nk')->result();
         return $this->db->query("SELECT a.*
-            FROM tb_req_nk a
+            FROM tbpo_req_nk a
             WHERE a.status = 'DONE'
             ORDER BY a.tgl_transaksi DESC;
             ");
@@ -400,9 +400,9 @@ class M_Reqpic extends CI_Model
         a.keterangan,
         a.tr_qty,
         c.nm_satuan
-        FROM tb_transaksi a 
-        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_barang
-        JOIN tb_satuan c ON c.id_satuan = a.satuan
+        FROM tbpo_transaksi a 
+        JOIN tbpo_barang_nk b ON b.kd_br_adm = a.kd_barang
+        JOIN tbpo_satuan c ON c.id_satuan = a.satuan
         WHERE a.kd_po_nk = '$kd'
         GROUP BY a.kd_barangsys
     ");
@@ -418,9 +418,9 @@ class M_Reqpic extends CI_Model
         a.qty,
         c.nm_satuan,
         COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock
-        FROM tb_detail_req a 
-        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
-        JOIN tb_satuan c ON c.id_satuan = a.satuan
+        FROM tbpo_detail_req a 
+        JOIN tbpo_barang_nk b ON b.kd_br_adm = a.kd_bsys
+        JOIN tbpo_satuan c ON c.id_satuan = a.satuan
         LEFT JOIN (
             SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
             FROM v_stockbarangnk
@@ -434,7 +434,7 @@ class M_Reqpic extends CI_Model
     public function countjmltmpbr($kd)
     {
         $this->db->select('id_tmp_nk');
-        $this->db->from('tb_tmp_item_nk');
+        $this->db->from('tbpo_tmp_item_nk');
         $this->db->where('jnis_po', '1');
         $this->db->where('kd_user', $kd);
         $num_results = $this->db->count_all_results();
@@ -444,7 +444,7 @@ class M_Reqpic extends CI_Model
     public function countpend($kd)
     {
         $this->db->select('id_tmp_nk');
-        $this->db->from('tb_tmp_item_nk');
+        $this->db->from('tbpo_tmp_item_nk');
         $this->db->where('jnis_po', '3');
         $this->db->where('kd_user', $kd);
         $num_results = $this->db->count_all_results();
@@ -454,7 +454,7 @@ class M_Reqpic extends CI_Model
     function get_tmp_non_komersil($kd)
     {
         $this->db->select('*');
-        $this->db->from('tb_tmp_item_nk');
+        $this->db->from('tbpo_tmp_item_nk');
         $this->db->where('jnis_po', '1');
         $this->db->where('kd_user', $kd);
         $query = $this->db->get()->result();
@@ -463,43 +463,43 @@ class M_Reqpic extends CI_Model
 
     public function inputreqbr($data)
     {
-        $this->db->insert('tb_tmp_item_nk', $data);
+        $this->db->insert('tbpo_tmp_item_nk', $data);
     }
 
     public function inputreq($data)
     {
-        $this->db->insert('tb_req_nk', $data);
+        $this->db->insert('tbpo_req_nk', $data);
     }
 
     public function editedreqpic($id, $data)
     {
         $this->db->where('id_tmp_nk', $id);
-        return $this->db->update('tb_tmp_item_nk', $data);
+        return $this->db->update('tbpo_tmp_item_nk', $data);
     }
 
     public function updatestsitem($id, $data)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->update('tb_detail_req', $data);
+        return $this->db->update('tbpo_detail_req', $data);
     }
 
     public function deletedtmpnkreq($id)
     {
         $this->db->where('id_tmp_nk', $id);
-        return $this->db->delete('tb_tmp_item_nk');
+        return $this->db->delete('tbpo_tmp_item_nk');
     }
 
     public function deletedet($id, $sts)
     {
         $this->db->where('id_tmp_nk', $id);
-        return $this->db->delete('tb_detail_req');
+        return $this->db->delete('tbpo_detail_req');
     }
 
     public function deletedetailporeqkdall($kd, $sts)
     {
         $this->db->where('kd_po_nk', $kd);
         $this->db->where('status', $sts);
-        return $this->db->delete('tb_detail_req');
+        return $this->db->delete('tbpo_detail_req');
     }
 
     public function getitemreq($id)
@@ -518,9 +518,9 @@ class M_Reqpic extends CI_Model
         c.kode_user AS kduser,
         c.nama_user AS nmuser,
         c.departement AS dep
-        FROM tb_detail_req a
-        JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
-        JOIN tb_user c ON c.kode_user = a.kd_user
+        FROM tbpo_detail_req a
+        JOIN tbpo_barang_nk b ON b.kd_br_adm = a.kd_bsys
+        JOIN tbpo_user c ON c.kode_user = a.kd_user
         WHERE a.id_det_po_nk = '$id'
             ");
     }
@@ -528,39 +528,39 @@ class M_Reqpic extends CI_Model
     public function deletedetailponk($id)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->delete('tb_detail_po_nk');
+        return $this->db->delete('tbpo_detail_po_nk');
     }
 
     public function updatestsponk($id, $data)
     {
         $this->db->where('kd_po_nk', $id);
-        return $this->db->update('tb_po_nk', $data);
+        return $this->db->update('tbpo_po_nk', $data);
     }
 
     public function insertpobaru($dt)
     {
-        $this->db->insert('tb_po_nk', $dt);
+        $this->db->insert('tbpo_po_nk', $dt);
     }
 
     public function deletedetailporeq($id)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->delete('tb_detail_req');
+        return $this->db->delete('tbpo_detail_req');
     }
 
     public function insert_tmp_transaksi($data)
     {
-        $this->db->insert('tb_transaksi_tmp', $data);
+        $this->db->insert('tbpo_transaksi_tmp', $data);
     }
 
     public function insertbrponkpending($data)
     {
-        $this->db->insert('tb_detail_po_nk', $data);
+        $this->db->insert('tbpo_detail_po_nk', $data);
     }
 
     public function insert_transaksi($data)
     {
-        $this->db->insert('tb_transaksi', $data);
+        $this->db->insert('tbpo_transaksi', $data);
     }
 
     public function getbuystsponk($kd)
@@ -574,7 +574,7 @@ class M_Reqpic extends CI_Model
         a.tj_pembelian AS tjbeli,
         a.kd_po_nk AS kdpo,
         a.kd_po_req as kdporeq
-        FROM tb_po_nk a
+        FROM tbpo_po_nk a
         WHERE a.kd_po_req = '$kd'
         ");
     }
@@ -583,7 +583,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT
         a.*
-        FROM tb_detail_po_nk a
+        FROM tbpo_detail_po_nk a
         WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -592,7 +592,7 @@ class M_Reqpic extends CI_Model
     {
         return $this->db->query("SELECT
         COUNT(a.kd_po_req)  as tot
-        FROM tb_po_nk a
+        FROM tbpo_po_nk a
         WHERE a.kd_po_req = '$kd'
         ");
     }
@@ -608,7 +608,7 @@ class M_Reqpic extends CI_Model
         a.qty AS trqty,
         a.satuan AS satuan,
         a.kd_user AS kduser
-        FROM tb_detail_po_nk a
+        FROM tbpo_detail_po_nk a
         WHERE a.kd_po_nk = '$kd'
         GROUP BY a.kd_barang
         ");
@@ -627,8 +627,8 @@ class M_Reqpic extends CI_Model
         a.kd_user AS kduser,
         b.tj_pembelian AS tjket,
         a.status AS sts
-        FROM tb_detail_req a
-        LEFT JOIN tb_po_nk b ON b.kd_po_req = a.kd_po_nk
+        FROM tbpo_detail_req a
+        LEFT JOIN tbpo_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.kd_po_nk = '$kd' AND a.status = '1'
         GROUP BY a.kd_barang
         ");
@@ -655,10 +655,10 @@ class M_Reqpic extends CI_Model
             d.tj_pembelian,
             b.gbr_barang,
             a.hrg_satuan
-            FROM tb_transaksi_tmp a
-            JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
-            JOIN tb_satuan c ON c.id_satuan = b.satuan
-            JOIN tb_req_nk d ON d.kd_po_nk	= a.kd_po_nk
+            FROM tbpo_transaksi_tmp a
+            JOIN tbpo_barang_nk b ON b.kd_barang = a.kd_barang
+            JOIN tbpo_satuan c ON c.id_satuan = b.satuan
+            JOIN tbpo_req_nk d ON d.kd_po_nk	= a.kd_po_nk
             WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -666,64 +666,64 @@ class M_Reqpic extends CI_Model
     function updatedetreqitm($kd, $data)
     {
         $this->db->where('id_det_po_nk', $kd);
-        return $this->db->update('tb_detail_req', $data);
+        return $this->db->update('tbpo_detail_req', $data);
     }
     function updatereqnk_sts($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        return $this->db->update('tb_detail_req', $data);
+        return $this->db->update('tbpo_detail_req', $data);
     }
     function updatereqnk_stsbr($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
         $this->db->where('status', '4');
-        return $this->db->update('tb_detail_req', $data);
+        return $this->db->update('tbpo_detail_req', $data);
     }
     function updatereqnk($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        return $this->db->update('tb_req_nk', $data);
+        return $this->db->update('tbpo_req_nk', $data);
     }
     function input_new_po_req($data)
     {
-        $this->db->insert('tb_tmp_item_nk', $data);
+        $this->db->insert('tbpo_tmp_item_nk', $data);
     }
     function input_tr($data)
     {
-        $this->db->insert('tb_transaksi', $data);
+        $this->db->insert('tbpo_transaksi', $data);
     }
     function inpt_tr_tmp($data)
     {
-        $this->db->insert('tb_transaksi_tmp', $data);
+        $this->db->insert('tbpo_transaksi_tmp', $data);
     }
     public function deletedtmpnkreqkd($id)
     {
         $this->db->where('kd_po_nk', $id);
-        return $this->db->delete('tb_tmp_item_nk');
+        return $this->db->delete('tbpo_tmp_item_nk');
     }
     public function deletetmptrreq($id)
     {
         $this->db->where('kd_po_nk', $id);
-        return $this->db->delete('tb_transaksi_tmp');
+        return $this->db->delete('tbpo_transaksi_tmp');
     }
     public function deleteitemtrtmp($kd, $usr, $ket)
     {
         $this->db->where('kd_po_nk', $kd);
         $this->db->where('req_by', $usr);
         $this->db->where('keterangan', $ket);
-        return $this->db->delete('tb_transaksi');
+        return $this->db->delete('tbpo_transaksi');
     }
     function getNoted($kdpo)
     {
         $this->db->select('*');
-        $this->db->from('tb_note_direktur');
+        $this->db->from('tbpo_note_direktur');
         $this->db->where('kd_po', $kdpo);
         $this->db->where('note_for', '2');
         return $this->db->get()->result();
     }
     function insertTmpmbarang($data)
     {
-        $this->db->insert('tb_req_masterbarang', $data);
+        $this->db->insert('tbpo_req_masterbarang', $data);
     }
     public function gettotsts($kd)
     {
@@ -737,12 +737,12 @@ class M_Reqpic extends CI_Model
         (
             SELECT
             a.kd_po_nk,
-            (SELECT COUNT(b.id_det_po_nk) FROM tb_detail_req b WHERE b.kd_po_nk = a.kd_po_nk) as totalbr,
-            (SELECT COUNT(c.status) FROM tb_detail_req c WHERE c.kd_po_nk = a.kd_po_nk AND c.status = '1') AS sts1,
-            (SELECT COUNT(d.status) FROM tb_detail_req d WHERE d.kd_po_nk = a.kd_po_nk AND d.status = '2') AS sts2,
-            (SELECT COUNT(e.status) FROM tb_detail_req e WHERE e.kd_po_nk = a.kd_po_nk AND e.status = '0') AS sts0,
-            (SELECT COUNT(f.status) FROM tb_detail_req f WHERE f.kd_po_nk = a.kd_po_nk AND f.status = '3') AS sts3
-            FROM tb_detail_req a
+            (SELECT COUNT(b.id_det_po_nk) FROM tbpo_detail_req b WHERE b.kd_po_nk = a.kd_po_nk) as totalbr,
+            (SELECT COUNT(c.status) FROM tbpo_detail_req c WHERE c.kd_po_nk = a.kd_po_nk AND c.status = '1') AS sts1,
+            (SELECT COUNT(d.status) FROM tbpo_detail_req d WHERE d.kd_po_nk = a.kd_po_nk AND d.status = '2') AS sts2,
+            (SELECT COUNT(e.status) FROM tbpo_detail_req e WHERE e.kd_po_nk = a.kd_po_nk AND e.status = '0') AS sts0,
+            (SELECT COUNT(f.status) FROM tbpo_detail_req f WHERE f.kd_po_nk = a.kd_po_nk AND f.status = '3') AS sts3
+            FROM tbpo_detail_req a
         ) AS x 
         WHERE x.kd_po_nk = '$kd' 
         GROUP BY x.kd_po_nk
@@ -751,27 +751,27 @@ class M_Reqpic extends CI_Model
     public function del_itm_det_req_ponk($id)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->delete('tb_detail_req');
+        return $this->db->delete('tbpo_detail_req');
     }
     public function ls_del_itm_det_req_ponk($kd)
     {
         return $this->db->query("SELECT
         a.*
-        FROM tb_detail_req a
+        FROM tbpo_detail_req a
         WHERE a.kd_po_nk = '$kd' AND a.status = '3'
         ");
     }
     public function insert_tmp_po_persediaan($kd)
     {
-        $this->db->insert('tb_detail_po_nk', $kd);
+        $this->db->insert('tbpo_detail_po_nk', $kd);
     }
     function generatekdponk($data)
     {
-        $this->db->insert('tb_generate_kd_ponk', $data);
+        $this->db->insert('tbpo_generate_kd_ponk', $data);
     }
     function kdnonkomersial()
     {
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tbpo_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
         $kd1 = "";
         if ($cd1->num_rows() > 0) {
             foreach ($cd1->result() as $k) {
@@ -787,7 +787,7 @@ class M_Reqpic extends CI_Model
     }
     function kdnewbuy()
     {
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tbpo_generate_kd WHERE DATE(create_at)=CURDATE()");
         $kd1 = "";
         if ($cd1->num_rows() > 0) {
             foreach ($cd1->result() as $k) {
@@ -805,27 +805,27 @@ class M_Reqpic extends CI_Model
     function updated_req_po_nk($kd, $data)
     {
         $this->db->where('kd_po_nk', $kd);
-        return $this->db->update('tb_req_nk', $data);
+        return $this->db->update('tbpo_req_nk', $data);
     }
 
     function det_updated_req_po_nk($id, $data)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->update('tb_detail_req', $data);
+        return $this->db->update('tbpo_detail_req', $data);
     }
 
     function det_delete_req_po_nk($id)
     {
         $this->db->where('id_det_po_nk', $id);
-        return $this->db->delete('tb_detail_req');
+        return $this->db->delete('tbpo_detail_req');
     }
 
     // function viewtot($kd)
     // {
-    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totdetail FROM tb_detail_req b WHERE b.kd_po_nk = '$kd'");
-    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totalbrtmp FROM tb_detail_req b WHERE b.kd_po_nk = '$kd'");
-    //     $q2     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tb_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'confirm'");
-    //     $q3     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tb_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'pending'");
+    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totdetail FROM tbpo_detail_req b WHERE b.kd_po_nk = '$kd'");
+    //     $q1     = $this->db->query("SELECT COUNT(b.id_det_po_nk) AS totalbrtmp FROM tbpo_detail_req b WHERE b.kd_po_nk = '$kd'");
+    //     $q2     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tbpo_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'confirm'");
+    //     $q3     = $this->db->query("SELECT COUNT(b.id_transnk) AS totpending FROM tbpo_transaksi_tmp b WHERE b.kd_po_nk = '$kd' AND b.status = 'pending'");
 
     //     if ($q->num_rows() > 0) {
     //         foreach ($q1->result() as $x1) {
@@ -856,10 +856,10 @@ class M_Reqpic extends CI_Model
 //     a.keterangan,
 //     a.qty,
 //     a.status,
-//     (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_minus,
-//     (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_plus
-//     FROM tb_detail_req a 
-//     JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
+//     (SELECT SUM(c.tr_qty) FROM tbpo_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_minus,
+//     (SELECT SUM(d.tr_qty) FROM tbpo_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_plus
+//     FROM tbpo_detail_req a 
+//     JOIN tbpo_barang_nk e ON e.kd_barang = a.kd_bsys
 //     GROUP BY a.kd_barang
 // ) AS x 
 // WHERE x.kd_po_nk = 'PONK2108240002'

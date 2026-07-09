@@ -58,16 +58,16 @@ class C_PoStatus extends CI_Controller
 
     private function getKeteranganHargaPpnDetailPo($kdpo)
     {
-        if (!$this->db->field_exists('keterangan_harga_ppn', 'tb_detail_po')) {
+        if (!$this->db->field_exists('keterangan_harga_ppn', 'tbpo_detail_po')) {
             return '';
         }
 
         $this->db->select('keterangan_harga_ppn');
-        $this->db->from('tb_detail_po');
+        $this->db->from('tbpo_detail_po');
         $this->db->where('kd_po', $kdpo);
         $this->db->where("TRIM(COALESCE(keterangan_harga_ppn, '')) <> ''", null, false);
 
-        if ($this->db->field_exists('is_bonus', 'tb_detail_po')) {
+        if ($this->db->field_exists('is_bonus', 'tbpo_detail_po')) {
             $this->db->where('COALESCE(is_bonus, 0) = 0', null, false);
         }
 
@@ -123,7 +123,7 @@ class C_PoStatus extends CI_Controller
             );
         }
 
-        if (!$this->db->field_exists('isi', 'tb_barang') || !$this->db->field_exists('kemasan', 'tb_barang')) {
+        if (!$this->db->field_exists('isi', 'tbpo_barang') || !$this->db->field_exists('kemasan', 'tbpo_barang')) {
             return array(
                 'success' => false,
                 'message' => 'Data isi atau kemasan barang belum disetting',
@@ -182,10 +182,10 @@ class C_PoStatus extends CI_Controller
     {
         $namaUser = (string) $this->session->userdata('nama_user');
         $kodeUser = (string) $this->session->userdata('kode');
-        $hasUserLogColumn = $this->db->field_exists('user_log', 'tb_tracking_po');
-        $hasKodeUserColumn = $this->db->field_exists('kode_user', 'tb_tracking_po');
-        $hasDataLamaColumn = $this->db->field_exists('data_lama', 'tb_tracking_po');
-        $hasDataBaruColumn = $this->db->field_exists('data_baru', 'tb_tracking_po');
+        $hasUserLogColumn = $this->db->field_exists('user_log', 'tbpo_tracking_po');
+        $hasKodeUserColumn = $this->db->field_exists('kode_user', 'tbpo_tracking_po');
+        $hasDataLamaColumn = $this->db->field_exists('data_lama', 'tbpo_tracking_po');
+        $hasDataBaruColumn = $this->db->field_exists('data_baru', 'tbpo_tracking_po');
         $oldSnapshot = $oldData !== null ? $this->buildTrackingSnapshot($oldData) : null;
         $newSnapshot = $newData !== null ? $this->buildTrackingSnapshot($newData) : null;
 
@@ -410,45 +410,22 @@ class C_PoStatus extends CI_Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $kdpolama   = $this->input->post('kd_lama');
-        $suplier    = $this->input->post('suplier');
         $nopo       = $this->input->post('nopo');
-        $tgl        = $this->input->post('tgl');
-        $tmpo       = $this->input->post('tmpo');
-        $gdg        = $this->input->post('gdg');
-        $kdpo       = $this->input->post('kdpo');
-        $jml        = $this->input->post('jml');
-        $harga      = $this->input->post('harga');
-        $tax        = $this->input->post('tax');
         $nmuser     = $this->session->userdata('nama_user');
         $user       = $this->session->userdata('kode');
-        $tmp        = $this->M_Postatus->get_ori_po($kdpolama);
-        $tmpdiskon  = $this->M_Postatus->getDiskon($kdpolama);
-        $note    = $this->M_Postatus->getNoted($suplier);
-        $tmpnotebr  = $this->M_Postatus->get_note_barang($kdpolama);
-        $totalHargaDiskon = 0;
 
-        foreach ($tmp as $chart) {
-            $totalHargaDiskon += isset($chart->hrg_total_diskon) ? $chart->hrg_total_diskon : $chart->hrg_total;
+        if (empty($kdpolama)) {
+            echo json_encode(array('msg' => 'error'));
+            return;
         }
 
         $rekamData = array(
-            'kd_po'         => $kdpo,
-            'no_po'         => $nopo,
-            'tgl_transaksi' => $tgl,
-            'kd_suplier'    => $suplier,
-            'jml_item'      => $jml,
-            'total_harga'   => $harga,
-            'total_harga_diskon' => $totalHargaDiskon,
-            'tmpo_pembayaran' => $tmpo,
-            'gdg_pengiriman'  => $gdg,
-            'tax'           => $tax,
             'status'        => 'PO REVISI'
         );
-        $this->M_Postatus->inputRevisi($rekamData);
+        $this->M_Postatus->updateStatus($kdpolama, $rekamData);
 
-        // UPDATE NOTE - REKAM BARU
         $updatenote = array(
-            'kd_po' => $kdpo,
+            'kd_po' => $kdpolama,
             'isi_note' => 'Revisi PO',
             'kd_user' => $user,
             'nama_user' => $nmuser,
@@ -456,77 +433,42 @@ class C_PoStatus extends CI_Controller
             'update_status' => '1'
         );
         $this->M_Postatus->addNote($updatenote);
-        if ($tmp) {
-            foreach ($tmp as $chart) {
-                $chartPpnMode = isset($chart->keterangan_harga_ppn) ? strtolower(trim((string) $chart->keterangan_harga_ppn)) : '';
-                $chartTaxForConversion = (float) $tax > 0 ? $tax : 11;
-                $chartHargaSatuanExclude = isset($chart->harga_satuan_exclude) && (float) $chart->harga_satuan_exclude > 0
-                    ? $chart->harga_satuan_exclude
-                    : ($chartPpnMode === 'include' ? $this->excludePpn($chart->hrg_satuan, $chartTaxForConversion) : $chart->hrg_satuan);
-                $listTransaksi = array(
-                    'no_po'         => $nopo,
-                    'kd_po'         => $kdpo,
-                    'tgl_transaksi' => $tgl,
-                    'kd_barang'     => $chart->kd_barang,
-                    'nama_barang'   => $chart->nama_barang,
-                    'kd_suplier'    => $chart->kd_suplier,
-                    'satuan'        => $chart->satuan,
-                    'qty'           => $chart->qty,
-                    'isi'           => isset($chart->isi) ? $chart->isi : 0,
-                    'kemasan'       => isset($chart->kemasan) ? $chart->kemasan : 0,
-                    'qty_kecil'     => isset($chart->qty_kecil) ? $chart->qty_kecil : $chart->qty,
-                    'hrg_satuan'    => $chart->hrg_satuan,
-                    'harga_satuan_exclude' => $chartHargaSatuanExclude,
-                    'harga_satuan_kecil' => isset($chart->harga_satuan_kecil) ? $chart->harga_satuan_kecil : $chart->hrg_satuan,
-                    'harga_satuan_kecil_exclude' => isset($chart->harga_satuan_kecil_exclude) ? $chart->harga_satuan_kecil_exclude : $this->excludePpn(isset($chart->harga_satuan_kecil) ? $chart->harga_satuan_kecil : $chart->hrg_satuan, $chartTaxForConversion),
-                    'hrg_diskon'    => isset($chart->hrg_diskon) ? $chart->hrg_diskon : $chart->hrg_satuan,
-                    'hrg_total'     => $chart->hrg_total,
-                    'hrg_total_diskon' => isset($chart->hrg_total_diskon) ? $chart->hrg_total_diskon : $chart->hrg_total,
-                    'is_bonus'      => isset($chart->is_bonus) ? $chart->is_bonus : 0,
-                    'keterangan_bonus' => isset($chart->keterangan_bonus) ? $chart->keterangan_bonus : null,
-                    'keterangan_harga_ppn' => isset($chart->keterangan_harga_ppn) ? $chart->keterangan_harga_ppn : '',
-                );
 
-                $this->M_Postatus->inputDetailPO($listTransaksi);
-            }
-            foreach ($tmpdiskon as $diskon) {
-                $listdiskon = array(
-                    'kd_po' => $kdpo,
-                    'kd_suplier' => $diskon->kd_suplier,
-                    'keterangan' => $diskon->keterangan,
-                    'nominal'    => $diskon->nominal
-                );
-                $this->M_Postatus->input_diskon($listdiskon);
-            }
-            foreach ($note as $nt) {
-                $listnote = array(
-                    'kd_po' => $kdpo,
-                    'isi_note' => $nt->isi_note,
-                    'kd_user' => $user,
-                    'nama_user' => $nmuser,
-                    'note_for' => '1',
-                    'update_status' => '1'
-                );
-                $this->M_Postatus->addNote($listnote);
-            }
-            foreach ($tmpnotebr as $ntbr) {
-                $listnotebr = array(
-                    'kd_po' => $kdpo,
-                    'kd_suplier' => $ntbr->kd_suplier,
-                    'isi_note'  => $ntbr->isi_note
-                );
-                $this->M_Postatus->input_note($listnotebr);
-            }
-            $msg = "success";
-            $data = array('msg' => $msg, 'nopo' => $nopo);
-            echo json_encode($data);
-        }
+        $msg = "success";
+        $data = array('msg' => $msg, 'nopo' => $nopo);
+        echo json_encode($data);
     }
     public function edit_no_po()
     {
         $idpo = $this->input->post('id_po');
         $kdpo = $this->input->post('kdpo');
-        $nopo = $this->input->post('nopo');
+        $nopo = strtoupper(trim((string) $this->input->post('nopo')));
+        $status = $this->M_Postatus->getdataStatus($kdpo);
+        $po = !empty($status) ? $status[0] : null;
+
+        if (!$po) {
+            $this->session->set_flashdata('error', 'Data PO tidak ditemukan.');
+            redirect('detailPO/' . $kdpo);
+            return;
+        }
+
+        if (!preg_match('/^[QA]\d{3}\/KIU\/(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII)\/\d{4}[A-Z]?$/', $nopo)) {
+            $this->session->set_flashdata('error', 'Format Nomor PO harus seperti Q001/KIU/VII/2026 atau Q001/KIU/VII/2026A.');
+            redirect('detailPO/' . $kdpo);
+            return;
+        }
+
+        if ($this->nomorPoExistsExceptCurrent($nopo, $kdpo)) {
+            $this->session->set_flashdata('error', 'Nomor PO sudah digunakan. Silakan gunakan nomor berikutnya atau suffix alfabet yang tersedia.');
+            redirect('detailPO/' . $kdpo);
+            return;
+        }
+
+        if ($this->nomorPoBaseSupplierExistsExceptCurrent($nopo, $po->kd_suplier, $kdpo)) {
+            $this->session->set_flashdata('error', 'Nomor PO sudah digunakan supplier ini. Silakan gunakan nomor berikutnya.');
+            redirect('detailPO/' . $kdpo);
+            return;
+        }
 
         $dataedited = array(
             'no_po' => $nopo
@@ -534,7 +476,30 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->editnopo($idpo, $dataedited);
         $this->M_Postatus->editnopodet($kdpo, $dataedited);
+        $this->session->set_flashdata('success', 'Nomor PO berhasil diperbarui.');
         redirect('detailPO/' . $kdpo);
+    }
+
+    private function nomorPoExistsExceptCurrent($noPo, $kdpo)
+    {
+        $this->db->from('tbpo_po');
+        $this->db->where('no_po', trim((string) $noPo));
+        $this->db->where('kd_po !=', $kdpo);
+        return $this->db->count_all_results() > 0;
+    }
+
+    private function nomorPoBaseSupplierExistsExceptCurrent($noPo, $kdSuplier, $kdpo)
+    {
+        $noPo = strtoupper(trim((string) $noPo));
+        if (!preg_match('/^([QA])(\d{3})\/KIU\/([IVXLCDM]+)\/(\d{4})([A-Z]?)$/', $noPo, $matches)) {
+            return false;
+        }
+
+        $this->db->from('tbpo_po');
+        $this->db->where('kd_suplier', $kdSuplier);
+        $this->db->where('kd_po !=', $kdpo);
+        $this->db->where("no_po REGEXP '^" . $this->db->escape_str($matches[1] . $matches[2]) . "/KIU/" . $this->db->escape_str($matches[3]) . "/" . $this->db->escape_str($matches[4]) . "[A-Z]?$'", null, false);
+        return $this->db->count_all_results() > 0;
     }
     public function hapuspo($kdpo)
     {

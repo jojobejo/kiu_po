@@ -6,7 +6,7 @@ Tanggal: 2026-07-03
 
 - Route utama: `postatusnk`
 - Route aksi: `postatusnk/update-tujuan-pembelian`
-- Tabel utama: `tb_po_nk`
+- Tabel utama: `tbpo_po_nk`
 - Kolom yang diperbarui: `tj_pembelian`
 
 ## Perubahan Struktur Database
@@ -17,12 +17,12 @@ Tidak ada tabel baru, kolom baru, index baru, constraint baru, atau migrasi SQL 
 
 ## Operasi Data
 
-Saat user menyimpan modal edit tujuan pembelian, aplikasi menjalankan update pada tabel existing `tb_po_nk` berdasarkan `kd_po_req`.
+Saat user menyimpan modal edit tujuan pembelian, aplikasi menjalankan update pada tabel existing `tbpo_po_nk` berdasarkan `kd_po_req`.
 
 Representasi operasi:
 
 ```sql
-UPDATE tb_po_nk
+UPDATE tbpo_po_nk
 SET tj_pembelian = :tujuan_pembelian
 WHERE kd_po_req = :kd_po_req;
 ```

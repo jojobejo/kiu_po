@@ -87,7 +87,7 @@ class M_Appsrated extends CI_Model
     }
     function inputsos($data)
     {
-        return $this->db->insert('tb_sosialisasi', $data);
+        return $this->db->insert('tbpo_sosialisasi', $data);
     }
     function getqnapic($user, $kdm)
     {
@@ -148,8 +148,8 @@ class M_Appsrated extends CI_Model
         b.departement AS dep,
         a.create_at AS tgl,
         a.status_nkomersil as sts
-        FROM tb_sosialisasi a 
-        JOIN tb_user b ON b.kode_user = a.kd_user
+        FROM tbpo_sosialisasi a 
+        JOIN tbpo_user b ON b.kode_user = a.kd_user
         WHERE a.kd_user = '$kduser'
         ");
     }

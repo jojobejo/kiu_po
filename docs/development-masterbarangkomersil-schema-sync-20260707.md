@@ -11,9 +11,9 @@ Tanggal: 2026-07-07
 
 ## Latar Belakang
 
-Halaman `masterbarangkomersil/` gagal dibuka karena query model masih memilih kolom `a.bahan_aktif`, sedangkan struktur `tb_barang` aktif saat ini memakai kolom `bhn_aktif`.
+Halaman `masterbarangkomersil/` gagal dibuka karena query model masih memilih kolom `a.bahan_aktif`, sedangkan struktur `tbpo_barang` aktif saat ini memakai kolom `bhn_aktif`.
 
-Saat schema dicek pada database lokal `kiucoid_po`, tabel `tb_barang` juga memakai:
+Saat schema dicek pada database lokal `kiucoid_po`, tabel `tbpo_barang` juga memakai:
 
 - `id` sebagai primary key, bukan `id_barang`
 - `satuan` sebagai teks satuan, bukan relasi `satuan_qty`
@@ -27,9 +27,9 @@ Query tidak lagi hard-code semua nama kolom lama. Model sekarang:
 
 1. Mengecek apakah primary key memakai `id_barang` atau `id`.
 2. Mengecek apakah bahan aktif memakai `bahan_aktif` atau `bhn_aktif`.
-3. Mengecek apakah satuan memakai relasi `satuan_qty` ke `tb_satuan` atau kolom teks `satuan`.
+3. Mengecek apakah satuan memakai relasi `satuan_qty` ke `tbpo_satuan` atau kolom teks `satuan`.
 4. Mengecek apakah `hasil_dimensi` tersedia; jika tidak tersedia, nilai dihitung dari `panjang * lebar * tinggi`.
-5. Menggunakan `LEFT JOIN` ke `tb_suplier` agar data barang tetap tampil meskipun master supplier belum lengkap.
+5. Menggunakan `LEFT JOIN` ke `tbpo_suplier` agar data barang tetap tampil meskipun master supplier belum lengkap.
 
 View `mbodyk.php` tetap memakai properti yang sama (`bahan_aktif`, `nm_satuan`, `panjang`, `lebar`, `tinggi`) karena model sudah menormalisasi alias field.
 
@@ -37,7 +37,7 @@ View `mbodyk.php` tetap memakai properti yang sama (`bahan_aktif`, `nm_satuan`, 
 
 Tanggal update: 2026-07-07
 
-Route `masterbarangkomersil/` sekarang tidak lagi memuat seluruh isi `tb_barang` ke HTML awal. Halaman memakai DataTables AJAX server-side melalui endpoint:
+Route `masterbarangkomersil/` sekarang tidak lagi memuat seluruh isi `tbpo_barang` ke HTML awal. Halaman memakai DataTables AJAX server-side melalui endpoint:
 
 - `masterbarangkomersil/data`
 - `masterbarangkomersil/detail/{id}`
@@ -60,8 +60,8 @@ Update alur terbaru:
 Update edit data:
 
 - Field supplier tidak dapat diedit dari SweetAlert2. Supplier tetap ditampilkan sebagai informasi pada halaman detail.
-- Field satuan memakai opsi dari `tb_satuan`.
-- Nilai satuan yang dikirim dan disimpan tetap nama satuan (`nm_satuan`) ke kolom `tb_barang.satuan`.
+- Field satuan memakai opsi dari `tbpo_satuan`.
+- Nilai satuan yang dikirim dan disimpan tetap nama satuan (`nm_satuan`) ke kolom `tbpo_barang.satuan`.
 
 Field yang dapat diedit dari SweetAlert2 pada halaman detail:
 
@@ -90,9 +90,9 @@ Field yang dapat diedit dari SweetAlert2 pada halaman detail:
 ## Tata Cara Penggunaan
 
 1. Buka menu Master Barang Komersil atau akses route `masterbarangkomersil/`.
-2. Sistem menampilkan daftar barang komersil dari `tb_barang`.
-3. Kolom Bahan Aktif mengambil data dari `tb_barang.bhn_aktif` pada schema sekarang.
-4. Kolom Nama Satuan mengambil data dari `tb_barang.satuan` pada schema sekarang.
+2. Sistem menampilkan daftar barang komersil dari `tbpo_barang`.
+3. Kolom Bahan Aktif mengambil data dari `tbpo_barang.bhn_aktif` pada schema sekarang.
+4. Kolom Nama Satuan mengambil data dari `tbpo_barang.satuan` pada schema sekarang.
 
 ## Dampak Bisnis
 
@@ -101,7 +101,7 @@ Perubahan ini menjaga halaman master barang komersil tetap berjalan mengikuti st
 ## Validasi
 
 - Syntax check model berhasil menggunakan `C:\xampp\php\php.exe -l`.
-- Struktur live `tb_barang` divalidasi dari database `kiucoid_po`.
+- Struktur live `tbpo_barang` divalidasi dari database `kiucoid_po`.
 - Syntax check controller, model, view `mbodyk.php`, dan JS partial `datatables.php` berhasil.
 - Syntax check view detail `detailbarangkomersil.php` berhasil.
 - Query server-side DataTables divalidasi langsung ke database live.

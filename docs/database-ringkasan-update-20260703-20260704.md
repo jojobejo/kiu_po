@@ -34,14 +34,14 @@ Tidak ada perubahan struktur database.
 
 Operasi data tetap memakai tabel existing:
 
-- Tabel: `tb_po_nk`
+- Tabel: `tbpo_po_nk`
 - Kolom yang diperbarui: `tj_pembelian`
 - Parameter kunci: `kd_po_req`
 
 Representasi operasi:
 
 ```sql
-UPDATE tb_po_nk
+UPDATE tbpo_po_nk
 SET tj_pembelian = :tujuan_pembelian
 WHERE kd_po_req = :kd_po_req;
 ```

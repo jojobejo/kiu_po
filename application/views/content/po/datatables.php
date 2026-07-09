@@ -6,7 +6,7 @@
             "autoWidth": false,
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
-        $("#tb_barang").DataTable({
+        $("#tbpo_barang").DataTable({
             "responsive": true,
             "lengthChange": false,
             "pageLength": 5,

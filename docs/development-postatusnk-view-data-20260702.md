@@ -53,5 +53,5 @@ Dengan perubahan ini, halaman `postatusnk/` menjadi alat monitoring yang lebih t
 ## Catatan Validasi
 
 - View yang digunakan tetap `content/postatus/nonkomersilstatus`.
-- Tabel sumber data tetap `tb_po_nk` dengan join ke `tb_user`.
+- Tabel sumber data tetap `tbpo_po_nk` dengan join ke `tbpo_user`.
 - Tidak ada perubahan pada struktur tampilan utama.

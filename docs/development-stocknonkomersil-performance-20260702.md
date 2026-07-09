@@ -17,8 +17,8 @@ Halaman `stocknonkomersil` terasa lambat saat load data dan saat filter dijalank
 
 - Endpoint lama mengirim seluruh data stock ke browser setiap reload.
 - Browser lalu membangun ulang semua row DataTables secara manual lewat JavaScript.
-- Query model memakai view `v_stockbarangnk` yang di database lokal berisi correlated subquery ke `tb_transaksi` berulang per barang.
-- Tabel lokal saat dicek berisi 875 barang dan 10.252 transaksi, sementara index pendukung pada `tb_transaksi.kd_barang` belum lengkap sebelum migrasi dijalankan.
+- Query model memakai view `v_stockbarangnk` yang di database lokal berisi correlated subquery ke `tbpo_transaksi` berulang per barang.
+- Tabel lokal saat dicek berisi 875 barang dan 10.252 transaksi, sementara index pendukung pada `tbpo_transaksi.kd_barang` belum lengkap sebelum migrasi dijalankan.
 
 ## Perubahan Development
 
@@ -31,7 +31,7 @@ Halaman `stocknonkomersil` terasa lambat saat load data dan saat filter dijalank
    - `order[0][dir]`
 2. DataTables di browser memakai `serverSide: true`, sehingga initial load dan filter hanya mengambil data per halaman.
 3. Filter lokasi dan status stock sekarang memanggil ulang AJAX DataTables, bukan membangun ulang semua row manual.
-4. Model menambahkan query stock berbasis agregasi `tb_transaksi` satu kali per request:
+4. Model menambahkan query stock berbasis agregasi `tbpo_transaksi` satu kali per request:
    - transaksi masuk: akun `11511`, `11513`
    - transaksi keluar: akun `11512`, `11514`
 5. Query halaman utama tidak lagi bergantung pada view `v_stockbarangnk`, karena view tersebut memakai subquery berulang.
