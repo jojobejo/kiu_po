@@ -107,6 +107,24 @@ class C_Order extends CI_Controller
             : $this->parseNumericInput($harga);
     }
 
+    private function hargaIncludeDariExclude($harga, $taxPercent)
+    {
+        $taxRate = $this->parseNumericInput($taxPercent) / 100;
+
+        return $this->parseNumericInput($harga) * (1 + $taxRate);
+    }
+
+    private function taxPercentForPpnSnapshot($ppnMode, $taxPercent)
+    {
+        $taxPercent = $this->parseNumericInput($taxPercent);
+
+        if ($taxPercent <= 0 && strtolower(trim((string) $ppnMode)) === 'include') {
+            return $this->ppnPersen;
+        }
+
+        return $taxPercent;
+    }
+
     private function isTaxPpnValid($taxPercent)
     {
         return abs($this->parseNumericInput($taxPercent) - $this->ppnPersen) < 0.00001;
@@ -782,6 +800,10 @@ class C_Order extends CI_Controller
         $detailTransaksi = array();
         $processedTmpIds = array();
         $totalHargaDiskon = 0;
+        $totalHargaInclude = 0;
+        $totalHargaExlude = 0;
+        $totalHargaDiskonInclude = 0;
+        $totalHargaDiskonExlude = 0;
         $hargaPajak = 0;
 
         if (!$tmp) {
@@ -813,7 +835,8 @@ class C_Order extends CI_Controller
             return;
         }
 
-        $tax = $this->taxByKeteranganHargaPpn($this->getKeteranganHargaPpnTmp($suplier));
+        $keteranganHargaPpnHeader = $this->getKeteranganHargaPpnTmp($suplier);
+        $tax = $this->taxByKeteranganHargaPpn($keteranganHargaPpnHeader);
         $this->M_Purchase->set_tmp_tax($suplier, $tax);
 
         if (!$this->tableColumnsAvailable('tbpo_detail_po', array('isi', 'kemasan', 'qty_kecil', 'harga_satuan_exclude', 'harga_satuan_kecil', 'harga_satuan_kecil_exclude', 'keterangan_harga_ppn'))) {
@@ -853,7 +876,22 @@ class C_Order extends CI_Controller
             $hargaSatuanKecilExclude = $isBonus ? 0 : $hargaSatuanKecil;
             $hargaDiskon = $isBonus ? 0 : $hargaDiskonInclude;
             $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
+            $taxSnapshot = $this->taxPercentForPpnSnapshot($keteranganHargaPpn, $tax);
+            $hargaTotalExlude = $isBonus ? 0 : ($hargaSatuanKecilExclude * $qtyKecil);
+            $hargaTotalInclude = $isBonus ? 0 : ($keteranganHargaPpn === 'include'
+                ? $chart->total_harga
+                : $this->hargaIncludeDariExclude($hargaTotalExlude, $taxSnapshot));
+            $hargaTotalDiskonExlude = $hargaTotalDiskon;
+            $hargaTotalDiskonInclude = $isBonus ? 0 : $this->hargaIncludeDariExclude($hargaTotalDiskonExlude, $taxSnapshot);
             $totalHargaDiskon += $hargaTotalDiskon;
+            $totalHargaInclude += $hargaTotalInclude;
+            $totalHargaExlude += $hargaTotalExlude;
+            $totalHargaDiskonInclude += $hargaTotalDiskonInclude;
+            $totalHargaDiskonExlude += $hargaTotalDiskonExlude;
+
+            if ($keteranganHargaPpnHeader === '' && in_array($keteranganHargaPpn, array('include', 'exclude'), true)) {
+                $keteranganHargaPpnHeader = $keteranganHargaPpn;
+            }
 
             $detailTransaksi[] = array(
                 'no_po'             => $nopo,
@@ -898,6 +936,11 @@ class C_Order extends CI_Controller
             'jml_item'      => $jml,
             'total_harga'   => $harga,
             'total_harga_diskon' => $totalHargaDiskon,
+            'keterangan_harga_ppn' => $keteranganHargaPpnHeader,
+            'total_harga_include' => $totalHargaInclude,
+            'total_harga_exlude' => $totalHargaExlude,
+            'total_harga_diskon_include' => $totalHargaDiskonInclude,
+            'total_harga_diskon_exlude' => $totalHargaDiskonExlude,
             'tmpo_pembayaran' => $tmpo,
             'gdg_pengiriman'  => $gdg,
             'tax'           => $tax,

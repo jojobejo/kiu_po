@@ -330,7 +330,14 @@ class M_Purchase extends CI_Model
 
     public function inputOrder($data)
     {
-        $this->db->insert('tbpo_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tbpo_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        $this->db->insert('tbpo_po', $filteredData);
     }
     public function inputDetailPO($data)
     {

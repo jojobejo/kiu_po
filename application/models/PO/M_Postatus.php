@@ -337,8 +337,15 @@ class M_PoStatus extends CI_Model
     }
     function updateTax($kdpo, $updateTax)
     {
+        $filteredData = array();
+        foreach ($updateTax as $field => $value) {
+            if ($this->db->field_exists($field, 'tbpo_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
         $this->db->where('kd_po', $kdpo);
-        return $this->db->update('tbpo_po', $updateTax);
+        return $this->db->update('tbpo_po', $filteredData);
     }
 
     function updateDetailPO($id, $data)
@@ -887,7 +894,14 @@ class M_PoStatus extends CI_Model
     }
     public function inputRevisi($data)
     {
-        $this->db->insert('tbpo_po', $data);
+        $filteredData = array();
+        foreach ($data as $field => $value) {
+            if ($this->db->field_exists($field, 'tbpo_po')) {
+                $filteredData[$field] = $value;
+            }
+        }
+
+        $this->db->insert('tbpo_po', $filteredData);
     }
     public function inputDetailPO($data)
     {

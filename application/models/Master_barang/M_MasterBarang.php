@@ -39,9 +39,17 @@ class M_MasterBarang extends CI_Model
         return $this->db->field_exists('id_barang', 'tbpo_barang') ? 'id_barang' : 'id';
     }
 
-    private function get_barang_bahan_aktif_column()
+    private function get_barang_bahan_aktif_select_sql()
     {
-        return $this->db->field_exists('bahan_aktif', 'tbpo_barang') ? 'bahan_aktif' : 'bhn_aktif';
+        if ($this->db->field_exists('bahan_aktif', 'tbpo_barang')) {
+            return 'a.bahan_aktif AS bahan_aktif';
+        }
+
+        if ($this->db->field_exists('bhn_aktif', 'tbpo_barang')) {
+            return 'a.bhn_aktif AS bahan_aktif';
+        }
+
+        return "'' AS bahan_aktif";
     }
 
     private function get_barang_image_select_sql()
@@ -60,9 +68,13 @@ class M_MasterBarang extends CI_Model
     private function get_barang_select_sql()
     {
         $idColumn = $this->get_barang_id_column();
-        $bahanAktifColumn = $this->get_barang_bahan_aktif_column();
         $hasSatuanQty = $this->db->field_exists('satuan_qty', 'tbpo_barang');
+        $hasSatuan = $this->db->field_exists('satuan', 'tbpo_barang');
         $hasHasilDimensi = $this->db->field_exists('hasil_dimensi', 'tbpo_barang');
+        $hasPanjang = $this->db->field_exists('panjang', 'tbpo_barang');
+        $hasLebar = $this->db->field_exists('lebar', 'tbpo_barang');
+        $hasTinggi = $this->db->field_exists('tinggi', 'tbpo_barang');
+        $hasDimensi = $hasPanjang && $hasLebar && $hasTinggi;
 
         $select = array(
             "a.$idColumn AS id_barang",
@@ -71,14 +83,14 @@ class M_MasterBarang extends CI_Model
             'c.nama_suplier',
             'a.nama_barang',
             $this->get_barang_image_select_sql(),
-            "a.$bahanAktifColumn AS bahan_aktif",
+            $this->get_barang_bahan_aktif_select_sql(),
             $hasSatuanQty ? 'a.satuan_qty' : 'NULL AS satuan_qty',
-            $hasSatuanQty ? 'b.nm_satuan' : 'COALESCE(b.nm_satuan, a.satuan) AS nm_satuan',
-            $this->db->field_exists('satuan', 'tbpo_barang') ? 'a.satuan' : 'NULL AS satuan',
-            'a.panjang',
-            'a.lebar',
-            'a.tinggi',
-            $hasHasilDimensi ? 'a.hasil_dimensi' : '(a.panjang * a.lebar * a.tinggi) AS hasil_dimensi',
+            $hasSatuanQty ? 'b.nm_satuan' : ($hasSatuan ? 'COALESCE(b.nm_satuan, a.satuan) AS nm_satuan' : "'' AS nm_satuan"),
+            $hasSatuan ? 'a.satuan' : 'NULL AS satuan',
+            $hasPanjang ? 'a.panjang' : '0 AS panjang',
+            $hasLebar ? 'a.lebar' : '0 AS lebar',
+            $hasTinggi ? 'a.tinggi' : '0 AS tinggi',
+            $hasHasilDimensi ? 'a.hasil_dimensi' : ($hasDimensi ? '(a.panjang * a.lebar * a.tinggi) AS hasil_dimensi' : '0 AS hasil_dimensi'),
             $this->db->field_exists('berat', 'tbpo_barang') ? 'a.berat' : '0 AS berat',
             $this->db->field_exists('isi', 'tbpo_barang') ? 'a.isi' : '0 AS isi',
             $this->db->field_exists('kemasan', 'tbpo_barang') ? 'a.kemasan' : '0 AS kemasan',
@@ -97,9 +109,10 @@ class M_MasterBarang extends CI_Model
     private function barang_komersil_base_sql()
     {
         $hasSatuanQty = $this->db->field_exists('satuan_qty', 'tbpo_barang');
+        $hasSatuan = $this->db->field_exists('satuan', 'tbpo_barang');
         $joinSatuan = $hasSatuanQty
             ? 'LEFT JOIN tbpo_satuan b ON b.id_satuan = a.satuan_qty'
-            : 'LEFT JOIN tbpo_satuan b ON b.nm_satuan = a.satuan';
+            : ($hasSatuan ? 'LEFT JOIN tbpo_satuan b ON b.nm_satuan = a.satuan' : '');
 
         return "SELECT
             {$this->get_barang_select_sql()}

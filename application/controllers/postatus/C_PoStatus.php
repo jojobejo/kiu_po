@@ -8,6 +8,7 @@ class C_PoStatus extends CI_Controller
 
 {
     private $bonusFlagValue = 1;
+    private $ppnPersen = 11;
 
     function __construct()
     {
@@ -42,6 +43,23 @@ class C_PoStatus extends CI_Controller
     {
         $taxRate = $this->parseNumericInput($taxPercent) / 100;
         return $taxRate > 0 ? (float) $value / (1 + $taxRate) : (float) $value;
+    }
+
+    private function includePpn($value, $taxPercent)
+    {
+        $taxRate = $this->parseNumericInput($taxPercent) / 100;
+        return $this->parseNumericInput($value) * (1 + $taxRate);
+    }
+
+    private function taxPercentForPpnSnapshot($ppnMode, $taxPercent)
+    {
+        $taxPercent = $this->parseNumericInput($taxPercent);
+
+        if ($taxPercent <= 0 && strtolower(trim((string) $ppnMode)) === 'include') {
+            return $this->ppnPersen;
+        }
+
+        return $taxPercent;
     }
 
     private function hargaExcludePpnByMode($harga, $ppnMode, $taxPercent)
@@ -1425,6 +1443,11 @@ class C_PoStatus extends CI_Controller
         $taxForConversion = (float) $tax > 0 ? $tax : 11;
         $totalHarga = 0;
         $totalHargaDiskon = 0;
+        $totalHargaInclude = 0;
+        $totalHargaExlude = 0;
+        $totalHargaDiskonInclude = 0;
+        $totalHargaDiskonExlude = 0;
+        $keteranganHargaPpnHeader = $this->getKeteranganHargaPpnDetailPo($kdpo);
 
         foreach ($detail as $item) {
             $isBonus = isset($item->is_bonus) ? (int) $item->is_bonus : 0;
@@ -1447,8 +1470,23 @@ class C_PoStatus extends CI_Controller
             $hargaSatuanKecilExclude = $isBonus ? 0 : $hargaSatuanKecil;
             $hargaDiskon = $isBonus ? 0 : $hargaDiskonInclude;
             $hargaTotalDiskon = $isBonus ? 0 : ($hargaDiskon * $qtyKecil);
+            $taxSnapshot = $this->taxPercentForPpnSnapshot($keteranganHargaPpn, $tax);
+            $hargaTotalExlude = $isBonus ? 0 : ($hargaSatuanKecilExclude * $qtyKecil);
+            $hargaTotalInclude = $isBonus ? 0 : ($keteranganHargaPpn === 'include'
+                ? $item->hrg_total
+                : $this->includePpn($hargaTotalExlude, $taxSnapshot));
+            $hargaTotalDiskonExlude = $hargaTotalDiskon;
+            $hargaTotalDiskonInclude = $isBonus ? 0 : $this->includePpn($hargaTotalDiskonExlude, $taxSnapshot);
             $totalHarga += $isBonus ? 0 : ($hargaSatuanKecil * $qtyKecil);
             $totalHargaDiskon += $hargaTotalDiskon;
+            $totalHargaInclude += $hargaTotalInclude;
+            $totalHargaExlude += $hargaTotalExlude;
+            $totalHargaDiskonInclude += $hargaTotalDiskonInclude;
+            $totalHargaDiskonExlude += $hargaTotalDiskonExlude;
+
+            if ($keteranganHargaPpnHeader === '' && in_array($keteranganHargaPpn, array('include', 'exclude'), true)) {
+                $keteranganHargaPpnHeader = $keteranganHargaPpn;
+            }
 
             $this->M_Postatus->update_diskon_item($item->id_det_po, array(
                 'harga_satuan_exclude' => $isBonus ? 0 : $hargaSatuanExclude,
@@ -1467,6 +1505,11 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->updateTax($kdpo, array(
             'total_harga' => $totalHarga,
             'total_harga_diskon' => $totalHargaDiskon,
+            'keterangan_harga_ppn' => $keteranganHargaPpnHeader,
+            'total_harga_include' => $totalHargaInclude,
+            'total_harga_exlude' => $totalHargaExlude,
+            'total_harga_diskon_include' => $totalHargaDiskonInclude,
+            'total_harga_diskon_exlude' => $totalHargaDiskonExlude,
             'hrg_pajak' => $totalHargaDiskon * ((float) $tax / 100)
         ));
     }
