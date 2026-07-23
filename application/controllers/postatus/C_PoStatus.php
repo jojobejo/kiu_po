@@ -1938,6 +1938,99 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/datatables');
     }
+    
+    public function cancel_pengajuan_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_req);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'PO CANCEL - PENGAJUAN DIBATALKAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+    
+    public function update_tujuan_pembelian_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        $tujuan_pembelian = trim((string) $this->input->post('tujuan_pembelian', true));
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        if ($tujuan_pembelian === '') {
+            return $this->responseJson(false, 'Tujuan pembelian tidak boleh kosong');
+        }
+
+        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_req, $tujuan_pembelian);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'EDIT DATA TUJUAN PEMBELIAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+
+    private function validatePonkForAjax($kd_po_req)
+    {
+        $kd_po_req = trim((string) $kd_po_req);
+        if ($kd_po_req === '') {
+            return array(false, null, 'Kode pengajuan tidak boleh kosong');
+        }
+
+        if (!$this->session->userdata('kode')) {
+            return array(false, null, 'Sesi login sudah berakhir, silakan login ulang');
+        }
+
+        $ponk = $this->M_Postatus->get_ponk_by_req($kd_po_req);
+        if (!$ponk) {
+            return array(false, null, 'Data pengajuan tidak ditemukan');
+        }
+
+        $blockedStatuses = array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN');
+        if (in_array($ponk->status, $blockedStatuses, true)) {
+            return array(false, null, 'Data dengan status ' . $ponk->status . ' tidak dapat diubah');
+        }
+
+        return array(true, $ponk, '');
+    }
+
+    private function responseJson($status, $message, $httpStatus = 200)
+    {
+        $this->output
+            ->set_status_header($httpStatus)
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'status' => (bool) $status,
+                'message' => $message
+            )));
+        return;
+    }
 
     public function historidone($lv, $user)
     {

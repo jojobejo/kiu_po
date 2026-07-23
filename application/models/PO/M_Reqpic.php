@@ -169,10 +169,16 @@ class M_Reqpic extends CI_Model
             a.keterangan AS keterangan,
             a.qty AS qtykebutuhan,
             c.nm_satuan AS nm_satuan,
+            COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock,
             a.status as sts
             FROM tb_detail_req a
             JOIN tb_barang_nk b ON b.kd_barang = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            LEFT JOIN (
+                SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+                FROM v_stockbarangnk
+                GROUP BY kode_barangs
+            ) stock ON stock.kode_barangs = a.kd_bsys
             WHERE a.kd_user = '$kduser' AND a.kd_po_nk = '$kdpo' AND a.status = '$sts1'
         ");
     }
@@ -185,10 +191,16 @@ class M_Reqpic extends CI_Model
             a.keterangan AS keterangan,
             a.qty AS qtykebutuhan,
             c.nm_satuan AS nm_satuan,
+            COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock,
             a.status as sts
             FROM tb_detail_req a
             JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = b.satuan 
+            LEFT JOIN (
+                SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+                FROM v_stockbarangnk
+                GROUP BY kode_barangs
+            ) stock ON stock.kode_barangs = a.kd_bsys
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
         ");
     }
@@ -202,10 +214,16 @@ class M_Reqpic extends CI_Model
             b.descnk AS deskripsi,
             a.keterangan AS ket,
             a.qty AS qty,
-            c.nm_satuan AS nmsatuan
+            c.nm_satuan AS nmsatuan,
+            COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock
             FROM tb_detail_req a 
             JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
             JOIN tb_satuan c ON c.id_satuan = a.satuan
+            LEFT JOIN (
+                SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+                FROM v_stockbarangnk
+                GROUP BY kode_barangs
+            ) stock ON stock.kode_barangs = a.kd_bsys
             WHERE a.kd_po_nk = '$kd'
         ");
     }
@@ -226,6 +244,7 @@ class M_Reqpic extends CI_Model
             COALESCE(x.qty_transaksi_m,0) qty_m,
             COALESCE(x.qty_transaksi_p,0) qty_p,
             COALESCE(x.qty,0) AS qty_req,
+            COALESCE(x.qty_ready_stock,0) AS qty_ready_stock,
             IF(x.status = '1', (COALESCE(x.qty_transaksi_pad,0)+COALESCE(x.qty_transaksi_p,0)) - (COALESCE(x.qty_transaksi_mad,0)+COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0), (COALESCE(x.qty_transaksi_pad,0)+COALESCE(x.qty_transaksi_p,0)) - (COALESCE(x.qty_transaksi_mad,0)+COALESCE(x.qty_transaksi_m,0))) AS qty_ready
             FROM
             (   SELECT 
@@ -238,6 +257,7 @@ class M_Reqpic extends CI_Model
                 a.qty,
                 a.status,
                 f.nm_satuan,
+                stock.qty_ready_stock,
                 (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_tmp,
                 (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barang = a.kd_barang GROUP BY a.kd_bsys) AS qty_transaksi,
                 (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barang = a.kd_barang AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
@@ -247,6 +267,11 @@ class M_Reqpic extends CI_Model
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_br_adm = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
+                LEFT JOIN (
+                    SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+                    FROM v_stockbarangnk
+                    GROUP BY kode_barangs
+                ) stock ON stock.kode_barangs = a.kd_bsys
             ) AS x 
             WHERE x.kd_po_nk = '$kd'
             ORDER BY x.id_det_po_nk
@@ -266,6 +291,7 @@ class M_Reqpic extends CI_Model
             COALESCE(x.qty_tmp,0) AS qty_tmp,
             (COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) AS qty_transaksi,
             COALESCE(x.qty,0) AS qty_req,
+            COALESCE(x.qty_ready_stock,0) AS qty_ready_stock,
             IF(x.status = '1',(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0)) - COALESCE(x.qty_tmp,0),(COALESCE(x.qty_transaksi_p,0) - COALESCE(x.qty_transaksi_m,0))) AS qty_ready
             FROM
             (   SELECT 
@@ -278,6 +304,7 @@ class M_Reqpic extends CI_Model
                 a.qty,
                 a.status,
                 f.nm_satuan,
+                stock.qty_ready_stock,
                 (SELECT SUM(c.tr_qty) FROM tb_transaksi_tmp c WHERE c.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_tmp,
                 (SELECT SUM(d.tr_qty) FROM tb_transaksi d WHERE d.kd_barangsys = a.kd_bsys GROUP BY a.kd_bsys) AS qty_transaksi,
                 (SELECT SUM(g.tr_qty) FROM tb_transaksi g WHERE g.kd_barangsys = a.kd_bsys AND g.kd_akun = '11511' GROUP BY a.kd_bsys) AS qty_transaksi_p,
@@ -285,6 +312,11 @@ class M_Reqpic extends CI_Model
                 FROM tb_detail_req a 
                 JOIN tb_barang_nk e ON e.kd_barang = a.kd_bsys
                 JOIN tb_satuan f ON f.id_satuan = e.satuan 
+                LEFT JOIN (
+                    SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+                    FROM v_stockbarangnk
+                    GROUP BY kode_barangs
+                ) stock ON stock.kode_barangs = a.kd_bsys
             ) AS x 
             WHERE x.kd_po_nk = '$kd' AND x.status = '$sts'
             ");
@@ -384,10 +416,16 @@ class M_Reqpic extends CI_Model
         b.descnk,
         a.keterangan,
         a.qty,
-        c.nm_satuan
+        c.nm_satuan,
+        COALESCE(stock.qty_ready_stock, 0) AS qty_ready_stock
         FROM tb_detail_req a 
         JOIN tb_barang_nk b ON b.kd_br_adm = a.kd_bsys
         JOIN tb_satuan c ON c.id_satuan = a.satuan
+        LEFT JOIN (
+            SELECT kode_barangs, SUM(qty_ready) AS qty_ready_stock
+            FROM v_stockbarangnk
+            GROUP BY kode_barangs
+        ) stock ON stock.kode_barangs = a.kd_bsys
         WHERE a.kd_po_nk = '$kd'
 
     ");

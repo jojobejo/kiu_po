@@ -318,9 +318,9 @@ class C_Laporan extends CI_Controller
         $tgl1 = $this->input->get('tglstart');
         $tgl2 = $this->input->get('tglend');
 
-        if (!$tgl1 || !$tgl2) {
-            echo "Tanggal harus diisi!";
-            exit;
+        if (!$tgl1 || !$tgl2 || !$this->is_valid_date_export($tgl1) || !$this->is_valid_date_export($tgl2)) {
+            show_error('Tanggal harus diisi dengan format YYYY-MM-DD.', 400);
+            return;
         }
 
         $export = $this->M_Laporanp->getdaterangelaptr($tgl1, $tgl2)->result();
@@ -412,14 +412,28 @@ class C_Laporan extends CI_Controller
         $sheet->getColumnDimension('G')->setWidth(25);
         $sheet->getColumnDimension('H')->setWidth(30);
         $sheet->getColumnDimension('I')->setWidth(6);
-        $sheet->getColumnDimension('j')->setWidth(20);
+        $sheet->getColumnDimension('J')->setWidth(20);
 
         // Download
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="Laporan_Transaksi_NonKomersil_' . $tgl1 . '_to_' . $tgl2 . '.xls"');
+        $filename = 'Laporan_Transaksi_NonKomersil_' . $tgl1 . '_to_' . $tgl2 . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
+        header('Pragma: public');
 
-        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+        while (ob_get_level() > 0 && @ob_end_clean()) {
+            // Bersihkan semua output sebelum stream Excel dikirim.
+        }
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $writer->save('php://output');
+        exit;
+    }
+
+    private function is_valid_date_export($date)
+    {
+        $parsed = DateTime::createFromFormat('Y-m-d', $date);
+
+        return $parsed && $parsed->format('Y-m-d') === $date;
     }
 }
