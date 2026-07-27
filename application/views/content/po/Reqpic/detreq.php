@@ -61,6 +61,7 @@
                                             <td>Keterangan</td>
                                             <td>QTY</td>
                                             <td>Satuan</td>
+                                            <td>Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -71,6 +72,7 @@
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->qtykebutuhan ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
+                                                <td><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -85,6 +87,7 @@
                                             <td style="width:20%;">Keterangan</td>
                                             <td style="width:10%;text-align: center;">QTY</td>
                                             <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="width:10%;text-align: center;">Qty Ready</td>
                                             <td style="width:10%;text-align: center;">#</td>
                                         </tr>
                                     </thead>
@@ -96,6 +99,7 @@
                                                 <td><?= $d->ket ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                                 <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -111,6 +115,7 @@
                                             <td style="width:20%;">Keterangan</td>
                                             <td style="width:10%;text-align: center;">QTY</td>
                                             <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="width:10%;text-align: center;">Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -121,6 +126,7 @@
                                                 <td><?= $d->ket ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -230,6 +236,7 @@
                                             <td style="width:20%;">Keterangan</td>
                                             <td style="width:10%;text-align: center;">QTY</td>
                                             <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="width:10%;text-align: center;">Qty Ready</td>
                                             <td style="text-align: center;">#</td>
                                         </tr>
                                     </thead>
@@ -241,6 +248,7 @@
                                                 <td><?= $d->ket ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                                 <td>
                                                     <div class="row">
                                                         <div class="col">
@@ -265,6 +273,7 @@
                                             <td>Deskripsi</td>
                                             <td style="width:30%">Keterangan</td>
                                             <td style="width:10%">Satuan</td>
+                                            <td style="width:10%">Qty Ready</td>
                                             <td style="width:10%">QTY</td>
                                             <td style="width:10%">#</td>
                                         </tr>
@@ -278,6 +287,7 @@
                                                 <td><?= $d->deskripsi ?></td>
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
+                                                <td><?= $d->qty_ready_stock ?></td>
                                                 <td><?= $d->qty_req ?></td>
                                                 <?php if ($d->sts == '1') : ?>
                                                     <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
@@ -298,6 +308,7 @@
                                             <td style="width:20%;">Keterangan</td>
                                             <td style="width:10%;text-align: center;">QTY</td>
                                             <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="width:10%;text-align: center;">Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -308,6 +319,7 @@
                                                 <td><?= $d->ket ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nmsatuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -591,6 +603,7 @@
                                             <td>Deskripsi</td>
                                             <td style="width:30%">Keterangan</td>
                                             <td style="width:10%">Satuan</td>
+                                            <td style="width:10%">Qty Ready</td>
                                             <td style="width:10%">QTY</td>
                                             <td style="width:10%">#</td>
                                         </tr>
@@ -604,6 +617,7 @@
                                                 <td><?= $d->deskripsi ?></td>
                                                 <td><?= $d->keterangan ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
+                                                <td><?= $d->qty_ready_stock ?></td>
                                                 <td><?= $d->qty_req ?></td>
                                                 <?php if ($d->sts == '1') : ?>
                                                     <td><a href="#" class="btn btn-block btn-success btn-md"><i class="fas fa-check-circle"></i></a></td>
@@ -656,10 +670,12 @@
                                             <td>QTY</td>
                                             <?php if ($s->tj_pembelian == "Restock By Admin PO") : ?>
                                                 <td>Satuan</td>
+                                                <td>Qty Ready</td>
                                                 <td>#</td>
                                             <?php else : ?>
                                                 <td style="width: 10%;">Qty Tersedia</td>
                                                 <td>Satuan</td>
+                                                <td>Qty Ready</td>
                                                 <td>Status</td>
                                                 <td>#</td>
                                             <?php endif; ?>
@@ -767,6 +783,7 @@
                                                     <td><?= $d->qty_ready ?></td>
                                                 <?php endif; ?>
                                                 <td><?= $d->nm_satuan ?></td>
+                                                <td><?= $d->qty_ready_stock ?></td>
                                                 <?php if ($s->tj_pembelian == "Restock By Admin PO") : ?>
                                                     <?php if ($d->sts == '0') : ?>
                                                         <td><a href="" class="btn btn-block btn-warning btn-sm" data-toggle="modal" data-target="#restockmodaledited<?= $d->id ?>"><i class="fas fa-plus"></i></a></td>
@@ -866,6 +883,7 @@
                                             <td>QTY</td>
                                             <td style="width: 10%;">Qty Tersedia</td>
                                             <td>Satuan</td>
+                                            <td>Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -879,6 +897,7 @@
                                                 <td><?= $d->qty_req ?></td>
                                                 <td><?= $d->qty_ready ?></td>
                                                 <td><?= $d->nm_satuan ?></td>
+                                                <td><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -896,6 +915,7 @@
                                             <td style="width:20%;">Keterangan</td>
                                             <td style="width:10%;text-align: center;">QTY</td>
                                             <td style="width:10%;text-align: center;">Satuan</td>
+                                            <td style="width:10%;text-align: center;">Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -906,6 +926,7 @@
                                                 <td><?= $d->keterangan ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nm_satuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -943,6 +964,7 @@
                                             <td style="width:30%">Keterangan</td>
                                             <td style="width:10%">QTY</td>
                                             <td style="width:10%">Satuan</td>
+                                            <td style="width:10%">Qty Ready</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -953,6 +975,7 @@
                                                 <td><?= $d->keterangan ?></td>
                                                 <td style="text-align: center;"><?= $d->qty ?></td>
                                                 <td style="text-align: center;"><?= $d->nm_satuan ?></td>
+                                                <td style="text-align: center;"><?= $d->qty_ready_stock ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
