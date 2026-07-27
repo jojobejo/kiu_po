@@ -86,7 +86,7 @@
                                     <a href="<?= base_url('listbarangready') ?>" class="btn btn-sm btn-primary"><i class="fas fa-plus"></i>&nbsp; Tambah Barang </a>
                                 </div>
                             </div>
-                            <?php echo form_open_multipart('addnewreq/' . $this->session->userdata('kode')); ?>
+                            <?php echo form_open_multipart('addnewreq'); ?>
                             <div class="col mb-2 mt-5">
                                 <div class="row">
                                     <div class="col-md-auto">

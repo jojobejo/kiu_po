@@ -141,6 +141,15 @@ class M_Reqpic extends CI_Model
         $query = $this->db->get()->result();
         return $query;
     }
+    public function getrequestbypicuser($kd, $usr)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_req_nk');
+        $this->db->where('kd_po_nk', $kd);
+        $this->db->where('kd_user', $usr);
+        $query = $this->db->get()->result();
+        return $query;
+    }
     public function count_acc_req($kd)
     {
         return $this->db->query("SELECT
@@ -212,8 +221,9 @@ class M_Reqpic extends CI_Model
             WHERE a.kd_user = '$usr' AND a.kd_po_nk = '$kd'
         ");
     }
-    public function getitmlistpicreq($kd)
+    public function getitmlistpicreq($kd, $usr = null)
     {
+        $userFilter = $usr ? " AND a.kd_user = " . $this->db->escape($usr) : "";
         return $this->db->query("SELECT
             a.id_det_po_nk AS idbarang,
             a.kd_bsys AS kodebarang,
@@ -236,14 +246,16 @@ class M_Reqpic extends CI_Model
                 ) stock_map
                 GROUP BY stock_key
             ) stock ON stock.stock_key = a.kd_bsys
-            WHERE a.kd_po_nk = '$kd'
+            WHERE a.kd_po_nk = " . $this->db->escape($kd) . $userFilter . "
         ");
     }
-    public function getreqwheres($kd)
+    public function getreqwheres($kd, $usr = null)
     {
+        $userFilter = $usr ? " AND x.kd_user = " . $this->db->escape($usr) : "";
         return $this->db->query("SELECT
             x.id_det_po_nk AS id,
             x.kd_po_nk AS kode_po,
+            x.kd_user AS kd_user,
             x.kd_barang AS kode_barang,
             x.nama_barang AS nama_barang,
             x.deskripsi AS deskripsi,
@@ -262,6 +274,7 @@ class M_Reqpic extends CI_Model
             (   SELECT 
                 a.id_det_po_nk,
                 a.kd_po_nk,
+                a.kd_user,
                 a.kd_barang,
                 a.nama_barang,
                 a.deskripsi,
@@ -289,7 +302,7 @@ class M_Reqpic extends CI_Model
                     GROUP BY stock_key
                 ) stock ON stock.stock_key = a.kd_bsys
             ) AS x 
-            WHERE x.kd_po_nk = '$kd'
+            WHERE x.kd_po_nk = " . $this->db->escape($kd) . $userFilter . "
             ORDER BY x.id_det_po_nk
         ");
     }
@@ -792,6 +805,53 @@ class M_Reqpic extends CI_Model
     function generatekdponk($data)
     {
         $this->db->insert('tb_generate_kd_ponk', $data);
+    }
+    function reserve_kdnonkomersial()
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        $lockName = 'kiu_po_nponk_' . date('Ymd');
+        $locked = $this->db->query("SELECT GET_LOCK(?, 10) AS is_locked", array($lockName))->row();
+
+        if (!$locked || $locked->is_locked != '1') {
+            return false;
+        }
+
+        try {
+            for ($i = 0; $i < 10; $i++) {
+                $cd1 = $this->db->query("SELECT MAX(CAST(RIGHT(kd_barang,4) AS UNSIGNED)) AS kd_max FROM tb_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
+                $next = 1;
+                if ($cd1->num_rows() > 0) {
+                    $row = $cd1->row();
+                    $next = ((int) $row->kd_max) + 1;
+                }
+
+                $kdponk = 'NPONK' . date('dmy') . sprintf("%04s", $next + $i);
+                if ($this->is_kdponk_exists($kdponk)) {
+                    continue;
+                }
+
+                $this->db->insert('tb_generate_kd_ponk', array('kd_barang' => $kdponk));
+                if ($this->db->affected_rows() > 0) {
+                    return $kdponk;
+                }
+            }
+        } finally {
+            $this->db->query("SELECT RELEASE_LOCK(?)", array($lockName));
+        }
+
+        return false;
+    }
+    function is_kdponk_exists($kdponk)
+    {
+        $usedReq = $this->db
+            ->where('kd_po_nk', $kdponk)
+            ->count_all_results('tb_req_nk');
+
+        $usedGenerate = $this->db
+            ->where('kd_barang', $kdponk)
+            ->count_all_results('tb_generate_kd_ponk');
+
+        return ($usedReq + $usedGenerate) > 0;
     }
     function kdnonkomersial()
     {

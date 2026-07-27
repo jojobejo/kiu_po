@@ -88,7 +88,7 @@
                             </div>
                         </div>
 
-                        <?php echo form_open_multipart('add_promosi_cp/' . $this->session->userdata('kode')); ?>
+                        <?php echo form_open_multipart('add_promosi_cp'); ?>
                         <div class="col mb-2 mt-5">
                             <div class="row">
                                 <div class="col-md-auto">

@@ -158,6 +158,7 @@ $route['index_done']                                    = 'purchaseorder/C_Reqpi
 $route['listbarangready']                               = 'purchaseorder/C_Reqpic/list_barang_ready';
 $route['add_mbarang_tmp']                               = 'purchaseorder/C_Reqpic/addrequestmasterbarangready';
 $route['addtmpreqbarang']                               = 'purchaseorder/C_Reqpic/addtmpreqbarang';
+$route['addnewreq']                                     = 'purchaseorder/C_Reqpic/addnewreq';
 $route['addnewreq/(:any)']                              = 'purchaseorder/C_Reqpic/addnewreq/$1';
 
 $route['editedreqpic']                                  = 'purchaseorder/C_Reqpic/editedreqpic';
@@ -183,12 +184,14 @@ $route['updated_po_nk/(:any)']                          = 'purchaseorder/C_Reqpi
 $route['promosi_seed']                                  = 'purchaseorder/C_Reqpic/promosiseed';
 $route['list_barang_ready_seed']                        = 'purchaseorder/C_Reqpic/list_barang_ready_seed';
 $route['addtmpreqbarang_seed']                          = 'purchaseorder/C_Reqpic/addtmpreqbarang_seed';
+$route['add_promosi_seed']                              = 'purchaseorder/C_Reqpic/add_promosi_seed';
 $route['add_promosi_seed/(:any)']                       = 'purchaseorder/C_Reqpic/add_promosi_seed/$1';
 
 
 $route['promosi_cp']                                    = 'purchaseorder/C_Reqpic/promosicp';
 $route['list_barang_ready_cp']                          = 'purchaseorder/C_Reqpic/list_barang_ready_cp';
 $route['addtmpreqbarang_cp']                            = 'purchaseorder/C_Reqpic/addtmpreqbarang_cp';
+$route['add_promosi_cp']                                = 'purchaseorder/C_Reqpic/add_promosi_cp';
 $route['add_promosi_cp/(:any)']                         = 'purchaseorder/C_Reqpic/add_promosi_cp/$1';
 
 //PurchaseOrderNonKomersil - STATUS
