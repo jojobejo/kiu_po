@@ -102,7 +102,15 @@ $route['vrequestmbarang']                               = 'master_barang/C_Maste
 $route['masterbarangkomersil']                          = 'master_barang/C_MasterBarang/masterbarangkomersil';
 
 // PO-Non-Komersil - PO JASA
-$route['pononkomersiljasa']                             = 'purchaseorder/pojasa/C_Pojasa';
+$route['pononkomersiljasa']                             = 'purchaseorder/C_Pojasa';
+$route['pojasa/vendor/data']                            = 'purchaseorder/C_Pojasa/vendor_data';
+$route['pojasa/vendor/save']                            = 'purchaseorder/C_Pojasa/vendor_save';
+$route['pojasa/vendor/status']                          = 'purchaseorder/C_Pojasa/vendor_status';
+$route['pojasa/request/data']                           = 'purchaseorder/C_Pojasa/request_data';
+$route['pojasa/request/save']                           = 'purchaseorder/C_Pojasa/request_save';
+$route['pojasa/request/detail/(:any)']                  = 'purchaseorder/C_Pojasa/request_detail/$1';
+$route['pojasa/request/status']                         = 'purchaseorder/C_Pojasa/request_status';
+$route['pojasa/summary']                                = 'purchaseorder/C_Pojasa/summary';
 
 // Stock PO Non Komersil
 $route['stocknonkomersil']                              = 'stock/C_Stocknonkomersil';
@@ -322,6 +330,7 @@ $route['updateisinote']                                 = 'settings/C_NoteSettin
 $route['lap_nonkomersil']                               = 'laporan/C_Laporan';
 $route['srclapbeli']                                    = 'laporan/C_Laporan/srclapbeli';
 $route['export_laporan_pembelian_nk']                   = 'laporan/C_Laporan/export_laporan_pembelian_nk';
+$route['export_cost_pic_ponk']                          = 'laporan/C_Laporan/export_cost_pic_ponk';
 $route['exported_allstock']                             = 'laporan/C_Laporan/exported_allstock';
 
 //LAPORAN TRANSAKSI NON KOMERSIL

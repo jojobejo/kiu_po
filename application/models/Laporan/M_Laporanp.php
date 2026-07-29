@@ -39,6 +39,83 @@ class M_Laporanp extends CI_Model
         return $query;
     }
 
+    public function getpicfiltercostponk()
+    {
+        $this->db->select('
+            a.kd_user,
+            COALESCE(MAX(b.nama_user), MAX(c.nm_user), a.kd_user) AS nama_user,
+            COALESCE(MAX(b.departement), MAX(c.departemen), "-") AS departement
+        ', false);
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_po_nk c', 'c.kd_po_nk = a.kd_po_nk');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user', 'left');
+        $this->db->where('c.status', 'DONE');
+        $this->db->group_by('a.kd_user');
+        $this->db->order_by('nama_user', 'ASC');
+
+        return $this->db->get();
+    }
+
+    public function getcostpicponk($tgl1, $tgl2, $kdpic = '')
+    {
+        $this->db->select('
+            a.kd_user,
+            COALESCE(MAX(b.nama_user), MAX(c.nm_user), a.kd_user) AS nama_user,
+            COALESCE(MAX(b.departement), MAX(c.departemen), "-") AS departement,
+            COUNT(DISTINCT c.kd_po_nk) AS total_po,
+            COUNT(a.id_det_po_nk) AS total_item,
+            SUM(a.qty) AS total_qty,
+            SUM(a.total_harga) AS total_cost
+        ', false);
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_po_nk c', 'c.kd_po_nk = a.kd_po_nk');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user', 'left');
+        $this->db->where('DATE(a.tgl_transaksi) >= ' . $this->db->escape($tgl1), null, false);
+        $this->db->where('DATE(a.tgl_transaksi) <= ' . $this->db->escape($tgl2), null, false);
+        $this->db->where('c.status', 'DONE');
+
+        if ($kdpic !== '') {
+            $this->db->where('a.kd_user', $kdpic);
+        }
+
+        $this->db->group_by('a.kd_user');
+        $this->db->order_by('total_cost', 'DESC');
+
+        return $this->db->get();
+    }
+
+    public function getdetailcostpicponk($tgl1, $tgl2, $kdpic = '')
+    {
+        $this->db->select('
+            c.nopo,
+            c.kd_po_nk,
+            a.tgl_transaksi,
+            COALESCE(b.nama_user, c.nm_user, a.kd_user) AS nama_user,
+            COALESCE(b.departement, c.departemen, "-") AS departement,
+            c.tj_pembelian,
+            a.nama_barang,
+            a.deskripsi,
+            a.qty,
+            a.hrg_satuan,
+            a.total_harga
+        ', false);
+        $this->db->from('tb_detail_po_nk a');
+        $this->db->join('tb_po_nk c', 'c.kd_po_nk = a.kd_po_nk');
+        $this->db->join('tb_user b', 'b.kode_user = a.kd_user', 'left');
+        $this->db->where('DATE(a.tgl_transaksi) >= ' . $this->db->escape($tgl1), null, false);
+        $this->db->where('DATE(a.tgl_transaksi) <= ' . $this->db->escape($tgl2), null, false);
+        $this->db->where('c.status', 'DONE');
+
+        if ($kdpic !== '') {
+            $this->db->where('a.kd_user', $kdpic);
+        }
+
+        $this->db->order_by('a.tgl_transaksi', 'DESC');
+        $this->db->order_by('c.kd_po_nk', 'DESC');
+
+        return $this->db->get();
+    }
+
     public function getdaterangelaptr($tgl1, $tgl2)
     {
         $this->db->select('a.kd_po_nk AS kdpo,d.nama_user AS inputer,a.kd_akun AS jn_transaksi, a.tgl_transaksi, c.departement, c.nama_user, b.nama_barang, a.keterangan, a.tr_qty AS qty');

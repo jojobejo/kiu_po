@@ -19,15 +19,64 @@ class C_Laporan extends CI_Controller
     public function index()
     {
 
-        $data['title'] = 'Laporan Pembelian';
-        $tglstart   = $this->input->post('tglstart');
-        $tglend     = $this->input->post('tglend');
-        $_SESSION['vartgl1'] = $tglstart;
-        $_SESSION['vartgl2'] = $tglend;
+        $data['title'] = 'Laporan Cost PO NK Per PIC';
+        $tglstart = $this->input->get_post('tglstart') ?: date('Y-m-01');
+        $tglend = $this->input->get_post('tglend') ?: date('Y-m-d');
+        $kdpic = trim((string) $this->input->get_post('kdpic'));
+        $data['tanggal_error'] = '';
+
+        if (!$this->is_valid_date_export($tglstart) || !$this->is_valid_date_export($tglend)) {
+            $tglstart = date('Y-m-01');
+            $tglend = date('Y-m-d');
+            $data['tanggal_error'] = 'Format tanggal tidak valid. Filter dikembalikan ke bulan berjalan.';
+        }
+
+        if ($tglstart > $tglend) {
+            $tanggal_temp = $tglstart;
+            $tglstart = $tglend;
+            $tglend = $tanggal_temp;
+            $data['tanggal_error'] = 'Tanggal start lebih besar dari tanggal end. Rentang tanggal otomatis disesuaikan.';
+        }
+
+        $pic_options = $this->M_Laporanp->getpicfiltercostponk()->result();
+        $selected_pic_label = 'Semua PIC';
+
+        foreach ($pic_options as $pic) {
+            if ($pic->kd_user === $kdpic) {
+                $selected_pic_label = $pic->nama_user;
+                break;
+            }
+        }
+
+        $summary = $this->M_Laporanp->getcostpicponk($tglstart, $tglend, $kdpic)->result();
+        $detail = $this->M_Laporanp->getdetailcostpicponk($tglstart, $tglend, $kdpic)->result();
+
+        $data['tglstart'] = $tglstart;
+        $data['tglend'] = $tglend;
+        $data['kdpic'] = $kdpic;
+        $data['pic_options'] = $pic_options;
+        $data['selected_pic_label'] = $selected_pic_label;
+        $data['summary_cost_pic'] = $summary;
+        $data['detail_cost_pic'] = $detail;
+        $data['grand_total_cost'] = 0;
+        $data['grand_total_po'] = 0;
+        $data['grand_total_item'] = 0;
+        $po_keys = array();
+
+        foreach ($summary as $row) {
+            $data['grand_total_cost'] += (float) $row->total_cost;
+            $data['grand_total_item'] += (int) $row->total_item;
+        }
+
+        foreach ($detail as $row) {
+            $po_keys[$row->kd_po_nk] = true;
+        }
+
+        $data['grand_total_po'] = count($po_keys);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
-        $this->load->view('content/laporan/laporan_p', $data);
+        $this->load->view('content/laporan/lap_cost_pic_ponk', $data);
         $this->load->view('partial/footer');
     }
     public function srclapbeli()
@@ -49,6 +98,200 @@ class C_Laporan extends CI_Controller
         $this->load->view('partial/sidebar');
         $this->load->view('content/laporan/srclaporan', $data);
         $this->load->view('partial/footer');
+    }
+
+    public function export_cost_pic_ponk()
+    {
+        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+
+        $tglstart = $this->input->get('tglstart') ?: date('Y-m-01');
+        $tglend = $this->input->get('tglend') ?: date('Y-m-d');
+        $kdpic = trim((string) $this->input->get('kdpic'));
+
+        if (!$this->is_valid_date_export($tglstart) || !$this->is_valid_date_export($tglend)) {
+            show_error('Tanggal harus diisi dengan format YYYY-MM-DD.', 400);
+            return;
+        }
+
+        if ($tglstart > $tglend) {
+            $tanggal_temp = $tglstart;
+            $tglstart = $tglend;
+            $tglend = $tanggal_temp;
+        }
+
+        $pic_options = $this->M_Laporanp->getpicfiltercostponk()->result();
+        $selected_pic_label = 'Semua PIC';
+
+        foreach ($pic_options as $pic) {
+            if ($pic->kd_user === $kdpic) {
+                $selected_pic_label = $pic->nama_user;
+                break;
+            }
+        }
+
+        $summary = $this->M_Laporanp->getcostpicponk($tglstart, $tglend, $kdpic)->result();
+        $detail = $this->M_Laporanp->getdetailcostpicponk($tglstart, $tglend, $kdpic)->result();
+
+        $excel = new PHPExcel();
+        $excel->getProperties()
+            ->setCreator('it_karisma')
+            ->setLastModifiedBy('it_karisma')
+            ->setTitle('Laporan Cost PO NK Per PIC')
+            ->setSubject('Laporan Non Komersil')
+            ->setDescription('Laporan Cost Purchase Order Non Komersil Per PIC');
+
+        $excel->setActiveSheetIndex(0);
+        $sheet = $excel->getActiveSheet();
+        $sheet->setTitle('Cost PIC PO NK');
+
+        $style_title = array(
+            'font' => array('bold' => true, 'size' => 14),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            )
+        );
+
+        $style_header = array(
+            'font' => array('bold' => true),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => 'D9EAD3')
+            ),
+            'borders' => array(
+                'allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)
+            )
+        );
+
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+            ),
+            'borders' => array(
+                'allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)
+            )
+        );
+
+        $sheet->mergeCells('A1:G1');
+        $sheet->setCellValue('A1', 'Ringkasan Cost - ' . $selected_pic_label);
+        $sheet->getStyle('A1')->applyFromArray($style_title);
+        $sheet->setCellValue('A2', 'Periode: ' . $tglstart . ' s/d ' . $tglend);
+
+        $summary_header_row = 4;
+        $sheet->setCellValue('A' . $summary_header_row, 'NO');
+        $sheet->setCellValue('B' . $summary_header_row, 'PIC');
+        $sheet->setCellValue('C' . $summary_header_row, 'Departemen');
+        $sheet->setCellValue('D' . $summary_header_row, 'Total PO');
+        $sheet->setCellValue('E' . $summary_header_row, 'Total Item');
+        $sheet->setCellValue('F' . $summary_header_row, 'Total Qty');
+        $sheet->setCellValue('G' . $summary_header_row, 'Total Cost');
+        $sheet->getStyle('A' . $summary_header_row . ':G' . $summary_header_row)->applyFromArray($style_header);
+
+        $row = $summary_header_row + 1;
+        $no = 1;
+        $grand_total_summary = 0;
+
+        foreach ($summary as $data) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data->nama_user);
+            $sheet->setCellValue('C' . $row, $data->departement);
+            $sheet->setCellValue('D' . $row, (int) $data->total_po);
+            $sheet->setCellValue('E' . $row, (int) $data->total_item);
+            $sheet->setCellValue('F' . $row, (int) $data->total_qty);
+            $sheet->setCellValue('G' . $row, (float) $data->total_cost);
+            $grand_total_summary += (float) $data->total_cost;
+            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $row++;
+        }
+
+        if (empty($summary)) {
+            $sheet->mergeCells('A' . $row . ':G' . $row);
+            $sheet->setCellValue('A' . $row, 'Data ringkasan tidak ditemukan.');
+            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_row);
+            $row++;
+        }
+
+        $sheet->mergeCells('A' . $row . ':F' . $row);
+        $sheet->setCellValue('A' . $row, 'Grandtotal');
+        $sheet->setCellValue('G' . $row, $grand_total_summary);
+        $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_header);
+        $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $row++;
+
+        $detail_title_row = $row + 3;
+        $sheet->mergeCells('A' . $detail_title_row . ':K' . $detail_title_row);
+        $sheet->setCellValue('A' . $detail_title_row, 'Detail Cost - ' . $selected_pic_label);
+        $sheet->getStyle('A' . $detail_title_row)->applyFromArray($style_title);
+
+        $detail_header_row = $detail_title_row + 2;
+        $sheet->setCellValue('A' . $detail_header_row, 'NO');
+        $sheet->setCellValue('B' . $detail_header_row, 'NOPO');
+        $sheet->setCellValue('C' . $detail_header_row, 'Tanggal');
+        $sheet->setCellValue('D' . $detail_header_row, 'PIC');
+        $sheet->setCellValue('E' . $detail_header_row, 'Departemen');
+        $sheet->setCellValue('F' . $detail_header_row, 'Tujuan Pembelian');
+        $sheet->setCellValue('G' . $detail_header_row, 'Nama Barang');
+        $sheet->setCellValue('H' . $detail_header_row, 'Deskripsi');
+        $sheet->setCellValue('I' . $detail_header_row, 'Qty');
+        $sheet->setCellValue('J' . $detail_header_row, 'Harga Satuan');
+        $sheet->setCellValue('K' . $detail_header_row, 'Total Cost');
+        $sheet->getStyle('A' . $detail_header_row . ':K' . $detail_header_row)->applyFromArray($style_header);
+
+        $row = $detail_header_row + 1;
+        $no = 1;
+
+        foreach ($detail as $data) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data->nopo);
+            $sheet->setCellValue('C' . $row, $data->tgl_transaksi);
+            $sheet->setCellValue('D' . $row, $data->nama_user);
+            $sheet->setCellValue('E' . $row, $data->departement);
+            $sheet->setCellValue('F' . $row, $data->tj_pembelian);
+            $sheet->setCellValue('G' . $row, $data->nama_barang);
+            $sheet->setCellValue('H' . $row, $data->deskripsi);
+            $sheet->setCellValue('I' . $row, (int) $data->qty);
+            $sheet->setCellValue('J' . $row, (float) $data->hrg_satuan);
+            $sheet->setCellValue('K' . $row, (float) $data->total_harga);
+            $sheet->getStyle('A' . $row . ':K' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('J' . $row . ':K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $row++;
+        }
+
+        if (empty($detail)) {
+            $sheet->mergeCells('A' . $row . ':K' . $row);
+            $sheet->setCellValue('A' . $row, 'Data detail tidak ditemukan.');
+            $sheet->getStyle('A' . $row . ':K' . $row)->applyFromArray($style_row);
+        }
+
+        foreach (range('A', 'K') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $sheet->getStyle('A1:K' . $row)->getAlignment()->setWrapText(true);
+        $sheet->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setFitToWidth(1);
+
+        $filename_pic = preg_replace('/[^A-Za-z0-9_-]+/', '_', $selected_pic_label);
+        $filename = 'Laporan_Cost_PO_NK_' . $filename_pic . '_' . $tglstart . '_to_' . $tglend . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        while (ob_get_level() > 0 && @ob_end_clean()) {
+            // Bersihkan semua output sebelum stream Excel dikirim.
+        }
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save('php://output');
+        exit;
     }
 
     public function export_laporan_pembelian_nk()
