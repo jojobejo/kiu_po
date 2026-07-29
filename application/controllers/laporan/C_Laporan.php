@@ -22,7 +22,8 @@ class C_Laporan extends CI_Controller
         $data['title'] = 'Laporan Cost PO NK Per PIC';
         $tglstart = $this->input->get_post('tglstart') ?: date('Y-m-01');
         $tglend = $this->input->get_post('tglend') ?: date('Y-m-d');
-        $kdpic = trim((string) $this->input->get_post('kdpic'));
+        $pic_filter = $this->get_cost_pic_filter($this->input->get_post('kdpic'));
+        $kdpic = $pic_filter['kdpic'];
         $data['tanggal_error'] = '';
 
         if (!$this->is_valid_date_export($tglstart) || !$this->is_valid_date_export($tglend)) {
@@ -48,6 +49,10 @@ class C_Laporan extends CI_Controller
             }
         }
 
+        if ($pic_filter['is_pic_report']) {
+            $selected_pic_label = $this->session->userdata('nama_user') ?: $selected_pic_label;
+        }
+
         $summary = $this->M_Laporanp->getcostpicponk($tglstart, $tglend, $kdpic)->result();
         $detail = $this->M_Laporanp->getdetailcostpicponk($tglstart, $tglend, $kdpic)->result();
 
@@ -56,6 +61,7 @@ class C_Laporan extends CI_Controller
         $data['kdpic'] = $kdpic;
         $data['pic_options'] = $pic_options;
         $data['selected_pic_label'] = $selected_pic_label;
+        $data['is_pic_report'] = $pic_filter['is_pic_report'];
         $data['summary_cost_pic'] = $summary;
         $data['detail_cost_pic'] = $detail;
         $data['grand_total_cost'] = 0;
@@ -107,7 +113,8 @@ class C_Laporan extends CI_Controller
 
         $tglstart = $this->input->get('tglstart') ?: date('Y-m-01');
         $tglend = $this->input->get('tglend') ?: date('Y-m-d');
-        $kdpic = trim((string) $this->input->get('kdpic'));
+        $pic_filter = $this->get_cost_pic_filter($this->input->get('kdpic'));
+        $kdpic = $pic_filter['kdpic'];
 
         if (!$this->is_valid_date_export($tglstart) || !$this->is_valid_date_export($tglend)) {
             show_error('Tanggal harus diisi dengan format YYYY-MM-DD.', 400);
@@ -128,6 +135,10 @@ class C_Laporan extends CI_Controller
                 $selected_pic_label = $pic->nama_user;
                 break;
             }
+        }
+
+        if ($pic_filter['is_pic_report']) {
+            $selected_pic_label = $this->session->userdata('nama_user') ?: $selected_pic_label;
         }
 
         $summary = $this->M_Laporanp->getcostpicponk($tglstart, $tglend, $kdpic)->result();
@@ -292,6 +303,22 @@ class C_Laporan extends CI_Controller
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $writer->save('php://output');
         exit;
+    }
+
+    private function get_cost_pic_filter($requested_kdpic)
+    {
+        $is_pic_report = ((string) $this->session->userdata('lv') === '4');
+        $session_kdpic = trim((string) $this->session->userdata('kode'));
+        $kdpic = trim((string) $requested_kdpic);
+
+        if ($is_pic_report) {
+            $kdpic = $session_kdpic;
+        }
+
+        return array(
+            'kdpic' => $kdpic,
+            'is_pic_report' => $is_pic_report
+        );
     }
 
     public function export_laporan_pembelian_nk()

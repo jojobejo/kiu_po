@@ -59,6 +59,10 @@ Laporan memakai filter:
 
 Jika user memilih `Semua PIC`, filter `kd_user` tidak dikirim ke query.
 
+Untuk pengguna PIC (`lv = 4`), aplikasi selalu mengisi `kdpic` dari session login, sehingga query tetap memakai filter:
+
+- `tb_detail_po_nk.kd_user = session kode`
+
 Ringkasan cost per PIC dihitung dari:
 
 - `COUNT(DISTINCT tb_po_nk.kd_po_nk)` sebagai total PO per PIC.

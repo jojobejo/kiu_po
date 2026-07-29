@@ -6,6 +6,8 @@ Buka menu laporan non komersil atau akses route:
 
 `lap_nonkomersil`
 
+Untuk pengguna PIC, menu `Laporan Pembelian` tersedia di navigasi kiri setelah menu `Request Master Barang`.
+
 ## Cara Menggunakan
 
 1. Isi `Tanggal Start`.
@@ -15,6 +17,8 @@ Buka menu laporan non komersil atau akses route:
 5. Klik tombol `Cari`.
 6. Sistem menampilkan ringkasan cost PO NK per PIC dan detail item pada rentang tanggal tersebut.
 7. Klik tombol `Export Excel` untuk mengunduh laporan sesuai filter aktif.
+
+Untuk pengguna PIC, pilihan `Nama PIC` tidak ditampilkan karena sistem otomatis memakai PIC dari session login.
 
 ## Informasi Yang Ditampilkan
 

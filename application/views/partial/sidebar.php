@@ -475,6 +475,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('lap_nonkomersil') ?>" class="nav-link">
+              <i class="nav-icon fas fa-file-invoice"></i>
+              <p>
+                Laporan Pembelian
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('stocknonkomersil') ?>" class="nav-link">
               <i class="nav-icon fas fa-cubes"></i>
               <p>

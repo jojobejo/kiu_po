@@ -40,6 +40,19 @@ Data yang ditampilkan:
 10. Menampilkan tabel dengan DataTables, default 25 baris per halaman, searchable, sortable, dan responsive.
 11. Menambahkan export Excel `export_cost_pic_ponk` dengan parameter `tglstart`, `tglend`, dan `kdpic`.
 12. Menambahkan tombol `Export Excel` pada view, mengikuti filter yang sedang aktif.
+13. Menambahkan akses menu `Laporan Pembelian` untuk pengguna PIC (`lv = 4`) pada sidebar setelah `Request Master Barang`.
+14. Menambahkan helper `get_cost_pic_filter()` di controller agar pengguna PIC selalu difilter berdasarkan `session kode`, termasuk saat export Excel.
+15. Menyembunyikan dropdown `Nama PIC` untuk pengguna PIC karena filter PIC ditentukan otomatis dari session login.
+
+## Akses Pengguna PIC
+
+Pengguna PIC memakai route dan view laporan yang sama dengan user lain, yaitu `lap_nonkomersil` dan `lap_cost_pic_ponk.php`.
+
+Perbedaannya:
+
+- User PIC tidak melihat filter dropdown `Nama PIC`.
+- Nilai `kdpic` dipaksa dari `$this->session->userdata('kode')`.
+- Export Excel `export_cost_pic_ponk` juga memakai session PIC, sehingga parameter `kdpic` dari URL tidak bisa dipakai untuk membuka data PIC lain.
 
 ## Layout Export Excel
 

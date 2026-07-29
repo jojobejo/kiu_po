@@ -21,31 +21,35 @@
                 <div class="card-body">
                     <form method="get" action="<?= base_url('lap_nonkomersil') ?>">
                         <div class="row">
-                            <div class="col-sm-3">
+                            <div class="<?= !empty($is_pic_report) ? 'col-sm-5' : 'col-sm-3' ?>">
                                 <div class="form-group">
                                     <label>Tanggal Start :</label>
                                     <input type="date" class="form-control" name="tglstart" id="tglstart" value="<?= html_escape($tglstart) ?>">
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="<?= !empty($is_pic_report) ? 'col-sm-5' : 'col-sm-3' ?>">
                                 <div class="form-group">
                                     <label>Tanggal End :</label>
                                     <input type="date" class="form-control" name="tglend" id="tglend" value="<?= html_escape($tglend) ?>">
                                 </div>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label>Nama PIC :</label>
-                                    <select class="form-control" name="kdpic" id="kdpic">
-                                        <option value="">Semua PIC</option>
-                                        <?php foreach ($pic_options as $pic) : ?>
-                                            <option value="<?= html_escape($pic->kd_user) ?>" <?= ($kdpic === $pic->kd_user) ? 'selected' : '' ?>>
-                                                <?= html_escape($pic->nama_user) ?> - <?= html_escape($pic->departement) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                            <?php if (empty($is_pic_report)) : ?>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label>Nama PIC :</label>
+                                        <select class="form-control" name="kdpic" id="kdpic">
+                                            <option value="">Semua PIC</option>
+                                            <?php foreach ($pic_options as $pic) : ?>
+                                                <option value="<?= html_escape($pic->kd_user) ?>" <?= ($kdpic === $pic->kd_user) ? 'selected' : '' ?>>
+                                                    <?= html_escape($pic->nama_user) ?> - <?= html_escape($pic->departement) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                            <?php else : ?>
+                                <input type="hidden" name="kdpic" value="<?= html_escape($kdpic) ?>">
+                            <?php endif; ?>
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <label>&nbsp;</label>
