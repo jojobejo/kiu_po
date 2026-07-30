@@ -690,11 +690,32 @@ class M_PoStatus extends CI_Model
     }
     public function getDetailnk($kd)
     {
-        $this->db->select('*');
+        $this->db->select('a.*');
+        $this->db->select('c.gbr_barang AS gbr_barang');
+        if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            $this->db->select('COALESCE(r.qty_nyata, a.qty) AS qty_nyata', false);
+            $this->db->select('COALESCE(r.harga_nyata, a.hrg_nyata) AS hrg_nyata', false);
+            $this->db->select('COALESCE(r.total_nyata, a.total_nyata) AS total_nyata', false);
+            $this->db->select('COALESCE(r.status_approval_harga, "") AS status_approval_harga_nyata', false);
+            $this->db->select('COALESCE(r.alasan_realisasi, "") AS alasan_realisasi', false);
+            $this->db->select('COALESCE(r.selisih_harga, 0) AS selisih_harga_nyata', false);
+            $this->db->select('COALESCE(r.updated_at, r.created_at) AS realisasi_updated_at', false);
+        } else {
+            $this->db->select('a.qty AS qty_nyata', false);
+            $this->db->select('a.hrg_nyata AS hrg_nyata', false);
+            $this->db->select('a.total_nyata AS total_nyata', false);
+            $this->db->select('"" AS status_approval_harga_nyata', false);
+            $this->db->select('"" AS alasan_realisasi', false);
+            $this->db->select('(a.hrg_nyata - a.hrg_satuan) AS selisih_harga_nyata', false);
+            $this->db->select('NULL AS realisasi_updated_at', false);
+        }
         $this->db->from('tbpo_detail_po_nk a');
         $this->db->join('tbpo_user b', 'b.kode_user = a.kd_user');
         $this->db->join('tbpo_barang_nk c', 'c.kd_barang = a.kd_barang');
-        $this->db->where('kd_po_nk', $kd);
+        if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            $this->db->join('tbpo_realisasi_detail_po_nk r', 'r.id_det_po_nk = a.id_det_po_nk', 'left');
+        }
+        $this->db->where('a.kd_po_nk', $kd);
         return $this->db->get()->result();
     }
     public function getDetailnktgl($kd)
@@ -814,10 +835,18 @@ class M_PoStatus extends CI_Model
     }
     function sumharganyata($kdpo)
     {
-        $this->db->select("SUM(total_nyata) as total_nyata");
-        $this->db->select("COUNT(id_det_po_nk) as total_item");
-        $this->db->from('tbpo_detail_po_nk');
-        $this->db->where('kd_po_nk', $kdpo);
+        if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            $this->db->select("SUM(COALESCE(r.total_nyata, a.total_nyata)) as total_nyata", false);
+            $this->db->select("COUNT(a.id_det_po_nk) as total_item", false);
+            $this->db->from('tbpo_detail_po_nk a');
+            $this->db->join('tbpo_realisasi_detail_po_nk r', 'r.id_det_po_nk = a.id_det_po_nk', 'left');
+            $this->db->where('a.kd_po_nk', $kdpo);
+        } else {
+            $this->db->select("SUM(total_nyata) as total_nyata");
+            $this->db->select("COUNT(id_det_po_nk) as total_item");
+            $this->db->from('tbpo_detail_po_nk');
+            $this->db->where('kd_po_nk', $kdpo);
+        }
         return $this->db->get()->result();
     }
     function edit_faktur_item_nk($id, $kdpo)
@@ -936,6 +965,182 @@ class M_PoStatus extends CI_Model
     {
         $this->db->where('id_det_po_nk', $id);
         return $this->db->update('tbpo_detail_po_nk', $data);
+    }
+    public function get_detail_po_nk_row($id)
+    {
+        $this->db->select('*');
+        $this->db->from('tbpo_detail_po_nk');
+        $this->db->where('id_det_po_nk', $id);
+        return $this->db->get()->row();
+    }
+    public function simpan_realisasi_harga_nyata($id, $data, $logData = array())
+    {
+        $detail = $this->get_detail_po_nk_row($id);
+        if (!$detail) {
+            return false;
+        }
+
+        $this->db->trans_start();
+
+        if ($this->db->table_exists('tbpo_realisasi_po_nk')) {
+            $header = array(
+                'kd_po_nk' => $detail->kd_po_nk,
+                'status_realisasi' => 'DRAFT',
+                'updated_by' => isset($logData['kd_user']) ? $logData['kd_user'] : '',
+                'updated_at' => date('Y-m-d H:i:s')
+            );
+
+            $exists = $this->db
+                ->where('kd_po_nk', $detail->kd_po_nk)
+                ->get('tbpo_realisasi_po_nk')
+                ->row();
+
+            if ($exists) {
+                $this->db->where('kd_po_nk', $detail->kd_po_nk);
+                $this->db->update('tbpo_realisasi_po_nk', $header);
+            } else {
+                $header['created_by'] = isset($logData['kd_user']) ? $logData['kd_user'] : '';
+                $header['created_at'] = date('Y-m-d H:i:s');
+                $this->db->insert('tbpo_realisasi_po_nk', $header);
+            }
+        }
+
+        if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            $row = array(
+                'kd_po_nk' => $detail->kd_po_nk,
+                'id_det_po_nk' => $id,
+                'qty_pengajuan' => $detail->qty,
+                'harga_pengajuan' => $detail->hrg_satuan,
+                'total_pengajuan' => $detail->total_harga,
+                'qty_nyata' => $data['qty_nyata'],
+                'harga_nyata' => $data['hrg_nyata'],
+                'total_nyata' => $data['total_nyata'],
+                'selisih_harga' => $data['hrg_nyata'] - $detail->hrg_satuan,
+                'status_approval_harga' => $data['status_approval_harga_nyata'],
+                'alasan_realisasi' => isset($data['alasan_realisasi']) ? $data['alasan_realisasi'] : '',
+                'updated_by' => isset($logData['kd_user']) ? $logData['kd_user'] : '',
+                'updated_at' => date('Y-m-d H:i:s')
+            );
+
+            $exists = $this->db
+                ->where('id_det_po_nk', $id)
+                ->get('tbpo_realisasi_detail_po_nk')
+                ->row();
+
+            if ($exists) {
+                $this->db->where('id_det_po_nk', $id);
+                $this->db->update('tbpo_realisasi_detail_po_nk', $row);
+            } else {
+                $row['created_by'] = isset($logData['kd_user']) ? $logData['kd_user'] : '';
+                $row['created_at'] = date('Y-m-d H:i:s');
+                $this->db->insert('tbpo_realisasi_detail_po_nk', $row);
+            }
+        }
+
+        $legacy = array(
+            'hrg_nyata' => $data['hrg_nyata'],
+            'total_nyata' => $data['total_nyata']
+        );
+        $this->db->where('id_det_po_nk', $id);
+        $this->db->update('tbpo_detail_po_nk', $legacy);
+
+        if ($this->db->table_exists('tbpo_realisasi_harganyata_log')) {
+            $log = array(
+                'kd_po_nk' => $detail->kd_po_nk,
+                'id_det_po_nk' => $id,
+                'aksi' => isset($logData['aksi']) ? $logData['aksi'] : 'SIMPAN_REALISASI',
+                'keterangan' => isset($logData['keterangan']) ? $logData['keterangan'] : '',
+                'kd_user' => isset($logData['kd_user']) ? $logData['kd_user'] : '',
+                'nama_user' => isset($logData['nama_user']) ? $logData['nama_user'] : '',
+                'created_at' => date('Y-m-d H:i:s')
+            );
+            $this->db->insert('tbpo_realisasi_harganyata_log', $log);
+        }
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+    public function get_harga_nyata_summary($kdpo)
+    {
+        if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            return $this->db->query("
+                SELECT
+                    COUNT(a.id_det_po_nk) AS total_item,
+                    SUM(CASE WHEN r.id_realisasi_detail IS NULL OR COALESCE(r.harga_nyata,0) <= 0 THEN 1 ELSE 0 END) AS belum_input,
+                    SUM(CASE WHEN COALESCE(r.harga_nyata,0) > a.hrg_satuan THEN 1 ELSE 0 END) AS harga_lebih_tinggi,
+                    SUM(CASE WHEN r.status_approval_harga = 'PENDING_DIREKTUR' THEN 1 ELSE 0 END) AS pending_direktur,
+                    SUM(CASE WHEN r.status_approval_harga = 'DITOLAK_DIREKTUR' THEN 1 ELSE 0 END) AS ditolak_direktur
+                FROM tbpo_detail_po_nk a
+                LEFT JOIN tbpo_realisasi_detail_po_nk r ON r.id_det_po_nk = a.id_det_po_nk
+                WHERE a.kd_po_nk = ?
+            ", array($kdpo))->row();
+        }
+
+        return $this->db->query("
+            SELECT
+                COUNT(id_det_po_nk) AS total_item,
+                SUM(CASE WHEN COALESCE(hrg_nyata,0) <= 0 THEN 1 ELSE 0 END) AS belum_input,
+                SUM(CASE WHEN COALESCE(hrg_nyata,0) > hrg_satuan THEN 1 ELSE 0 END) AS harga_lebih_tinggi,
+                0 AS pending_direktur,
+                0 AS ditolak_direktur
+            FROM tbpo_detail_po_nk
+            WHERE kd_po_nk = ?
+        ", array($kdpo))->row();
+    }
+    public function approve_harga_nyata_detail($id, $status, $userData = array())
+    {
+        $detail = $this->get_detail_po_nk_row($id);
+        if (!$detail || !$this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
+            return false;
+        }
+
+        $data = array(
+            'status_approval_harga' => $status,
+            'approved_by' => isset($userData['kd_user']) ? $userData['kd_user'] : '',
+            'approved_at' => date('Y-m-d H:i:s'),
+            'updated_by' => isset($userData['kd_user']) ? $userData['kd_user'] : '',
+            'updated_at' => date('Y-m-d H:i:s')
+        );
+
+        $this->db->trans_start();
+        $this->db->where('id_det_po_nk', $id);
+        $this->db->update('tbpo_realisasi_detail_po_nk', $data);
+
+        if ($this->db->table_exists('tbpo_realisasi_harganyata_log')) {
+            $this->db->insert('tbpo_realisasi_harganyata_log', array(
+                'kd_po_nk' => $detail->kd_po_nk,
+                'id_det_po_nk' => $id,
+                'aksi' => $status,
+                'keterangan' => $status === 'DISETUJUI_DIREKTUR' ? 'Harga nyata lebih tinggi disetujui Direktur.' : 'Harga nyata ditolak Direktur.',
+                'kd_user' => isset($userData['kd_user']) ? $userData['kd_user'] : '',
+                'nama_user' => isset($userData['nama_user']) ? $userData['nama_user'] : '',
+                'created_at' => date('Y-m-d H:i:s')
+            ));
+        }
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+    public function can_proses_pembelian_harga_nyata($kdpo)
+    {
+        $summary = $this->get_harga_nyata_summary($kdpo);
+        if (!$summary) {
+            return array('status' => true, 'message' => '');
+        }
+
+        if (!$this->db->table_exists('tbpo_realisasi_detail_po_nk') && (int) $summary->harga_lebih_tinggi > 0) {
+            return array('status' => false, 'message' => 'Harga nyata lebih tinggi membutuhkan tabel realisasi dan approval Direktur. Jalankan migrasi database realisasi harga nyata terlebih dahulu.');
+        }
+
+        if ((int) $summary->pending_direktur > 0) {
+            return array('status' => false, 'message' => 'Harga nyata lebih tinggi dari harga pengajuan masih menunggu approval Direktur.');
+        }
+
+        if ((int) $summary->ditolak_direktur > 0) {
+            return array('status' => false, 'message' => 'Ada harga nyata yang ditolak Direktur. Revisi harga nyata sebelum proses pembelian.');
+        }
+
+        return array('status' => true, 'message' => '');
     }
     function editharganyata($id, $data)
     {

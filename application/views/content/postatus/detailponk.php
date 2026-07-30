@@ -14,6 +14,16 @@
         </div>
     </div>
     <section class="content">
+        <?php foreach (array('success' => 'success', 'warning' => 'warning', 'error' => 'danger') as $flashKey => $alertClass) : ?>
+            <?php if ($this->session->flashdata($flashKey)) : ?>
+                <div class="alert alert-<?= $alertClass ?> alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($this->session->flashdata($flashKey), ENT_QUOTES, 'UTF-8') ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
         <div class="card">
             <div class="m-2">
                 <div class="">
@@ -23,6 +33,11 @@
                             $blockedPonkEditStatuses = array('ACC-KADEP', 'SEDANG DIAJUKAN', 'ON PROGRESS - KADEP', 'ACC DIREKTUR', 'PROSES PEMBELIAN', 'PENGAJUAN DIBATALKAN');
                             $canUpdatePonkPengajuan = !in_array($s->status, $blockedPonkEditStatuses, true);
                             $kdPonkDetail = isset($kd) ? $kd : $s->kd_po_nk;
+                            $hargaNyataStatusView = array('ACC DIREKTUR', 'PROSES PEMBELIAN', 'DONE');
+                            $hargaNyataStatusInput = array('ACC DIREKTUR', 'PROSES PEMBELIAN');
+                            $canShowHargaNyata = (int) $s->status_hrg_nyata === 1 && in_array($s->status, $hargaNyataStatusView, true);
+                            $canEditHargaNyata = $this->session->userdata('lv') == '2' && (int) $s->status_hrg_nyata === 1 && in_array($s->status, $hargaNyataStatusInput, true);
+                            $canSwitchHargaNyata = $this->session->userdata('lv') == '2' && in_array($s->status, $hargaNyataStatusInput, true);
                             ?>
                             <div class="col-2">
                                 <label for="naSupp" class="">NOMOR PO : </label>
@@ -432,14 +447,14 @@
                         Setting Tax
                     </a>
                 </div>
-                <?php if ($this->session->userdata('lv') == '2' && $s->status_hrg_nyata == '0') : ?>
+                <?php if ($canSwitchHargaNyata && $s->status_hrg_nyata == '0') : ?>
                     <div class="col-md">
                         <a href="<?= base_url('hrgnyataon/' . $s->kd_po_nk) ?>" class="btn btn-secondary btn-sm btn-block">
                             <i class="fas fa-toggle-off"></i>
                             Harga Nyata OFF
                         </a>
                     </div>
-                <?php elseif ($this->session->userdata('lv') == '2' && $s->status_hrg_nyata == '1') : ?>
+                <?php elseif ($canSwitchHargaNyata && $s->status_hrg_nyata == '1') : ?>
                     <div class="col-md">
                         <a href="<?= base_url('hrgnyataoff/' . $s->kd_po_nk) ?>" class="btn btn-success btn-sm btn-block">
                             <i class="fas fa-toggle-on"></i>
@@ -489,6 +504,32 @@
                 </div>
             </div>
         <?php endif; ?>
+        <?php if ($canSwitchHargaNyata) : ?>
+            <div class="row px-2 pb-2">
+                <div class="col-md-3 mb-2">
+                    <?php if ((int) $s->status_hrg_nyata === 1) : ?>
+                        <a href="<?= base_url('hrgnyataoff/' . $s->kd_po_nk) ?>" class="btn btn-success btn-sm btn-block">
+                            <i class="fas fa-toggle-on"></i>
+                            Harga Nyata ON
+                        </a>
+                    <?php else : ?>
+                        <a href="<?= base_url('hrgnyataon/' . $s->kd_po_nk) ?>" class="btn btn-secondary btn-sm btn-block">
+                            <i class="fas fa-toggle-off"></i>
+                            Harga Nyata OFF
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <?php if (!empty($hargaNyataSummary) && (int) $s->status_hrg_nyata === 1) : ?>
+                    <div class="col-md-9 mb-2">
+                        <div class="alert alert-info mb-0 py-2">
+                            Item belum input: <?= (int) $hargaNyataSummary->belum_input ?> |
+                            Harga lebih tinggi: <?= (int) $hargaNyataSummary->harga_lebih_tinggi ?> |
+                            Pending Direktur: <?= (int) $hargaNyataSummary->pending_direktur ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <table class="table table-bordered table-striped ">
             <thead style="background-color: #212529; color:white;">
@@ -502,9 +543,11 @@
                     <td>Total Harga</td>
 
                     <!-- HARGA NYATA -->
-                    <?php if ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP' && $s->status_hrg_nyata == '1') : ?>
+                    <?php if ($canShowHargaNyata) : ?>
+                        <td>Qty Nyata</td>
                         <td>Harga Nyata</td>
                         <td>Total Harga Nyata</td>
+                        <td>Approval Harga</td>
                     <?php endif; ?>
 
                     <!-- END HARGANYATA -->
@@ -529,6 +572,10 @@
                                 } else {
                                     $imagePath = "../images/gbrbarang/masterbr/" . $d->gbr_barang;
                                 }
+                                $qtyNyata = isset($d->qty_nyata) && (float) $d->qty_nyata > 0 ? (float) $d->qty_nyata : 0;
+                                $hargaNyata = isset($d->hrg_nyata) ? (float) $d->hrg_nyata : 0;
+                                $totalNyata = isset($d->total_nyata) ? (float) $d->total_nyata : 0;
+                                $statusApprovalHarga = isset($d->status_approval_harga_nyata) ? (string) $d->status_approval_harga_nyata : '';
 
                 ?>
                     <tr>
@@ -540,9 +587,30 @@
                         <td>Rp. <?= number_format($d->hrg_satuan) ?></td>
                         <td>Rp. <?= number_format($d->total_harga) ?></td>
                         <!-- HARGA NYATA -->
-                        <?php if ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP' && $s->status_hrg_nyata == '1') : ?>
-                            <td>Rp. <?= number_format($d->hrg_nyata) ?></td>
-                            <td>Rp. <?= number_format($d->total_nyata) ?></td>
+                        <?php if ($canShowHargaNyata) : ?>
+                            <td><?= $qtyNyata > 0 ? number_format($qtyNyata, 2) : '-' ?></td>
+                            <td>Rp. <?= number_format($hargaNyata) ?></td>
+                            <td>Rp. <?= number_format($totalNyata) ?></td>
+                            <td>
+                                <?php if ($statusApprovalHarga === 'PENDING_DIREKTUR') : ?>
+                                    <span class="badge badge-warning d-block mb-1">PENDING DIREKTUR</span>
+                                    <?php if ($this->session->userdata('lv') == '3') : ?>
+                                        <a href="<?= base_url('approve_harganyata/' . $d->id_det_po_nk) ?>" class="btn btn-success btn-xs">Approve</a>
+                                        <a href="<?= base_url('reject_harganyata/' . $d->id_det_po_nk) ?>" class="btn btn-danger btn-xs">Reject</a>
+                                    <?php endif; ?>
+                                <?php elseif ($statusApprovalHarga === 'DISETUJUI_DIREKTUR') : ?>
+                                    <span class="badge badge-success">DISETUJUI DIREKTUR</span>
+                                <?php elseif ($statusApprovalHarga === 'DITOLAK_DIREKTUR') : ?>
+                                    <span class="badge badge-danger">DITOLAK DIREKTUR</span>
+                                <?php elseif ($statusApprovalHarga === 'DISETUJUI_OTOMATIS') : ?>
+                                    <span class="badge badge-info">OTOMATIS</span>
+                                <?php else : ?>
+                                    <span class="badge badge-secondary">BELUM INPUT</span>
+                                <?php endif; ?>
+                                <?php if (!empty($d->alasan_realisasi)) : ?>
+                                    <div class="small text-muted mt-1"><?= htmlspecialchars($d->alasan_realisasi, ENT_QUOTES, 'UTF-8') ?></div>
+                                <?php endif; ?>
+                            </td>
                         <?php endif; ?>
                         <!-- END HARGA NYATA -->
                         <td>
@@ -624,7 +692,7 @@
                                         <i class="fas fa-trash-alt"></i>
                                         Hapus
                                     </a>
-                                    <?php if ($this->session->userdata('lv') == '2' && $s->status_hrg_nyata == '1') : ?>
+                                    <?php if ($canEditHargaNyata) : ?>
                                         <a class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#hrgnyata<?= $d->id_det_po_nk ?>">
                                             <i class="fas fa-plus"></i>
                                             Add Harganyata

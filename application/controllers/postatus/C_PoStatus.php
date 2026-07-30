@@ -39,6 +39,34 @@ class C_PoStatus extends CI_Controller
         return (float) $value;
     }
 
+    private function getPonkStatusRow($kdpo)
+    {
+        $status = $this->M_Postatus->getdataStatusnk($kdpo);
+        return !empty($status) ? $status[0] : null;
+    }
+
+    private function canInputHargaNyata($status)
+    {
+        return in_array($status, array('ACC DIREKTUR', 'PROSES PEMBELIAN'), true);
+    }
+
+    private function validateHargaNyataBeforePembelian($kdpo, $statusRow)
+    {
+        if (!$statusRow || (int) $statusRow->status_hrg_nyata !== 1) {
+            return array('status' => true, 'message' => '');
+        }
+
+        $summary = $this->M_Postatus->get_harga_nyata_summary($kdpo);
+        if ($summary && (int) $summary->belum_input > 0) {
+            return array(
+                'status' => false,
+                'message' => 'Lengkapi Qty Nyata dan Harga Nyata semua item sebelum proses pembelian.'
+            );
+        }
+
+        return $this->M_Postatus->can_proses_pembelian_harga_nyata($kdpo);
+    }
+
     private function excludePpn($value, $taxPercent)
     {
         $taxRate = $this->parseNumericInput($taxPercent) / 100;
@@ -1857,6 +1885,7 @@ class C_PoStatus extends CI_Controller
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
         $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
+        $data['hargaNyataSummary'] = $this->M_Postatus->get_harga_nyata_summary($kd);
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -2135,6 +2164,14 @@ class C_PoStatus extends CI_Controller
         $kdpo           = $this->input->post('kdpo');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
+        $statusRow      = $this->getPonkStatusRow($kdpo);
+        $validHargaNyata = $this->validateHargaNyataBeforePembelian($kdpo, $statusRow);
+
+        if (!$validHargaNyata['status']) {
+            $this->session->set_flashdata('error', $validHargaNyata['message']);
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
 
         $addnoteuser = array(
             'kd_po'     => $kdpo,
@@ -2685,17 +2722,135 @@ class C_PoStatus extends CI_Controller
     {
         $idpo = $this->input->post('idisi');
         $kdpo = $this->input->post('kdponk');
-        $hrgnyata = $this->input->post('hrg_nyata');
-        $qty    = $this->input->post('qty_isi');
+        $hrgnyata = $this->parseNumericInput($this->input->post('hrg_nyata'));
+        $qty = $this->parseNumericInput($this->input->post('qty_nyata'));
+        $alasan = trim((string) $this->input->post('alasan_realisasi'));
+        $detail = $this->M_Postatus->get_detail_po_nk_row($idpo);
+        $statusRow = $this->getPonkStatusRow($kdpo);
+
+        if ($this->session->userdata('lv') != '2' || !$statusRow || !$this->canInputHargaNyata($statusRow->status)) {
+            $this->session->set_flashdata('error', 'Harga nyata hanya dapat diinput Purchasing setelah ACC DIREKTUR.');
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
+        if (!$detail || $detail->kd_po_nk !== $kdpo) {
+            $this->session->set_flashdata('error', 'Detail item tidak valid untuk PO ini.');
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
+        if ($qty <= 0 || $hrgnyata <= 0) {
+            $this->session->set_flashdata('error', 'Qty Nyata dan Harga Nyata wajib lebih besar dari 0.');
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
         $total_harga = $qty * $hrgnyata;
+        $statusApproval = $hrgnyata > (float) $detail->hrg_satuan ? 'PENDING_DIREKTUR' : 'DISETUJUI_OTOMATIS';
 
         $dataedited = array(
             'hrg_nyata' => $hrgnyata,
-            'total_nyata' => $total_harga
+            'qty_nyata' => $qty,
+            'total_nyata' => $total_harga,
+            'status_approval_harga_nyata' => $statusApproval,
+            'alasan_realisasi' => $alasan
         );
 
-        $this->M_Postatus->editharganyatadetail($idpo, $dataedited);
+        $saved = $this->M_Postatus->simpan_realisasi_harga_nyata($idpo, $dataedited, array(
+            'aksi' => $statusApproval,
+            'keterangan' => $statusApproval === 'PENDING_DIREKTUR'
+                ? 'Harga nyata lebih tinggi dari harga pengajuan dan menunggu approval Direktur.'
+                : 'Harga nyata sama atau lebih rendah dari harga pengajuan.',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user')
+        ));
+
+        if (!$saved) {
+            $this->session->set_flashdata('error', 'Gagal menyimpan harga nyata.');
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
+        if ($statusApproval === 'PENDING_DIREKTUR') {
+            $this->M_Postatus->addNote(array(
+                'kd_po' => $kdpo,
+                'isi_note' => 'HARGA NYATA MENUNGGU APPROVAL DIREKTUR - ' . $detail->nama_barang,
+                'kd_user' => $this->session->userdata('kode'),
+                'nama_user' => $this->session->userdata('nama_user'),
+                'note_for' => '1',
+                'update_status' => '1'
+            ));
+            $this->session->set_flashdata('warning', 'Harga nyata lebih tinggi dari harga pengajuan. Menunggu approval Direktur.');
+        } else {
+            $this->session->set_flashdata('success', 'Harga nyata tersimpan dan tidak membutuhkan approval Direktur.');
+        }
+
         redirect('detailponk/' . $kdpo);
+    }
+
+    public function approve_harganyata($id)
+    {
+        $detail = $this->M_Postatus->get_detail_po_nk_row($id);
+        if ($this->session->userdata('lv') != '3' || !$detail) {
+            $this->session->set_flashdata('error', 'Approval harga nyata hanya dapat dilakukan Direktur.');
+            redirect('postatusnk');
+            return;
+        }
+
+        $saved = $this->M_Postatus->approve_harga_nyata_detail($id, 'DISETUJUI_DIREKTUR', array(
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user')
+        ));
+
+        if (!$saved) {
+            $this->session->set_flashdata('error', 'Gagal approval harga nyata. Pastikan migrasi database realisasi sudah dijalankan.');
+            redirect('detailponk/' . $detail->kd_po_nk);
+            return;
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $detail->kd_po_nk,
+            'isi_note' => 'HARGA NYATA DISETUJUI DIREKTUR - ' . $detail->nama_barang,
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+        $this->session->set_flashdata('success', 'Harga nyata disetujui Direktur.');
+        redirect('detailponk/' . $detail->kd_po_nk);
+    }
+
+    public function reject_harganyata($id)
+    {
+        $detail = $this->M_Postatus->get_detail_po_nk_row($id);
+        if ($this->session->userdata('lv') != '3' || !$detail) {
+            $this->session->set_flashdata('error', 'Reject harga nyata hanya dapat dilakukan Direktur.');
+            redirect('postatusnk');
+            return;
+        }
+
+        $saved = $this->M_Postatus->approve_harga_nyata_detail($id, 'DITOLAK_DIREKTUR', array(
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user')
+        ));
+
+        if (!$saved) {
+            $this->session->set_flashdata('error', 'Gagal reject harga nyata. Pastikan migrasi database realisasi sudah dijalankan.');
+            redirect('detailponk/' . $detail->kd_po_nk);
+            return;
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $detail->kd_po_nk,
+            'isi_note' => 'HARGA NYATA DITOLAK DIREKTUR - ' . $detail->nama_barang,
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+        $this->session->set_flashdata('error', 'Harga nyata ditolak Direktur. Purchasing perlu revisi harga nyata.');
+        redirect('detailponk/' . $detail->kd_po_nk);
     }
 
     public function edit_gbr_pndukung()
@@ -2719,6 +2874,14 @@ class C_PoStatus extends CI_Controller
         $keterangan   = $this->input->post('desc_isi');
         $userup       = $this->session->userdata('kode');
         $namauser     = $this->session->userdata('nama_user');
+        $statusRow    = $this->getPonkStatusRow($kdponk);
+        $validHargaNyata = $this->validateHargaNyataBeforePembelian($kdponk, $statusRow);
+
+        if (!$validHargaNyata['status']) {
+            $this->session->set_flashdata('error', $validHargaNyata['message']);
+            redirect('detailponk/' . $kdponk);
+            return;
+        }
 
         if (!empty($_FILES['gambar_1'])) {
             $config['upload_path'] = './images/upbukti/';
@@ -2945,6 +3108,13 @@ class C_PoStatus extends CI_Controller
 
     public function hrgnyataon($kdponk)
     {
+        $statusRow = $this->getPonkStatusRow($kdponk);
+        if (!$statusRow || $this->session->userdata('lv') != '2' || !$this->canInputHargaNyata($statusRow->status)) {
+            $this->session->set_flashdata('error', 'Harga Nyata hanya dapat diaktifkan setelah ACC DIREKTUR.');
+            redirect('detailponk/' . $kdponk);
+            return;
+        }
+
         $hrgnyataon = array(
             'status_hrg_nyata' => '1'
         );
@@ -2953,6 +3123,20 @@ class C_PoStatus extends CI_Controller
     }
     public function hrgnyataoff($kdponk)
     {
+        $statusRow = $this->getPonkStatusRow($kdponk);
+        if (!$statusRow || $this->session->userdata('lv') != '2' || !$this->canInputHargaNyata($statusRow->status)) {
+            $this->session->set_flashdata('error', 'Harga Nyata hanya dapat dinonaktifkan pada status setelah ACC DIREKTUR.');
+            redirect('detailponk/' . $kdponk);
+            return;
+        }
+
+        $summary = $this->M_Postatus->get_harga_nyata_summary($kdponk);
+        if ($summary && (int) $summary->total_item > (int) $summary->belum_input) {
+            $this->session->set_flashdata('error', 'Harga Nyata sudah mulai diinput sehingga switch tidak dapat dimatikan.');
+            redirect('detailponk/' . $kdponk);
+            return;
+        }
+
         $hrgnyataoff = array(
             'status_hrg_nyata' => '0'
         );

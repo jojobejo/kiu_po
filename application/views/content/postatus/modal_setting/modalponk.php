@@ -739,11 +739,15 @@
 <?php endforeach; ?>
 
 <?php foreach ($detail as $s) : ?>
+    <?php
+    $qtyNyataModal = isset($s->qty_nyata) && (float) $s->qty_nyata > 0 ? (float) $s->qty_nyata : (float) $s->qty;
+    $alasanRealisasiModal = isset($s->alasan_realisasi) ? $s->alasan_realisasi : '';
+    ?>
     <div class="modal fade" id="hrgnyata<?= $s->id_det_po_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Input Harga Nyata</h4>
+                    <h4 class="modal-title">Input Realisasi Pembelian</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -759,8 +763,32 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Harga Nyata<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="hrg_nyata" name="hrg_nyata" value="<?= $s->hrg_nyata ?>" /></div>
+                            <label class="col-sm-3 control-label text-right">Qty Pengajuan</label>
+                            <div class="col-sm-8"><input class="form-control" type="number" value="<?= $s->qty ?>" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right">Harga Pengajuan</label>
+                            <div class="col-sm-8"><input class="form-control" type="text" value="Rp. <?= number_format($s->hrg_satuan) ?>" readonly /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="qty_nyata">Qty Nyata<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" step="0.01" id="qty_nyata" name="qty_nyata" value="<?= $qtyNyataModal ?>" /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="hrg_nyata">Harga Nyata<span class="required">*</span></label>
+                            <div class="col-sm-8"><input class="form-control" type="number" step="0.01" id="hrg_nyata" name="hrg_nyata" value="<?= $s->hrg_nyata ?>" /></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-3 control-label text-right" for="alasan_realisasi">Alasan Selisih</label>
+                            <div class="col-sm-8"><textarea class="form-control" id="alasan_realisasi" name="alasan_realisasi" rows="3"><?= htmlspecialchars($alasanRealisasiModal, ENT_QUOTES, 'UTF-8') ?></textarea></div>
                         </div>
                     </div>
                 </div>
