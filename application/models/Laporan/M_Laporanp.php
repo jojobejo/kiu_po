@@ -58,6 +58,12 @@ class M_Laporanp extends CI_Model
 
     public function getcostpicponk($tgl1, $tgl2, $kdpic = '')
     {
+        $hasRealisasi = $this->db->table_exists('tb_penerimaan_po_nk_detail');
+        $hasTotalNyata = $this->db->field_exists('total_nyata', 'tb_detail_po_nk');
+        $detailTotalNyataExpr = $hasTotalNyata ? 'CASE WHEN a.total_nyata > 0 THEN a.total_nyata ELSE a.total_harga END' : 'a.total_harga';
+        $qtyNyataExpr = $hasRealisasi ? 'COALESCE(r.qty_real, a.qty)' : 'a.qty';
+        $totalNyataExpr = $hasRealisasi ? 'COALESCE(r.total_real, ' . $detailTotalNyataExpr . ')' : $detailTotalNyataExpr;
+
         $this->db->select('
             a.kd_user,
             COALESCE(MAX(b.nama_user), MAX(c.nm_user), a.kd_user) AS nama_user,
@@ -65,11 +71,16 @@ class M_Laporanp extends CI_Model
             COUNT(DISTINCT c.kd_po_nk) AS total_po,
             COUNT(a.id_det_po_nk) AS total_item,
             SUM(a.qty) AS total_qty,
-            SUM(a.total_harga) AS total_cost
+            SUM(a.total_harga) AS total_cost,
+            SUM(' . $qtyNyataExpr . ') AS total_qty_nyata,
+            SUM(' . $totalNyataExpr . ') AS total_cost_nyata
         ', false);
         $this->db->from('tb_detail_po_nk a');
         $this->db->join('tb_po_nk c', 'c.kd_po_nk = a.kd_po_nk');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user', 'left');
+        if ($hasRealisasi) {
+            $this->db->join('tb_penerimaan_po_nk_detail r', 'r.id_det_po_nk = a.id_det_po_nk', 'left');
+        }
         $this->db->where('DATE(a.tgl_transaksi) >= ' . $this->db->escape($tgl1), null, false);
         $this->db->where('DATE(a.tgl_transaksi) <= ' . $this->db->escape($tgl2), null, false);
         $this->db->where('c.status', 'DONE');
@@ -86,6 +97,15 @@ class M_Laporanp extends CI_Model
 
     public function getdetailcostpicponk($tgl1, $tgl2, $kdpic = '')
     {
+        $hasRealisasi = $this->db->table_exists('tb_penerimaan_po_nk_detail');
+        $hasHargaNyata = $this->db->field_exists('hrg_nyata', 'tb_detail_po_nk');
+        $hasTotalNyata = $this->db->field_exists('total_nyata', 'tb_detail_po_nk');
+        $detailHargaNyataExpr = $hasHargaNyata ? 'CASE WHEN a.hrg_nyata > 0 THEN a.hrg_nyata ELSE a.hrg_satuan END' : 'a.hrg_satuan';
+        $detailTotalNyataExpr = $hasTotalNyata ? 'CASE WHEN a.total_nyata > 0 THEN a.total_nyata ELSE a.total_harga END' : 'a.total_harga';
+        $qtyNyataExpr = $hasRealisasi ? 'COALESCE(r.qty_real, a.qty)' : 'a.qty';
+        $hargaNyataExpr = $hasRealisasi ? 'COALESCE(r.harga_satuan_real, ' . $detailHargaNyataExpr . ')' : $detailHargaNyataExpr;
+        $totalNyataExpr = $hasRealisasi ? 'COALESCE(r.total_real, ' . $detailTotalNyataExpr . ')' : $detailTotalNyataExpr;
+
         $this->db->select('
             c.nopo,
             c.kd_po_nk,
@@ -97,11 +117,17 @@ class M_Laporanp extends CI_Model
             a.deskripsi,
             a.qty,
             a.hrg_satuan,
-            a.total_harga
+            a.total_harga,
+            ' . $qtyNyataExpr . ' AS qty_nyata,
+            ' . $hargaNyataExpr . ' AS hrg_nyata,
+            ' . $totalNyataExpr . ' AS total_nyata
         ', false);
         $this->db->from('tb_detail_po_nk a');
         $this->db->join('tb_po_nk c', 'c.kd_po_nk = a.kd_po_nk');
         $this->db->join('tb_user b', 'b.kode_user = a.kd_user', 'left');
+        if ($hasRealisasi) {
+            $this->db->join('tb_penerimaan_po_nk_detail r', 'r.id_det_po_nk = a.id_det_po_nk', 'left');
+        }
         $this->db->where('DATE(a.tgl_transaksi) >= ' . $this->db->escape($tgl1), null, false);
         $this->db->where('DATE(a.tgl_transaksi) <= ' . $this->db->escape($tgl2), null, false);
         $this->db->where('c.status', 'DONE');

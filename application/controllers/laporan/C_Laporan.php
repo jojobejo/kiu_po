@@ -65,12 +65,14 @@ class C_Laporan extends CI_Controller
         $data['summary_cost_pic'] = $summary;
         $data['detail_cost_pic'] = $detail;
         $data['grand_total_cost'] = 0;
+        $data['grand_total_cost_nyata'] = 0;
         $data['grand_total_po'] = 0;
         $data['grand_total_item'] = 0;
         $po_keys = array();
 
         foreach ($summary as $row) {
             $data['grand_total_cost'] += (float) $row->total_cost;
+            $data['grand_total_cost_nyata'] += (float) $row->total_cost_nyata;
             $data['grand_total_item'] += (int) $row->total_item;
         }
 
@@ -188,7 +190,7 @@ class C_Laporan extends CI_Controller
             )
         );
 
-        $sheet->mergeCells('A1:G1');
+        $sheet->mergeCells('A1:I1');
         $sheet->setCellValue('A1', 'Ringkasan Cost - ' . $selected_pic_label);
         $sheet->getStyle('A1')->applyFromArray($style_title);
         $sheet->setCellValue('A2', 'Periode: ' . $tglstart . ' s/d ' . $tglend);
@@ -200,12 +202,15 @@ class C_Laporan extends CI_Controller
         $sheet->setCellValue('D' . $summary_header_row, 'Total PO');
         $sheet->setCellValue('E' . $summary_header_row, 'Total Item');
         $sheet->setCellValue('F' . $summary_header_row, 'Total Qty');
-        $sheet->setCellValue('G' . $summary_header_row, 'Total Cost');
-        $sheet->getStyle('A' . $summary_header_row . ':G' . $summary_header_row)->applyFromArray($style_header);
+        $sheet->setCellValue('G' . $summary_header_row, 'Total Qty Nyata');
+        $sheet->setCellValue('H' . $summary_header_row, 'Total Cost');
+        $sheet->setCellValue('I' . $summary_header_row, 'Total Cost Nyata');
+        $sheet->getStyle('A' . $summary_header_row . ':I' . $summary_header_row)->applyFromArray($style_header);
 
         $row = $summary_header_row + 1;
         $no = 1;
         $grand_total_summary = 0;
+        $grand_total_summary_nyata = 0;
 
         foreach ($summary as $data) {
             $sheet->setCellValue('A' . $row, $no++);
@@ -213,30 +218,34 @@ class C_Laporan extends CI_Controller
             $sheet->setCellValue('C' . $row, $data->departement);
             $sheet->setCellValue('D' . $row, (int) $data->total_po);
             $sheet->setCellValue('E' . $row, (int) $data->total_item);
-            $sheet->setCellValue('F' . $row, (int) $data->total_qty);
-            $sheet->setCellValue('G' . $row, (float) $data->total_cost);
+            $sheet->setCellValue('F' . $row, (float) $data->total_qty);
+            $sheet->setCellValue('G' . $row, (float) $data->total_qty_nyata);
+            $sheet->setCellValue('H' . $row, (float) $data->total_cost);
+            $sheet->setCellValue('I' . $row, (float) $data->total_cost_nyata);
             $grand_total_summary += (float) $data->total_cost;
-            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_row);
-            $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $grand_total_summary_nyata += (float) $data->total_cost_nyata;
+            $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('H' . $row . ':I' . $row)->getNumberFormat()->setFormatCode('#,##0');
             $row++;
         }
 
         if (empty($summary)) {
-            $sheet->mergeCells('A' . $row . ':G' . $row);
+            $sheet->mergeCells('A' . $row . ':I' . $row);
             $sheet->setCellValue('A' . $row, 'Data ringkasan tidak ditemukan.');
-            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($style_row);
             $row++;
         }
 
-        $sheet->mergeCells('A' . $row . ':F' . $row);
+        $sheet->mergeCells('A' . $row . ':G' . $row);
         $sheet->setCellValue('A' . $row, 'Grandtotal');
-        $sheet->setCellValue('G' . $row, $grand_total_summary);
-        $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($style_header);
-        $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->setCellValue('H' . $row, $grand_total_summary);
+        $sheet->setCellValue('I' . $row, $grand_total_summary_nyata);
+        $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($style_header);
+        $sheet->getStyle('H' . $row . ':I' . $row)->getNumberFormat()->setFormatCode('#,##0');
         $row++;
 
         $detail_title_row = $row + 3;
-        $sheet->mergeCells('A' . $detail_title_row . ':K' . $detail_title_row);
+        $sheet->mergeCells('A' . $detail_title_row . ':N' . $detail_title_row);
         $sheet->setCellValue('A' . $detail_title_row, 'Detail Cost - ' . $selected_pic_label);
         $sheet->getStyle('A' . $detail_title_row)->applyFromArray($style_title);
 
@@ -250,9 +259,12 @@ class C_Laporan extends CI_Controller
         $sheet->setCellValue('G' . $detail_header_row, 'Nama Barang');
         $sheet->setCellValue('H' . $detail_header_row, 'Deskripsi');
         $sheet->setCellValue('I' . $detail_header_row, 'Qty');
-        $sheet->setCellValue('J' . $detail_header_row, 'Harga Satuan');
-        $sheet->setCellValue('K' . $detail_header_row, 'Total Cost');
-        $sheet->getStyle('A' . $detail_header_row . ':K' . $detail_header_row)->applyFromArray($style_header);
+        $sheet->setCellValue('J' . $detail_header_row, 'Qty Nyata');
+        $sheet->setCellValue('K' . $detail_header_row, 'Harga Satuan');
+        $sheet->setCellValue('L' . $detail_header_row, 'Harga Nyata');
+        $sheet->setCellValue('M' . $detail_header_row, 'Total Cost');
+        $sheet->setCellValue('N' . $detail_header_row, 'Total Nyata');
+        $sheet->getStyle('A' . $detail_header_row . ':N' . $detail_header_row)->applyFromArray($style_header);
 
         $row = $detail_header_row + 1;
         $no = 1;
@@ -266,25 +278,28 @@ class C_Laporan extends CI_Controller
             $sheet->setCellValue('F' . $row, $data->tj_pembelian);
             $sheet->setCellValue('G' . $row, $data->nama_barang);
             $sheet->setCellValue('H' . $row, $data->deskripsi);
-            $sheet->setCellValue('I' . $row, (int) $data->qty);
-            $sheet->setCellValue('J' . $row, (float) $data->hrg_satuan);
-            $sheet->setCellValue('K' . $row, (float) $data->total_harga);
-            $sheet->getStyle('A' . $row . ':K' . $row)->applyFromArray($style_row);
-            $sheet->getStyle('J' . $row . ':K' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->setCellValue('I' . $row, (float) $data->qty);
+            $sheet->setCellValue('J' . $row, (float) $data->qty_nyata);
+            $sheet->setCellValue('K' . $row, (float) $data->hrg_satuan);
+            $sheet->setCellValue('L' . $row, (float) $data->hrg_nyata);
+            $sheet->setCellValue('M' . $row, (float) $data->total_harga);
+            $sheet->setCellValue('N' . $row, (float) $data->total_nyata);
+            $sheet->getStyle('A' . $row . ':N' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('K' . $row . ':N' . $row)->getNumberFormat()->setFormatCode('#,##0');
             $row++;
         }
 
         if (empty($detail)) {
-            $sheet->mergeCells('A' . $row . ':K' . $row);
+            $sheet->mergeCells('A' . $row . ':N' . $row);
             $sheet->setCellValue('A' . $row, 'Data detail tidak ditemukan.');
-            $sheet->getStyle('A' . $row . ':K' . $row)->applyFromArray($style_row);
+            $sheet->getStyle('A' . $row . ':N' . $row)->applyFromArray($style_row);
         }
 
-        foreach (range('A', 'K') as $column) {
+        foreach (range('A', 'N') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        $sheet->getStyle('A1:K' . $row)->getAlignment()->setWrapText(true);
+        $sheet->getStyle('A1:N' . $row)->getAlignment()->setWrapText(true);
         $sheet->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
         $sheet->getPageSetup()->setFitToWidth(1);
 

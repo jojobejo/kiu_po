@@ -79,7 +79,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="info-box">
                         <span class="info-box-icon bg-success"><i class="fas fa-wallet"></i></span>
                         <div class="info-box-content">
@@ -88,7 +88,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Total Cost Nyata</span>
+                            <span class="info-box-number">Rp. <?= number_format($grand_total_cost_nyata) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="info-box">
                         <span class="info-box-icon bg-info"><i class="fas fa-file-invoice"></i></span>
                         <div class="info-box-content">
@@ -97,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="info-box">
                         <span class="info-box-icon bg-warning"><i class="fas fa-boxes"></i></span>
                         <div class="info-box-content">
@@ -123,7 +132,9 @@
                                     <th>Total PO</th>
                                     <th>Total Item</th>
                                     <th>Total Qty</th>
+                                    <th>Total Qty Nyata</th>
                                     <th>Total Cost</th>
+                                    <th>Total Cost Nyata</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,7 +147,9 @@
                                         <td><?= number_format($row->total_po) ?></td>
                                         <td><?= number_format($row->total_item) ?></td>
                                         <td><?= number_format($row->total_qty) ?></td>
+                                        <td><?= number_format($row->total_qty_nyata) ?></td>
                                         <td>Rp. <?= number_format($row->total_cost) ?></td>
+                                        <td>Rp. <?= number_format($row->total_cost_nyata) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -163,8 +176,11 @@
                                     <th>Nama Barang</th>
                                     <th>Deskripsi</th>
                                     <th>Qty</th>
+                                    <th>Qty Nyata</th>
                                     <th>Harga Satuan</th>
+                                    <th>Harga Nyata</th>
                                     <th>Total Cost</th>
+                                    <th>Total Nyata</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -180,8 +196,11 @@
                                         <td><?= html_escape($row->nama_barang) ?></td>
                                         <td><?= html_escape($row->deskripsi) ?></td>
                                         <td><?= number_format($row->qty) ?></td>
+                                        <td><?= number_format($row->qty_nyata) ?></td>
                                         <td>Rp. <?= number_format($row->hrg_satuan) ?></td>
+                                        <td>Rp. <?= number_format($row->hrg_nyata) ?></td>
                                         <td>Rp. <?= number_format($row->total_harga) ?></td>
+                                        <td>Rp. <?= number_format($row->total_nyata) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
