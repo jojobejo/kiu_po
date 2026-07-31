@@ -13,7 +13,46 @@ class C_Laporan extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Laporan/M_Laporanp');
+        $this->load->model('stock/M_Stocknonkomersil');
         $this->load->library('form_validation');
+    }
+
+    private function clear_export_output_buffers()
+    {
+        while (ob_get_level() > 0) {
+            if (!@ob_end_clean()) {
+                break;
+            }
+        }
+    }
+
+    private function download_excel2007($excel, $filename)
+    {
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $tempFile = tempnam(sys_get_temp_dir(), 'ponk_xlsx_');
+
+        if ($tempFile === false) {
+            show_error('Gagal membuat file temporary export Excel.', 500);
+            return;
+        }
+
+        $writer->save($tempFile);
+        $fileSize = filesize($tempFile);
+
+        $this->clear_export_output_buffers();
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+
+        if ($fileSize !== false) {
+            header('Content-Length: ' . $fileSize);
+        }
+
+        readfile($tempFile);
+        @unlink($tempFile);
+        exit;
     }
 
     public function index()
@@ -179,7 +218,8 @@ class C_Laporan extends CI_Controller
 
     public function exported_allstock()
     {
-        include APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        ob_start();
+        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
         $excel = new PHPExcel();
         $excel->getProperties()->setCreator('it_karisma')
             ->setLastModifiedBy('it_karisma')
@@ -236,13 +276,14 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
 
-        $export = $this->M_Laporanp->v_stock();
+        $export = $this->M_Stocknonkomersil->v_stock();
 
         $no = 1;
         $numrow = 4;
         foreach ($export as $data) {
             $excel->setActiveSheetIndex(0)->setCellValue('A' . $numrow, $no);
-            $excel->setActiveSheetIndex(0)->setCellValue('B' . $numrow, $data->kode_barangs);
+            $kodeBarang = isset($data->kode_barang) && $data->kode_barang !== '' ? $data->kode_barang : $data->kode_barangs;
+            $excel->setActiveSheetIndex(0)->setCellValue('B' . $numrow, $kodeBarang);
             $excel->setActiveSheetIndex(0)->setCellValue('C' . $numrow, $data->nama_barang);
             $excel->setActiveSheetIndex(0)->setCellValue('D' . $numrow, $data->deskripsi);
             $excel->setActiveSheetIndex(0)->setCellValue('E' . $numrow, $data->qty_ready);
@@ -265,19 +306,12 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(10);
         $excel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
-        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(25);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
+        $excel->getActiveSheet(0)->setTitle("lap_stock_nonkomersil");
         $excel->setActiveSheetIndex(0);
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="lap_stock_po_nonkomersil.xlsx"');
-        header('Cache-Control: max-age=0');
-
-
-        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-        ob_end_clean();
-        $write->save('php://output');
+        $this->download_excel2007($excel, 'lap_stock_po_nonkomersil.xlsx');
     }
 
     public function tr_allstock()
