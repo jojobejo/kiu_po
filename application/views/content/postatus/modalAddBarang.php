@@ -69,7 +69,7 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Qty<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="qty_isi" name="qty_isi" value="" inputmode="decimal" pattern="[0-9]+([,.][0-9]+)?" /></div>
                         </div>
                     </div>
                     <div class="form-group">

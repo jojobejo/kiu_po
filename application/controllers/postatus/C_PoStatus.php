@@ -17,6 +17,23 @@ class C_PoStatus extends CI_Controller
         $this->load->library('form_validation');
     }
 
+    private function normalize_decimal_input($value)
+    {
+        $value = trim((string) $value);
+        $value = str_replace(' ', '', $value);
+
+        if ($value === '') {
+            return 0;
+        }
+
+        if (strpos($value, ',') !== false) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return is_numeric($value) ? (float) $value : 0;
+    }
+
     public function index()
     {
         $data['title'] = 'PO Status';
@@ -622,8 +639,8 @@ class C_PoStatus extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
-        $hargaQty   = $this->input->post('hrg_isi');
+        $qty        = $this->normalize_decimal_input($this->input->post('qty_isi'));
+        $hargaQty   = $this->normalize_decimal_input($this->input->post('hrg_isi'));
         $hargahasil = $hargaQty * $qty;
 
         $data = array(
