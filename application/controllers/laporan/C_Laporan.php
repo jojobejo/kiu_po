@@ -598,6 +598,7 @@ class C_Laporan extends CI_Controller
     }
     public function exported_tr_allnk()
     {
+        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
         require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
 
         $tgl1 = $this->input->get('tglstart');
@@ -699,19 +700,35 @@ class C_Laporan extends CI_Controller
         $sheet->getColumnDimension('I')->setWidth(6);
         $sheet->getColumnDimension('J')->setWidth(20);
 
-        // Download
         $filename = 'Laporan_Transaksi_NonKomersil_' . $tgl1 . '_to_' . $tgl2 . '.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Pragma: public');
+
+        $this->download_excel2007($excel, $filename);
+    }
+
+    private function download_excel2007($excel, $filename)
+    {
+        $temporary_file = tempnam(sys_get_temp_dir(), 'kiu_export_');
+
+        if ($temporary_file === false) {
+            show_error('Gagal membuat file sementara untuk export Excel.', 500);
+            return;
+        }
+
+        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $writer->save($temporary_file);
 
         while (ob_get_level() > 0 && @ob_end_clean()) {
             // Bersihkan semua output sebelum stream Excel dikirim.
         }
 
-        $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-        $writer->save('php://output');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($temporary_file));
+
+        readfile($temporary_file);
+        @unlink($temporary_file);
         exit;
     }
 
