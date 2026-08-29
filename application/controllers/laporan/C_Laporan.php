@@ -218,6 +218,7 @@ class C_Laporan extends CI_Controller
 
     public function exported_allstock()
     {
+        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
         ob_start();
         require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
         $excel = new PHPExcel();

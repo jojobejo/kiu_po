@@ -108,6 +108,7 @@ $route['pononkomersiljasa']                             = 'purchaseorder/pojasa/
 $route['stocknonkomersil']                              = 'stock/C_Stocknonkomersil';
 $route['stocknonkomersil/data']                         = 'stock/C_Stocknonkomersil/ajax_stocknonkomersil';
 $route['stocknonkomersil/update_lokasi']                = 'stock/C_Stocknonkomersil/update_lokasi_barang';
+$route['stocknonkomersil/update_minimum_stock']          = 'stock/C_Stocknonkomersil/update_minimum_stock';
 $route['pononkomersil/list_stocknkpo']                  = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['detailtransaksi/(:any)']                        = 'stock/C_Stocknonkomersil/detailtransaksi/$1';
 $route['revisitr/(:any)/(:any)/(:any)']                 = 'stock/C_Stocknonkomersil/revisitr/$1/$2/$3';
@@ -199,8 +200,6 @@ $route['postatusnk']                                    = 'postatus/C_PoStatus/p
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
-$route['postatusnk/update-tujuan-pembelian']            = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
-$route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 $route['add_faktur_item_nk']                            = 'postatus/C_PoStatus/add_item_faktur_nk';
 $route['listbarangnk/1/2/3/(:any)']                     = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['noteupdatenk']                                  = 'postatus/C_PoStatus/addnotenk';
@@ -226,6 +225,8 @@ $route['historidone/(:any)/(:any)']                     = 'postatus/C_PoStatus/h
 $route['stsviewpo/(:any)']                              = 'postatus/C_PoStatus/stsviewpo/$1';
 $route['srcexpdone']                                    = 'postatus/C_PoStatus/srcexpdone';
 $route['downloadfile/(:any)']                           = 'postatus/C_PoStatus/downloadfile/$1';
+$route['postatusnk/update-tujuan-pembelian']            = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
+$route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 
 
 $route['edit_faktur_item_nk']                           = 'postatus/C_PoStatus/edit_faktur_item_nk';
