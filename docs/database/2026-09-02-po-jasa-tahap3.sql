@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_payment` (
+  `id_payment_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_po_jasa` varchar(30) NOT NULL,
+  `tgl_invoice` date NOT NULL,
+  `jatuh_tempo` date NOT NULL,
+  `no_invoice` varchar(100) NOT NULL,
+  `nominal_tagihan` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `nominal_bayar` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `status_bayar` varchar(30) NOT NULL DEFAULT 'BELUM BAYAR',
+  `catatan_payment` text DEFAULT NULL,
+  `created_by` varchar(50) DEFAULT NULL,
+  `created_name` varchar(120) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_payment_jasa`),
+  KEY `idx_tbpo_jasa_payment_kd_po` (`kd_po_jasa`),
+  KEY `idx_tbpo_jasa_payment_status` (`status_bayar`),
+  KEY `idx_tbpo_jasa_payment_due` (`jatuh_tempo`),
+  CONSTRAINT `fk_tbpo_jasa_payment_request` FOREIGN KEY (`kd_po_jasa`) REFERENCES `tbpo_jasa_request` (`kd_po_jasa`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_evaluation` (
+  `id_evaluation_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_po_jasa` varchar(30) NOT NULL,
+  `kd_vendor_jasa` varchar(20) NOT NULL,
+  `kualitas_score` decimal(4,2) NOT NULL DEFAULT 0.00,
+  `ketepatan_waktu_score` decimal(4,2) NOT NULL DEFAULT 0.00,
+  `biaya_score` decimal(4,2) NOT NULL DEFAULT 0.00,
+  `total_score` decimal(4,2) NOT NULL DEFAULT 0.00,
+  `catatan_evaluasi` text DEFAULT NULL,
+  `evaluated_by` varchar(50) DEFAULT NULL,
+  `evaluated_name` varchar(120) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `update_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_evaluation_jasa`),
+  UNIQUE KEY `uk_tbpo_jasa_evaluation_kd_po` (`kd_po_jasa`),
+  KEY `idx_tbpo_jasa_evaluation_vendor` (`kd_vendor_jasa`),
+  KEY `idx_tbpo_jasa_evaluation_score` (`total_score`),
+  CONSTRAINT `fk_tbpo_jasa_evaluation_request` FOREIGN KEY (`kd_po_jasa`) REFERENCES `tbpo_jasa_request` (`kd_po_jasa`) ON DELETE CASCADE,
+  CONSTRAINT `fk_tbpo_jasa_evaluation_vendor` FOREIGN KEY (`kd_vendor_jasa`) REFERENCES `tbpo_jasa_vendor` (`kd_vendor_jasa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

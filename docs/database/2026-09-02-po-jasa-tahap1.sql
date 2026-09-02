@@ -1,0 +1,81 @@
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_vendor` (
+  `id_vendor_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_vendor_jasa` varchar(20) NOT NULL,
+  `nama_vendor` varchar(150) NOT NULL,
+  `kategori_jasa` varchar(100) DEFAULT NULL,
+  `nama_pic` varchar(100) DEFAULT NULL,
+  `no_telpon` varchar(50) DEFAULT NULL,
+  `email` varchar(120) DEFAULT NULL,
+  `alamat_vendor` text DEFAULT NULL,
+  `npwp` varchar(80) DEFAULT NULL,
+  `status_vendor` varchar(20) NOT NULL DEFAULT 'AKTIF',
+  `created_by` varchar(50) DEFAULT NULL,
+  `updated_by` varchar(50) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `update_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_vendor_jasa`),
+  UNIQUE KEY `uk_tbpo_jasa_vendor_kd` (`kd_vendor_jasa`),
+  KEY `idx_tbpo_jasa_vendor_status` (`status_vendor`),
+  KEY `idx_tbpo_jasa_vendor_kategori` (`kategori_jasa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_request` (
+  `id_po_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_po_jasa` varchar(30) NOT NULL,
+  `no_spk` varchar(30) DEFAULT NULL,
+  `kd_vendor_jasa` varchar(20) NOT NULL,
+  `kd_user` varchar(50) NOT NULL,
+  `nm_user` varchar(120) NOT NULL,
+  `departemen` varchar(100) NOT NULL,
+  `tgl_request` date NOT NULL,
+  `tgl_target` date NOT NULL,
+  `lokasi_pekerjaan` varchar(180) DEFAULT NULL,
+  `tujuan_pekerjaan` text NOT NULL,
+  `estimasi_total` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `status` varchar(40) NOT NULL DEFAULT 'ON PROGRESS',
+  `acc_with_kadep` varchar(50) DEFAULT NULL,
+  `acc_at_kadep` datetime DEFAULT NULL,
+  `acc_with_direktur` varchar(50) DEFAULT NULL,
+  `acc_at_direktur` datetime DEFAULT NULL,
+  `generated_by` varchar(50) DEFAULT NULL,
+  `generated_at` datetime DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `update_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_po_jasa`),
+  UNIQUE KEY `uk_tbpo_jasa_request_kd` (`kd_po_jasa`),
+  UNIQUE KEY `uk_tbpo_jasa_request_spk` (`no_spk`),
+  KEY `idx_tbpo_jasa_request_vendor` (`kd_vendor_jasa`),
+  KEY `idx_tbpo_jasa_request_status` (`status`),
+  KEY `idx_tbpo_jasa_request_user` (`kd_user`),
+  KEY `idx_tbpo_jasa_request_dept` (`departemen`),
+  KEY `idx_tbpo_jasa_request_tgl` (`tgl_request`, `tgl_target`),
+  CONSTRAINT `fk_tbpo_jasa_request_vendor` FOREIGN KEY (`kd_vendor_jasa`) REFERENCES `tbpo_jasa_vendor` (`kd_vendor_jasa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_request_detail` (
+  `id_detail_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_po_jasa` varchar(30) NOT NULL,
+  `nama_pekerjaan` varchar(180) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `qty` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `satuan` varchar(40) DEFAULT NULL,
+  `hrg_satuan` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `total_harga` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_detail_jasa`),
+  KEY `idx_tbpo_jasa_detail_kd_po` (`kd_po_jasa`),
+  CONSTRAINT `fk_tbpo_jasa_detail_request` FOREIGN KEY (`kd_po_jasa`) REFERENCES `tbpo_jasa_request` (`kd_po_jasa`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `tbpo_jasa_note` (
+  `id_note_jasa` int(11) NOT NULL AUTO_INCREMENT,
+  `kd_po_jasa` varchar(30) NOT NULL,
+  `isi_note` text NOT NULL,
+  `kd_user` varchar(50) DEFAULT NULL,
+  `nama_user` varchar(120) DEFAULT NULL,
+  `aksi_status` varchar(40) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_note_jasa`),
+  KEY `idx_tbpo_jasa_note_kd_po` (`kd_po_jasa`),
+  CONSTRAINT `fk_tbpo_jasa_note_request` FOREIGN KEY (`kd_po_jasa`) REFERENCES `tbpo_jasa_request` (`kd_po_jasa`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

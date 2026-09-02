@@ -108,8 +108,25 @@ $route['masterbarangkomersil/get/(:num)']                = 'master_barang/C_Mast
 $route['masterbarangkomersil/save']                     = 'master_barang/C_MasterBarang/ajax_save_masterbarangkomersil';
 $route['masterbarangkomersil/delete']                   = 'master_barang/C_MasterBarang/ajax_delete_masterbarangkomersil';
 
-// PO-Non-Komersil - PO JASA
-$route['pononkomersiljasa']                             = 'purchaseorder/pojasa/C_Pojasa';
+// Purchase Order Jasa
+$route['pononkomersiljasa']                             = 'purchaseorder/C_Pojasa';
+$route['pojasa/vendor/save']                            = 'purchaseorder/C_Pojasa/save_vendor';
+$route['pojasa/vendor/update']                          = 'purchaseorder/C_Pojasa/update_vendor';
+$route['pojasa/vendor/delete']                          = 'purchaseorder/C_Pojasa/delete_vendor';
+$route['pojasa/vendor/approval']                        = 'purchaseorder/C_Pojasa/vendor_approval';
+$route['pojasa/request/save']                           = 'purchaseorder/C_Pojasa/save_request';
+$route['pojasa/request/revise']                         = 'purchaseorder/C_Pojasa/revise_request';
+$route['pojasa/scope/save']                             = 'purchaseorder/C_Pojasa/save_scope_review';
+$route['pojasa/detail/(:any)']                          = 'purchaseorder/C_Pojasa/detail/$1';
+$route['pojasa/approval']                               = 'purchaseorder/C_Pojasa/approval';
+$route['pojasa/generate-spk']                           = 'purchaseorder/C_Pojasa/generate_spk';
+$route['pojasa/progress/save']                          = 'purchaseorder/C_Pojasa/save_progress';
+$route['pojasa/file/upload']                            = 'purchaseorder/C_Pojasa/upload_file';
+$route['pojasa/biaya/save']                             = 'purchaseorder/C_Pojasa/save_biaya';
+$route['pojasa/bast/complete']                          = 'purchaseorder/C_Pojasa/complete_bast';
+$route['pojasa/payment/save']                           = 'purchaseorder/C_Pojasa/save_payment';
+$route['pojasa/evaluation/save']                        = 'purchaseorder/C_Pojasa/save_evaluation';
+$route['pojasa/report']                                 = 'purchaseorder/C_Pojasa/report';
 
 // Stock PO Non Komersil
 $route['stocknonkomersil']                              = 'stock/C_Stocknonkomersil';
