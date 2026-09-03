@@ -41,9 +41,9 @@ if (!function_exists('pojasa_money')) {
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Vendor</label>
+                                    <label>Toko / Vendor</label>
                                     <select class="form-control" name="kd_vendor_jasa">
-                                        <option value="">Semua Vendor</option>
+                                        <option value="">Semua Toko / Vendor</option>
                                         <?php foreach ($vendors as $vendor) : ?>
                                             <option value="<?= pojasa_h($vendor->kd_vendor_jasa) ?>" <?= $filters['kd_vendor_jasa'] === $vendor->kd_vendor_jasa ? 'selected' : '' ?>>
                                                 <?= pojasa_h($vendor->nama_vendor) ?>
@@ -70,7 +70,7 @@ if (!function_exists('pojasa_money')) {
             </div>
 
             <div class="row">
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6 d-none">
                     <div class="small-box bg-success">
                         <div class="inner">
                             <h3><?= (int) $report_summary['total_project_done'] ?></h3>
@@ -97,7 +97,7 @@ if (!function_exists('pojasa_money')) {
                         <div class="icon"><i class="fas fa-calculator"></i></div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6 d-none">
                     <div class="small-box bg-primary">
                         <div class="inner">
                             <h3><?= number_format((float) $report_summary['avg_score'], 2) ?></h3>
@@ -113,12 +113,12 @@ if (!function_exists('pojasa_money')) {
                     <strong>Report Histori Jasa Vendor Project Done</strong>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-striped" id="tbReportDonePojasa">
+                    <table class="table table-sm table-bordered table-striped" id="tbReportDonePojasa">
                         <thead>
                             <tr>
                                 <th>No</th>
                                 <th>Kode</th>
-                                <th>Vendor</th>
+                                <th>Toko / Vendor</th>
                                 <th>Departemen</th>
                                 <th>BAST</th>
                                 <th>Estimasi</th>
@@ -158,11 +158,11 @@ if (!function_exists('pojasa_money')) {
                     <strong>Vendor Performance</strong>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-striped" id="tbVendorPerformancePojasa">
+                    <table class="table table-sm table-bordered table-striped" id="tbVendorPerformancePojasa">
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Vendor</th>
+                                <th>Toko / Vendor</th>
                                 <th>Kategori</th>
                                 <th>Total Project DONE</th>
                                 <th>Total Estimasi</th>

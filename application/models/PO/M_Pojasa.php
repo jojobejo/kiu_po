@@ -71,6 +71,15 @@ class M_Pojasa extends CI_Model
         return $this->db->get()->row();
     }
 
+    public function get_active_vendor_by_name($nama_vendor)
+    {
+        $this->db->from('tbpo_jasa_vendor');
+        $this->db->where('LOWER(nama_vendor)', strtolower(trim((string) $nama_vendor)));
+        $this->db->where('status_vendor', 'AKTIF');
+
+        return $this->db->get()->row();
+    }
+
     public function insert_vendor($data)
     {
         return $this->db->insert('tbpo_jasa_vendor', $data);
@@ -372,6 +381,48 @@ class M_Pojasa extends CI_Model
         return $this->db->trans_status();
     }
 
+    public function insert_files_and_note($files, $note)
+    {
+        $this->db->trans_start();
+        foreach ($files as $file) {
+            $this->db->insert('tbpo_jasa_file', $file);
+        }
+        $this->db->insert('tbpo_jasa_note', $note);
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
+    public function get_file($id_file_jasa)
+    {
+        $this->db->from('tbpo_jasa_file');
+        $this->db->where('id_file_jasa', $id_file_jasa);
+
+        return $this->db->get()->row();
+    }
+
+    public function update_file_and_note($id_file_jasa, $file, $note)
+    {
+        $this->db->trans_start();
+        $this->db->where('id_file_jasa', $id_file_jasa);
+        $this->db->update('tbpo_jasa_file', $file);
+        $this->db->insert('tbpo_jasa_note', $note);
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
+    public function delete_file_and_note($id_file_jasa, $note)
+    {
+        $this->db->trans_start();
+        $this->db->where('id_file_jasa', $id_file_jasa);
+        $this->db->delete('tbpo_jasa_file');
+        $this->db->insert('tbpo_jasa_note', $note);
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
     public function get_files($kd_po_jasa)
     {
         $this->db->from('tbpo_jasa_file');
@@ -542,6 +593,10 @@ class M_Pojasa extends CI_Model
 
     private function apply_report_filters($filters)
     {
+        if (isset($filters['lv'], $filters['kode_user'], $filters['access_departemen'])) {
+            $this->apply_access_filter($filters['lv'], $filters['kode_user'], $filters['access_departemen'], 'r');
+        }
+
         if (!empty($filters['kd_vendor_jasa'])) {
             $this->db->where('v.kd_vendor_jasa', $filters['kd_vendor_jasa']);
         }

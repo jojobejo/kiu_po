@@ -718,6 +718,26 @@ class M_PoStatus extends CI_Model
         $this->db->where('a.kd_po_nk', $kd);
         return $this->db->get()->result();
     }
+
+    public function get_last_harga_barang_nk($kodeBarang, $kodeBarangSys = '')
+    {
+        $this->db->select('a.hrg_satuan, a.hrg_nyata, a.total_harga, a.total_nyata, a.kd_po_nk, p.tgl_transaksi');
+        $this->db->from('tbpo_detail_po_nk a');
+        $this->db->join('tbpo_po_nk p', 'p.kd_po_nk = a.kd_po_nk', 'left');
+        $this->db->where('a.hrg_satuan >', 0);
+
+        if ($kodeBarangSys !== '') {
+            $this->db->where('a.kd_bsys', $kodeBarangSys);
+        } else {
+            $this->db->where('a.kd_barang', $kodeBarang);
+        }
+
+        $this->db->order_by('p.tgl_transaksi', 'DESC');
+        $this->db->order_by('a.id_det_po_nk', 'DESC');
+        $this->db->limit(1);
+
+        return $this->db->get()->row();
+    }
     public function getDetailnktgl($kd)
     {
         $this->db->select('*');
@@ -763,7 +783,7 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*,
-        RIGHT(a.file_uploaded,3) AS kdfile 
+        LOWER(SUBSTRING_INDEX(a.file_uploaded,'.',-1)) AS kdfile
         FROM tbpo_file_nk a
         JOIN tbpo_user b ON b.kode_user = a.user_upload
         WHERE a.kd_po_nk = '$kdpo'");
@@ -772,7 +792,7 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*,
-        RIGHT(a.file_uploaded,3) AS kdfile 
+        LOWER(SUBSTRING_INDEX(a.file_uploaded,'.',-1)) AS kdfile
         FROM tbpo_file_bukti_beli a
         JOIN tbpo_user b ON b.kode_user = a.user_upload
         WHERE a.kd_po_nk = '$kdpo'");
@@ -799,6 +819,7 @@ class M_PoStatus extends CI_Model
     function upbuktibeli($data)
     {
         $this->db->insert('tbpo_file_bukti_beli', $data);
+        return $this->db->insert_id();
     }
 
     function editflupload($id, $data)
@@ -1180,6 +1201,97 @@ class M_PoStatus extends CI_Model
     function add_file_po_nk($data)
     {
         $this->db->insert('tbpo_file_nk', $data);
+        return $this->db->insert_id();
+    }
+
+    function insert_arsip_evident_ponk($data)
+    {
+        if (!$this->db->table_exists('tbpo_arsip_evident_ponk')) {
+            return false;
+        }
+
+        $this->db->insert('tbpo_arsip_evident_ponk', $data);
+        return $this->db->insert_id();
+    }
+
+    function get_arsip_evident_ponk_done($filters = array())
+    {
+        $where = "p.status = 'DONE'";
+        $binds = array();
+
+        if (!empty($filters['tgl_start'])) {
+            $where .= " AND p.tgl_transaksi >= ?";
+            $binds[] = $filters['tgl_start'];
+        }
+
+        if (!empty($filters['tgl_end'])) {
+            $where .= " AND p.tgl_transaksi <= ?";
+            $binds[] = $filters['tgl_end'];
+        }
+
+        if (!empty($filters['kd_po_nk'])) {
+            $where .= " AND p.kd_po_nk LIKE ?";
+            $binds[] = '%' . $filters['kd_po_nk'] . '%';
+        }
+
+        if ($this->db->table_exists('tbpo_arsip_evident_ponk')) {
+            return $this->db->query("
+                SELECT
+                    a.id_arsip_evident AS id_file,
+                    a.kd_po_nk,
+                    a.jenis_evident,
+                    a.keterangan,
+                    a.file_path,
+                    a.file_uploaded,
+                    a.user_upload,
+                    a.create_at,
+                    p.nopo,
+                    p.tgl_transaksi,
+                    p.departemen,
+                    p.tj_pembelian
+                FROM tbpo_arsip_evident_ponk a
+                JOIN tbpo_po_nk p ON p.kd_po_nk = a.kd_po_nk
+                WHERE {$where}
+                ORDER BY p.tgl_transaksi DESC, a.create_at DESC
+            ", $binds)->result();
+        }
+
+        return $this->db->query("
+            SELECT
+                f.id_file_nk AS id_file,
+                f.kd_po_nk,
+                'FILE PENDUKUNG PENGAJUAN' AS jenis_evident,
+                f.keterangan,
+                CONCAT('images/filepndukung/', f.file_uploaded) AS file_path,
+                f.file_uploaded,
+                f.user_upload,
+                f.create_at,
+                p.nopo,
+                p.tgl_transaksi,
+                p.departemen,
+                p.tj_pembelian
+            FROM tbpo_file_nk f
+            JOIN tbpo_po_nk p ON p.kd_po_nk = f.kd_po_nk
+            WHERE {$where}
+            UNION ALL
+            SELECT
+                b.id_fk_bukti AS id_file,
+                b.kd_po_nk,
+                'BUKTI PEMBELIAN BARANG' AS jenis_evident,
+                b.keterangan,
+                CONCAT('images/upbukti/', b.file_uploaded) AS file_path,
+                b.file_uploaded,
+                b.user_upload,
+                b.create_at,
+                p.nopo,
+                p.tgl_transaksi,
+                p.departemen,
+                p.tj_pembelian
+            FROM tbpo_file_bukti_beli b
+            JOIN tbpo_po_nk p ON p.kd_po_nk = b.kd_po_nk
+            WHERE {$where}
+            ORDER BY tgl_transaksi DESC, create_at DESC
+        ", array_merge($binds, $binds))->result();
     }
     function add_tax_nk($id, $data)
     {

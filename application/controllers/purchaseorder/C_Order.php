@@ -14,6 +14,7 @@ class C_Order extends CI_Controller
     {
         parent::__construct();
         $this->load->model('PO/M_Purchase');
+        $this->load->model('PO/M_Postatus');
         $this->load->model('Master_barang/M_MasterBarang');
         $this->load->library('form_validation');
     }
@@ -36,6 +37,21 @@ class C_Order extends CI_Controller
         }
 
         return (float) $value;
+    }
+
+    private function hargaLifoNk($kodeBarang, $kodeBarangSys = '', $fallback = 0)
+    {
+        $fallbackHarga = $this->parseNumericInput($fallback);
+        if ($fallbackHarga > 0) {
+            return $fallbackHarga;
+        }
+
+        $lastHarga = $this->M_Postatus->get_last_harga_barang_nk($kodeBarang, $kodeBarangSys);
+        if ($lastHarga && (float) $lastHarga->hrg_satuan > 0) {
+            return (float) $lastHarga->hrg_satuan;
+        }
+
+        return 0;
     }
 
     private function satuanPerluKonversi($satuan)
@@ -1075,7 +1091,7 @@ class C_Order extends CI_Controller
         $descbarang = $this->input->post('descisi');
         $ketbarang  = $this->input->post('ketbarang');
         $qtybarang  = $this->input->post('qtyisi');
-        $hrgsatuan  = $this->input->post('hrgisi');
+        $hrgsatuan  = $this->hargaLifoNk($kdbarang, $kdbrsys, $this->input->post('hrgisi'));
         $kduser     = $this->session->userdata('kode');
         $totalharga = $qtybarang * $hrgsatuan;
 
@@ -1255,6 +1271,18 @@ class C_Order extends CI_Controller
                     'total_harga'       => $chart->total_harga,
                     'total_nyata'       => '0',
                 );
+
+                if ($this->db->field_exists('harga_lifo', 'tbpo_detail_po_nk') || $this->db->field_exists('kd_po_lifo_ref', 'tbpo_detail_po_nk')) {
+                    $lastHarga = $this->M_Postatus->get_last_harga_barang_nk($chart->kd_barang, $chart->kd_bsys);
+                    if ($lastHarga) {
+                        if ($this->db->field_exists('harga_lifo', 'tbpo_detail_po_nk')) {
+                            $listTransaksi['harga_lifo'] = $lastHarga->hrg_satuan;
+                        }
+                        if ($this->db->field_exists('kd_po_lifo_ref', 'tbpo_detail_po_nk')) {
+                            $listTransaksi['kd_po_lifo_ref'] = $lastHarga->kd_po_nk;
+                        }
+                    }
+                }
 
                 $this->M_Purchase->input_detail_po_nk($listTransaksi);
             }

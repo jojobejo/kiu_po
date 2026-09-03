@@ -12,6 +12,10 @@ class C_Pojasa extends CI_Controller
 
     public function index()
     {
+        if (!$this->guardModuleAccess()) {
+            return;
+        }
+
         $data = $this->baseData('Purchase Order Jasa');
         $data['tables_ready'] = $this->M_Pojasa->tables_ready();
         $data['missing_tables'] = $data['tables_ready'] ? array() : $this->M_Pojasa->missing_tables();
@@ -64,6 +68,11 @@ class C_Pojasa extends CI_Controller
             return;
         }
 
+        if (!$this->canAccessRequest($request)) {
+            show_404();
+            return;
+        }
+
         $data = $this->baseData('Detail PO Jasa');
         $data['request'] = $request;
         $data['active_vendors'] = $this->M_Pojasa->get_active_vendors();
@@ -88,6 +97,10 @@ class C_Pojasa extends CI_Controller
 
     public function report()
     {
+        if (!$this->guardModuleAccess()) {
+            return;
+        }
+
         if (!$this->M_Pojasa->tables_ready()) {
             $this->session->set_flashdata('error', 'Tabel PO Jasa belum tersedia. Jalankan migration database Tahap 1, Tahap 2, dan Tahap 3 terlebih dahulu.');
             redirect('pononkomersiljasa');
@@ -98,7 +111,10 @@ class C_Pojasa extends CI_Controller
             'tgl_start' => $this->input->get('tgl_start', true),
             'tgl_end' => $this->input->get('tgl_end', true),
             'kd_vendor_jasa' => $this->input->get('kd_vendor_jasa', true),
-            'departemen' => $this->input->get('departemen', true)
+            'departemen' => $this->input->get('departemen', true),
+            'lv' => $this->session->userdata('lv'),
+            'kode_user' => $this->session->userdata('kode'),
+            'access_departemen' => $this->session->userdata('departemen')
         );
 
         $data = $this->baseData('Report PO Jasa');
@@ -260,27 +276,35 @@ class C_Pojasa extends CI_Controller
             return;
         }
 
-        $kd_vendor_jasa = $this->input->post('kd_vendor_jasa', true);
-        $tgl_request = $this->input->post('tgl_request', true);
-        $tgl_target = $this->input->post('tgl_target', true);
-        $tujuan = trim((string) $this->input->post('tujuan_pekerjaan', true));
-
-        if ($kd_vendor_jasa === '' || $tgl_request === '' || $tgl_target === '' || $tujuan === '') {
-            return $this->jsonResponse(false, 'Vendor, tanggal request, tanggal target, dan tujuan pekerjaan wajib diisi.');
+        if (!$this->canCreateRequest()) {
+            return $this->jsonResponse(false, 'Request PO Jasa hanya dapat dibuat oleh PIC atau Admin/Purchasing.');
         }
 
-        $vendor = $this->M_Pojasa->get_vendor($kd_vendor_jasa);
-        if (!$vendor || $vendor->status_vendor !== 'AKTIF') {
-            return $this->jsonResponse(false, 'Vendor jasa tidak ditemukan atau tidak aktif.');
+        $tgl_request = $this->normalizeRequestDate($this->input->post('tgl_request', true));
+        $tgl_target = $this->normalizeTargetDate($this->input->post('tgl_target', true), $tgl_request);
+        $lokasi_pekerjaan = $this->normalizeLokasiPekerjaan($this->input->post('lokasi_pekerjaan', true));
+        $tujuan = trim((string) $this->input->post('tujuan_pekerjaan', true));
+
+        $vendorResult = $this->resolveRequestVendor(
+            $this->input->post('kd_vendor_jasa', true),
+            $this->input->post('nama_vendor_jasa', true)
+        );
+
+        if (!$vendorResult['success']) {
+            return $this->jsonResponse(false, $vendorResult['message']);
+        }
+
+        if ($tgl_request === '' || $tgl_target === '' || $tujuan === '') {
+            return $this->jsonResponse(false, 'Tanggal request dan deskripsi jasa wajib diisi.');
         }
 
         if ($tgl_target < $tgl_request) {
             return $this->jsonResponse(false, 'Target selesai tidak boleh lebih awal dari tanggal request.');
         }
 
-        $details = $this->buildRequestDetails();
+        $details = $this->buildRequestDetails(array('allow_zero_price' => true));
         if (empty($details['rows'])) {
-            return $this->jsonResponse(false, 'Minimal satu scope pekerjaan wajib diisi dengan nilai biaya lebih dari 0.');
+            return $this->jsonResponse(false, 'Minimal satu scope pekerjaan wajib diisi.');
         }
 
         date_default_timezone_set('Asia/Jakarta');
@@ -291,13 +315,13 @@ class C_Pojasa extends CI_Controller
 
         $header = array(
             'kd_po_jasa' => $kd_po_jasa,
-            'kd_vendor_jasa' => $kd_vendor_jasa,
+            'kd_vendor_jasa' => $vendorResult['vendor']->kd_vendor_jasa,
             'kd_user' => $kd_user,
             'nm_user' => $nama_user,
             'departemen' => $departemen,
             'tgl_request' => $tgl_request,
             'tgl_target' => $tgl_target,
-            'lokasi_pekerjaan' => trim((string) $this->input->post('lokasi_pekerjaan', true)),
+            'lokasi_pekerjaan' => $lokasi_pekerjaan,
             'tujuan_pekerjaan' => $tujuan,
             'estimasi_total' => $details['total'],
             'status' => 'ON PROGRESS'
@@ -309,13 +333,13 @@ class C_Pojasa extends CI_Controller
             $rows[] = $row;
         }
 
-        $files = $this->collectPojasaUploads($kd_po_jasa, 'dokumen_project_jasa', 'DOKUMEN PROJECT', trim((string) $this->input->post('keterangan_project_file', true)));
+        $files = $this->collectPojasaUploads($kd_po_jasa, 'dokumen_project_jasa', 'DOKUMEN PENDUKUNG', $this->input->post('keterangan_project_file'), $departemen, $tgl_request);
         if (!$files['success']) {
             return $this->jsonResponse(false, $files['message']);
         }
 
         if (empty($files['rows'])) {
-            return $this->jsonResponse(false, 'Dokumen project jasa wajib diupload sebelum request diajukan ke KADEP.');
+            return $this->jsonResponse(false, 'Dokumen pendukung wajib diupload sebelum request diajukan ke KADEP.');
         }
 
         $note = $this->noteData($kd_po_jasa, 'Request Pekerjaan Jasa Baru', 'ON PROGRESS');
@@ -344,27 +368,31 @@ class C_Pojasa extends CI_Controller
             return $this->jsonResponse(false, 'Revisi hanya dapat dilakukan PIC pemilik request ketika status REJECT atau PENDING.');
         }
 
-        $kd_vendor_jasa = $this->input->post('kd_vendor_jasa', true);
-        $tgl_request = $this->input->post('tgl_request', true);
-        $tgl_target = $this->input->post('tgl_target', true);
+        $tgl_request = $this->normalizeRequestDate($this->input->post('tgl_request', true), $request->tgl_request);
+        $tgl_target = $this->normalizeTargetDate($this->input->post('tgl_target', true), $tgl_request);
+        $lokasi_pekerjaan = $this->normalizeLokasiPekerjaan($this->input->post('lokasi_pekerjaan', true), $request->lokasi_pekerjaan);
         $tujuan = trim((string) $this->input->post('tujuan_pekerjaan', true));
 
-        if ($kd_vendor_jasa === '' || $tgl_request === '' || $tgl_target === '' || $tujuan === '') {
-            return $this->jsonResponse(false, 'Vendor, tanggal request, tanggal target, dan tujuan pekerjaan wajib diisi.');
+        $vendorResult = $this->resolveRequestVendor(
+            $this->input->post('kd_vendor_jasa', true),
+            $this->input->post('nama_vendor_jasa', true)
+        );
+
+        if (!$vendorResult['success']) {
+            return $this->jsonResponse(false, $vendorResult['message']);
         }
 
-        $vendor = $this->M_Pojasa->get_vendor($kd_vendor_jasa);
-        if (!$vendor || $vendor->status_vendor !== 'AKTIF') {
-            return $this->jsonResponse(false, 'Vendor jasa tidak ditemukan atau belum di-ACC.');
+        if ($tgl_request === '' || $tgl_target === '' || $tujuan === '') {
+            return $this->jsonResponse(false, 'Tanggal request dan deskripsi jasa wajib diisi.');
         }
 
         if ($tgl_target < $tgl_request) {
             return $this->jsonResponse(false, 'Target selesai tidak boleh lebih awal dari tanggal request.');
         }
 
-        $details = $this->buildRequestDetails();
+        $details = $this->buildRequestDetails(array('allow_zero_price' => true));
         if (empty($details['rows'])) {
-            return $this->jsonResponse(false, 'Minimal satu scope pekerjaan wajib diisi dengan nilai biaya lebih dari 0.');
+            return $this->jsonResponse(false, 'Minimal satu scope pekerjaan wajib diisi.');
         }
 
         $rows = array();
@@ -373,16 +401,16 @@ class C_Pojasa extends CI_Controller
             $rows[] = $row;
         }
 
-        $files = $this->collectPojasaUploads($kd_po_jasa, 'dokumen_project_jasa', 'DOKUMEN REVISI', trim((string) $this->input->post('keterangan_project_file', true)));
+        $files = $this->collectPojasaUploads($kd_po_jasa, 'dokumen_project_jasa', 'DOKUMEN REVISI', $this->input->post('keterangan_project_file'), $request->departemen, $request->tgl_request);
         if (!$files['success']) {
             return $this->jsonResponse(false, $files['message']);
         }
 
         $header = array(
-            'kd_vendor_jasa' => $kd_vendor_jasa,
+            'kd_vendor_jasa' => $vendorResult['vendor']->kd_vendor_jasa,
             'tgl_request' => $tgl_request,
             'tgl_target' => $tgl_target,
-            'lokasi_pekerjaan' => trim((string) $this->input->post('lokasi_pekerjaan', true)),
+            'lokasi_pekerjaan' => $lokasi_pekerjaan,
             'tujuan_pekerjaan' => $tujuan,
             'estimasi_total' => $details['total'],
             'status' => 'ON PROGRESS'
@@ -591,23 +619,92 @@ class C_Pojasa extends CI_Controller
         }
 
         if (!$this->canUploadProjectDocument($request)) {
-            return $this->jsonResponse(false, 'Upload dokumen project jasa hanya dapat dilakukan oleh PIC terkait atau Admin/Purchasing sebelum project DONE.');
+            return $this->jsonResponse(false, 'Upload dokumen pendukung hanya dapat dilakukan oleh PIC terkait atau Admin/Purchasing sebelum diajukan ke direktur dan sebelum project DONE.');
         }
 
         if (empty($_FILES['dokumen_jasa']['name'])) {
             return $this->jsonResponse(false, 'File dokumen wajib dipilih.');
         }
 
-        $uploadResult = $this->uploadPojasaFile('dokumen_jasa');
+        $jenis_dokumen = trim((string) $this->input->post('jenis_dokumen', true));
+        $files = $this->collectPojasaUploads($kd_po_jasa, 'dokumen_jasa', $jenis_dokumen === '' ? 'DOKUMEN PENDUKUNG' : $jenis_dokumen, $this->input->post('keterangan_file'), $request->departemen, $request->tgl_request);
+        if (!$files['success']) {
+            return $this->jsonResponse(false, $files['message']);
+        }
+
+        if (empty($files['rows'])) {
+            return $this->jsonResponse(false, 'File dokumen wajib dipilih.');
+        }
+
+        if (!$this->M_Pojasa->insert_files_and_note($files['rows'], $this->noteData($kd_po_jasa, 'Upload dokumen pendukung jasa: ' . count($files['rows']) . ' file', $request->status))) {
+            return $this->jsonResponse(false, 'Dokumen pendukung PO Jasa gagal disimpan.');
+        }
+
+        return $this->jsonResponse(true, 'Dokumen pendukung PO Jasa berhasil diupload.', array(
+            'files' => $this->M_Pojasa->get_files($kd_po_jasa)
+        ));
+    }
+
+    public function update_file()
+    {
+        if (!$this->guardTablesJson()) {
+            return;
+        }
+
+        $fileContext = $this->fileContextFromPost();
+        if (!$fileContext['success']) {
+            return $this->jsonResponse(false, $fileContext['message']);
+        }
+
+        $file = $fileContext['file'];
+        $request = $fileContext['request'];
+        $jenis_dokumen = trim((string) $this->input->post('jenis_dokumen', true));
+        $keterangan = trim((string) $this->input->post('keterangan_file', true));
+
+        if ($jenis_dokumen === '') {
+            return $this->jsonResponse(false, 'Jenis dokumen wajib diisi.');
+        }
+
+        $update = array(
+            'jenis_dokumen' => $jenis_dokumen,
+            'keterangan' => $keterangan
+        );
+
+        if (!$this->M_Pojasa->update_file_and_note($file->id_file_jasa, $update, $this->noteData($request->kd_po_jasa, 'Update data dokumen pendukung: ' . $file->file_original, $request->status))) {
+            return $this->jsonResponse(false, 'Data dokumen pendukung gagal diperbarui.');
+        }
+
+        return $this->jsonResponse(true, 'Data dokumen pendukung berhasil diperbarui.', array(
+            'files' => $this->M_Pojasa->get_files($request->kd_po_jasa)
+        ));
+    }
+
+    public function replace_file()
+    {
+        if (!$this->guardTablesJson()) {
+            return;
+        }
+
+        $fileContext = $this->fileContextFromPost();
+        if (!$fileContext['success']) {
+            return $this->jsonResponse(false, $fileContext['message']);
+        }
+
+        if (empty($_FILES['dokumen_jasa']['name'])) {
+            return $this->jsonResponse(false, 'File pengganti wajib dipilih.');
+        }
+
+        $file = $fileContext['file'];
+        $request = $fileContext['request'];
+        $uploadResult = $this->uploadPojasaFile('dokumen_jasa', $request->departemen, $request->tgl_request);
         if (!$uploadResult['success']) {
             return $this->jsonResponse(false, $uploadResult['message']);
         }
 
         $jenis_dokumen = trim((string) $this->input->post('jenis_dokumen', true));
         $keterangan = trim((string) $this->input->post('keterangan_file', true));
-        $file = array(
-            'kd_po_jasa' => $kd_po_jasa,
-            'jenis_dokumen' => $jenis_dokumen === '' ? 'DOKUMEN' : $jenis_dokumen,
+        $update = array(
+            'jenis_dokumen' => $jenis_dokumen === '' ? $file->jenis_dokumen : $jenis_dokumen,
             'keterangan' => $keterangan,
             'file_name' => $uploadResult['file_name'],
             'file_original' => $uploadResult['client_name'],
@@ -617,13 +714,50 @@ class C_Pojasa extends CI_Controller
             'uploaded_name' => $this->session->userdata('nama_user')
         );
 
-        if (!$this->M_Pojasa->insert_file_and_note($file, $this->noteData($kd_po_jasa, 'Upload dokumen jasa: ' . $file['jenis_dokumen'], $request->status))) {
-            return $this->jsonResponse(false, 'Dokumen PO Jasa gagal disimpan.');
+        if (!$this->M_Pojasa->update_file_and_note($file->id_file_jasa, $update, $this->noteData($request->kd_po_jasa, 'Replace dokumen pendukung: ' . $file->file_original, $request->status))) {
+            $this->deletePhysicalPojasaFile($uploadResult['file_name']);
+            return $this->jsonResponse(false, 'Dokumen pendukung gagal direplace.');
         }
 
-        return $this->jsonResponse(true, 'Dokumen PO Jasa berhasil diupload.', array(
-            'redirect' => base_url('pojasa/detail/' . $kd_po_jasa)
+        $this->deletePhysicalPojasaFile($file->file_name);
+
+        return $this->jsonResponse(true, 'Dokumen pendukung berhasil direplace.', array(
+            'files' => $this->M_Pojasa->get_files($request->kd_po_jasa)
         ));
+    }
+
+    public function delete_file()
+    {
+        if (!$this->guardTablesJson()) {
+            return;
+        }
+
+        $fileContext = $this->fileContextFromPost();
+        if (!$fileContext['success']) {
+            return $this->jsonResponse(false, $fileContext['message']);
+        }
+
+        $file = $fileContext['file'];
+        $request = $fileContext['request'];
+        if (!$this->M_Pojasa->delete_file_and_note($file->id_file_jasa, $this->noteData($request->kd_po_jasa, 'Hapus dokumen pendukung: ' . $file->file_original, $request->status))) {
+            return $this->jsonResponse(false, 'Dokumen pendukung gagal dihapus.');
+        }
+
+        $this->deletePhysicalPojasaFile($file->file_name);
+
+        return $this->jsonResponse(true, 'Dokumen pendukung berhasil dihapus.', array(
+            'redirect' => base_url('pojasa/detail/' . $request->kd_po_jasa)
+        ));
+    }
+
+    public function view_file($id_file_jasa)
+    {
+        $this->serve_file($id_file_jasa, false);
+    }
+
+    public function download_file($id_file_jasa)
+    {
+        $this->serve_file($id_file_jasa, true);
     }
 
     public function save_biaya()
@@ -872,8 +1006,52 @@ class C_Pojasa extends CI_Controller
             'depuser' => $this->session->userdata('departemen'),
             'nmuser' => $this->session->userdata('nama_user'),
             'kduser' => $this->session->userdata('kode'),
-            'lv' => $this->session->userdata('lv')
+            'lv' => $this->session->userdata('lv'),
+            'can_create_request' => $this->canCreateRequest()
         );
+    }
+
+    private function guardModuleAccess()
+    {
+        if ($this->canAccessModule()) {
+            return true;
+        }
+
+        $this->session->set_flashdata('error', 'Akses PO Jasa hanya untuk PIC, KADEP, DIREKTUR, Admin, atau Purchasing.');
+        redirect('dashboard');
+
+        return false;
+    }
+
+    private function canAccessModule()
+    {
+        return in_array((string) $this->session->userdata('lv'), array('1', '2', '3', '4', '5'), true);
+    }
+
+    private function canCreateRequest()
+    {
+        return in_array((string) $this->session->userdata('lv'), array('1', '2', '4'), true);
+    }
+
+    private function canAccessRequest($request)
+    {
+        $lv = (string) $this->session->userdata('lv');
+        $kode = $this->session->userdata('kode');
+        $departemen = $this->session->userdata('departemen');
+
+        if (in_array($lv, array('1', '2', '3'), true)) {
+            return true;
+        }
+
+        if ($lv === '4') {
+            return $request->kd_user === $kode;
+        }
+
+        if ($lv === '5') {
+            return $request->departemen === $departemen;
+        }
+
+        return false;
     }
 
     private function canManageVendor()
@@ -908,14 +1086,14 @@ class C_Pojasa extends CI_Controller
 
     private function canUploadProjectDocument($request)
     {
-        if ($request->status === 'DONE') {
-            return false;
-        }
-
         $lv = (string) $this->session->userdata('lv');
-        $kode = $this->session->userdata('kode');
 
-        return in_array($lv, array('1', '2'), true) || ($lv === '4' && $request->kd_user === $kode);
+        return in_array($lv, array('1', '2'), true) && in_array($request->status, array('ACC-KADEP', 'REVIEW PURCHASING'), true);
+    }
+
+    private function canReviewProjectDocument($request)
+    {
+        return $this->canAccessRequest($request) || in_array((string) $this->session->userdata('lv'), array('1', '2', '3'), true);
     }
 
     private function canReviseRequest($request)
@@ -924,6 +1102,54 @@ class C_Pojasa extends CI_Controller
         $kode = $this->session->userdata('kode');
 
         return $lv === '4' && $request->kd_user === $kode && in_array($request->status, array('REJECT', 'PENDING'), true);
+    }
+
+    private function resolveRequestVendor($vendorCode, $vendorName)
+    {
+        $vendorCode = trim((string) $vendorCode);
+        $vendorName = trim((string) $vendorName);
+        $vendorReference = $vendorCode !== '' ? $vendorCode : $vendorName;
+
+        if ($vendorReference !== '') {
+            $vendor = $this->M_Pojasa->get_vendor($vendorReference);
+            if ($vendor && $vendor->status_vendor === 'AKTIF') {
+                return array('success' => true, 'vendor' => $vendor);
+            }
+        }
+
+        if ($vendorName === '') {
+            return array('success' => false, 'message' => 'Toko / Vendor wajib diisi.');
+        }
+
+        $vendor = $this->M_Pojasa->get_active_vendor_by_name($vendorName);
+        if ($vendor) {
+            return array('success' => true, 'vendor' => $vendor);
+        }
+
+        $data = array(
+            'kd_vendor_jasa' => $this->M_Pojasa->generate_kd_vendor(),
+            'nama_vendor' => $vendorName,
+            'kategori_jasa' => '',
+            'nama_pic' => '',
+            'no_telpon' => '',
+            'email' => '',
+            'alamat_vendor' => '',
+            'npwp' => '',
+            'status_vendor' => 'AKTIF',
+            'created_by' => $this->session->userdata('kode')
+        );
+        $this->appendVendorAuditColumns($data, 'AKTIF');
+
+        if (!$this->M_Pojasa->insert_vendor($data)) {
+            return array('success' => false, 'message' => 'Toko / Vendor gagal disimpan.');
+        }
+
+        $vendor = $this->M_Pojasa->get_vendor($data['kd_vendor_jasa']);
+        if (!$vendor) {
+            return array('success' => false, 'message' => 'Toko / Vendor gagal dimuat setelah disimpan.');
+        }
+
+        return array('success' => true, 'vendor' => $vendor);
     }
 
     private function guardTablesJson()
@@ -938,8 +1164,9 @@ class C_Pojasa extends CI_Controller
         return false;
     }
 
-    private function buildRequestDetails()
+    private function buildRequestDetails($options = array())
     {
+        $allowZeroPrice = !empty($options['allow_zero_price']);
         $nama = $this->input->post('nama_pekerjaan');
         $deskripsi = $this->input->post('deskripsi');
         $qty = $this->input->post('qty');
@@ -956,9 +1183,20 @@ class C_Pojasa extends CI_Controller
             $namaPekerjaan = trim((string) $namaPekerjaan);
             $qtyValue = $this->parseNumericInput(isset($qty[$index]) ? $qty[$index] : 0);
             $hargaValue = $this->parseNumericInput(isset($harga[$index]) ? $harga[$index] : 0);
+            if ($qtyValue <= 0) {
+                if (!$allowZeroPrice) {
+                    continue;
+                }
+
+                $qtyValue = 1;
+            }
             $subtotal = $qtyValue * $hargaValue;
 
-            if ($namaPekerjaan === '' || $qtyValue <= 0 || $hargaValue <= 0) {
+            if ($namaPekerjaan === '') {
+                continue;
+            }
+
+            if (!$allowZeroPrice && $hargaValue <= 0) {
                 continue;
             }
 
@@ -966,7 +1204,7 @@ class C_Pojasa extends CI_Controller
                 'nama_pekerjaan' => $namaPekerjaan,
                 'deskripsi' => isset($deskripsi[$index]) ? trim((string) $deskripsi[$index]) : '',
                 'qty' => $qtyValue,
-                'satuan' => isset($satuan[$index]) ? trim((string) $satuan[$index]) : '',
+                'satuan' => isset($satuan[$index]) && trim((string) $satuan[$index]) !== '' ? trim((string) $satuan[$index]) : 'Lot',
                 'hrg_satuan' => $hargaValue,
                 'total_harga' => $subtotal
             );
@@ -974,6 +1212,45 @@ class C_Pojasa extends CI_Controller
         }
 
         return array('rows' => $rows, 'total' => $total);
+    }
+
+    private function normalizeRequestDate($value, $fallback = '')
+    {
+        $value = trim((string) $value);
+        if ($value !== '') {
+            return $value;
+        }
+
+        $fallback = trim((string) $fallback);
+        if ($fallback !== '') {
+            return $fallback;
+        }
+
+        return date('Y-m-d');
+    }
+
+    private function normalizeTargetDate($value, $requestDate)
+    {
+        $value = trim((string) $value);
+
+        return $value !== '' ? $value : $requestDate;
+    }
+
+    private function normalizeLokasiPekerjaan($value, $fallback = '')
+    {
+        $value = trim((string) $value);
+        if ($value !== '') {
+            return $value;
+        }
+
+        $fallback = trim((string) $fallback);
+        if ($fallback !== '') {
+            return $fallback;
+        }
+
+        $departemen = trim((string) $this->session->userdata('departemen'));
+
+        return $departemen !== '' ? $departemen : 'UMUM';
     }
 
     private function approvalTransition($request, $action)
@@ -1002,9 +1279,9 @@ class C_Pojasa extends CI_Controller
             );
         }
 
-        if ($action === 'submit_direktur' && in_array($lv, array('1', '2'), true) && $request->status === 'REVIEW PURCHASING') {
+        if ($action === 'submit_direktur' && in_array($lv, array('1', '2'), true) && in_array($request->status, array('ACC-KADEP', 'REVIEW PURCHASING'), true)) {
             $update = array(
-                'status' => 'PENGAJUAN DIREKTUR'
+                'status' => 'REVIEW DIREKTUR'
             );
             $this->appendPurchasingSubmitColumns($update, $kode, $now);
 
@@ -1015,7 +1292,7 @@ class C_Pojasa extends CI_Controller
             );
         }
 
-        if ($action === 'approve_direktur' && $lv === '3' && $request->status === 'PENGAJUAN DIREKTUR') {
+        if ($action === 'approve_direktur' && $lv === '3' && $request->status === 'REVIEW DIREKTUR') {
             return array(
                 'success' => true,
                 'update' => array(
@@ -1027,7 +1304,7 @@ class C_Pojasa extends CI_Controller
             );
         }
 
-        if ($action === 'reject' && (($lv === '5' && $request->status === 'ON PROGRESS') || ($lv === '3' && $request->status === 'PENGAJUAN DIREKTUR'))) {
+        if ($action === 'reject' && (($lv === '5' && $request->status === 'ON PROGRESS') || ($lv === '3' && $request->status === 'REVIEW DIREKTUR'))) {
             if ($lv === '5' && $request->departemen !== $departemen) {
                 return array(
                     'success' => false,
@@ -1042,7 +1319,7 @@ class C_Pojasa extends CI_Controller
             );
         }
 
-        if ($action === 'pending' && (($lv === '5' && $request->status === 'ON PROGRESS') || ($lv === '3' && $request->status === 'PENGAJUAN DIREKTUR'))) {
+        if ($action === 'pending' && (($lv === '5' && $request->status === 'ON PROGRESS') || ($lv === '3' && $request->status === 'REVIEW DIREKTUR'))) {
             if ($lv === '5' && $request->departemen !== $departemen) {
                 return array(
                     'success' => false,
@@ -1094,17 +1371,32 @@ class C_Pojasa extends CI_Controller
         return $value >= 1 && $value <= 5;
     }
 
-    private function uploadPojasaFile($field)
+    private function uploadPojasaFile($field, $departemen = '', $tanggal = '')
     {
-        $uploadPath = FCPATH . 'images/pojasa/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
+        if (!isset($_FILES[$field])) {
+            return array('success' => false, 'message' => 'File dokumen tidak ditemukan.');
+        }
+
+        $fileSize = isset($_FILES[$field]['size']) ? (int) $_FILES[$field]['size'] : 0;
+        $originalName = isset($_FILES[$field]['name']) ? (string) $_FILES[$field]['name'] : '';
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        if ($this->isImageExtension($ext) && $fileSize > (3 * 1024 * 1024)) {
+            return array('success' => false, 'message' => 'Ukuran dokumen gambar tidak boleh lebih dari 3 MB.');
+        }
+
+        $relativePath = $this->pojasaArchiveRelativePath($departemen, $tanggal);
+        $uploadPath = FCPATH . $relativePath;
+        if (!$this->ensurePojasaUploadDirectory($uploadPath)) {
+            return array(
+                'success' => false,
+                'message' => 'Folder upload PO Jasa tidak dapat dibuat/ditulis. Periksa permission folder images/pojasa.'
+            );
         }
 
         $config = array(
             'upload_path' => $uploadPath,
-            'allowed_types' => 'jpg|jpeg|png|pdf|doc|docx|xls|xlsx',
-            'max_size' => '5120',
+            'allowed_types' => 'jpg|jpeg|png|pdf|doc|docx|xls|xlsx|txt|rtf|csv',
+            'max_size' => '0',
             'overwrite' => false,
             'encrypt_name' => true
         );
@@ -1123,14 +1415,14 @@ class C_Pojasa extends CI_Controller
 
         return array(
             'success' => true,
-            'file_name' => $data['file_name'],
+            'file_name' => $relativePath . $data['file_name'],
             'client_name' => $data['client_name'],
             'file_ext' => $data['file_ext'],
             'file_size' => $data['file_size']
         );
     }
 
-    private function collectPojasaUploads($kd_po_jasa, $field, $jenis_dokumen, $keterangan)
+    private function collectPojasaUploads($kd_po_jasa, $field, $jenis_dokumen, $keterangan, $departemen = '', $tanggal = '')
     {
         if (empty($_FILES[$field]['name'])) {
             return array('success' => true, 'rows' => array());
@@ -1155,16 +1447,20 @@ class C_Pojasa extends CI_Controller
                 'size' => $isMultiple ? $original['size'][$i] : $original['size']
             );
 
-            $uploadResult = $this->uploadPojasaFile($field);
+            $uploadResult = $this->uploadPojasaFile($field, $departemen, $tanggal);
             if (!$uploadResult['success']) {
                 $_FILES[$field] = $original;
                 return array('success' => false, 'message' => $uploadResult['message'], 'rows' => array());
             }
 
+            $keteranganValue = is_array($keterangan)
+                ? (isset($keterangan[$i]) ? trim((string) $keterangan[$i]) : '')
+                : trim((string) $keterangan);
+
             $rows[] = array(
                 'kd_po_jasa' => $kd_po_jasa,
                 'jenis_dokumen' => $jenis_dokumen,
-                'keterangan' => $keterangan,
+                'keterangan' => $keteranganValue,
                 'file_name' => $uploadResult['file_name'],
                 'file_original' => $uploadResult['client_name'],
                 'file_ext' => $uploadResult['file_ext'],
@@ -1177,6 +1473,127 @@ class C_Pojasa extends CI_Controller
         $_FILES[$field] = $original;
 
         return array('success' => true, 'rows' => $rows);
+    }
+
+    private function fileContextFromPost()
+    {
+        $id_file_jasa = (int) $this->input->post('id_file_jasa', true);
+        if ($id_file_jasa <= 0) {
+            return array('success' => false, 'message' => 'Data dokumen tidak valid.');
+        }
+
+        $file = $this->M_Pojasa->get_file($id_file_jasa);
+        if (!$file) {
+            return array('success' => false, 'message' => 'Dokumen pendukung tidak ditemukan.');
+        }
+
+        $request = $this->M_Pojasa->get_request($file->kd_po_jasa);
+        if (!$request || !$this->canUploadProjectDocument($request)) {
+            return array('success' => false, 'message' => 'Ubah dokumen pendukung hanya dapat dilakukan PIC terkait atau Admin/Purchasing sebelum diajukan ke direktur dan sebelum project DONE.');
+        }
+
+        return array('success' => true, 'file' => $file, 'request' => $request);
+    }
+
+    private function serve_file($id_file_jasa, $download)
+    {
+        if (!$this->M_Pojasa->tables_ready()) {
+            show_404();
+            return;
+        }
+
+        $file = $this->M_Pojasa->get_file((int) $id_file_jasa);
+        if (!$file) {
+            show_404();
+            return;
+        }
+
+        $request = $this->M_Pojasa->get_request($file->kd_po_jasa);
+        if (!$request || !$this->canReviewProjectDocument($request)) {
+            show_404();
+            return;
+        }
+
+        $path = $this->resolvePojasaFilePath($file->file_name);
+        if (!$path || !is_file($path)) {
+            show_404();
+            return;
+        }
+
+        $name = $file->file_original ? $file->file_original : basename($path);
+        if ($download) {
+            $this->load->helper('download');
+            force_download($name, file_get_contents($path));
+            return;
+        }
+
+        $mime = function_exists('mime_content_type') ? mime_content_type($path) : 'application/octet-stream';
+        $this->output
+            ->set_content_type($mime)
+            ->set_header('Content-Disposition: inline; filename="' . str_replace('"', '', $name) . '"')
+            ->set_output(file_get_contents($path));
+    }
+
+    private function pojasaArchiveRelativePath($departemen, $tanggal)
+    {
+        $departemen = $this->sanitizePathSegment($departemen === '' ? 'UMUM' : $departemen);
+        $timestamp = strtotime($tanggal);
+        if (!$timestamp) {
+            $timestamp = time();
+        }
+
+        return 'images/pojasa/' . $departemen . '/' . date('Y', $timestamp) . '/' . date('m', $timestamp) . '/' . date('d', $timestamp) . '/';
+    }
+
+    private function sanitizePathSegment($value)
+    {
+        $value = strtoupper(trim((string) $value));
+        $value = preg_replace('/[^A-Z0-9_-]+/', '_', $value);
+
+        return trim($value, '_') !== '' ? trim($value, '_') : 'UMUM';
+    }
+
+    private function isImageExtension($ext)
+    {
+        return in_array(strtolower((string) $ext), array('jpg', 'jpeg', 'png'), true);
+    }
+
+    private function resolvePojasaFilePath($fileName)
+    {
+        $fileName = ltrim((string) $fileName, '/');
+        $candidates = array(
+            FCPATH . $fileName,
+            FCPATH . 'images/pojasa/' . $fileName
+        );
+
+        foreach ($candidates as $candidate) {
+            $real = realpath($candidate);
+            $base = realpath(FCPATH . 'images/pojasa');
+            if ($real && $base && strpos($real, $base) === 0) {
+                return $real;
+            }
+        }
+
+        return false;
+    }
+
+    private function ensurePojasaUploadDirectory($uploadPath)
+    {
+        if (!is_dir($uploadPath) && !@mkdir($uploadPath, 0777, true) && !is_dir($uploadPath)) {
+            return false;
+        }
+
+        @chmod($uploadPath, 0777);
+
+        return is_dir($uploadPath) && is_writable($uploadPath);
+    }
+
+    private function deletePhysicalPojasaFile($fileName)
+    {
+        $path = $this->resolvePojasaFilePath($fileName);
+        if ($path && is_file($path)) {
+            @unlink($path);
+        }
     }
 
     private function appendVendorAuditColumns(&$data, $statusVendor)

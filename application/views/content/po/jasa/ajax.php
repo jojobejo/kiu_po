@@ -16,6 +16,140 @@
             });
         }
 
+        function escapeHtml(value) {
+            return $('<div>').text(value === null || value === undefined || value === '' ? '-' : value).html();
+        }
+
+        function renderReadonlyScopeFromEditor() {
+            var rows = [];
+            var total = 0;
+
+            $('#formReviewScopePojasa .tbScopeEditorPojasa tbody tr').each(function() {
+                var nama = $(this).find('[name="nama_pekerjaan[]"]').val() || '';
+                var deskripsi = $(this).find('[name="deskripsi[]"]').val() || '';
+                var qty = Number($(this).find('[name="qty[]"]').val() || 0);
+                var harga = Number($(this).find('[name="hrg_satuan[]"]').val() || 0);
+                var subtotal = qty * harga;
+
+                if (!nama) {
+                    return;
+                }
+
+                total += subtotal;
+                rows.push({
+                    nama: nama,
+                    deskripsi: deskripsi,
+                    qty: qty,
+                    harga: harga,
+                    subtotal: subtotal
+                });
+            });
+
+            var html = '';
+            if (!rows.length) {
+                html = '<tr><td colspan="6" class="text-center text-muted">Belum ada data scope pekerjaan.</td></tr>';
+            } else {
+                rows.forEach(function(row, index) {
+                    html += '<tr>' +
+                        '<td>' + (index + 1) + '</td>' +
+                        '<td>' + escapeHtml(row.nama) + '</td>' +
+                        '<td>' + escapeHtml(row.deskripsi) + '</td>' +
+                        '<td>' + escapeHtml(row.qty.toFixed(2)) + '</td>' +
+                        '<td>' + formatRupiah(row.harga) + '</td>' +
+                        '<td>' + formatRupiah(row.subtotal) + '</td>' +
+                        '</tr>';
+                });
+            }
+
+            $('#tbScopeReadonlyPojasa tbody').html(html);
+            $('#scopeReadonlyTotalPojasa').text(formatRupiah(total));
+        }
+
+        function renderDocumentRows(files) {
+            if (!Array.isArray(files)) {
+                return;
+            }
+
+            var html = '';
+            var modalHtml = '';
+            if (!files.length) {
+                html = '<tr><td colspan="4" class="text-center text-muted">Belum ada dokumen pendukung.</td></tr>';
+            } else {
+                files.forEach(function(file) {
+                    var id = Number(file.id_file_jasa || 0);
+                    html += '<tr>' +
+                        '<td>' + escapeHtml(file.jenis_dokumen) + '</td>' +
+                        '<td>' + escapeHtml(file.file_original) + '<br><small>' + escapeHtml(file.keterangan) + '</small></td>' +
+                        '<td>' + escapeHtml(file.uploaded_name) + '</td>' +
+                        '<td>' +
+                        '<a href="<?= base_url('pojasa/file/view/') ?>' + id + '" class="btn btn-info btn-sm" target="_blank" title="Tinjau"><i class="fas fa-eye"></i></a> ' +
+                        '<a href="<?= base_url('pojasa/file/download/') ?>' + id + '" class="btn btn-secondary btn-sm" title="Download"><i class="fas fa-download"></i></a> ' +
+                        <?php if ($canProjectDocumentManage) : ?>
+                        '<button type="button" class="btn btn-warning btn-sm document-edit-action d-none" data-toggle="modal" data-target="#modalEditFilePojasa' + id + '" title="Ubah"><i class="fas fa-edit"></i></button> ' +
+                        '<button type="button" class="btn btn-danger btn-sm btnDeleteFilePojasa document-edit-action d-none" data-id-file="' + id + '" title="Hapus"><i class="fas fa-trash"></i></button>' +
+                        <?php else : ?>
+                        '' +
+                        <?php endif; ?>
+                        '</td>' +
+                        '</tr>';
+
+                    <?php if ($canProjectDocumentManage) : ?>
+                    modalHtml += '<div class="modal fade dynamic-file-modal-pojasa" id="modalEditFilePojasa' + id + '" tabindex="-1" role="dialog">' +
+                        '<div class="modal-dialog modal-lg" role="document">' +
+                        '<div class="modal-content">' +
+                        '<form class="formEditFilePojasa" enctype="multipart/form-data">' +
+                        '<input type="hidden" name="id_file_jasa" value="' + id + '">' +
+                        '<div class="modal-header">' +
+                        '<h5 class="modal-title">Ubah Dokumen Pendukung</h5>' +
+                        '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                        '<div class="form-group">' +
+                        '<label>Jenis Dokumen</label>' +
+                        '<input type="text" class="form-control" name="jenis_dokumen" value="' + escapeHtml(file.jenis_dokumen) + '">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                        '<label>Keterangan</label>' +
+                        '<input type="text" class="form-control" name="keterangan_file" value="' + escapeHtml(file.keterangan) + '">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                        '<label>Replace File</label>' +
+                        '<input type="file" class="form-control" name="dokumen_jasa" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.csv">' +
+                        '<small class="text-muted">Kosongkan jika hanya mengubah jenis atau keterangan dokumen.</small>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                        '<button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>' +
+                        '<button type="submit" class="btn btn-primary">Simpan</button>' +
+                        '</div>' +
+                        '</form>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+                    <?php endif; ?>
+                });
+            }
+
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable('#tbFilePojasa')) {
+                $('#tbFilePojasa').DataTable().destroy();
+            }
+
+            $('#tbFilePojasaBody').html(html);
+            if ($.fn.DataTable) {
+                $('#tbFilePojasa').DataTable({
+                    responsive: true,
+                    lengthChange: false,
+                    autoWidth: false,
+                    pageLength: 10
+                });
+            }
+
+            $('.dynamic-file-modal-pojasa').remove();
+            if (modalHtml) {
+                $('body').append(modalHtml);
+            }
+        }
+
         function recalculateScope() {
             var grandTotal = 0;
             $('#tbScopeJasa tbody tr').each(function() {
@@ -27,6 +161,62 @@
             });
             $('#grandTotalScopeJasa').text(formatRupiah(grandTotal));
         }
+
+        function syncHiddenTarget(form) {
+            var tanggalRequest = $(form).find('[name="tgl_request"]').val();
+            if (tanggalRequest) {
+                $(form).find('.pojasa-target-sync').val(tanggalRequest);
+            }
+        }
+
+        function normalizeHiddenPojasaInputs(form) {
+            var $form = $(form);
+            var defaultLokasi = <?= json_encode((string) $depuser) ?> || 'UMUM';
+
+            syncHiddenTarget(form);
+
+            $form.find('input[type="hidden"][name="lokasi_pekerjaan"]').each(function() {
+                if (!$(this).val()) {
+                    $(this).val(defaultLokasi);
+                }
+            });
+
+            $form.find('input[type="hidden"][name="satuan[]"]').each(function() {
+                if (!$(this).val()) {
+                    $(this).val('Lot');
+                }
+            });
+
+            $form.find('input[type="hidden"][name="qty[]"]').each(function() {
+                if (!$(this).val() || Number($(this).val()) <= 0) {
+                    $(this).val('1');
+                }
+            });
+
+            $form.find('input[type="hidden"][name="hrg_satuan[]"]').each(function() {
+                if ($(this).val() === '') {
+                    $(this).val('0');
+                }
+            });
+
+            $form.find('input[type="hidden"][name="nama_pekerjaan[]"]').each(function() {
+                if ($(this).val()) {
+                    return;
+                }
+
+                var $row = $(this).closest('tr, .row');
+                var deskripsi = $row.find('[name="deskripsi[]"]').val() || $form.find('[name="tujuan_pekerjaan"]').val() || 'Jasa';
+                $(this).val(deskripsi);
+            });
+        }
+
+        $('#formRequestPojasa, #formRevisePojasa').each(function() {
+            syncHiddenTarget(this);
+        });
+
+        $(document).on('change input', '[name="tgl_request"]', function() {
+            syncHiddenTarget($(this).closest('form'));
+        });
 
         $('#btnAddScopeJasa').on('click', function() {
             var row = $('#tbScopeJasa tbody tr:first').clone();
@@ -43,6 +233,42 @@
             if ($('#tbScopeJasa tbody tr').length > 1) {
                 $(this).closest('tr').remove();
                 recalculateScope();
+            }
+        });
+
+        $('#btnAddDokumenPendukung').on('click', function() {
+            var row = $('#dokumenPendukungRows .dokumen-pendukung-row:first').clone();
+            row.find('input').val('');
+            $('#dokumenPendukungRows').append(row);
+        });
+
+        $(document).on('click', '.btnRemoveDokumenPendukung', function() {
+            if ($('#dokumenPendukungRows .dokumen-pendukung-row').length > 1) {
+                $(this).closest('.dokumen-pendukung-row').remove();
+            }
+        });
+
+        $('#btnAddDokumenJasaDetail').on('click', function() {
+            var row = $('#dokumenJasaDetailRows .dokumen-jasa-detail-row:first').clone();
+            row.find('input').val('');
+            $('#dokumenJasaDetailRows').append(row);
+        });
+
+        $(document).on('click', '.btnRemoveDokumenJasaDetail', function() {
+            if ($('#dokumenJasaDetailRows .dokumen-jasa-detail-row').length > 1) {
+                $(this).closest('.dokumen-jasa-detail-row').remove();
+            }
+        });
+
+        $('.btnAddRevisiDokumenPojasa').on('click', function() {
+            var row = $('#revisiDokumenPojasaRows .revisi-dokumen-pojasa-row:first').clone();
+            row.find('input').val('');
+            $('#revisiDokumenPojasaRows').append(row);
+        });
+
+        $(document).on('click', '.btnRemoveRevisiDokumenPojasa', function() {
+            if ($('#revisiDokumenPojasaRows .revisi-dokumen-pojasa-row').length > 1) {
+                $(this).closest('.revisi-dokumen-pojasa-row').remove();
             }
         });
 
@@ -64,6 +290,31 @@
             if (tbody.find('tr').length > 1) {
                 $(this).closest('tr').remove();
             }
+        });
+
+        $(document).on('click', '.btnToggleScopeEditPojasa', function(e) {
+            e.preventDefault();
+            $('#scopeEditorPojasa').removeClass('d-none').show();
+            $('.btnRekamScopePojasa').removeClass('d-none').show();
+            $(this).addClass('d-none');
+        });
+
+        $(document).on('click', '.btnRekamScopePojasa', function(e) {
+            e.preventDefault();
+            $('#formReviewScopePojasa').trigger('submit');
+        });
+
+        $(document).on('click', '.btnToggleDokumenEditPojasa', function(e) {
+            e.preventDefault();
+            $('#formUploadFilePojasa').removeClass('d-none').show();
+            $('.document-edit-action').removeClass('d-none').show();
+            $('.btnRekamDokumenPojasa').removeClass('d-none').show();
+            $(this).addClass('d-none');
+        });
+
+        $(document).on('click', '.btnRekamDokumenPojasa', function(e) {
+            e.preventDefault();
+            $('#formUploadFilePojasa').trigger('submit');
         });
 
         function recalculateSelisihBiaya() {
@@ -142,7 +393,48 @@
             });
         }
 
+        function postFormNoReload(url, data, afterSuccess) {
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: data,
+                dataType: 'json',
+                beforeSend: function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Memproses',
+                            allowOutsideClick: false,
+                            didOpen: function() {
+                                Swal.showLoading();
+                            }
+                        });
+                    }
+                },
+                success: function(response) {
+                    var success = response.success || response.status;
+                    var message = response.message || 'Proses selesai.';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire(success ? 'Berhasil' : 'Gagal', message, success ? 'success' : 'error');
+                    } else {
+                        alert(message);
+                    }
+                    if (success && typeof afterSuccess === 'function') {
+                        afterSuccess(response);
+                    }
+                },
+                error: function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Gagal', 'Terjadi gangguan koneksi atau server tidak mengembalikan JSON.', 'error');
+                    } else {
+                        alert('Terjadi gangguan koneksi atau server tidak mengembalikan JSON.');
+                    }
+                }
+            });
+        }
+
         function postMultipart(url, form) {
+            normalizeHiddenPojasaInputs(form);
+
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -170,18 +462,58 @@
             });
         }
 
+        function postMultipartNoReload(url, form, afterSuccess) {
+            normalizeHiddenPojasaInputs(form);
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: new FormData(form),
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Mengupload',
+                            allowOutsideClick: false,
+                            didOpen: function() {
+                                Swal.showLoading();
+                            }
+                        });
+                    }
+                },
+                success: function(response) {
+                    var success = response.success || response.status;
+                    var message = response.message || 'Upload selesai.';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire(success ? 'Berhasil' : 'Gagal', message, success ? 'success' : 'error');
+                    } else {
+                        alert(message);
+                    }
+                    if (success && typeof afterSuccess === 'function') {
+                        afterSuccess(response);
+                    }
+                },
+                error: function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Gagal', 'Upload gagal atau server tidak mengembalikan JSON.', 'error');
+                    } else {
+                        alert('Upload gagal atau server tidak mengembalikan JSON.');
+                    }
+                }
+            });
+        }
+
         $('#formAddVendorJasa').on('submit', function(e) {
             e.preventDefault();
-            postForm('<?= base_url('pojasa/vendor/save') ?>', $(this).serialize());
-        });
-
-        $('#formRequestVendorJasa').on('submit', function(e) {
-            e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/vendor/save') ?>', $(this).serialize());
         });
 
         $('.formEditVendorJasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/vendor/update') ?>', $(this).serialize());
         });
 
@@ -249,7 +581,13 @@
 
         $('#formReviewScopePojasa').on('submit', function(e) {
             e.preventDefault();
-            postForm('<?= base_url('pojasa/scope/save') ?>', $(this).serialize());
+            normalizeHiddenPojasaInputs(this);
+            postFormNoReload('<?= base_url('pojasa/scope/save') ?>', $(this).serialize(), function() {
+                renderReadonlyScopeFromEditor();
+                $('#scopeEditorPojasa').addClass('d-none');
+                $('.btnRekamScopePojasa').addClass('d-none');
+                $('.btnToggleScopeEditPojasa').removeClass('d-none');
+            });
         });
 
         $('.btnApprovalPojasa').on('click', function() {
@@ -312,21 +650,65 @@
 
         $('#formProgressPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/progress/save') ?>', $(this).serialize());
         });
 
         $('#formUploadFilePojasa').on('submit', function(e) {
             e.preventDefault();
-            postMultipart('<?= base_url('pojasa/file/upload') ?>', this);
+            postMultipartNoReload('<?= base_url('pojasa/file/upload') ?>', this, function(response) {
+                renderDocumentRows(response.files || []);
+                $('#formUploadFilePojasa')[0].reset();
+                $('#formUploadFilePojasa').addClass('d-none');
+                $('.document-edit-action').addClass('d-none');
+                $('.btnRekamDokumenPojasa').addClass('d-none');
+                $('.btnToggleDokumenEditPojasa').removeClass('d-none');
+            });
+        });
+
+        $(document).on('submit', '.formEditFilePojasa', function(e) {
+            e.preventDefault();
+            var hasFile = $(this).find('[name="dokumen_jasa"]').val() !== '';
+            var form = this;
+            postMultipartNoReload(hasFile ? '<?= base_url('pojasa/file/replace') ?>' : '<?= base_url('pojasa/file/update') ?>', form, function(response) {
+                renderDocumentRows(response.files || []);
+                $(form).closest('.modal').modal('hide');
+            });
+        });
+
+        $('.btnDeleteFilePojasa').on('click', function() {
+            var idFile = $(this).data('id-file');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Hapus dokumen pendukung?',
+                    text: 'Data dokumen dan file arsipnya akan dihapus.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        postForm('<?= base_url('pojasa/file/delete') ?>', {
+                            id_file_jasa: idFile
+                        });
+                    }
+                });
+            } else if (confirm('Hapus dokumen pendukung?')) {
+                postForm('<?= base_url('pojasa/file/delete') ?>', {
+                    id_file_jasa: idFile
+                });
+            }
         });
 
         $('#formBiayaPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/biaya/save') ?>', $(this).serialize());
         });
 
         $('#formBastPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     title: 'Selesaikan project jasa?',
@@ -347,11 +729,13 @@
 
         $('#formPaymentPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/payment/save') ?>', $(this).serialize());
         });
 
         $('#formEvaluationPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postForm('<?= base_url('pojasa/evaluation/save') ?>', $(this).serialize());
         });
     });

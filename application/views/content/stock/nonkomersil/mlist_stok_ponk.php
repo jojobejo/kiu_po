@@ -54,7 +54,10 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
                             <div class="col-sm-8">
-                                <input class="form-control" type="number" id="hrgisi" name="hrgisi" value="" placeholder="Input harga barang Rp. " />
+                                <input class="form-control" type="number" id="hrgisi" name="hrgisi" value="<?= isset($s->harga_lifo) && $s->harga_lifo > 0 ? $s->harga_lifo : '' ?>" placeholder="Input harga barang Rp. " />
+                                <?php if (isset($s->harga_lifo) && $s->harga_lifo > 0) : ?>
+                                    <small class="form-text text-muted">Harga LIFO dari PO terakhir <?= htmlspecialchars($s->harga_lifo_po, ENT_QUOTES, 'UTF-8') ?></small>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -186,7 +189,10 @@
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Harga Satuan<span class="required">*</span></label>
                             <div class="col-sm-8">
-                                <input class="form-control" type="number" id="hrgisi" name="hrgisi" value="" placeholder="Input harga barang Rp. " />
+                                <input class="form-control" type="number" id="hrgisi" name="hrgisi" value="<?= isset($s->harga_lifo) && $s->harga_lifo > 0 ? $s->harga_lifo : '' ?>" placeholder="Input harga barang Rp. " />
+                                <?php if (isset($s->harga_lifo) && $s->harga_lifo > 0) : ?>
+                                    <small class="form-text text-muted">Harga LIFO dari PO terakhir <?= htmlspecialchars($s->harga_lifo_po, ENT_QUOTES, 'UTF-8') ?></small>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

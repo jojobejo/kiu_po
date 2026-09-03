@@ -14,6 +14,7 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <a href="<?= base_url('historidone/') . $this->session->userdata('lv') . '/' . $this->session->userdata('kode') ?>" class="btn btn-warning"><i class="fas fa-history"></i> Histori PO Non Komersil &nbsp;</a>
+                        <a href="<?= base_url('arsip-evident-ponk') ?>" class="btn btn-info"><i class="fas fa-archive"></i> Arsip Evident PO Selesai</a>
                     </div>
                 </div>
             <?php else : ?>
@@ -25,6 +26,9 @@
                     </div>
                     <div class="col-sm-6">
                         <a href="<?= base_url('stsviewpo/2') ?>" class="btn btn-danger btn-block"><i class="fas fa-times"></i> Data REJECT </a>
+                    </div>
+                    <div class="col-sm-12 mt-2">
+                        <a href="<?= base_url('arsip-evident-ponk') ?>" class="btn btn-info btn-block"><i class="fas fa-archive"></i> Arsip Evident PO Selesai</a>
                     </div>
                 </div>
             <?php else : ?>
@@ -246,19 +250,42 @@
                                                 </button>
                                             </div>
                                         <?php endif; ?>
-                                        <?php if ($this->session->userdata('lv') == '1') : ?>
+                                        <?php if (is_super_admin()) : ?>
+                                            <?php if ($p->status == 'ON PROGRESS' || $p->status == 'ON PROGRESS - KADEP') : ?>
+                                                <div class="col-md">
+                                                    <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrderNK/') . $p->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                        <i class="fas fa-clipboard-check"></i>
+                                                        ACC KADEP
+                                                    </a>
+                                                </div>
+                                            <?php elseif ($p->status == 'SEDANG DIAJUKAN') : ?>
+                                                <div class="col-md">
+                                                    <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrderdirNK/') . $p->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                        <i class="fas fa-clipboard-check"></i>
+                                                        ACC Direktur
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
                                             <div class="col-md">
-                                                <a class="btn btn-block btn-success btn-sm" href="<?= base_url('konfirmasiOrderNK/') . $p->kd_po_nk ?>">
-                                                    <i class="fas fa-clipboard-check"></i>
-                                                    Accept
-                                                </a>
-                                            </div>
-                                            <div class="col-md">
-                                                <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('tolakOrderNK/') . $p->kd_po_nk ?>">
+                                                <a class="btn btn-block btn-warning btn-sm" href="<?= base_url('tolakordernk/') . $p->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
                                                     <i class="fas fa-times"></i>
                                                     Reject
                                                 </a>
                                             </div>
+                                            <?php if ($p->status == 'REJECT') : ?>
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-info btn-sm" href="<?= base_url('unpostponk/') . $p->kd_po_nk ?>">
+                                                        <i class="fas fa-sync"></i> &nbsp;
+                                                        UNPOST
+                                                    </a>
+                                                </div>
+                                                <div class="col">
+                                                    <a class="btn btn-block btn-danger btn-sm" href="<?= base_url('hapusponk/') . $p->kd_po_nk ?>">
+                                                        <i class="fas fa-trash"></i> &nbsp;
+                                                        DELETE
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
                                         <?php elseif ($this->session->userdata('lv') == '2' && $p->status == 'REJECT') : ?>
                                             <div class="col">
                                                 <a class="btn btn-block btn-info btn-sm" href="<?= base_url('unpostponk/') . $p->kd_po_nk ?>">

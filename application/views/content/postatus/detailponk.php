@@ -36,8 +36,8 @@
                             $hargaNyataStatusView = array('ACC DIREKTUR', 'PROSES PEMBELIAN', 'DONE');
                             $hargaNyataStatusInput = array('ACC DIREKTUR', 'PROSES PEMBELIAN');
                             $canShowHargaNyata = (int) $s->status_hrg_nyata === 1 && in_array($s->status, $hargaNyataStatusView, true);
-                            $canEditHargaNyata = $this->session->userdata('lv') == '2' && (int) $s->status_hrg_nyata === 1 && in_array($s->status, $hargaNyataStatusInput, true);
-                            $canSwitchHargaNyata = $this->session->userdata('lv') == '2' && in_array($s->status, $hargaNyataStatusInput, true);
+                            $canEditHargaNyata = ($this->session->userdata('lv') == '2' || is_super_admin()) && (int) $s->status_hrg_nyata === 1 && in_array($s->status, $hargaNyataStatusInput, true);
+                            $canSwitchHargaNyata = ($this->session->userdata('lv') == '2' || is_super_admin()) && in_array($s->status, $hargaNyataStatusInput, true);
                             ?>
                             <div class="col-2">
                                 <label for="naSupp" class="">NOMOR PO : </label>
@@ -124,7 +124,7 @@
 
                                 <!--PURCHASING -->
 
-                            <?php elseif ($this->session->userdata('lv') == '2') : ?>
+                            <?php elseif ($this->session->userdata('lv') == '2' || is_super_admin()) : ?>
                                 <div class="col-lg">
                                     <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
                                     <?php if ($s->status == 'DONE') : ?>
@@ -304,6 +304,44 @@
                                 </div>
                             <?php endif; ?>
 
+                            <?php if (is_super_admin() && ($s->status == 'ON PROGRESS' || $s->status == 'ON PROGRESS - KADEP')) : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class="">Approval KADEP : &nbsp;&nbsp; </label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrderNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                <i class="fas fa-clipboard-check"></i>
+                                                Accept
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakordernk/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                <i class="fas fa-times"></i>
+                                                Reject
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif (is_super_admin() && $s->status == 'SEDANG DIAJUKAN') : ?>
+                                <div class="col">
+                                    <label for="tgTrans" class="">Approval Direktur : &nbsp;&nbsp; </label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <a class="btn btn-block btn-success btn-md" href="<?= base_url('konfirmasiOrderdirNK/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                <i class="fas fa-clipboard-check"></i>
+                                                Accept
+                                            </a>
+                                        </div>
+                                        <div class="col">
+                                            <a class="btn btn-block btn-danger btn-md" href="<?= base_url('tolakordernk/') . $s->kd_po_nk . '/' . $this->session->userdata('kode') ?>">
+                                                <i class="fas fa-times"></i>
+                                                Reject
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
                             <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
 
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
@@ -318,7 +356,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
+                            <?php elseif (($this->session->userdata('lv') == '2' || is_super_admin()) && $s->status == 'ACC-KADEP') : ?>
                                 <div class="col">
                                     <label for="tgTrans" class="">Konfirmasi Update : &nbsp;&nbsp; </label>
                                     <div class="row">
@@ -336,7 +374,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PROSES PEMBELIAN') : ?>
+                            <?php elseif (($this->session->userdata('lv') == '2' || is_super_admin()) && $s->status == 'PROSES PEMBELIAN') : ?>
                                 <div class="col">
                                     <div class="row">
                                         <div class="col">
@@ -348,7 +386,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC DIREKTUR') : ?>
+                            <?php elseif (($this->session->userdata('lv') == '2' || is_super_admin()) && $s->status == 'ACC DIREKTUR') : ?>
                                 <div class="col">
                                     <div class="row">
                                         <div class="col">
@@ -385,6 +423,19 @@
                 </div>
                 <textarea type="text" id="tujuanPembelianPonk" name="noInv" class="form-control mb-2" readonly><?= htmlspecialchars($s->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
+            <?php if ($canShowHargaNyata && in_array((string) $this->session->userdata('lv'), array('4', '5'), true)) : ?>
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <?php foreach ($totalnyata as $tn) : ?>
+                            <b>Total Harga Nyata:</b> Rp. <?= number_format($tn->total_nyata) ?>
+                        <?php endforeach; ?>
+                        <?php if (!empty($hargaNyataSummary)) : ?>
+                            <span class="ml-3">Belum Input: <?= (int) $hargaNyataSummary->belum_input ?></span>
+                            <span class="ml-3">Pending Direktur: <?= (int) $hargaNyataSummary->pending_direktur ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
         <?php if ($canUpdatePonkPengajuan) : ?>
@@ -433,7 +484,7 @@
         <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'PROSES PEMBELIAN') : ?>
         <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC DIREKTUR') : ?>
 
-        <?php elseif ($this->session->userdata('lv') == '2' && $s->status != 'ON PROGRESS') : ?>
+        <?php elseif (($this->session->userdata('lv') == '2' || is_super_admin()) && $s->status != 'ON PROGRESS') : ?>
             <div class="row">
                 <div class="col-md mb-2">
                     <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addnopo<?= $s->kd_po_nk ?>">
@@ -553,7 +604,9 @@
                     <!-- END HARGANYATA -->
 
                     <td>Gambar Barang</td>
-                    <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
+                    <?php if (is_super_admin()) : ?>
+                        <td>#</td>
+                    <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                     <?php elseif ($this->session->userdata('lv') == '2' && $s->status == 'ACC-KADEP') : ?>
                         <td>#</td>
                     <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS' || $s->status == 'PO REVISI') : ?>
@@ -594,7 +647,7 @@
                             <td>
                                 <?php if ($statusApprovalHarga === 'PENDING_DIREKTUR') : ?>
                                     <span class="badge badge-warning d-block mb-1">PENDING DIREKTUR</span>
-                                    <?php if ($this->session->userdata('lv') == '3') : ?>
+                                    <?php if ($this->session->userdata('lv') == '3' || is_super_admin()) : ?>
                                         <a href="<?= base_url('approve_harganyata/' . $d->id_det_po_nk) ?>" class="btn btn-success btn-xs">Approve</a>
                                         <a href="<?= base_url('reject_harganyata/' . $d->id_det_po_nk) ?>" class="btn btn-danger btn-xs">Reject</a>
                                     <?php endif; ?>
@@ -616,7 +669,9 @@
                         <td>
                             <!-- GAMBAR -->
 
-                            <?php if ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
+                            <?php if (is_super_admin()) : ?>
+                                <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
+                            <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ON PROGRESS') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'ACC-KADEP') : ?>
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
@@ -654,7 +709,26 @@
                                 <a href="<?= $imagePath ?>" target="_blank"><img src="<?php echo $imagePath ?>" style="width:50px; height:50px"></a>
                             <?php endif; ?>
                         </td>
-                        <?php if ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
+                        <?php if (is_super_admin() && !in_array($s->status, array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN'), true)) : ?>
+                            <td>
+                                <div class="row">
+                                    <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
+                                        <i class="fas fa-pencil-alt"></i>
+                                        Edit
+                                    </a>
+                                    <a class="btn btn-danger btn-sm mr-2" data-toggle="modal" data-target="#hapusitem<?= $d->id_det_po_nk ?>">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Hapus
+                                    </a>
+                                    <?php if ($canEditHargaNyata) : ?>
+                                        <a class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#hrgnyata<?= $d->id_det_po_nk ?>">
+                                            <i class="fas fa-plus"></i>
+                                            Add Harganyata
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        <?php elseif ($this->session->userdata('lv') == '4' && $s->status == 'PO REVISI') : ?>
                             <td>
                                 <div class="row">
                                     <a class="btn btn-success btn-sm mr-2" data-toggle="modal" data-target="#edititem<?= $d->id_det_po_nk ?>">
@@ -727,7 +801,7 @@
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
                                 <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                                     <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                                <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                                <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                                 <?php endif; ?>
                             </td>
@@ -808,7 +882,7 @@
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
                                 <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                                     <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                                <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                                <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                                 <?php endif; ?>
                             </td>
@@ -932,7 +1006,7 @@
                 <td colspan="3" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1002,7 +1076,7 @@
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1281,7 +1355,7 @@
                     <td colspan="3" style="padding-right:3%; font-weight: bold;">
                         <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                             <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                        <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                        <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                             <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                         <?php endif; ?>
                     </td>
@@ -1342,7 +1416,7 @@
                 <td colspan="6" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1362,7 +1436,7 @@
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1395,7 +1469,7 @@
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1450,7 +1524,7 @@
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1478,7 +1552,7 @@
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($fb->kdfile == 'png' || $fb->kdfile == 'jpg' || $fb->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1604,7 +1678,7 @@
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>
@@ -1677,7 +1751,7 @@
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
                         <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
-                    <?php elseif ($f->kdfile == 'png' || $f->kdfile == 'jpg' || $f->kdfile == 'peg') : ?>
+                    <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
                 </td>

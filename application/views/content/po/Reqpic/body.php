@@ -1,5 +1,5 @@
 <a href="" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
-<?php if ($this->session->userdata('lv') == '4') : ?>
+<?php if ($this->session->userdata('lv') == '4' && !is_super_admin()) : ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -34,6 +34,10 @@
                                                 <?php if ($g->status == 'ON PROGRESS') : ?>
                                                     <div class="col">
                                                         <a class="btn btn-block btn-secondary btn-sm"><?= $g->status ?></a>
+                                                    </div>
+                                                <?php elseif ($g->status == 'MENUNGGU ACC KADEP') : ?>
+                                                    <div class="col">
+                                                        <a class="btn btn-block btn-warning btn-sm"><?= $g->status ?></a>
                                                     </div>
                                                 <?php elseif ($g->status == 'REQUEST ACC') : ?>
                                                     <div class="col">
@@ -157,7 +161,7 @@
         <!-- END VIEW CONTENT -->
     </div>
 
-<?php elseif ($this->session->userdata('lv')  == '2') : ?>
+<?php elseif ($this->session->userdata('lv')  == '2' || is_super_admin()) : ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">

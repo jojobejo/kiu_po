@@ -141,6 +141,14 @@ class M_Reqpic extends CI_Model
         $query = $this->db->get()->result();
         return $query;
     }
+
+    public function getrequestrow($kd)
+    {
+        $this->db->select('*');
+        $this->db->from('tbpo_req_nk');
+        $this->db->where('kd_po_nk', $kd);
+        return $this->db->get()->row();
+    }
     public function count_acc_req($kd)
     {
         return $this->db->query("SELECT
@@ -369,6 +377,19 @@ class M_Reqpic extends CI_Model
         LEFT JOIN tbpo_po_nk b ON b.kd_po_req = a.kd_po_nk
         WHERE a.status = 'REQUEST ACC'
         ORDER BY a.tgl_transaksi DESC;");
+    }
+
+    public function getlistpicreqkadep($departemen, $kodeKadep = '')
+    {
+        $this->db->select('a.*');
+        $this->db->from('tbpo_req_nk a');
+        $this->db->where('a.status', 'MENUNGGU ACC KADEP');
+        if (!is_super_admin()) {
+            $this->db->where('a.departemen', $departemen);
+        }
+        $this->db->order_by('a.tgl_transaksi', 'DESC');
+
+        return $this->db->get();
     }
 
     public function getlistready()

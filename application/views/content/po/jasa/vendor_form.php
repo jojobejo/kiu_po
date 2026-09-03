@@ -11,7 +11,7 @@ if (!function_exists('pojasa_h')) {
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            <label>Nama Vendor</label>
+            <label>Toko / Vendor</label>
             <input type="text" class="form-control" name="nama_vendor" value="<?= $vendor ? pojasa_h($vendor->nama_vendor) : '' ?>" required>
         </div>
     </div>

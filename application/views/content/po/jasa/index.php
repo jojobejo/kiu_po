@@ -14,7 +14,7 @@ if (!function_exists('pojasa_money')) {
 }
 
 $canManageVendor = in_array((string) $lv, array('1', '2'), true);
-$canRequestVendor = !$canManageVendor;
+$canCreateRequest = isset($can_create_request) ? (bool) $can_create_request : in_array((string) $lv, array('1', '2', '4'), true);
 ?>
 <div class="content-wrapper">
     <div class="content-header">
@@ -45,7 +45,7 @@ $canRequestVendor = !$canManageVendor;
             <?php endif; ?>
 
             <div class="row">
-                <div class="col-lg-2 col-md-4">
+                <div class="col-lg-4 col-md-4">
                     <div class="small-box bg-info">
                         <div class="inner">
                             <h3><?= (int) $summary['total'] ?></h3>
@@ -54,7 +54,7 @@ $canRequestVendor = !$canManageVendor;
                         <div class="icon"><i class="fas fa-clipboard-list"></i></div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4">
+                <div class="col-lg-4 col-md-4">
                     <div class="small-box bg-warning">
                         <div class="inner">
                             <h3><?= (int) $summary['on_progress'] ?></h3>
@@ -63,79 +63,13 @@ $canRequestVendor = !$canManageVendor;
                         <div class="icon"><i class="fas fa-clock"></i></div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4">
+                <div class="col-lg-4 col-md-4">
                     <div class="small-box bg-primary">
                         <div class="inner">
                             <h3><?= (int) $summary['acc_kadep'] + (int) $summary['pengajuan_direktur'] ?></h3>
                             <p>Review Purchasing/Direktur</p>
                         </div>
                         <div class="icon"><i class="fas fa-file-signature"></i></div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <div class="small-box bg-success">
-                        <div class="inner">
-                            <h3><?= (int) $summary['spk_terbit'] ?></h3>
-                            <p>SPK Terbit</p>
-                        </div>
-                        <div class="icon"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <div class="small-box bg-secondary">
-                        <div class="inner">
-                            <h3><?= (int) $summary['progress_vendor'] ?></h3>
-                            <p>Progress Vendor</p>
-                        </div>
-                        <div class="icon"><i class="fas fa-tasks"></i></div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4">
-                    <div class="small-box bg-success">
-                        <div class="inner">
-                            <h3><?= (int) $summary['done'] ?></h3>
-                            <p>Project Done</p>
-                        </div>
-                        <div class="icon"><i class="fas fa-flag-checkered"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-danger"><i class="fas fa-calendar-times"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Project Overdue</span>
-                            <span class="info-box-number"><?= (int) $summary['overdue_active'] ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-warning"><i class="fas fa-file-invoice-dollar"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Payment Pending</span>
-                            <span class="info-box-number"><?= (int) $summary['payment_pending'] ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-success"><i class="fas fa-money-check-alt"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Payment Lunas</span>
-                            <span class="info-box-number"><?= (int) $summary['payment_done'] ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-info"><i class="fas fa-star"></i></span>
-                        <div class="info-box-content">
-                            <span class="info-box-text">Avg Vendor Score</span>
-                            <span class="info-box-number"><?= number_format((float) $summary['avg_vendor_score'], 2) ?></span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -146,11 +80,13 @@ $canRequestVendor = !$canManageVendor;
                         <i class="fas fa-list"></i> List Request
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#tabRequestForm" role="tab">
-                        <i class="fas fa-plus-circle"></i> Request Pekerjaan
-                    </a>
-                </li>
+                <?php if ($canCreateRequest) : ?>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tabRequestForm" role="tab">
+                            <i class="fas fa-plus-circle"></i> Request Pekerjaan
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($canManageVendor) : ?>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#tabVendorJasa" role="tab">
@@ -164,15 +100,14 @@ $canRequestVendor = !$canManageVendor;
                 <div class="tab-pane fade show active" id="tabRequestList" role="tabpanel">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-bordered table-striped" id="tbPojasa">
+                            <table class="table table-sm table-bordered table-striped" id="tbPojasa">
                                 <thead>
                                     <tr>
                                         <th>No</th>
                                         <th>Kode</th>
                                         <th>SPK</th>
-                                        <th>Vendor</th>
+                                        <th>Toko / Vendor</th>
                                         <th>Departemen</th>
-                                        <th>Target</th>
                                         <th>Total</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
@@ -187,7 +122,6 @@ $canRequestVendor = !$canManageVendor;
                                             <td><?= pojasa_h($request->no_spk) ?></td>
                                             <td><?= pojasa_h($request->nama_vendor) ?></td>
                                             <td><?= pojasa_h($request->departemen) ?></td>
-                                            <td><?= pojasa_h($request->tgl_target) ?></td>
                                             <td><?= pojasa_money($request->estimasi_total) ?></td>
                                             <td>
                                                 <span class="badge badge-<?= in_array($request->status, array('SPK TERBIT', 'PROGRESS VENDOR', 'DONE'), true) ? 'success' : ($request->status === 'REJECT' ? 'danger' : 'warning') ?>">
@@ -207,135 +141,136 @@ $canRequestVendor = !$canManageVendor;
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="tabRequestForm" role="tabpanel">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="formRequestPojasa" enctype="multipart/form-data">
+                <?php if ($canCreateRequest) : ?>
+                    <div class="tab-pane fade" id="tabRequestForm" role="tabpanel">
+                        <form id="formRequestPojasa" enctype="multipart/form-data">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong>Data Request PO Jasa</strong>
+                                </div>
+                                <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Nama Pengaju</label>
                                             <input type="text" class="form-control" value="<?= pojasa_h($nmuser) ?>" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Departemen</label>
                                             <input type="text" class="form-control" value="<?= pojasa_h($depuser) ?>" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Tanggal Request</label>
                                             <input type="date" class="form-control" name="tgl_request" value="<?= date('Y-m-d') ?>">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Target Selesai</label>
-                                            <input type="date" class="form-control" name="tgl_target">
-                                        </div>
-                                    </div>
+                                    <input type="hidden" name="tgl_target" class="pojasa-target-sync" value="<?= date('Y-m-d') ?>">
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Vendor Jasa</label>
-                                            <?php if ($canRequestVendor) : ?>
-                                                <button type="button" class="btn btn-link btn-sm p-0 float-right" data-toggle="modal" data-target="#modalRequestVendorJasa">
-                                                    Request Vendor Baru
-                                                </button>
-                                            <?php endif; ?>
-                                            <select class="form-control" name="kd_vendor_jasa" id="kdVendorJasa">
-                                                <option value="">Pilih Vendor</option>
-                                                <?php foreach ($active_vendors as $vendor) : ?>
-                                                    <option value="<?= pojasa_h($vendor->kd_vendor_jasa) ?>">
-                                                        <?= pojasa_h($vendor->nama_vendor) ?> - <?= pojasa_h($vendor->kategori_jasa) ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
+                                            <label>Toko / Vendor</label>
+                                            <input type="text" class="form-control" name="nama_vendor_jasa" id="namaVendorJasa" placeholder="Toko / Vendor">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <input type="hidden" name="lokasi_pekerjaan" value="<?= pojasa_h($depuser) ?>">
+                                    <div class="col-md-8">
                                         <div class="form-group">
-                                            <label>Lokasi Pekerjaan</label>
-                                            <input type="text" class="form-control" name="lokasi_pekerjaan" placeholder="Lokasi pekerjaan">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Tujuan Pekerjaan</label>
-                                            <input type="text" class="form-control" name="tujuan_pekerjaan" placeholder="Tujuan pekerjaan">
+                                            <label>Deskripsi Jasa</label>
+                                            <input type="text" class="form-control" name="tujuan_pekerjaan" placeholder="Deskripsi jasa">
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label>Dokumen Project Jasa</label>
-                                            <input type="file" class="form-control" name="dokumen_project_jasa[]" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-7">
-                                        <div class="form-group">
-                                            <label>Keterangan Dokumen</label>
-                                            <input type="text" class="form-control" name="keterangan_project_file" placeholder="Penawaran, gambar lokasi, TOR, atau dokumen pendukung">
-                                        </div>
-                                    </div>
                                 </div>
+                            </div>
 
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="mb-0">Scope & Estimasi Biaya</h5>
-                                    <button type="button" class="btn btn-primary btn-sm" id="btnAddScopeJasa">
-                                        <i class="fas fa-plus"></i> Tambah Scope
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <strong>Dokumen Pendukung</strong>
+                                    <button type="button" class="btn btn-primary btn-sm ml-auto" id="btnAddDokumenPendukung">
+                                        <i class="fas fa-plus"></i> Tambah Dokumen
                                     </button>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="tbScopeJasa">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th style="width: 22%">Nama Pekerjaan</th>
-                                                <th>Deskripsi</th>
-                                                <th style="width: 10%">Qty</th>
-                                                <th style="width: 12%">Satuan</th>
-                                                <th style="width: 15%">Harga</th>
-                                                <th style="width: 15%">Total</th>
-                                                <th style="width: 6%">#</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="scope-row">
-                                                <td><input type="text" class="form-control" name="nama_pekerjaan[]" placeholder="Nama pekerjaan"></td>
-                                                <td><input type="text" class="form-control" name="deskripsi[]" placeholder="Detail scope"></td>
-                                                <td><input type="number" min="0" step="0.01" class="form-control scope-qty" name="qty[]" value="1"></td>
-                                                <td><input type="text" class="form-control" name="satuan[]" value="Lot"></td>
-                                                <td><input type="number" min="0" step="0.01" class="form-control scope-price" name="hrg_satuan[]" value="0"></td>
-                                                <td><input type="text" class="form-control scope-total" value="0" readonly></td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm btnRemoveScopeJasa">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th colspan="5" class="text-right">Estimasi Total</th>
-                                                <th colspan="2" id="grandTotalScopeJasa">Rp. 0</th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                <div class="card-body">
+                                    <div id="dokumenPendukungRows">
+                                        <div class="row dokumen-pendukung-row">
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label>File Pendukung</label>
+                                                    <input type="file" class="form-control" name="dokumen_project_jasa[]" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.csv">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Keterangan Dokumen</label>
+                                                    <input type="text" class="form-control" name="keterangan_project_file[]" placeholder="Penawaran, gambar lokasi, TOR, atau dokumen pendukung">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <label>&nbsp;</label>
+                                                <button type="button" class="btn btn-danger btn-block btnRemoveDokumenPendukung">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="text-right">
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body table-responsive">
+                                    <button type="button" class="btn btn-primary btn-sm mb-3" id="btnAddScopeJasa">
+                                        <i class="fas fa-plus"></i> Tambah baris baru
+                                    </button>
+                                    <table class="table table-sm table-bordered mb-0" id="tbScopeJasa">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th style="width: 22%">Nama Jasa</th>
+                                                    <th>Deskripsi</th>
+                                                    <th style="width: 10%">Qty</th>
+                                                    <th style="width: 15%">Harga</th>
+                                                    <th style="width: 15%">Total</th>
+                                                    <th style="width: 6%">#</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="scope-row">
+                                                    <td>
+                                                        <input type="text" class="form-control" name="nama_pekerjaan[]" placeholder="Nama jasa">
+                                                        <input type="hidden" name="satuan[]" value="Lot">
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="deskripsi[]" placeholder="Detail scope"></td>
+                                                    <td><input type="number" min="0" step="0.01" class="form-control scope-qty" name="qty[]" value="1"></td>
+                                                    <td><input type="number" min="0" step="0.01" class="form-control scope-price" name="hrg_satuan[]" value="0"></td>
+                                                    <td><input type="text" class="form-control scope-total" value="0" readonly></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger btn-sm btnRemoveScopeJasa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="4" class="text-right">Estimasi Total</th>
+                                                    <th colspan="2" id="grandTotalScopeJasa">Rp. 0</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                </div>
+                                <div class="card-footer text-right">
                                     <button type="submit" class="btn btn-success" <?= !$tables_ready ? 'disabled' : '' ?>>
                                         <i class="fas fa-save"></i> Rekam Request
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <?php if ($canManageVendor) : ?>
                     <div class="tab-pane fade" id="tabVendorJasa" role="tabpanel">
@@ -346,12 +281,12 @@ $canRequestVendor = !$canManageVendor;
                                 </button>
                             </div>
                             <div class="card-body">
-                                <table class="table table-bordered table-striped" id="tbVendorJasa">
+                                <table class="table table-sm table-bordered table-striped" id="tbVendorJasa">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>Kode</th>
-                                            <th>Nama Vendor</th>
+                                            <th>Toko / Vendor</th>
                                             <th>Kategori</th>
                                             <th>PIC</th>
                                                 <th>Telpon</th>
@@ -404,28 +339,6 @@ $canRequestVendor = !$canManageVendor;
         </div>
     </div>
 </div>
-
-<?php if ($canRequestVendor) : ?>
-    <div class="modal fade" id="modalRequestVendorJasa" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form id="formRequestVendorJasa">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Request Vendor Jasa Baru</h5>
-                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                    </div>
-                    <div class="modal-body">
-                        <?php $this->load->view('content/po/jasa/vendor_form', array('vendor' => null, 'show_status' => false)); ?>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary" <?= !$tables_ready ? 'disabled' : '' ?>>Kirim Request</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
 
 <?php if ($canManageVendor) : ?>
     <div class="modal fade" id="modalAddVendorJasa" tabindex="-1" role="dialog">

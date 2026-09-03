@@ -1640,7 +1640,27 @@ class C_PoStatus extends CI_Controller
     public function postatusnk()
     {
         //VIEW-PURCHASING
-        if ($this->session->userdata('lv') == '2') {
+        if (is_super_admin()) {
+
+            $data['title'] = 'PO Status';
+            $kd =  $this->session->userdata('kode');
+            $tglstart   = $this->input->post('tglstart');
+            $tglend     = $this->input->post('tglend');
+            $_SESSION['vartgl1'] = $tglstart;
+            $_SESSION['vartgl2'] = $tglend;
+
+            $data['po']      = $this->M_Postatus->getAllNk()->result();
+            $data['ponk']    = $this->M_Postatus->ponkgetAllNK_keu_purchasing($kd)->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-PURCHASING
+        elseif ($this->session->userdata('lv') == '2') {
 
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
@@ -2023,7 +2043,11 @@ class C_PoStatus extends CI_Controller
         $descbarang = $this->input->post('descisi');
         $ketbarang  = $this->input->post('ketbarang');
         $qtybr      = $this->input->post('qtyisi');
-        $hrgsatuan  = $this->input->post('hrgisi');
+        $lastHarga  = $this->M_Postatus->get_last_harga_barang_nk($kdbarang, $kdsys);
+        $hrgsatuan  = $this->parseNumericInput($this->input->post('hrgisi'));
+        if ($hrgsatuan <= 0 && $lastHarga && (float) $lastHarga->hrg_satuan > 0) {
+            $hrgsatuan = (float) $lastHarga->hrg_satuan;
+        }
         $totalhrg   = $qtybr * $hrgsatuan;
 
         $addbarang = array(
@@ -2039,6 +2063,15 @@ class C_PoStatus extends CI_Controller
             'hrg_satuan'    => $hrgsatuan,
             'total_harga'   => $totalhrg,
         );
+
+        if ($lastHarga) {
+            if ($this->db->field_exists('harga_lifo', 'tbpo_detail_po_nk')) {
+                $addbarang['harga_lifo'] = $lastHarga->hrg_satuan;
+            }
+            if ($this->db->field_exists('kd_po_lifo_ref', 'tbpo_detail_po_nk')) {
+                $addbarang['kd_po_lifo_ref'] = $lastHarga->kd_po_nk;
+            }
+        }
 
         $this->M_Postatus->add_faktur_nk($addbarang);
         redirect('detailponk/' . $kdponk);
@@ -2728,7 +2761,7 @@ class C_PoStatus extends CI_Controller
         $detail = $this->M_Postatus->get_detail_po_nk_row($idpo);
         $statusRow = $this->getPonkStatusRow($kdpo);
 
-        if ($this->session->userdata('lv') != '2' || !$statusRow || !$this->canInputHargaNyata($statusRow->status)) {
+        if ((!is_super_admin() && $this->session->userdata('lv') != '2') || !$statusRow || !$this->canInputHargaNyata($statusRow->status)) {
             $this->session->set_flashdata('error', 'Harga nyata hanya dapat diinput Purchasing setelah ACC DIREKTUR.');
             redirect('detailponk/' . $kdpo);
             return;
@@ -2792,7 +2825,7 @@ class C_PoStatus extends CI_Controller
     public function approve_harganyata($id)
     {
         $detail = $this->M_Postatus->get_detail_po_nk_row($id);
-        if ($this->session->userdata('lv') != '3' || !$detail) {
+        if ((!is_super_admin() && $this->session->userdata('lv') != '3') || !$detail) {
             $this->session->set_flashdata('error', 'Approval harga nyata hanya dapat dilakukan Direktur.');
             redirect('postatusnk');
             return;
@@ -2824,7 +2857,7 @@ class C_PoStatus extends CI_Controller
     public function reject_harganyata($id)
     {
         $detail = $this->M_Postatus->get_detail_po_nk_row($id);
-        if ($this->session->userdata('lv') != '3' || !$detail) {
+        if ((!is_super_admin() && $this->session->userdata('lv') != '3') || !$detail) {
             $this->session->set_flashdata('error', 'Reject harga nyata hanya dapat dilakukan Direktur.');
             redirect('postatusnk');
             return;
@@ -2851,6 +2884,73 @@ class C_PoStatus extends CI_Controller
         ));
         $this->session->set_flashdata('error', 'Harga nyata ditolak Direktur. Purchasing perlu revisi harga nyata.');
         redirect('detailponk/' . $detail->kd_po_nk);
+    }
+
+    private function uploadPonkEvidenceFile($field, $path)
+    {
+        if (empty($_FILES[$field]['name'])) {
+            return array('success' => false, 'message' => 'File evidence wajib dipilih.');
+        }
+
+        if (!is_dir($path)) {
+            @mkdir($path, 0755, true);
+        }
+
+        $config = array(
+            'upload_path' => $path,
+            'allowed_types' => 'jpg|jpeg|png|gif|webp|pdf|csv|xls|xlsx|doc|docx',
+            'max_size' => '5120',
+            'max_width' => '6000',
+            'max_height' => '6000',
+            'overwrite' => false,
+            'encrypt_name' => true
+        );
+
+        $this->load->library('upload');
+        $this->upload->initialize($config);
+
+        if (!$this->upload->do_upload($field)) {
+            return array('success' => false, 'message' => strip_tags($this->upload->display_errors('', '')));
+        }
+
+        return array('success' => true, 'data' => $this->upload->data());
+    }
+
+    private function recordPonkEvidenceArchive($kdponk, $jenis, $keterangan, $uploadData, $relativePath, $sourceTable, $sourceId = null)
+    {
+        $data = array(
+            'kd_po_nk' => $kdponk,
+            'jenis_evident' => $jenis,
+            'keterangan' => $keterangan,
+            'file_path' => $relativePath . $uploadData['file_name'],
+            'file_name' => pathinfo($uploadData['file_name'], PATHINFO_FILENAME),
+            'file_uploaded' => $uploadData['file_name'],
+            'file_original' => $uploadData['client_name'],
+            'file_ext' => $uploadData['file_ext'],
+            'file_size' => $uploadData['file_size'],
+            'source_table' => $sourceTable,
+            'source_id' => $sourceId,
+            'user_upload' => $this->session->userdata('kode')
+        );
+
+        return $this->M_Postatus->insert_arsip_evident_ponk($data);
+    }
+
+    public function arsip_evident_ponk()
+    {
+        $data['title'] = 'Arsip Evident PO Non Komersil';
+        $data['filters'] = array(
+            'tgl_start' => $this->input->get('tgl_start', true),
+            'tgl_end' => $this->input->get('tgl_end', true),
+            'kd_po_nk' => $this->input->get('kd_po_nk', true)
+        );
+        $data['arsip'] = $this->M_Postatus->get_arsip_evident_ponk_done($data['filters']);
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/arsip_evident_ponk', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 
     public function edit_gbr_pndukung()
@@ -2883,35 +2983,19 @@ class C_PoStatus extends CI_Controller
             return;
         }
 
-        if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/upbukti/';
-            $config['allowed_types'] = '*';
-            $config['max_size'] = '2000';
-            $config['max_width'] = '6000';
-            $config['max_height'] = '6000';
-            $config['overwrite'] = TRUE;
-            $config['file_name'] = date('Y') . date('m') . date('U');
-            $this->load->library('upload', $config);
-            $this->upload->initialize($config);;
-
-            if (!$this->upload->do_upload('gambar_1')) {
-                $image_data1 = $this->upload->data();
-                $full_path1 = $config['file_name'];
-                $data["gbr_produk"] = $full_path1;
-            } else {
-                if ($this->upload->do_upload('gambar_1')) {
-                    $image_data1 = $this->upload->data();
-                    $full_path1 = $config['file_name'];
-                    $data["gbr_produk"] = $full_path1;
-                }
-            }
+        $upload = $this->uploadPonkEvidenceFile('gambar_1', './images/upbukti/');
+        if (!$upload['success']) {
+            $this->session->set_flashdata('error', $upload['message']);
+            redirect('detailponk/' . $kdponk);
+            return;
         }
+        $image_data1 = $upload['data'];
 
         $dataupload = array(
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'     => $config['file_name'],
+            'file_name'     => pathinfo($image_data1['file_name'], PATHINFO_FILENAME),
             'file_uploaded' => $image_data1['file_name']
         );
         $dataKonfirm = array(
@@ -2929,7 +3013,8 @@ class C_PoStatus extends CI_Controller
 
         $this->M_Postatus->konfirmPonk($kdponk, $dataKonfirm);
         $this->M_Postatus->addNote($notedirektur);
-        $this->M_Postatus->upbuktibeli($dataupload);
+        $sourceId = $this->M_Postatus->upbuktibeli($dataupload);
+        $this->recordPonkEvidenceArchive($kdponk, 'BUKTI PEMBELIAN BARANG', $keterangan, $image_data1, 'images/upbukti/', 'tbpo_file_bukti_beli', $sourceId);
 
         redirect('detailponk/' . $kdponk);
     }
@@ -3069,39 +3154,24 @@ class C_PoStatus extends CI_Controller
         $keterangan   = $this->input->post('desc_isi');
         $userup       = $this->session->userdata('kode');
 
-        if (!empty($_FILES['gambar_1'])) {
-            $config['upload_path'] = './images/filepndukung/';
-            $config['allowed_types'] = '*';
-            $config['max_size'] = '2000';
-            $config['max_width'] = '6000';
-            $config['max_height'] = '6000';
-            $config['overwrite'] = TRUE;
-            $config['file_name'] = date('Y') . date('m') . date('U');
-            $this->load->library('upload', $config);
-            $this->upload->initialize($config);;
-
-            if (!$this->upload->do_upload('gambar_1')) {
-                $error = array('error' => $this->upload->display_errors());
-                print_r($error);
-                die;
-            } else {
-                if ($this->upload->do_upload('gambar_1')) {
-                    $image_data1 = $this->upload->data();
-                    $full_path1 = $config['file_name'];
-                    $data["gbr_produk"] = $full_path1;
-                }
-            }
+        $upload = $this->uploadPonkEvidenceFile('gambar_1', './images/filepndukung/');
+        if (!$upload['success']) {
+            $this->session->set_flashdata('error', $upload['message']);
+            redirect('detailponk/' . $kdponk);
+            return;
         }
+        $image_data1 = $upload['data'];
 
         $dataBarang = array(
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'   => $config['file_name'],
+            'file_name'   => pathinfo($image_data1['file_name'], PATHINFO_FILENAME),
             'file_uploaded'    => $image_data1['file_name']
         );
 
-        $this->M_Postatus->add_file_po_nk($dataBarang);
+        $sourceId = $this->M_Postatus->add_file_po_nk($dataBarang);
+        $this->recordPonkEvidenceArchive($kdponk, 'FILE PENDUKUNG PENGAJUAN', $keterangan, $image_data1, 'images/filepndukung/', 'tbpo_file_nk', $sourceId);
 
         redirect('detailponk/' . $kdponk);
     }
@@ -3109,7 +3179,7 @@ class C_PoStatus extends CI_Controller
     public function hrgnyataon($kdponk)
     {
         $statusRow = $this->getPonkStatusRow($kdponk);
-        if (!$statusRow || $this->session->userdata('lv') != '2' || !$this->canInputHargaNyata($statusRow->status)) {
+        if (!$statusRow || (!is_super_admin() && $this->session->userdata('lv') != '2') || !$this->canInputHargaNyata($statusRow->status)) {
             $this->session->set_flashdata('error', 'Harga Nyata hanya dapat diaktifkan setelah ACC DIREKTUR.');
             redirect('detailponk/' . $kdponk);
             return;
@@ -3124,7 +3194,7 @@ class C_PoStatus extends CI_Controller
     public function hrgnyataoff($kdponk)
     {
         $statusRow = $this->getPonkStatusRow($kdponk);
-        if (!$statusRow || $this->session->userdata('lv') != '2' || !$this->canInputHargaNyata($statusRow->status)) {
+        if (!$statusRow || (!is_super_admin() && $this->session->userdata('lv') != '2') || !$this->canInputHargaNyata($statusRow->status)) {
             $this->session->set_flashdata('error', 'Harga Nyata hanya dapat dinonaktifkan pada status setelah ACC DIREKTUR.');
             redirect('detailponk/' . $kdponk);
             return;

@@ -141,6 +141,26 @@ class C_Reqpic extends CI_Controller
         $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
+    public function index_acckadep()
+    {
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $data['title'] = 'Approval Request PIC';
+        $data['getlistpic'] = $this->M_Reqpic->getlistpicreqkadep(
+            $this->session->userdata('departemen'),
+            $this->session->userdata('kode')
+        )->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/acckadep', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
+
     public function list_barang_ready()
     {
         $data['title']      = 'List Barang PO';
@@ -401,6 +421,8 @@ class C_Reqpic extends CI_Controller
 
             $this->db->trans_begin();
 
+            $statusAwal = (string) $this->session->userdata('lv') === '4' ? 'MENUNGGU ACC KADEP' : 'ON PROGRESS';
+
             $inpdataponk = array(
                 'jns_po'        => '2',
                 'kd_po_nk'      => $kdponk,
@@ -408,7 +430,7 @@ class C_Reqpic extends CI_Controller
                 'nm_user'       => $nmuser,
                 'tgl_transaksi' => $now,
                 'jml_item'      => $totbr,
-                'status'        => 'ON PROGRESS',
+                'status'        => $statusAwal,
                 'departemen'    => $dep,
                 'tj_pembelian'  => $tjuan
             );
@@ -433,7 +455,7 @@ class C_Reqpic extends CI_Controller
 
             $inputnt    = array(
                 'kd_po'         => $kdponk,
-                'isi_note'      => 'REQUEST BARU',
+                'isi_note'      => $statusAwal === 'MENUNGGU ACC KADEP' ? 'REQUEST BARU - MENUNGGU ACC KADEP' : 'REQUEST BARU',
                 'kd_user'       => $kdus,
                 'nama_user'     => $nmuser,
                 'note_for'      => '2',
@@ -499,6 +521,83 @@ class C_Reqpic extends CI_Controller
         redirect('reqpic');
     }
 
+    public function acc_req_kadep()
+    {
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $kdreqpo = $this->input->post('kdreqpo', true);
+        $request = $this->M_Reqpic->getrequestrow($kdreqpo);
+
+        if (!$request || $request->status !== 'MENUNGGU ACC KADEP') {
+            $this->session->set_flashdata('error', 'Request tidak valid untuk approval KADEP.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        if (!is_super_admin() && $request->departemen !== $this->session->userdata('departemen')) {
+            $this->session->set_flashdata('error', 'Request berbeda departemen.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        $this->M_Reqpic->updatereqnk($kdreqpo, array(
+            'status' => 'ON PROGRESS',
+            'acc_with' => $this->session->userdata('kode')
+        ));
+        $this->M_Purchase->addNote(array(
+            'kd_po' => $kdreqpo,
+            'isi_note' => 'REQUEST PIC DISETUJUI KADEP',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '2',
+            'update_status' => '2',
+        ));
+
+        redirect('reqpicacckadep');
+    }
+
+    public function reject_req_kadep()
+    {
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $kdreqpo = $this->input->post('kdreqpo', true);
+        $note = trim((string) $this->input->post('note_reject', true));
+        $request = $this->M_Reqpic->getrequestrow($kdreqpo);
+
+        if (!$request || $request->status !== 'MENUNGGU ACC KADEP') {
+            $this->session->set_flashdata('error', 'Request tidak valid untuk reject KADEP.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        if (!is_super_admin() && $request->departemen !== $this->session->userdata('departemen')) {
+            $this->session->set_flashdata('error', 'Request berbeda departemen.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        $this->M_Reqpic->updatereqnk($kdreqpo, array(
+            'status' => 'PENDING',
+            'acc_with' => $this->session->userdata('kode')
+        ));
+        $this->M_Purchase->addNote(array(
+            'kd_po' => $kdreqpo,
+            'isi_note' => 'REQUEST PIC DITOLAK KADEP' . ($note !== '' ? ' - ' . $note : ''),
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '2',
+            'update_status' => '2',
+        ));
+
+        redirect('reqpicacckadep');
+    }
+
     private function generate_kdponk_req($kode_user, $offset = 0)
     {
         $kode_user = strtoupper($kode_user);
@@ -551,7 +650,7 @@ class C_Reqpic extends CI_Controller
         }
 
         // FUNGSI ADM PURCHASING
-        elseif ($this->session->userdata('lv') == '2') {
+        elseif ($this->session->userdata('lv') == '2' || is_super_admin()) {
             $data['title']      = 'PO Detail Req PIC';
             $data['stspo']      = $this->M_Reqpic->getbuystsponk($kdpo)->result();
 
@@ -568,6 +667,32 @@ class C_Reqpic extends CI_Controller
             $data['log']             = $this->M_Reqpic->getNoted($kdpo);
             $data['gettrs']          = $this->M_Reqpic->gettr($kdpo)->result();
             $data['gettr']           = $this->M_Reqpic->getdetailreq($kdpo)->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/po/Reqpic/detreq', $data);
+            $this->load->view('partial/footer');
+        }
+        elseif ($this->session->userdata('lv') == '5') {
+            $request = $this->M_Reqpic->getrequestrow($kdpo);
+            if (!$request || $request->departemen !== $this->session->userdata('departemen')) {
+                show_404();
+                return;
+            }
+
+            $data['title']              = 'PO Detail Req PIC';
+            $data['status']             = $this->M_Reqpic->getrequestbypic($kdpo);
+            $data['stspo']              = $this->M_Reqpic->getbuystsponk($kdpo)->result();
+            $data['stspo1']             = $this->M_Reqpic->getbuystsponks($kdpo)->result();
+            $data['datereqpic']         = $this->M_Reqpic->getreqpicnosts($request->kd_user, $kdpo)->result();
+            $data['getitmlistpicreq']   = $this->M_Reqpic->getitmlistpicreq($kdpo)->result();
+            $data['detreqpic1']         = $this->M_Reqpic->getreqwherepic($request->kd_user, $kdpo, $sts1)->result();
+            $data['detreqpic2']         = $this->M_Reqpic->getreqwherepic($request->kd_user, $kdpo, $sts2)->result();
+            $data['detreqpic0']         = $this->M_Reqpic->getreqwherepic($request->kd_user, $kdpo, $sts0)->result();
+            $data['listtr']             = $this->M_Reqpic->getlisttmptr($kdpo)->result();
+            $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
+            $data['detreq']             = $this->M_Reqpic->getreqwheres($kdpo)->result();
+            $data['log']                = $this->M_Reqpic->getNoted($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');

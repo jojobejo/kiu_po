@@ -19,6 +19,7 @@
                         <a href="<?= base_url('exported_allstock') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-file-alt"></i> &nbsp;<b style="text-transform:uppercase">Export Stock</b></a>
                         <a href="<?= base_url('master_lokasi') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-file-alt"></i> &nbsp;<b style="text-transform:uppercase">Master Lokasi</b></a>
                         <a href="<?= base_url('tr_allstock') ?>" class="btn btn-md mt-2 mb-2 btn-info"><i class="fas fa-archive"></i> &nbsp;<b style="text-transform:uppercase">Histori All Stock</b></a>
+                        <a href="<?= base_url('stockopnamenk') ?>" class="btn btn-md mt-2 mb-2 btn-warning"><i class="fas fa-clipboard-list"></i> &nbsp;<b style="text-transform:uppercase">Stock Opname</b></a>
 
                         <form id="stocknk_filter_form" class="row mt-3 mb-2">
                             <div class="col-md-4">

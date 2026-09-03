@@ -203,7 +203,7 @@
                                 <label for="noInv" class="">No Po</label>
                                 <input type="text" id="noInv" name="noInv" value="<?= $s->no_po ?>" class="form-control" readonly>
                             </div>
-                            <?php if ($this->session->userdata('lv') == '2' && $s->status == 'PO REVISI') : ?>
+                            <?php if (($this->session->userdata('lv') == '2' || is_super_admin()) && $s->status == 'PO REVISI') : ?>
                                 <div class="col">
                                     <label for="noInv" class=""> Edit No.Po</label>
                                     <a class="btn btn-block btn-success" data-toggle="modal" data-target="#modaleditnopo<?= $s->id_po ?>"><i class=" fas fa-pencil-alt"></i></a>
@@ -218,7 +218,7 @@
                                 <label for="tgTrans" class="">Tanggal Transaksi : &nbsp;&nbsp; </label>
                                 <input type="date" id="tgTrans" name="tgTrans" style="max-width: 250px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly>
                             </div>
-                            <?php if ($this->session->userdata('lv') == '2') : ?>
+                            <?php if ($this->session->userdata('lv') == '2' || is_super_admin()) : ?>
                                 <div class="col-lg">
                                     <label for="tgTrans" class="">Status Order : &nbsp;&nbsp; </label>
 
@@ -265,6 +265,22 @@
                                     <?php elseif ($s->status == 'ACC DIREKTUR') : ?>
                                         <div>
                                             <a href="#" class="btn btn-primary btn-block"><i class="fas fa-user-tie"></i> ACC DIREKTUR</a>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (is_super_admin() && in_array($s->status, array('ON PROGRESS', 'PO REVISI', 'NOTE DIREKTUR', 'NOTE KEUANGAN', 'UPDATE KEUANGAN'), true)) : ?>
+                                        <div class="row mt-2">
+                                            <div class="col">
+                                                <a href="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>" class="btn btn-block btn-success btn-md btn-konfirmasi" data-url="<?= base_url('konfirmasiOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                                    <i class="fas fa-clipboard-check"></i>
+                                                    ACC Direktur
+                                                </a>
+                                            </div>
+                                            <div class="col">
+                                                <a href="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>" class="btn btn-block btn-danger btn-md btn-reject" data-url="<?= base_url('tolakOrder/') . $s->kd_po . '/' . $this->session->userdata('kode') ?>">
+                                                    <i class="fas fa-times"></i>
+                                                    Reject
+                                                </a>
+                                            </div>
                                         </div>
                                     <?php endif; ?>
                                 </div>

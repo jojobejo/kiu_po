@@ -38,6 +38,11 @@ class C_Stocknonkomersil extends CI_Controller
     {
         $data['title'] = 'list stock tersedia';
         $data['stocknk'] = $this->M_Stocknonkomersil->getallbarang()->result();
+        foreach ($data['stocknk'] as $stock) {
+            $lastHarga = $this->M_Postatus->get_last_harga_barang_nk($stock->kd_br_adm, $stock->kd_barang);
+            $stock->harga_lifo = $lastHarga ? (float) $lastHarga->hrg_satuan : 0;
+            $stock->harga_lifo_po = $lastHarga ? $lastHarga->kd_po_nk : '';
+        }
         $data['satuan'] = $this->M_Stocknonkomersil->getSatuan();
 
         $this->load->view('partial/header', $data);
@@ -452,5 +457,176 @@ class C_Stocknonkomersil extends CI_Controller
     {
         $this->M_Stocknonkomersil->delete_master_lokasi($id);
         redirect('master_lokasi');
+    }
+
+    private function parseStockNumber($value)
+    {
+        $value = trim((string) $value);
+        $value = str_replace(' ', '', $value);
+
+        if (strpos($value, ',') !== false) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return (float) $value;
+    }
+
+    public function stock_opname()
+    {
+        if (!in_array((string) $this->session->userdata('lv'), array('1', '2'), true)) {
+            show_404();
+            return;
+        }
+
+        $data['title'] = 'Stock Opname Non Komersil';
+        $data['stock'] = $this->M_Stocknonkomersil->v_stock();
+        $data['opname'] = $this->M_Stocknonkomersil->get_stock_opname_headers();
+        $data['tables_ready'] = $this->db->table_exists('tbpo_stock_opname_nk') && $this->db->table_exists('tbpo_stock_opname_nk_detail');
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/stock_opname', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+
+    public function save_stock_opname()
+    {
+        if (!in_array((string) $this->session->userdata('lv'), array('1', '2'), true)) {
+            show_404();
+            return;
+        }
+
+        if (!$this->db->table_exists('tbpo_stock_opname_nk') || !$this->db->table_exists('tbpo_stock_opname_nk_detail')) {
+            $this->session->set_flashdata('error', 'Tabel stock opname belum tersedia. Jalankan migration stock opname PO Non Komersil terlebih dahulu.');
+            redirect('stockopnamenk');
+            return;
+        }
+
+        date_default_timezone_set("Asia/Jakarta");
+        $kodeBarang = $this->input->post('kode_barang');
+        $kodeBarangSys = $this->input->post('kode_barangs');
+        $namaBarang = $this->input->post('nama_barang');
+        $qtySistem = $this->input->post('qty_sistem');
+        $qtyFisik = $this->input->post('qty_fisik');
+        $satuan = $this->input->post('satuan');
+        $idSatuan = $this->input->post('id_satuan');
+        $katBarang = $this->input->post('kat_barang');
+        $keterangan = $this->input->post('keterangan_detail');
+        $tglOpname = $this->input->post('tgl_opname', true);
+        $catatan = trim((string) $this->input->post('catatan', true));
+        $now = date('Y-m-d H:i:s');
+        $tglTransaksi = $tglOpname ?: date('Y-m-d');
+
+        $details = array();
+        $transactions = array();
+        $totalItem = 0;
+        $totalSelisihPlus = 0;
+        $totalSelisihMinus = 0;
+
+        foreach ((array) $kodeBarang as $idx => $kode) {
+            $kode = trim((string) $kode);
+            if ($kode === '') {
+                continue;
+            }
+
+            $sistem = $this->parseStockNumber(isset($qtySistem[$idx]) ? $qtySistem[$idx] : 0);
+            $rawFisik = isset($qtyFisik[$idx]) ? trim((string) $qtyFisik[$idx]) : '';
+            $fisik = $rawFisik === '' ? $sistem : $this->parseStockNumber($rawFisik);
+            if ($fisik < 0) {
+                continue;
+            }
+
+            $selisih = $fisik - $sistem;
+            $kodeSys = isset($kodeBarangSys[$idx]) ? $kodeBarangSys[$idx] : '';
+
+            $details[] = array(
+                'kode_barang' => $kode,
+                'kode_barangs' => $kodeSys,
+                'nama_barang' => isset($namaBarang[$idx]) ? $namaBarang[$idx] : '',
+                'qty_sistem' => $sistem,
+                'qty_fisik' => $fisik,
+                'selisih' => $selisih,
+                'satuan' => isset($satuan[$idx]) ? $satuan[$idx] : '',
+                'keterangan' => isset($keterangan[$idx]) ? $keterangan[$idx] : ''
+            );
+
+            if ($selisih != 0) {
+                $transactions[] = array(
+                    'kd_akun' => $selisih > 0 ? '11513' : '11514',
+                    'kd_barang' => $kodeSys,
+                    'kd_barangsys' => $kode,
+                    'keterangan' => 'STOCK OPNAME - ' . (isset($keterangan[$idx]) && trim($keterangan[$idx]) !== '' ? $keterangan[$idx] : $catatan),
+                    'kat_barang' => isset($katBarang[$idx]) ? $katBarang[$idx] : '',
+                    'tr_qty' => abs($selisih),
+                    'satuan' => isset($idSatuan[$idx]) ? $idSatuan[$idx] : '',
+                    'inputer' => $this->session->userdata('kode'),
+                    'req_by' => 'STOCK OPNAME',
+                    'tgl_transaksi' => $tglTransaksi,
+                    'create_at' => $now,
+                    'last_updated_by' => $this->session->userdata('kode'),
+                    'update_at' => $now
+                );
+
+                if ($selisih > 0) {
+                    $totalSelisihPlus += $selisih;
+                } else {
+                    $totalSelisihMinus += abs($selisih);
+                }
+            }
+
+            $totalItem++;
+        }
+
+        if (empty($details)) {
+            $this->session->set_flashdata('error', 'Tidak ada data stock opname yang dapat disimpan.');
+            redirect('stockopnamenk');
+            return;
+        }
+
+        $header = array(
+            'tgl_opname' => $tglTransaksi,
+            'catatan' => $catatan,
+            'total_item' => $totalItem,
+            'total_selisih_plus' => $totalSelisihPlus,
+            'total_selisih_minus' => $totalSelisihMinus,
+            'created_by' => $this->session->userdata('kode'),
+            'created_name' => $this->session->userdata('nama_user'),
+            'created_at' => $now
+        );
+
+        $idOpname = $this->M_Stocknonkomersil->insert_stock_opname($header, $details, $transactions);
+        if (!$idOpname) {
+            $this->session->set_flashdata('error', 'Stock opname gagal disimpan.');
+            redirect('stockopnamenk');
+            return;
+        }
+
+        $this->session->set_flashdata('success', 'Stock opname berhasil disimpan.');
+        redirect('stockopnamenk/detail/' . $idOpname);
+    }
+
+    public function detail_stock_opname($id)
+    {
+        if (!in_array((string) $this->session->userdata('lv'), array('1', '2'), true)) {
+            show_404();
+            return;
+        }
+
+        $data['title'] = 'Detail Stock Opname Non Komersil';
+        $data['header'] = $this->M_Stocknonkomersil->get_stock_opname_header($id);
+        $data['detail'] = $this->M_Stocknonkomersil->get_stock_opname_detail($id);
+
+        if (!$data['header']) {
+            show_404();
+            return;
+        }
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/stock_opname_detail', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
     }
 }

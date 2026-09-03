@@ -55,10 +55,18 @@ $route['404_override']                                  = '';
 $route['translate_uri_dashes']                          = FALSE;
 
 //user
-$route['user']                                          = 'User/C_User';
+$route['user']                                          = 'user/C_User';
+$route['usermanagement']                                = 'user/C_User';
 $route['adduser']                                       = 'user/C_User/AddUser';
+$route['edituser']                                      = 'user/C_User/EditUser';
+$route['deleteuser/(:num)']                             = 'user/C_User/DeleteUser/$1';
 $route['usersetting']                                   = 'user/C_User/usersetting';
 $route['editPass']                                      = 'user/C_User/editPassword';
+
+//admin data view
+$route['admin-data']                                    = 'admin/C_AdminData';
+$route['admin-data/table/(:any)']                       = 'admin/C_AdminData/index/$1';
+$route['admin-data/update']                             = 'admin/C_AdminData/update';
 
 //auth
 $route['login']                                         = 'auth/process';
@@ -109,6 +117,7 @@ $route['masterbarangkomersil/save']                     = 'master_barang/C_Maste
 $route['masterbarangkomersil/delete']                   = 'master_barang/C_MasterBarang/ajax_delete_masterbarangkomersil';
 
 // Purchase Order Jasa
+$route['pojasa']                                        = 'purchaseorder/C_Pojasa';
 $route['pononkomersiljasa']                             = 'purchaseorder/C_Pojasa';
 $route['pojasa/vendor/save']                            = 'purchaseorder/C_Pojasa/save_vendor';
 $route['pojasa/vendor/update']                          = 'purchaseorder/C_Pojasa/update_vendor';
@@ -122,6 +131,11 @@ $route['pojasa/approval']                               = 'purchaseorder/C_Pojas
 $route['pojasa/generate-spk']                           = 'purchaseorder/C_Pojasa/generate_spk';
 $route['pojasa/progress/save']                          = 'purchaseorder/C_Pojasa/save_progress';
 $route['pojasa/file/upload']                            = 'purchaseorder/C_Pojasa/upload_file';
+$route['pojasa/file/update']                            = 'purchaseorder/C_Pojasa/update_file';
+$route['pojasa/file/replace']                           = 'purchaseorder/C_Pojasa/replace_file';
+$route['pojasa/file/delete']                            = 'purchaseorder/C_Pojasa/delete_file';
+$route['pojasa/file/view/(:num)']                       = 'purchaseorder/C_Pojasa/view_file/$1';
+$route['pojasa/file/download/(:num)']                   = 'purchaseorder/C_Pojasa/download_file/$1';
 $route['pojasa/biaya/save']                             = 'purchaseorder/C_Pojasa/save_biaya';
 $route['pojasa/bast/complete']                          = 'purchaseorder/C_Pojasa/complete_bast';
 $route['pojasa/payment/save']                           = 'purchaseorder/C_Pojasa/save_payment';
@@ -141,6 +155,9 @@ $route['nkrestok']                                      = 'stock/C_Stocknonkomer
 $route['indraftrestock']                                = 'stock/C_Stocknonkomersil/indraftrestock';
 $route['stockcontrollernk']                             = 'stock/C_Stockcontroller';
 $route['stock/filterqtybytgl']                          = 'stock/C_Stocknonkomersil/filterqtybytgl';
+$route['stockopnamenk']                                 = 'stock/C_Stocknonkomersil/stock_opname';
+$route['stockopnamenk/save']                            = 'stock/C_Stocknonkomersil/save_stock_opname';
+$route['stockopnamenk/detail/(:num)']                   = 'stock/C_Stocknonkomersil/detail_stock_opname/$1';
 $route['master_lokasi']                                 = 'stock/C_Stocknonkomersil/master_lokasi';
 $route['add_master_lokasi']                             = 'stock/C_Stocknonkomersil/add_master_lokasi';
 $route['edit_master_lokasi']                            = 'stock/C_Stocknonkomersil/edit_master_lokasi';
@@ -178,6 +195,7 @@ $route['reqpic']                                        = 'purchaseorder/C_Reqpi
 $route['reqpic/admrestock']                             = 'purchaseorder/C_Reqpic/admrestock';
 $route['historireqpic']                                 = 'purchaseorder/C_Reqpic/historireqpic';
 $route['reqpicaccreq']                                  = 'purchaseorder/C_Reqpic/index_accreq';
+$route['reqpicacckadep']                                = 'purchaseorder/C_Reqpic/index_acckadep';
 $route['index_brsedia']                                 = 'purchaseorder/C_Reqpic/index_brsedia';
 $route['index_done']                                    = 'purchaseorder/C_Reqpic/index_done';
 $route['listbarangready']                               = 'purchaseorder/C_Reqpic/list_barang_ready';
@@ -194,6 +212,8 @@ $route['actpending/(:any)/(:any)']                      = 'purchaseorder/C_Reqpi
 $route['actconfirm/(:any)']                             = 'purchaseorder/C_Reqpic/actconfirm/$1/';
 $route['acc_req_admin']                                 = 'purchaseorder/C_Reqpic/acc_req_admin';
 $route['acc_req_admin_plus']                            = 'purchaseorder/C_Reqpic/acc_req_admin_plus';
+$route['acc_req_kadep']                                 = 'purchaseorder/C_Reqpic/acc_req_kadep';
+$route['reject_req_kadep']                              = 'purchaseorder/C_Reqpic/reject_req_kadep';
 $route['pendingreq1']                                   = 'purchaseorder/C_Reqpic/pendingreq1';
 $route['accreqpic']                                     = 'purchaseorder/C_Reqpic/accreqpic';
 $route['reqpicconfirmed']                               = 'purchaseorder/C_Reqpic/reqpicconfirmed';
@@ -218,6 +238,7 @@ $route['add_promosi_cp/(:any)']                         = 'purchaseorder/C_Reqpi
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk']                                    = 'postatus/C_PoStatus/postatusnk';
+$route['arsip-evident-ponk']                            = 'postatus/C_PoStatus/arsip_evident_ponk';
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';

@@ -19,7 +19,7 @@ class Dashboard extends CI_Controller
 
         // VIEW PURCHASING
 
-        if ($this->session->userdata('lv') == '2') {
+        if (is_super_admin() || $this->session->userdata('lv') == '2') {
             $data['title']  = 'Dashboard';
             $kduser = $this->session->userdata("kode");
 

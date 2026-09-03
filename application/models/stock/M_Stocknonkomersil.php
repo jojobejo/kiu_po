@@ -261,6 +261,69 @@ class M_Stocknonkomersil  extends CI_Model
         ]);
     }
 
+    public function get_stock_opname_headers()
+    {
+        if (!$this->db->table_exists('tbpo_stock_opname_nk')) {
+            return array();
+        }
+
+        $this->db->select('*');
+        $this->db->from('tbpo_stock_opname_nk');
+        $this->db->order_by('tgl_opname', 'DESC');
+        $this->db->order_by('id_stock_opname', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    public function get_stock_opname_header($id)
+    {
+        if (!$this->db->table_exists('tbpo_stock_opname_nk')) {
+            return null;
+        }
+
+        $this->db->select('*');
+        $this->db->from('tbpo_stock_opname_nk');
+        $this->db->where('id_stock_opname', $id);
+        return $this->db->get()->row();
+    }
+
+    public function get_stock_opname_detail($id)
+    {
+        if (!$this->db->table_exists('tbpo_stock_opname_nk_detail')) {
+            return array();
+        }
+
+        $this->db->select('*');
+        $this->db->from('tbpo_stock_opname_nk_detail');
+        $this->db->where('id_stock_opname', $id);
+        $this->db->order_by('nama_barang', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    public function insert_stock_opname($header, $details, $transactions)
+    {
+        if (!$this->db->table_exists('tbpo_stock_opname_nk') || !$this->db->table_exists('tbpo_stock_opname_nk_detail')) {
+            return false;
+        }
+
+        $this->db->trans_start();
+        $this->db->insert('tbpo_stock_opname_nk', $header);
+        $id = $this->db->insert_id();
+
+        foreach ($details as $detail) {
+            $detail['id_stock_opname'] = $id;
+            $this->db->insert('tbpo_stock_opname_nk_detail', $detail);
+        }
+
+        foreach ($transactions as $transaction) {
+            $transaction['kd_po_nk'] = 'OPNAMENK' . $id;
+            $this->db->insert('tbpo_transaksi', $transaction);
+        }
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status() ? $id : false;
+    }
+
     public function update_minimum_stock($kode_barang, $minimum_stock)
     {
         $this->db->where('kd_barang', $kode_barang);

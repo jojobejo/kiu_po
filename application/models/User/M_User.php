@@ -12,8 +12,26 @@ class M_User extends CI_Model
 
     public function getAll()
     {
+        $this->db->order_by('id_user', 'ASC');
         return $this->db->get('tbpo_user')->result();
     }
+
+    public function getById($iduser)
+    {
+        $this->db->where('id_user', $iduser);
+        return $this->db->get('tbpo_user')->row();
+    }
+
+    public function usernameExists($username, $exclude_id = null)
+    {
+        $this->db->where('username', $username);
+        if ($exclude_id !== null) {
+            $this->db->where('id_user !=', $exclude_id);
+        }
+
+        return $this->db->get('tbpo_user')->num_rows() > 0;
+    }
+
     public function addUser($data)
     {
         return $this->db->insert('tbpo_user', $data);
@@ -23,6 +41,22 @@ class M_User extends CI_Model
     {
         $this->db->where('id_user', $iduser);
         return $this->db->update('tbpo_user', $data);
+    }
+
+    public function deleteUser($iduser)
+    {
+        $this->db->where('id_user', $iduser);
+        return $this->db->delete('tbpo_user');
+    }
+
+    public function upsertAdmin($data)
+    {
+        if ($this->usernameExists($data['username'])) {
+            $this->db->where('username', $data['username']);
+            return $this->db->update('tbpo_user', $data);
+        }
+
+        return $this->db->insert('tbpo_user', $data);
     }
     public function getInfoUser($kduser)
     {

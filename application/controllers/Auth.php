@@ -38,8 +38,9 @@ class Auth extends CI_Controller
                         'kode'          => $key->kode_user,
                         'username'      => $key->username,
                         'nama_user'     => $key->nama_user,
-                        'departemen'    => $key->departement,
+                        'departemen'    => strtoupper($key->departement),
                         'lv'            => $key->aksess_lv,
+                        'is_super_admin'=> ((string) $key->aksess_lv === '1' || strtoupper($key->departement) === 'ADMIN' || strtolower($key->username) === 'admin') ? 1 : 0,
                         'status'        => "is_login"
                     );
                     $this->session->set_userdata($data_session);

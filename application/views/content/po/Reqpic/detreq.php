@@ -1,4 +1,4 @@
-<?php if ($this->session->userdata('lv') == '4') : ?>
+<?php if (($this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '5') && !is_super_admin()) : ?>
     <?php foreach ($status as $s) : ?>
         <div class="content-wrapper">
             <div class="content-header">
@@ -8,7 +8,7 @@
                         </div><!-- /.col -->
                     </div><!-- /.row -->
                     <div class="card">
-                        <?php if ($s->status == 'ON PROGRESS') : ?>
+                        <?php if ($s->status == 'ON PROGRESS' || $s->status == 'MENUNGGU ACC KADEP') : ?>
                             <a class="btn btn-block btn-warning btn-sm" href=""><i class="fas fa-exclamation-triangle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
                         <?php elseif ($s->status == 'REQUEST ACC') : ?>
                             <a class="btn btn-block btn-info btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
@@ -21,7 +21,7 @@
                                     <h1 class="m-0">Detail Request Barang - PIC</h1>
                                 </div>
                                 <div class="col">
-                                    <a class="btn btn-primary btn-sm btn-block" href="<?= base_url('reqpic') ?>"><i class="fas fa-home"></i> <b>HOMEPAGE</b></a>
+                                    <a class="btn btn-primary btn-sm btn-block" href="<?= base_url($this->session->userdata('lv') == '5' ? 'reqpicacckadep' : 'reqpic') ?>"><i class="fas fa-home"></i> <b>HOMEPAGE</b></a>
                                 </div>
                                 <?php if ($s->status == 'PENDING') : ?>
                                     <div class="col">
@@ -52,7 +52,7 @@
                                     <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
                                 </div>
                             </div>
-                            <?php if ($s->status == 'ON PROGRESS') : ?>
+                            <?php if ($s->status == 'ON PROGRESS' || $s->status == 'MENUNGGU ACC KADEP') : ?>
                                 <table class="table table-bordered table-striped mt-4 mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
                                         <tr>
@@ -349,7 +349,7 @@
     <!-- ============================================================================================================================================================================== -->
     <!-- ============================================================================================================================================================================== -->
     <!-- ============================================================================================================================================================================== -->
-<?php elseif ($this->session->userdata('lv') == '2') : ?>
+<?php elseif ($this->session->userdata('lv') == '2' || is_super_admin()) : ?>
     <?php foreach ($status as $s) : ?>
         <div class="content-wrapper">
             <div class="content-header">
