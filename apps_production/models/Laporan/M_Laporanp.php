@@ -149,8 +149,8 @@ class M_Laporanp extends CI_Model
         $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_barang', 'left');
         $this->db->join('tb_user c', 'c.kode_user = a.req_by', 'left');
         $this->db->join('tb_user d', 'd.kode_user = a.inputer', 'left');
-        $this->db->where('a.tgl_transaksi >=', $tgl1);
-        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $this->db->where('DATE(a.tgl_transaksi) >= ' . $this->db->escape($tgl1), null, false);
+        $this->db->where('DATE(a.tgl_transaksi) <= ' . $this->db->escape($tgl2), null, false);
         $this->db->where('a.kd_akun != 11411');
         $query = $this->db->get();
         return $query;
