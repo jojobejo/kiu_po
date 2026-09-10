@@ -189,15 +189,131 @@ $canCreateRequest = isset($can_create_request) ? (bool) $can_create_request : in
                             </div>
 
                             <div class="card">
+                                <div class="card-header">
+                                    <strong>Scope Pekerjaan</strong>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="nav nav-tabs mb-3" id="scopePekerjaanTabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="tab" href="#tabDetailJasa" role="tab">Detail Jasa</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#tabAlatBahanKebutuhan" role="tab">Alat &amp; Bahan Kebutuhan</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active" id="tabDetailJasa" role="tabpanel">
+                                            <div class="d-flex justify-content-end mb-3">
+                                                <button type="button" class="btn btn-primary btn-sm btnReqScopeTambahBaru" data-table-target="#tbReqScopeDetailJasaBaru">
+                                                    <i class="fas fa-plus"></i> Tambah baris baru
+                                                </button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered mb-0 req-scope-table-baru" id="tbReqScopeDetailJasaBaru" data-total-target="#totalReqScopeDetailJasaBaru">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th style="width: 22%">Nama Pekerjaan</th>
+                                                            <th>Deskripsi</th>
+                                                            <th style="width: 10%">Qty</th>
+                                                            <th style="width: 15%">Biaya</th>
+                                                            <th style="width: 15%">Total Biaya</th>
+                                                            <th style="width: 6%">#</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="scope-row">
+                                                            <td>
+                                                                <input type="text" class="form-control" name="nama_pekerjaan[]" placeholder="Nama pekerjaan">
+                                                                <input type="hidden" name="jenis_detail[]" value="JASA">
+                                                                <input type="hidden" name="satuan[]" value="Lot">
+                                                            </td>
+                                                            <td><input type="text" class="form-control" name="deskripsi[]" placeholder="Detail jasa"></td>
+                                                            <td><input type="number" min="0" step="0.01" class="form-control req-scope-qty-baru" name="qty[]" value="1"></td>
+                                                            <td><input type="number" min="0" step="0.01" class="form-control req-scope-biaya-baru" name="hrg_satuan[]" value="0"></td>
+                                                            <td><input type="text" class="form-control req-scope-total-baru" value="Rp. 0" readonly></td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-sm btnReqScopeHapusBaru">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="tabAlatBahanKebutuhan" role="tabpanel">
+                                            <div class="d-flex justify-content-end mb-3">
+                                                <button type="button" class="btn btn-primary btn-sm btnReqScopeTambahBaru" data-table-target="#tbReqScopeAlatBahanBaru">
+                                                    <i class="fas fa-plus"></i> Tambah baris baru
+                                                </button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered mb-0 req-scope-table-baru" id="tbReqScopeAlatBahanBaru" data-total-target="#totalReqScopeAlatBahanBaru">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <th style="width: 22%">Nama Alat &amp; Bahan</th>
+                                                            <th>Deskripsi</th>
+                                                            <th style="width: 10%">Qty</th>
+                                                            <th style="width: 15%">Biaya</th>
+                                                            <th style="width: 15%">Total Biaya</th>
+                                                            <th style="width: 6%">#</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="scope-row">
+                                                            <td>
+                                                                <input type="text" class="form-control" name="nama_pekerjaan[]" placeholder="Nama alat & bahan">
+                                                                <input type="hidden" name="jenis_detail[]" value="BAHAN">
+                                                                <input type="hidden" name="satuan[]" value="Lot">
+                                                            </td>
+                                                            <td><input type="text" class="form-control" name="deskripsi[]" placeholder="Detail alat & bahan"></td>
+                                                            <td><input type="number" min="0" step="0.01" class="form-control req-scope-qty-baru" name="qty[]" value="1"></td>
+                                                            <td><input type="number" min="0" step="0.01" class="form-control req-scope-biaya-baru" name="hrg_satuan[]" value="0"></td>
+                                                            <td><input type="text" class="form-control req-scope-total-baru" value="Rp. 0" readonly></td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger btn-sm btnReqScopeHapusBaru">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-3 h-100">
+                                                <div class="text-muted">Estimasi Total Biaya Pekerjaan :</div>
+                                                <strong id="totalReqScopeDetailJasaBaru">Rp. 0</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-3 h-100">
+                                                <div class="text-muted">Estimasi Total Biaya Alat &amp; Bahan :</div>
+                                                <strong id="totalReqScopeAlatBahanBaru">Rp. 0</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-3 h-100">
+                                                <div class="text-muted">Grand Total Biaya Estimasi Pekerjaan :</div>
+                                                <strong id="grandTotalReqScopeBaru">Rp. 0</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <strong>Dokumen Pendukung</strong>
-                                    <button type="button" class="btn btn-primary btn-sm ml-auto" id="btnAddDokumenPendukung">
+                                    <button type="button" class="btn btn-primary btn-sm ml-auto" id="btnReqDokumenTambahBaru">
                                         <i class="fas fa-plus"></i> Tambah Dokumen
                                     </button>
                                 </div>
                                 <div class="card-body">
-                                    <div id="dokumenPendukungRows">
-                                        <div class="row dokumen-pendukung-row">
+                                    <div id="reqDokumenPendukungRowsBaru">
+                                        <div class="row req-dokumen-pendukung-row-baru">
                                             <div class="col-md-5">
                                                 <div class="form-group">
                                                     <label>File Pendukung</label>
@@ -212,55 +328,12 @@ $canCreateRequest = isset($can_create_request) ? (bool) $can_create_request : in
                                             </div>
                                             <div class="col-md-1">
                                                 <label>&nbsp;</label>
-                                                <button type="button" class="btn btn-danger btn-block btnRemoveDokumenPendukung">
+                                                <button type="button" class="btn btn-danger btn-block btnReqDokumenHapusBaru">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-body table-responsive">
-                                    <button type="button" class="btn btn-primary btn-sm mb-3" id="btnAddScopeJasa">
-                                        <i class="fas fa-plus"></i> Tambah baris baru
-                                    </button>
-                                    <table class="table table-sm table-bordered mb-0" id="tbScopeJasa">
-                                            <thead class="thead-dark">
-                                                <tr>
-                                                    <th style="width: 22%">Nama Jasa</th>
-                                                    <th>Deskripsi</th>
-                                                    <th style="width: 10%">Qty</th>
-                                                    <th style="width: 15%">Harga</th>
-                                                    <th style="width: 15%">Total</th>
-                                                    <th style="width: 6%">#</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="scope-row">
-                                                    <td>
-                                                        <input type="text" class="form-control" name="nama_pekerjaan[]" placeholder="Nama jasa">
-                                                        <input type="hidden" name="satuan[]" value="Lot">
-                                                    </td>
-                                                    <td><input type="text" class="form-control" name="deskripsi[]" placeholder="Detail scope"></td>
-                                                    <td><input type="number" min="0" step="0.01" class="form-control scope-qty" name="qty[]" value="1"></td>
-                                                    <td><input type="number" min="0" step="0.01" class="form-control scope-price" name="hrg_satuan[]" value="0"></td>
-                                                    <td><input type="text" class="form-control scope-total" value="0" readonly></td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger btn-sm btnRemoveScopeJasa">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th colspan="4" class="text-right">Estimasi Total</th>
-                                                    <th colspan="2" id="grandTotalScopeJasa">Rp. 0</th>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
                                 </div>
                                 <div class="card-footer text-right">
                                     <button type="submit" class="btn btn-success" <?= !$tables_ready ? 'disabled' : '' ?>>

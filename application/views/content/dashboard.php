@@ -3,6 +3,7 @@
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
+                <?php $this->load->view('content/po/jasa/dashboard_widget'); ?>
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="m-0">Dashboard Purchase Order Non Komersil </h1>
@@ -84,10 +85,11 @@
 
     <!-- VIEW PURCHASING -->
 
-<?php elseif ($this->session->userdata('lv') == '2') : ?>
+<?php elseif (is_super_admin() || $this->session->userdata('lv') == '2') : ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
+                <?php $this->load->view('content/po/jasa/dashboard_widget'); ?>
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1><b style="text-transform:uppercase">Dashboard Purchase Order</b></h1>
@@ -231,6 +233,7 @@
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
+                <?php $this->load->view('content/po/jasa/dashboard_widget'); ?>
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="m-0">Dashboard Purchase Order</h1>
@@ -312,10 +315,11 @@
 
     <!-- VIEW DIREKTUR -->
 
-<?php elseif ($this->session->userdata('lv') == '3') : ?>
+<?php elseif (in_array((string) $this->session->userdata('lv'), array('3', '6'), true)) : ?>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
+                <?php $this->load->view('content/po/jasa/dashboard_widget'); ?>
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1 class="m-0">Dashboard Purchase Order</h1>

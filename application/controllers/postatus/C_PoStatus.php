@@ -1682,7 +1682,7 @@ class C_PoStatus extends CI_Controller
         }
 
         //VIEW-DIREKTUR
-        elseif ($this->session->userdata('lv') == '3') {
+        elseif (in_array((string) $this->session->userdata('lv'), array('3', '6'), true)) {
 
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');

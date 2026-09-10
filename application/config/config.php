@@ -142,6 +142,9 @@ $config['subclass_prefix'] = 'MY_';
 */
 $config['composer_autoload'] = FALSE;
 
+// Temporary server-only PO Jasa draft calculation trace. Keep disabled in production.
+$config['pojasa_draft_diagnostic'] = (ENVIRONMENT !== 'production');
+
 /*
 |--------------------------------------------------------------------------
 | Allowed URL Characters

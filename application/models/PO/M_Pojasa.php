@@ -121,20 +121,14 @@ class M_Pojasa extends CI_Model
 
     public function generate_kd_po_jasa()
     {
-        $row = $this->db->query("SELECT MAX(RIGHT(kd_po_jasa, 4)) AS kd_max FROM tbpo_jasa_request WHERE DATE(create_at) = CURDATE()")->row();
-        $next = $row && $row->kd_max ? ((int) $row->kd_max) + 1 : 1;
-
-        date_default_timezone_set('Asia/Jakarta');
-        return 'PJASA' . date('dmy') . sprintf('%04d', $next);
+        $this->load->model('PO/M_PojasaCore');
+        return $this->M_PojasaCore->generate_request_number();
     }
 
     public function generate_no_spk()
     {
-        $row = $this->db->query("SELECT MAX(RIGHT(no_spk, 4)) AS kd_max FROM tbpo_jasa_request WHERE DATE(generated_at) = CURDATE()")->row();
-        $next = $row && $row->kd_max ? ((int) $row->kd_max) + 1 : 1;
-
-        date_default_timezone_set('Asia/Jakarta');
-        return 'SPKJ' . date('dmy') . sprintf('%04d', $next);
+        $this->load->model('PO/M_PojasaCore');
+        return $this->M_PojasaCore->generate_spk_number();
     }
 
     public function insert_request($header, $details, $note, $files = array())

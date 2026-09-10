@@ -150,16 +150,28 @@
             }
         }
 
-        function recalculateScope() {
-            var grandTotal = 0;
-            $('#tbScopeJasa tbody tr').each(function() {
-                var qty = Number($(this).find('.scope-qty').val() || 0);
-                var price = Number($(this).find('.scope-price').val() || 0);
-                var total = qty * price;
-                grandTotal += total;
-                $(this).find('.scope-total').val(formatRupiah(total));
+        function hitungUlangReqScopeBaruPojasa() {
+            var grandTotalBaru = 0;
+
+            $('.req-scope-table-baru').each(function() {
+                var totalPerTabelBaru = 0;
+                var targetTotalBaru = $(this).data('total-target');
+
+                $(this).find('tbody tr').each(function() {
+                    var qtyBaru = Number($(this).find('.req-scope-qty-baru').val() || 0);
+                    var biayaBaru = Number($(this).find('.req-scope-biaya-baru').val() || 0);
+                    var subtotalBaru = qtyBaru * biayaBaru;
+                    totalPerTabelBaru += subtotalBaru;
+                    $(this).find('.req-scope-total-baru').val(formatRupiah(subtotalBaru));
+                });
+
+                grandTotalBaru += totalPerTabelBaru;
+                if (targetTotalBaru) {
+                    $(targetTotalBaru).text(formatRupiah(totalPerTabelBaru));
+                }
             });
-            $('#grandTotalScopeJasa').text(formatRupiah(grandTotal));
+
+            $('#grandTotalReqScopeBaru').text(formatRupiah(grandTotalBaru));
         }
 
         function syncHiddenTarget(form) {
@@ -218,33 +230,38 @@
             syncHiddenTarget($(this).closest('form'));
         });
 
-        $('#btnAddScopeJasa').on('click', function() {
-            var row = $('#tbScopeJasa tbody tr:first').clone();
-            row.find('input').val('');
-            row.find('.scope-qty').val('1');
-            row.find('[name="satuan[]"]').val('Lot');
-            row.find('.scope-price').val('0');
-            row.find('.scope-total').val('0');
-            $('#tbScopeJasa tbody').append(row);
-            recalculateScope();
+        $(document).on('click', '.btnReqScopeTambahBaru', function() {
+            var selectorTabelBaru = $(this).data('table-target');
+            var tabelBaru = $(selectorTabelBaru);
+            var jenisDetailBaru = tabelBaru.attr('id') === 'tbReqScopeAlatBahanBaru' ? 'BAHAN' : 'JASA';
+            var barisBaru = tabelBaru.find('tbody tr:first').clone();
+            barisBaru.find('input').val('');
+            barisBaru.find('.req-scope-qty-baru').val('1');
+            barisBaru.find('[name="jenis_detail[]"]').val(jenisDetailBaru);
+            barisBaru.find('[name="satuan[]"]').val('Lot');
+            barisBaru.find('.req-scope-biaya-baru').val('0');
+            barisBaru.find('.req-scope-total-baru').val(formatRupiah(0));
+            tabelBaru.find('tbody').append(barisBaru);
+            hitungUlangReqScopeBaruPojasa();
         });
 
-        $(document).on('click', '.btnRemoveScopeJasa', function() {
-            if ($('#tbScopeJasa tbody tr').length > 1) {
+        $(document).on('click', '.btnReqScopeHapusBaru', function() {
+            var tbodyBaru = $(this).closest('tbody');
+            if (tbodyBaru.find('tr').length > 1) {
                 $(this).closest('tr').remove();
-                recalculateScope();
+                hitungUlangReqScopeBaruPojasa();
             }
         });
 
-        $('#btnAddDokumenPendukung').on('click', function() {
-            var row = $('#dokumenPendukungRows .dokumen-pendukung-row:first').clone();
-            row.find('input').val('');
-            $('#dokumenPendukungRows').append(row);
+        $('#btnReqDokumenTambahBaru').on('click', function() {
+            var barisDokumenBaru = $('#reqDokumenPendukungRowsBaru .req-dokumen-pendukung-row-baru:first').clone();
+            barisDokumenBaru.find('input').val('');
+            $('#reqDokumenPendukungRowsBaru').append(barisDokumenBaru);
         });
 
-        $(document).on('click', '.btnRemoveDokumenPendukung', function() {
-            if ($('#dokumenPendukungRows .dokumen-pendukung-row').length > 1) {
-                $(this).closest('.dokumen-pendukung-row').remove();
+        $(document).on('click', '.btnReqDokumenHapusBaru', function() {
+            if ($('#reqDokumenPendukungRowsBaru .req-dokumen-pendukung-row-baru').length > 1) {
+                $(this).closest('.req-dokumen-pendukung-row-baru').remove();
             }
         });
 
@@ -272,8 +289,8 @@
             }
         });
 
-        $(document).on('input', '.scope-qty, .scope-price', recalculateScope);
-        recalculateScope();
+        $(document).on('input', '.req-scope-qty-baru, .req-scope-biaya-baru', hitungUlangReqScopeBaruPojasa);
+        hitungUlangReqScopeBaruPojasa();
 
         $('.btnAddEditorScopePojasa').on('click', function() {
             var table = $(this).closest('form').find('.tbScopeEditorPojasa tbody');
@@ -571,11 +588,13 @@
 
         $('#formRequestPojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postMultipart('<?= base_url('pojasa/request/save') ?>', this);
         });
 
         $('#formRevisePojasa').on('submit', function(e) {
             e.preventDefault();
+            normalizeHiddenPojasaInputs(this);
             postMultipart('<?= base_url('pojasa/request/revise') ?>', this);
         });
 

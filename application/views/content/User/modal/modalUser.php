@@ -31,6 +31,7 @@
                                 <option value="KEUANGAN">KEUANGAN</option>
                                 <option value="PURCHASING">PURCHASING</option>
                                 <option value="DIREKTUR">DIREKTUR</option>
+                                <option value="DIREKTUR OPRASIONAL">DIREKTUR OPRASIONAL</option>
                                 <option value="IT">IT</option>
                                 <option value="SALES">SALES</option>
                                 <option value="LOGISTIK">LOGISTIK</option>
@@ -61,6 +62,7 @@
                                 <option value="3">3 - Direktur</option>
                                 <option value="4">4 - PIC/Inputer</option>
                                 <option value="5">5 - Kadep</option>
+                                <option value="6">6 - Direktur Oprasional</option>
                             </Select></div>
                     </div>
                 </div>
@@ -77,13 +79,14 @@
 </div>
 
 <?php
-$departemenOptions = array('ADMIN', 'KEUANGAN', 'PURCHASING', 'DIREKTUR', 'IT', 'SALES', 'LOGISTIK', 'HRD', 'GA');
+$departemenOptions = array('ADMIN', 'KEUANGAN', 'PURCHASING', 'DIREKTUR', 'DIREKTUR OPRASIONAL', 'IT', 'SALES', 'LOGISTIK', 'HRD', 'GA');
 $levelOptions = array(
     '1' => '1 - Admin Full Akses',
     '2' => '2 - Purchasing/Keuangan',
     '3' => '3 - Direktur',
     '4' => '4 - PIC/Inputer',
     '5' => '5 - Kadep',
+    '6' => '6 - Direktur Oprasional',
 );
 ?>
 

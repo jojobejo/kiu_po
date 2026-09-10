@@ -326,6 +326,7 @@ class C_Pojasa extends CI_Controller
             'estimasi_total' => $details['total'],
             'status' => 'ON PROGRESS'
         );
+        $this->appendRequestSplitTotals($header, $details);
 
         $rows = array();
         foreach ($details['rows'] as $row) {
@@ -415,6 +416,7 @@ class C_Pojasa extends CI_Controller
             'estimasi_total' => $details['total'],
             'status' => 'ON PROGRESS'
         );
+        $this->appendRequestSplitTotals($header, $details);
 
         if (!$this->M_Pojasa->update_request_revision($kd_po_jasa, $header, $rows, $this->noteData($kd_po_jasa, 'Revisi request dikirim ulang ke KADEP', 'ON PROGRESS'), $files['rows'])) {
             return $this->jsonResponse(false, 'Revisi PO Jasa gagal disimpan.');
@@ -460,6 +462,7 @@ class C_Pojasa extends CI_Controller
             'estimasi_total' => $details['total'],
             'status' => 'REVIEW PURCHASING'
         );
+        $this->appendRequestSplitTotals($update, $details);
         $this->appendPurchasingReviewColumns($update);
 
         if (!$this->M_Pojasa->replace_request_details($kd_po_jasa, $rows, $update, $this->noteData($kd_po_jasa, 'Purchasing review scope dan estimasi biaya', 'REVIEW PURCHASING'))) {
@@ -1172,8 +1175,12 @@ class C_Pojasa extends CI_Controller
         $qty = $this->input->post('qty');
         $satuan = $this->input->post('satuan');
         $harga = $this->input->post('hrg_satuan');
+        $jenis = $this->input->post('jenis_detail');
+        $supportSplitDetail = $this->db->field_exists('jenis_detail', 'tbpo_jasa_request_detail');
         $rows = array();
         $total = 0;
+        $totalJasa = 0;
+        $totalBahan = 0;
 
         if (!is_array($nama)) {
             return array('rows' => array(), 'total' => 0);
@@ -1200,7 +1207,8 @@ class C_Pojasa extends CI_Controller
                 continue;
             }
 
-            $rows[] = array(
+            $jenisDetail = isset($jenis[$index]) && strtoupper((string) $jenis[$index]) === 'BAHAN' ? 'BAHAN' : 'JASA';
+            $row = array(
                 'nama_pekerjaan' => $namaPekerjaan,
                 'deskripsi' => isset($deskripsi[$index]) ? trim((string) $deskripsi[$index]) : '',
                 'qty' => $qtyValue,
@@ -1208,10 +1216,36 @@ class C_Pojasa extends CI_Controller
                 'hrg_satuan' => $hargaValue,
                 'total_harga' => $subtotal
             );
+            if ($supportSplitDetail) {
+                $row['jenis_detail'] = $jenisDetail;
+            }
+
+            $rows[] = $row;
             $total += $subtotal;
+            if ($jenisDetail === 'BAHAN') {
+                $totalBahan += $subtotal;
+            } else {
+                $totalJasa += $subtotal;
+            }
         }
 
-        return array('rows' => $rows, 'total' => $total);
+        return array(
+            'rows' => $rows,
+            'total' => $total,
+            'total_jasa' => $totalJasa,
+            'total_bahan' => $totalBahan
+        );
+    }
+
+    private function appendRequestSplitTotals(&$data, $details)
+    {
+        if ($this->db->field_exists('estimasi_total_jasa', 'tbpo_jasa_request')) {
+            $data['estimasi_total_jasa'] = isset($details['total_jasa']) ? $details['total_jasa'] : 0;
+        }
+
+        if ($this->db->field_exists('estimasi_total_bahan', 'tbpo_jasa_request')) {
+            $data['estimasi_total_bahan'] = isset($details['total_bahan']) ? $details['total_bahan'] : 0;
+        }
     }
 
     private function normalizeRequestDate($value, $fallback = '')

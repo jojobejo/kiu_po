@@ -31,15 +31,21 @@ class AuthGuard
 		}
 
 		if ($this->isAjaxRequest($CI)) {
+			$response = array(
+				'status' => false,
+				'success' => false,
+				'message' => 'Session login sudah habis. Silakan login kembali.',
+				'redirect' => base_url('Auth'),
+			);
+			if (in_array(strtolower($CI->router->class), array('c_pojasaajax', 'c_pojasapic', 'c_pojasaworkflow', 'c_pojasapurchasing'), true)) {
+				$response['code'] = 'AUTH_REQUIRED';
+				$response['data'] = array();
+				$response['errors'] = new stdClass();
+			}
 			$CI->output
 				->set_status_header(401)
 				->set_content_type('application/json')
-				->set_output(json_encode(array(
-					'status' => false,
-					'success' => false,
-					'message' => 'Session login sudah habis. Silakan login kembali.',
-					'redirect' => base_url('Auth'),
-				)));
+				->set_output(json_encode($response));
 			$CI->output->_display();
 			exit;
 		}

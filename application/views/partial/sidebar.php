@@ -8,6 +8,7 @@
       <a href="<?= base_url('dashboard') ?>" class="nav-link">Home</a>
     </li>
   </ul>
+  <?php $this->load->view('partial/pojasa_notification_dropdown'); ?>
 </nav>
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -536,7 +537,7 @@
                 </a>
                 <ul class="nav nav-treeview" style="display: none;">
                   <li class="nav-item">
-                    <a href="<?= base_url('pononkomersiljasa') ?>" class="nav-link">
+                    <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
                       <i class="far fa-dot-circle nav-icon"></i>
                       <p>PO Jasa</p>
                     </a>
@@ -582,7 +583,7 @@
                 </a>
                 <ul class="nav nav-treeview" style="display: none;">
                   <li class="nav-item">
-                    <a href="<?= base_url('pononkomersiljasa') ?>" class="nav-link">
+                    <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
                       <i class="far fa-dot-circle nav-icon"></i>
                       <p>PO Jasa</p>
                     </a>
@@ -736,7 +737,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('pojasa') ?>" class="nav-link">
+            <a href="<?= base_url('pojasa/pic') ?>" class="nav-link">
               <i class="nav-icon fas fa-tools"></i>
               <p>
                 PO Jasa
@@ -802,7 +803,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('pojasa') ?>" class="nav-link">
+            <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
               <i class="nav-icon fas fa-tools"></i>
               <p>
                 PO Jasa
@@ -823,6 +824,26 @@
               <p>
                 Log Out
               </p>
+            </a>
+          </li>
+
+        <?php elseif ($this->session->userdata('lv') == '6' && in_array(strtoupper(trim((string) $this->session->userdata('departemen'))), array('DIREKTUR OPERASIONAL', 'DIREKTUR OPRASIONAL'), true)) : ?>
+          <li class="nav-item">
+            <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
+              <i class="nav-icon fas fa-clipboard-check"></i>
+              <p>Approval PO Jasa</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('usersetting') ?>" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>Account Setting</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?= base_url('logout') ?>" class="nav-link">
+              <i class="nav-icon fas fa-unlock"></i>
+              <p>Log Out</p>
             </a>
           </li>
 
@@ -928,7 +949,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="<?= base_url('pojasa') ?>" class="nav-link">
+            <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
               <i class="nav-icon fas fa-tools"></i>
               <p>
                 PO Jasa

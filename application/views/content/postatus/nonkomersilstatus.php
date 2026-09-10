@@ -5,7 +5,7 @@
                 <div class="col-sm-6">
                     <?php if ($this->session->userdata('lv') == '2' || $this->session->userdata('lv') == '4' || $this->session->userdata('lv') == '5') : ?>
                         <h1 class="m-0">PO STATUS</h1>
-                    <?php elseif ($this->session->userdata('lv') == '3') : ?>
+                    <?php elseif (in_array((string) $this->session->userdata('lv'), array('3', '6'), true)) : ?>
                         <h1 class="m-0">Purchase Order To Do</h1>
                     <?php endif; ?>
                 </div><!-- /.col -->

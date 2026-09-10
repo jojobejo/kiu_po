@@ -11,16 +11,20 @@ class Dashboard extends CI_Controller
     {
         parent::__construct();
         $this->load->model('M_Dashboard');
+        $this->load->model('PO/M_PojasaExecution');
+        $this->load->helper('pojasa_authorization');
         $this->load->library('form_validation');
     }
 
     public function index()
     {
+        $pojasaSummary = $this->M_PojasaExecution->dashboard_summary(pojasa_session_context());
 
         // VIEW PURCHASING
 
         if (is_super_admin() || $this->session->userdata('lv') == '2') {
             $data['title']  = 'Dashboard';
+            $data['pojasa_summary'] = $pojasaSummary;
             $kduser = $this->session->userdata("kode");
 
             $data['all']        = $this->M_Dashboard->totalAll($kduser)->result();
@@ -40,6 +44,7 @@ class Dashboard extends CI_Controller
 
         elseif ($this->session->userdata('lv') == '4' && $this->session->userdata('kode') != 'KEULOGICS01') {
             $data['title']  = 'Dashboard';
+            $data['pojasa_summary'] = $pojasaSummary;
             $kduser = $this->session->userdata("kode");
 
             $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
@@ -56,6 +61,7 @@ class Dashboard extends CI_Controller
         // VIEW KADEP
         elseif ($this->session->userdata('lv') == '5') {
             $data['title']  = 'Dashboard';
+            $data['pojasa_summary'] = $pojasaSummary;
             $kduser = $this->session->userdata("kode");
 
             $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
@@ -70,8 +76,9 @@ class Dashboard extends CI_Controller
         }
 
         // VIEW DIREKTUR
-        elseif ($this->session->userdata('lv') == '3') {
+        elseif (in_array((string) $this->session->userdata('lv'), array('3', '6'), true)) {
             $data['title']  = 'Dashboard';
+            $data['pojasa_summary'] = $pojasaSummary;
             $kduser = $this->session->userdata("kode");
 
             $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
@@ -86,6 +93,7 @@ class Dashboard extends CI_Controller
         } elseif ($this->session->userdata('lv') == '4' && $this->session->userdata('kode') == 'KEULOGICS01') {
 
             $data['title']  = 'Dashboard';
+            $data['pojasa_summary'] = $pojasaSummary;
             $kduser = $this->session->userdata("kode");
 
             $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();

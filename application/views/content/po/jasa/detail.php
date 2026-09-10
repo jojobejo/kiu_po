@@ -28,7 +28,7 @@ $isPurchasingAdmin = in_array($lvSession, array('1', '2'), true);
 $isPicOwner = $lvSession === '4' && $request->kd_user === $kodeSession;
 $isKadepDirekturPurchasing = in_array($lvSession, array('1', '2', '3', '5'), true);
 $isSubmittedToDirektur = $request->status === 'REVIEW DIREKTUR';
-$showProgressTracking = $isPicAccount;
+$showProgressTracking = $isPicAccount && $request->status === 'SPK TERBIT';
 $showVendorCostAudit = !$isPicAccount && !$isKadepDirekturPurchasing;
 $showBastCompletion = !$isPicAccount && !$isKadepDirekturPurchasing;
 $showVendorPaymentTracking = !$isPicAccount && !$isKadepDirekturPurchasing;
