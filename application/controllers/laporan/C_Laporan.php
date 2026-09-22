@@ -26,8 +26,15 @@ class C_Laporan extends CI_Controller
         }
     }
 
+    private function load_spreadsheet_library()
+    {
+        require_once APPPATH . 'libraries/PhpSpreadsheetBootstrap.php';
+        PhpSpreadsheetBootstrap::load();
+    }
+
     private function download_excel2007($excel, $filename)
     {
+        $this->load_spreadsheet_library();
         $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $tempFile = tempnam(sys_get_temp_dir(), 'ponk_xlsx_');
 
@@ -92,7 +99,7 @@ class C_Laporan extends CI_Controller
 
     public function export_laporan_pembelian_nk()
     {
-        include APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        $this->load_spreadsheet_library();
         $excel = new PHPExcel();
         $excel->getProperties()->setCreator('it_karisma')
             ->setLastModifiedBy('it_karisma')
@@ -204,23 +211,19 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
+        $excel->getActiveSheet()->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
         $excel->setActiveSheetIndex(0);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xlsx"');
         header('Cache-Control: max-age=0');
 
 
-        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-        ob_end_clean();
-        $write->save('php://output');
+        $this->download_excel2007($excel, 'lap_beli_po_nonkomersil.xlsx');
     }
 
     public function exported_allstock()
     {
-        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-        ob_start();
-        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        $this->load_spreadsheet_library();
         $excel = new PHPExcel();
         $excel->getProperties()->setCreator('it_karisma')
             ->setLastModifiedBy('it_karisma')
@@ -310,7 +313,7 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('G')->setWidth(25);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("lap_stock_nonkomersil");
+        $excel->getActiveSheet()->setTitle("lap_stock_nonkomersil");
         $excel->setActiveSheetIndex(0);
         $this->download_excel2007($excel, 'lap_stock_po_nonkomersil.xlsx');
     }
@@ -348,8 +351,7 @@ class C_Laporan extends CI_Controller
     }
     public function exported_tr_allnk()
     {
-        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        $this->load_spreadsheet_library();
 
         $tgl1 = $this->input->get('tglstart');
         $tgl2 = $this->input->get('tglend');

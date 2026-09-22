@@ -12,6 +12,9 @@ class Dashboard extends CI_Controller
         parent::__construct();
         $this->load->model('M_Dashboard');
         $this->load->model('PO/M_PojasaExecution');
+        // Keep Dashboard functional when a deployment still has an older
+        // autoload.php that does not list the access helper.
+        $this->load->helper('access');
         $this->load->helper('pojasa_authorization');
         $this->load->library('form_validation');
     }
