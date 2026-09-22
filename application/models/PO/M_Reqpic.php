@@ -149,6 +149,29 @@ class M_Reqpic extends CI_Model
         $this->db->where('kd_po_nk', $kd);
         return $this->db->get()->row();
     }
+
+    /** Dokumen pendukung yang melekat pada pengajuan request PIC. */
+    public function add_supporting_document($data)
+    {
+        return $this->db->insert('tbpo_req_nk_supporting_file', $data);
+    }
+
+    public function get_supporting_documents($kdpo)
+    {
+        return $this->db
+            ->where('kd_po_nk', $kdpo)
+            ->order_by('id_supporting_file', 'ASC')
+            ->get('tbpo_req_nk_supporting_file')
+            ->result();
+    }
+
+    public function get_supporting_document($id)
+    {
+        return $this->db
+            ->where('id_supporting_file', (int) $id)
+            ->get('tbpo_req_nk_supporting_file')
+            ->row();
+    }
     public function count_acc_req($kd)
     {
         return $this->db->query("SELECT
@@ -336,6 +359,44 @@ class M_Reqpic extends CI_Model
         return $this->db->delete('tbpo_tmp_item_nk');
     }
 
+    /**
+     * Check the request-number reservation before a new request is stored.
+     * This is a convenience check only; the UNIQUE index on kd_po_nk remains
+     * the authoritative protection against concurrent inserts.
+     */
+    public function is_kdponk_exists($kdponk)
+    {
+        return $this->db
+            ->where('kd_po_nk', $kdponk)
+            ->count_all_results('tbpo_req_nk') > 0;
+    }
+
+    /**
+     * Read one PIC's request draft while holding its rows until the current
+     * transaction completes. This prevents two simultaneous submits from
+     * copying the same draft into separate requests.
+     */
+    public function get_tmp_non_komersil_for_update($kd)
+    {
+        return $this->db->query(
+            'SELECT * FROM tbpo_tmp_item_nk WHERE jnis_po = ? AND kd_user = ? FOR UPDATE',
+            array('1', $kd)
+        )->result();
+    }
+
+    /** Delete only the draft rows that were locked and copied for this request. */
+    public function hapus_tmp_nk_by_ids($kduser, array $ids)
+    {
+        if (empty($ids)) {
+            return false;
+        }
+
+        $this->db->where('jnis_po', '1');
+        $this->db->where('kd_user', $kduser);
+        $this->db->where_in('id_tmp_nk', $ids);
+        return $this->db->delete('tbpo_tmp_item_nk');
+    }
+
     public function getlistpic()
     {
         return $this->db->query("SELECT a.*
@@ -365,7 +426,20 @@ class M_Reqpic extends CI_Model
 
     public function getlistpicreqacc()
     {
-        return $this->db->query("SELECT 
+        return $this->get_request_list('request_acc');
+    }
+
+    /** Daftar request PIC untuk daftar Purchasing. */
+    public function get_request_list($scope = 'request_acc')
+    {
+        $where = '';
+        if ($scope === 'request_acc') {
+            // Tampilkan request yang masih menunggu KADEP dan yang PO-nya
+            // telah memperoleh approval KADEP (REQUEST ACC).
+            $where = "WHERE TRIM(a.status) IN ('MENUNGGU ACC KADEP', 'REQUEST ACC')";
+        }
+
+        return $this->db->query("SELECT
         a.kd_po_nk AS kd_po_nk,
         a.nm_user AS nm_user,
         a.departemen AS departemen,
@@ -375,7 +449,7 @@ class M_Reqpic extends CI_Model
         COALESCE(b.status,0) AS status_po
         FROM tbpo_req_nk a
         LEFT JOIN tbpo_po_nk b ON b.kd_po_req = a.kd_po_nk
-        WHERE a.status = 'REQUEST ACC'
+        $where
         ORDER BY a.tgl_transaksi DESC;");
     }
 
@@ -392,13 +466,60 @@ class M_Reqpic extends CI_Model
         return $this->db->get();
     }
 
+    /** PO yang sudah disiapkan Purchasing dan menunggu persetujuan KADEP. */
+    public function get_purchase_waiting_kadep($departemen = null, $allDepartments = false)
+    {
+        $this->db->select('p.kd_po_nk, p.kd_po_req, p.nopo, p.status, p.tgl_transaksi, p.jml_item, p.total_harga, p.departemen, p.tj_pembelian, r.nm_user AS nama_pengaju');
+        $this->db->from('tbpo_po_nk p');
+        $this->db->join('tbpo_req_nk r', 'r.kd_po_nk = p.kd_po_req', 'left');
+        $this->db->where('p.status', 'ON PROGRESS - KADEP');
+        if (!$allDepartments) {
+            $this->db->where('p.departemen', $departemen);
+        }
+        $this->db->order_by('p.tgl_transaksi', 'DESC');
+        return $this->db->get();
+    }
+
     public function getlistready()
     {
         // return $this->db->get('tbpo_req_nk')->result();
         return $this->db->query("SELECT a.*
             FROM tbpo_req_nk a
-            WHERE a.status = 'BARANG TERSEDIA';
-            ");
+            WHERE TRIM(a.status) IN (
+                'BARANG TERSEDIA',
+                'MENUNGGU PENYERAHAN BARANG',
+                'MENUNGGU PENYERAHAN BARAN'
+            )
+            ORDER BY a.tgl_transaksi DESC;");
+    }
+
+    public function getlistpickup()
+    {
+        return $this->db->query("SELECT a.*
+            FROM tbpo_req_nk a
+            WHERE TRIM(a.status) IN ('MENUNGGU PENYERAHAN BARANG', 'MENUNGGU PENYERAHAN BARAN')
+            ORDER BY a.tgl_transaksi DESC;");
+    }
+
+    /** Permohonan pengambilan yang menunggu keputusan KADEP. */
+    public function get_pickup_approval_waiting_kadep($departemen, $allDepartments = false)
+    {
+        $this->db->from('tbpo_req_nk');
+        $this->db->where('status', 'MENUNGGU ACC PENGAMBILAN');
+        if (!$allDepartments) {
+            $this->db->where('departemen', $departemen);
+        }
+        $this->db->order_by('tgl_transaksi', 'DESC');
+        return $this->db->get();
+    }
+
+    /** Update hanya bila statusnya masih sesuai agar keputusan ganda tidak menimpa data. */
+    public function update_request_status_if_current($kdpo, $currentStatus, $data)
+    {
+        $this->db->where('kd_po_nk', $kdpo);
+        $this->db->where('status', $currentStatus);
+        $this->db->update('tbpo_req_nk', $data);
+        return $this->db->affected_rows() === 1;
     }
 
     public function getlistdone()

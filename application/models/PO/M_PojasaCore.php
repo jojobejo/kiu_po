@@ -421,14 +421,23 @@ class M_PojasaCore extends CI_Model
             $this->db->trans_rollback();
             return array('success' => false, 'code' => 'INVALID_ACTION');
         }
-        if (in_array($action, array('REVISI', 'REJECT'), true) && trim((string) $note) === '') {
+        if ($stage === 'PURCHASING' && $request->status === 'MENUNGGU_PURCHASING_AWAL'
+            && $action === 'UPDATE' && empty($request->reviewed_at_purchasing)) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'PURCHASING_REVIEW_NOT_SAVED');
+        }
+        $picConfirmation = $stage === 'PIC' && $action === 'ACC';
+        if ((in_array($action, array('REVISI', 'REJECT', 'UPDATE'), true) || $picConfirmation) && trim((string) $note) === '') {
             $this->db->trans_rollback();
             return array('success' => false, 'code' => 'NOTE_REQUIRED');
         }
 
         $approvalRevision = (int) $request->revision_no;
         $isPurchasingRevisionSubmit = $stage === 'PURCHASING'
-            && in_array($request->status, array('REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true);
+            && in_array($request->status, array(
+                'REVISI_PURCHASING_KADEP', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT',
+            ), true)
+            && $action === 'SUBMIT';
         if ($isPurchasingRevisionSubmit) {
             if (empty($request->edit_revision_no)
                 || $request->purchasing_revision_status !== $request->status
@@ -438,7 +447,7 @@ class M_PojasaCore extends CI_Model
             }
             $approvalRevision = (int) $request->edit_revision_no;
         }
-        if ($stage === 'PURCHASING' && $action === 'SUBMIT'
+        if ($stage === 'PURCHASING' && in_array($action, array('SUBMIT', 'TERBITKAN'), true)
             && (empty($request->tgl_mulai_pekerjaan) || empty($request->tgl_selesai_pekerjaan)
                 || $request->tgl_selesai_pekerjaan < $request->tgl_mulai_pekerjaan)) {
             $this->db->trans_rollback();
@@ -497,18 +506,23 @@ class M_PojasaCore extends CI_Model
             $requestUpdate['dirut_ops_approved_revision'] = $approvalRevision;
         }
         if ($stage === 'DIREKTUR' && $action === 'ACC') {
+            $requestUpdate['acc_with_direktur'] = (string) $context['kode_user'];
+            $requestUpdate['acc_at_direktur'] = $now;
+        }
+        if ($stage === 'PURCHASING' && $action === 'TERBITKAN') {
             $spkNumber = $this->generate_spk_number(date('Y-m-d'));
             if ($spkNumber === false) {
                 $this->db->trans_rollback();
                 return array('success' => false, 'code' => 'NUMBER_ERROR');
             }
             $requestUpdate['no_spk'] = $spkNumber;
-            $requestUpdate['acc_with_direktur'] = (string) $context['kode_user'];
-            $requestUpdate['acc_at_direktur'] = $now;
             $requestUpdate['generated_by'] = (string) $context['kode_user'];
             $requestUpdate['generated_at'] = $now;
             if ($this->db->field_exists('estimasi_disetujui', 'tbpo_jasa_request')) {
-                $requestUpdate['estimasi_disetujui'] = (float) $request->estimasi_total;
+                $requestUpdate['estimasi_disetujui'] = $this->db->field_exists('estimasi_purchasing', 'tbpo_jasa_request')
+                    && $request->estimasi_purchasing !== null
+                    ? (float) $request->estimasi_purchasing
+                    : (float) $request->estimasi_total;
             }
             $this->db->insert('tbpo_jasa_spk', array(
                 'kd_po_jasa' => $requestCode,
@@ -530,7 +544,7 @@ class M_PojasaCore extends CI_Model
             return array('success' => false, 'code' => 'CONCURRENT_UPDATE');
         }
 
-        if ($stage === 'DIREKTUR' && $action === 'ACC') {
+        if ($stage === 'PURCHASING' && $action === 'TERBITKAN') {
             $this->load->model('PO/M_PojasaIntegration');
             $purchaseSubmission = $this->M_PojasaIntegration->create_purchase_submission($context, $requestCode);
             if (!$purchaseSubmission['success']) {
@@ -927,8 +941,22 @@ class M_PojasaCore extends CI_Model
     private function createApprovalNotifications($request, $nextStatus, $spkNumber)
     {
         $users = array();
-        if (in_array($nextStatus, array('MENUNGGU_PURCHASING', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true)) {
+        if (in_array($nextStatus, array(
+            'MENUNGGU_PURCHASING_AWAL',
+            'MENUNGGU_PURCHASING',
+            'REVISI_PURCHASING_KADEP',
+            'REVISI_PURCHASING_DIROPS',
+            'REVISI_PURCHASING_DIRUT',
+            'MENUNGGU_PENERBITAN_PURCHASING',
+        ), true)) {
             $users = $this->db->query("SELECT id_user FROM tbpo_user WHERE aksess_lv = 2 AND UPPER(TRIM(departement)) = 'PURCHASING'")->result();
+        } elseif ($nextStatus === 'MENUNGGU_KONFIRMASI_PIC') {
+            $users = $this->db->query('SELECT id_user FROM tbpo_user WHERE kode_user = ?', array($request->kd_user))->result();
+        } elseif ($nextStatus === 'MENUNGGU_KADEP') {
+            $users = $this->db->query(
+                'SELECT id_user FROM tbpo_user WHERE aksess_lv = 5 AND UPPER(TRIM(departement)) = ?',
+                array(pojasa_normalize_department($request->departemen))
+            )->result();
         } elseif ($nextStatus === 'MENUNGGU_DIRUT_OPS') {
             $users = $this->db->query("SELECT id_user FROM tbpo_user WHERE aksess_lv = 6 AND UPPER(TRIM(departement)) IN ('DIREKTUR OPERASIONAL','DIREKTUR OPRASIONAL')")->result();
         } elseif ($nextStatus === 'MENUNGGU_DIREKTUR') {
@@ -949,7 +977,7 @@ class M_PojasaCore extends CI_Model
                 'recipient_user_id' => (int) $user->id_user,
                 'title' => 'Status PO Jasa',
                 'message' => $message,
-                'target_url' => $nextStatus === 'REVISI_PIC' || strpos($nextStatus, 'DITOLAK_') === 0 || in_array($nextStatus, array('PENDING_KADEP', 'SPK_TERBIT'), true)
+                'target_url' => $nextStatus === 'REVISI_PIC' || strpos($nextStatus, 'REVISI_PURCHASING_') === 0 || strpos($nextStatus, 'DITOLAK_') === 0 || in_array($nextStatus, array('PENDING_KADEP', 'SPK_TERBIT'), true)
                     ? base_url('pojasa/pic/detail/' . $request->kd_po_jasa)
                     : base_url('pojasa/workflow/detail/' . $request->kd_po_jasa),
             );

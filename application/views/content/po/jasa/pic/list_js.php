@@ -29,12 +29,11 @@
     },
     columns: [
       { data: 'tgl_request' },
-      { data: 'kd_po_jasa' },
       { data: 'vendor' },
-      { data: 'jadwal' },
-      { data: 'total', className: 'text-right' },
-      { data: 'status', orderable: false },
-      { data: 'actions', orderable: false, searchable: false }
+      { data: 'total', className: 'text-left' },
+      { data: 'status', orderable: false, className: 'pojasa-pic-status-column text-left align-middle' },
+      { data: 'po_pembelian_status', orderable: false, searchable: false, className: 'pojasa-pic-status-column text-left align-middle' },
+      { data: 'actions', orderable: false, searchable: false, className: 'pojasa-pic-actions-column text-center align-middle' }
     ],
     language: {
       processing: 'Memuat data...',
@@ -76,12 +75,12 @@
   $(document).on('click', '.btn-delete-draft', function() {
     var code = String($(this).data('code') || '');
     Swal.fire({
-      title: 'Hapus draft?',
-      text: code + ' akan disembunyikan dari daftar. Riwayat audit tetap disimpan.',
+      title: 'Hapus data PO Jasa?',
+      text: code + ' akan dihapus dari daftar. Riwayat audit tetap disimpan.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
-      confirmButtonText: 'Ya, hapus draft',
+      confirmButtonText: 'Ya, hapus',
       cancelButtonText: 'Batal'
     }).then(function(result) {
       if (!result.value) {

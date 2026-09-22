@@ -9,6 +9,7 @@
   var receiptUrl = <?= json_encode(base_url('pojasa/ajax/stock/confirm-receipt')) ?>;
   var costUrl = <?= json_encode(base_url('pojasa/ajax/cost/save')) ?>;
   var costUpdateUrl = <?= json_encode(base_url('pojasa/ajax/cost/update')) ?>;
+  var pickupUrl = <?= json_encode(base_url('pojasa/ajax/pic/pickup/request')) ?>;
   var documentBase = <?= json_encode(base_url('pojasa/pic/document/')) ?>;
   var state = <?= json_encode($this->M_PojasaExecution->get_state(pojasa_session_context(), $request->kd_po_jasa)) ?>;
 
@@ -63,9 +64,11 @@
     $('#pojasaProgressBody').html(progress || '<tr><td colspan="8" class="text-center text-muted">Belum ada progress.</td></tr>');
 
     var receipts = (state.receipts || []).map(function (row) {
-      return '<tr><td>' + escapeHtml(row.receipt_at) + '</td><td>' + escapeHtml(row.no_receipt) + '</td><td>' + escapeHtml(row.nama_material) + '</td><td>' + escapeHtml(row.qty_received + ' ' + row.satuan) + '</td><td>' + escapeHtml(row.id_transnk) + '</td></tr>';
+      var source = row.record_type === 'REVERSAL' ? 'Reversal ON_HAND Purchasing' : (row.receipt_source === 'ON_HAND_PURCHASING' ? 'ON_HAND Purchasing' : (row.receipt_source === 'ON_HAND_LEGACY_PO' ? 'ON HAND PO Pembelian' : 'Penerimaan PIC'));
+      var account = row.kd_akun || (row.receipt_source === 'ON_HAND_PURCHASING' ? '11511' : '11512');
+      return '<tr><td>' + escapeHtml(row.receipt_at) + '</td><td>' + escapeHtml(row.no_receipt) + '</td><td>' + escapeHtml(source) + '</td><td>' + escapeHtml(row.nama_material) + '</td><td>' + escapeHtml(row.qty_received + ' ' + row.satuan) + '</td><td>' + escapeHtml(account + ' / ' + row.id_transnk) + '</td></tr>';
     }).join('');
-    $('#pojasaReceiptBody').html(receipts || '<tr><td colspan="5" class="text-center text-muted">Belum ada penerimaan material.</td></tr>');
+    $('#pojasaReceiptBody').html(receipts || '<tr><td colspan="6" class="text-center text-muted">Belum ada penerimaan material.</td></tr>');
 
     var costs = (state.costs || []).map(function (row) {
       var evidenceUrl = row.evidence_url || '';
@@ -80,6 +83,10 @@
     }).join('');
     $('#pojasaReceiptInputBody').html(allocationRows || '<tr><td colspan="4" class="text-center text-muted">Tidak ada reservasi yang menunggu penerimaan.</td></tr>');
   }
+  $('#pojasaPickupRequest').on('click', function () {
+    var button=$(this).prop('disabled',true);
+    $.post(pickupUrl,{kd_po_jasa:requestCode,idempotency_token:uuid(),csrf_token:csrfToken},null,'json').done(function(r){alertResult(r.success?'success':'error',r.success?'Berhasil':'Gagal',r.message);if(r.success) window.location.reload();}).fail(function(xhr){alertResult('error','Gagal',messageFrom(xhr));}).always(function(){button.prop('disabled',false);});
+  });
 
   $('#pojasaProgressModal, #pojasaReceiptModal, #pojasaCostModal').on('show.bs.modal', function () {
     $(this).find('[name="idempotency_token"]').val(uuid());

@@ -877,8 +877,8 @@
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Upload file<span class="required">*</span></label>
-                            <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept="img/*">
-                                <label class="custom-file-label" for="customFile">Pilih Gambar</label>
+                            <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.csv,.xls,.xlsx,.doc,.docx" required>
+                                <label class="custom-file-label" for="customFile">Pilih File</label>
                             </div>
                         </div>
                     </div>
@@ -895,7 +895,7 @@
     </div>
 <?php endforeach; ?>
 <?php foreach ($flupload as $f) :
-    $imagePath = "../images/filepndukung/" . $f->file_uploaded; ?>
+    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk); ?>
     <div class="modal fade" id="openflnk<?= $f->id_file_nk ?>">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1031,9 +1031,9 @@
                 </div>
                 <div class="form-group">
                     <div class="row">
-                        <label class="col-sm-3 control-label text-right" for="kd_user">Upload Gambar<span class="required">*</span></label>
-                        <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept="img/*">
-                            <label class="custom-file-label" for="customFile">Pilih Gambar</label>
+                        <label class="col-sm-3 control-label text-right" for="kd_user">Upload Bukti<span class="required">*</span></label>
+                        <div class="col-sm-8"><input type="file" class="custom-file-input" id="gambar_1" name="gambar_1" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.csv,.xls,.xlsx,.doc,.docx" required>
+                            <label class="custom-file-label" for="gambar_1">Pilih File</label>
                         </div>
                     </div>
                 </div>

@@ -803,6 +803,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="<?= base_url('reqpicpickupapproval') ?>" class="nav-link">
+              <i class="nav-icon fas fa-hand-holding"></i>
+              <p>
+                Approval Pengambilan
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="<?= base_url('pojasa/workflow') ?>" class="nav-link">
               <i class="nav-icon fas fa-tools"></i>
               <p>

@@ -1,6 +1,6 @@
 # Modul PO Jasa
 
-Dokumen ini merangkum instalasi dan penggunaan implementasi PO Jasa sampai Fase 8. Modul menggunakan tabel berawalan `tbpo_`, session/login CodeIgniter 3, policy backend, transaksi InnoDB, DataTables, Bootstrap, jQuery, dan SweetAlert yang telah tersedia di proyek.
+Dokumen ini merangkum instalasi dan penggunaan implementasi PO Jasa sampai Fase 9. Modul menggunakan tabel berawalan `tbpo_`, session/login CodeIgniter 3, policy backend, transaksi InnoDB, DataTables, Bootstrap, jQuery, dan SweetAlert yang telah tersedia di proyek.
 
 ## Instalasi database
 
@@ -14,9 +14,15 @@ mysql -u USER -p DATABASE < database/sql/pojasa_phase5_purchasing_stock_spk_2026
 mysql -u USER -p DATABASE < database/sql/pojasa_phase6_execution_finalization_20260910.sql
 mysql -u USER -p DATABASE < database/sql/pojasa_phase7_limited_improvements_20260910.sql
 mysql -u USER -p DATABASE < database/sql/pojasa_phase8_purchase_revision_cost_20260911.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase9_sequential_approval_flow_20260911.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase10_material_catalog_20260914.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase11_purchasing_review_20260914.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase12_pic_purchasing_confirmation_20260914.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase13_estimasi_header_dan_alur_approval_20260914.sql
+mysql -u USER -p DATABASE < database/sql/pojasa_phase15_keep_purchase_in_process_20260915.sql
 ```
 
-Migration Fase 2–8 bersifat aditif dan idempotent. Migration tidak membuat user, tidak menghapus data, dan tidak mengubah transaksi stok existing. Pastikan seluruh tabel memakai InnoDB agar rollback dan penguncian baris bekerja.
+Migration Fase 2–9 bersifat idempotent. Migration tidak membuat user, tidak menghapus data, dan tidak mengubah transaksi stok existing. Fase 9 memetakan status request aktif ke checkpoint alur baru tanpa mengubah request yang telah selesai. Pastikan seluruh tabel memakai InnoDB agar rollback dan penguncian baris bekerja.
 
 ## Role dan prasyarat user
 
@@ -25,13 +31,19 @@ Migration Fase 2–8 bersifat aditif dan idempotent. Migration tidak membuat use
 - Direktur: level 3 dengan departemen `DIREKTUR`.
 - PIC: level 4; hanya request miliknya.
 - KADEP: level 5; hanya departemennya.
-- Direktur Operasional: level 6 dengan departemen `DIREKTUR OPERASIONAL`. Ejaan database `DIREKTUR OPRASIONAL` dinormalisasi oleh policy.
+- Direktur Operasional: level 6 dengan departemen `DIREKTUR OPERASIONAL` dan memproses seluruh departemen. Ejaan database `DIREKTUR OPRASIONAL` dinormalisasi oleh policy.
 
-Database lokal saat dokumentasi ini dibuat belum mempunyai user level 6. Setup user tersebut adalah prasyarat pengujian manual alur IT/HRD/GA dan tidak dilakukan otomatis oleh migration.
+User level 6 Direktur Operasional wajib tersedia karena seluruh request harus melewati tahap tersebut. User tidak dibuat otomatis oleh migration.
 
 ## Status bisnis
 
-`DRAFT`, `MENUNGGU_KADEP`, `PENDING_KADEP`, `REVISI_PIC`, `MENUNGGU_PURCHASING`, `MENUNGGU_DIRUT_OPS`, `REVISI_PURCHASING_DIROPS`, `MENUNGGU_DIREKTUR`, `REVISI_PURCHASING_DIRUT`, `SPK_TERBIT`, `ON_PROGRESS`, `SELESAI`, `DITUTUP`, `DITOLAK_KADEP`, `DITOLAK_DIRUT_OPS`, dan `DITOLAK_DIREKTUR`.
+Alur utama wajib: `PIC → PURCHASING (harga pembanding) → PIC (konfirmasi kesepakatan) → KADEP → DIREKTUR OPERASIONAL → DIREKTUR → SPK TERBIT & PO PEMBELIAN OTOMATIS`.
+
+Setelah KADEP menyetujui, request langsung ke Direktur Operasional tanpa kembali ke Purchasing. Setelah Direktur Operasional menyetujui, request langsung ke Direktur. Revisi dari tahap mana pun kembali ke PIC dan saat diajukan ulang kembali melalui pemeriksaan awal Purchasing, sehingga approval dimulai kembali dari PIC.
+
+Header request menyimpan dua nilai terpisah: `Estimasi PIC` (`estimasi_total`) dan `Estimasi Purchasing` (`estimasi_purchasing`). Estimasi Purchasing diisi otomatis dari hasil review harga pembanding; revisi PIC mengosongkannya sampai review awal berikutnya selesai.
+
+Status workflow: `DRAFT`, `MENUNGGU_PURCHASING_AWAL`, `MENUNGGU_KONFIRMASI_PIC`, `MENUNGGU_KADEP`, `PENDING_KADEP`, `REVISI_PIC`, `MENUNGGU_DIRUT_OPS`, `MENUNGGU_DIREKTUR`, `SPK_TERBIT`, `ON_PROGRESS`, `SELESAI`, `DITUTUP`, `DITOLAK_KADEP`, `DITOLAK_DIRUT_OPS`, dan `DITOLAK_DIREKTUR`.
 
 Status pekerjaan PIC adalah `BELUM_DIMULAI`, `ON_PROGRESS`, `SELESAI`, dan `DITUTUP`. Progress tidak boleh mundur. `SELESAI` wajib 100%, sedangkan `DITUTUP` hanya dapat dibuat setelah request berstatus `SELESAI`.
 
@@ -53,6 +65,7 @@ Status pekerjaan PIC adalah `BELUM_DIMULAI`, `ON_PROGRESS`, `SELESAI`, dan `DITU
 - `POST /pojasa/ajax/purchasing/purchase/submit` — buat satu PO Pembelian komprehensif dari draft aktif.
 - `POST /pojasa/ajax/purchasing/purchase/receive` dan `/reverse` — penerimaan parsial/ON_HAND dan reversal aditif.
 - `POST /pojasa/ajax/purchasing/change/submit` dan `/decide` — revisi data/biaya pasca-SPK.
+- `GET /pojasa/ajax/pic/material-catalog` — pencarian Select2 katalog `tbpo_barang_nk` untuk form PIC.
 - `GET /pojasa/ajax/notifications` dan `POST /pojasa/ajax/notifications/read` — polling notifikasi.
 
 Semua endpoint mutasi mengharuskan login, AJAX, method POST, CSRF modul, otorisasi berbasis role/departemen/owner, validasi status asal, dan validasi input server-side.
@@ -69,7 +82,7 @@ Semua endpoint mutasi mengharuskan login, AJAX, method POST, CSRF modul, otorisa
 ## Integrasi PO Pembelian dan revisi pasca-SPK
 
 - Ketika Direktur meng-ACC dan SPK diterbitkan, semua draft pembelian aktif dikirim menjadi satu header `tbpo_po_nk` berstatus `PROSES PEMBELIAN`. Mapping request/SPK/material/draft tersimpan eksplisit dan replay tidak menggandakan PO.
-- Tabel lama tidak memiliki status literal `ON_HAND`. Modul memetakan seluruh detail diterima ke status legacy `DONE`, sedangkan tabel integrasi tetap menyimpan `ON_HAND`/`PARTIAL_ON_HAND`.
+- Header PO Pembelian otomatis PO Jasa selalu berstatus legacy `PROSES PEMBELIAN` agar tetap berada pada antrian monitoring lintas peran. Status pemenuhan material disimpan terpisah pada tabel integrasi sebagai `ON_HAND`/`PARTIAL_ON_HAND`.
 - Kolom quantity dan harga PO Pembelian lama bertipe integer. Draft dengan quantity atau harga pecahan ditolak dengan pesan kompatibilitas; nilai tidak dibulatkan diam-diam.
 - Penerimaan dapat parsial. Setiap penerimaan membentuk biaya aktual otomatis dari harga aktual, tanpa membuat transaksi stok. Reversal membuat record penerimaan dan biaya negatif; record asal tidak dihapus.
 - Perubahan data atau biaya setelah SPK diajukan Purchasing. Departemen IT/HRD/GA melewati Direktur Operasional kemudian Direktur; departemen lain langsung Direktur. Aksi hanya `ACC`, `REVISI`, atau `REJECT`.
@@ -92,6 +105,7 @@ php index.php cli/PojasaPhase5Check
 php index.php cli/PojasaPhase6Check
 php index.php cli/PojasaPhase7Check
 php index.php cli/PojasaPhase8Check
+php index.php cli/PojasaPhase9Check
 ```
 
 Checklist manual:
@@ -103,7 +117,7 @@ Checklist manual:
 - Pastikan hanya penerimaan menghasilkan transaksi `11512`; reservasi tidak membuat transaksi dan tidak ada `11511` untuk stok existing.
 - Uji biaya tanpa bukti, sumber stok, draft pembelian request lain, replay token, PIC lain, Purchasing, dan session berakhir.
 - Uji badge notifikasi saat tab aktif/nonaktif dan dashboard PIC/KADEP/Purchasing/Direktur/Admin.
-- Setup user level 6 secara manual lalu uji alur IT/HRD/GA sampai Direktur.
+- Uji alur penuh: PIC, Purchasing, konfirmasi PIC, KADEP, Direktur Operasional, lalu Direktur.
 
 ## Dependency dan keterbatasan
 

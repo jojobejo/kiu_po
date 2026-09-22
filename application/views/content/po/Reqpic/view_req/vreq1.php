@@ -11,7 +11,10 @@
                             <a href="<?= base_url('reqpic') ?>" class="btn btn-md btn-primary btn-block"><i class="fas fa-home"></i></a>
                         </div>
                         <div class="col-sm mb-2">
-                            <a href="<?= base_url('reqpicaccreq') ?>" class="btn btn-md btn-warning btn-block"><b>REQUEST ACC</b></a>
+                            <button type="button" class="btn btn-md btn-warning btn-block js-request-scope active" data-scope="request_acc"><b>REQUEST ACC</b></button>
+                        </div>
+                        <div class="col-sm mb-2">
+                            <button type="button" class="btn btn-md btn-secondary btn-block js-request-scope" data-scope="all"><b>ALL PENGAJUAN</b></button>
                         </div>
                         <div class="col-sm mb-2">
                             <a href="<?= base_url('index_brsedia') ?>" class="btn btn-md btn-info btn-block"><b>BARANG TERSEDIA</b></a>
@@ -32,45 +35,7 @@
                                 <td>#</td>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($getlistpic as $g) : ?>
-                                <tr>
-                                    <td><?= $g->nm_user ?></td>
-                                    <td><?= $g->departemen ?></td>
-                                    <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
-                                    <td style="width: min-content;"><?= $g->tj_pembelian ?></td>
-                                    <td>
-                                        <a class="btn btn-block btn-warning btn-sm m-1"><b><?= $g->status ?></b></a>
-                                    </td>
-                                    <td>
-                                        <?php if ($g->status_po == 'ON PROGRESS - KADEP') : ?>
-                                            <a class="btn btn-block btn-warning btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'ACC-KADEP') : ?>
-                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'SEDANG DIAJUKAN') : ?>
-                                            <a class="btn btn-block btn-warning btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'ACC DIREKTUR') : ?>
-                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'PROSES PEMBELIAN') : ?>
-                                            <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'DONE') : ?>
-                                            <a class="btn btn-block btn-success btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == 'REJECT') : ?>
-                                            <a class="btn btn-block btn-danger btn-sm"><b><?= $g->status_po ?></b></a>
-                                        <?php elseif ($g->status_po == '0') : ?>
-                                            <a class="btn btn-block btn-secondary btn-sm"><b>BARANG READY</b></a>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <div class="row">
-                                            <div class="col">
-                                                <a class="btn btn-block btn-primary btn-sm" href="<?= base_url('reqpic/detreqbarangpic/' . $g->kd_po_nk) ?>"><i class="fas fa-eye"></i></a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
 
                 </div> <!-- END CARD BODY -->
@@ -78,3 +43,27 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var table = $('#list_reqpic').DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        pageLength: 10,
+        order: [],
+        ajax: {
+            url: <?= json_encode(base_url('reqpic/ajax/request-list')) ?>,
+            data: function (data) { data.scope = $('#list_reqpic').data('scope') || 'request_acc'; }
+        }
+    });
+
+    $(document).on('click', '.js-request-scope', function () {
+        var button = $(this);
+        $('#list_reqpic').data('scope', button.data('scope'));
+        $('.js-request-scope').removeClass('active btn-warning').addClass('btn-secondary');
+        button.removeClass('btn-secondary').addClass('active btn-warning');
+        table.ajax.reload();
+    });
+});
+</script>

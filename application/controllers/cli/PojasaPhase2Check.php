@@ -47,7 +47,7 @@ class PojasaPhase2Check extends CI_Controller
 
     private function testStatusAndAuthorization()
     {
-        $this->assert('status_count', count(pojasa_statuses()) === 16, pojasa_statuses());
+        $this->assert('status_count', count(pojasa_statuses()) === 18, pojasa_statuses());
         $this->assert('department_typo_normalized', pojasa_normalize_department('Direktur Oprasional') === 'DIREKTUR OPERASIONAL');
         $this->assert('finance_level_2_excluded', pojasa_role_from_context(2, 'KEUANGAN') === 'NONE');
         $this->assert('purchasing_exact_policy', pojasa_role_from_context(2, 'PURCHASING') === 'PURCHASING');
@@ -55,9 +55,11 @@ class PojasaPhase2Check extends CI_Controller
         $this->assert('director_ops_no_pending', pojasa_next_status('MENUNGGU_DIRUT_OPS', 'PENDING', 'IT') === false);
         $this->assert('director_no_pending', pojasa_next_status('MENUNGGU_DIREKTUR', 'PENDING', 'SALES') === false);
         $this->assert('director_acc_issues_spk', pojasa_next_status('MENUNGGU_DIREKTUR', 'ACC', 'SALES') === 'SPK_TERBIT');
-        $this->assert('it_routes_to_director_ops', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'IT', false) === 'MENUNGGU_DIRUT_OPS');
-        $this->assert('it_after_director_ops_routes_to_director', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'IT', true) === 'MENUNGGU_DIREKTUR');
-        $this->assert('other_department_routes_to_director', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'SALES', false) === 'MENUNGGU_DIREKTUR');
+        $this->assert('pic_routes_to_initial_purchasing', pojasa_next_status('DRAFT', 'SUBMIT', 'SALES') === 'MENUNGGU_PURCHASING_AWAL');
+        $this->assert('initial_purchasing_routes_to_kadep', pojasa_next_status('MENUNGGU_PURCHASING_AWAL', 'SUBMIT', 'SALES') === 'MENUNGGU_KADEP');
+        $this->assert('post_kadep_purchasing_routes_to_ops', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'SALES', false) === 'MENUNGGU_DIRUT_OPS');
+        $this->assert('post_ops_purchasing_routes_to_director', pojasa_next_status('MENUNGGU_PURCHASING_DIROPS', 'SUBMIT', 'SALES') === 'MENUNGGU_DIREKTUR');
+        $this->assert('legacy_post_ops_status_routes_to_director', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'IT', true) === 'MENUNGGU_DIREKTUR');
 
         $request = (object) array('kd_user' => 'PIC001', 'departemen' => 'IT');
         $picOwner = array('role' => 'PIC', 'kode_user' => 'PIC001', 'departemen' => 'IT');

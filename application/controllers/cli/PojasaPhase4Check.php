@@ -28,7 +28,7 @@ class PojasaPhase4Check extends CI_Controller
             'checks' => $this->checks,
             'prerequisites' => array(
                 'director_ops_level_6_user_present' => $directorOpsCount > 0,
-                'note' => $directorOpsCount > 0 ? 'User Direktur Operasional tersedia.' : 'UAT DirOps memerlukan setup user level 6; pengujian transaksi menggunakan context policy sintetis tanpa membuat user.',
+                'note' => $directorOpsCount > 0 ? 'User Direktur Operasional tersedia.' : 'UAT seluruh alur memerlukan user level 6; pengujian transaksi menggunakan context policy sintetis tanpa membuat user.',
             ),
         ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
         if ($failed) { exit(1); }
@@ -40,6 +40,9 @@ class PojasaPhase4Check extends CI_Controller
         $this->assert('kadep_pending_has_no_second_pending', pojasa_workflow_actions('PENDING_KADEP') === array('ACC', 'REVISI', 'REJECT'));
         $this->assert('director_ops_no_pending', !in_array('PENDING', pojasa_workflow_actions('MENUNGGU_DIRUT_OPS'), true));
         $this->assert('director_no_pending', !in_array('PENDING', pojasa_workflow_actions('MENUNGGU_DIREKTUR'), true));
+        $this->assert('initial_purchasing_routes_kadep', pojasa_next_status('MENUNGGU_PURCHASING_AWAL', 'SUBMIT', 'KEUANGAN') === 'MENUNGGU_KADEP');
+        $this->assert('post_kadep_purchasing_routes_ops_for_all_departments', pojasa_next_status('MENUNGGU_PURCHASING', 'SUBMIT', 'KEUANGAN') === 'MENUNGGU_DIRUT_OPS');
+        $this->assert('post_ops_purchasing_routes_director', pojasa_next_status('MENUNGGU_PURCHASING_DIROPS', 'SUBMIT', 'KEUANGAN') === 'MENUNGGU_DIREKTUR');
         $this->assert('purchasing_revision_returns_ops', pojasa_next_status('REVISI_PURCHASING_DIROPS', 'SUBMIT', 'GA') === 'MENUNGGU_DIRUT_OPS');
         $this->assert('purchasing_revision_returns_director', pojasa_next_status('REVISI_PURCHASING_DIRUT', 'SUBMIT', 'SALES') === 'MENUNGGU_DIREKTUR');
     }
@@ -72,7 +75,9 @@ class PojasaPhase4Check extends CI_Controller
     private function testSpecialDepartmentHappyPath($f)
     {
         $code = 'P4TESTGAHAPPY01';
-        $this->createRequest($code, 'GA', 'MENUNGGU_KADEP', $f['pic']);
+        $this->createRequest($code, 'GA', 'MENUNGGU_PURCHASING_AWAL', $f['pic']);
+        $initialPurchasing = $this->approve($f['purchasing'], $code, 'SUBMIT');
+        $this->assert('ga_initial_purchasing_routes_to_kadep', $initialPurchasing['success'] && $initialPurchasing['status'] === 'MENUNGGU_KADEP', $initialPurchasing);
         $wrong = $this->approve($f['kadep_keu'], $code, 'ACC');
         $this->assert('kadep_other_department_denied', !$wrong['success'] && $wrong['code'] === 'FORBIDDEN', $wrong);
         $kadep = $this->approve($f['kadep_ga'], $code, 'ACC');
@@ -85,7 +90,7 @@ class PojasaPhase4Check extends CI_Controller
         $this->assert('ops_pending_rejected', !$pendingOps['success'] && $pendingOps['code'] === 'INVALID_ACTION', $pendingOps);
         $ops = $this->approve($f['director_ops'], $code, 'ACC');
         $request = $this->M_PojasaCore->get_request($code);
-        $this->assert('ops_acc_returns_to_purchasing', $ops['success'] && $ops['status'] === 'MENUNGGU_PURCHASING' && (int) $request->dirut_ops_approved_revision === 1, $ops);
+        $this->assert('ops_acc_returns_to_purchasing', $ops['success'] && $ops['status'] === 'MENUNGGU_PURCHASING_DIROPS' && (int) $request->dirut_ops_approved_revision === 1, $ops);
         $toDirector = $this->approve($f['purchasing'], $code, 'SUBMIT');
         $this->assert('post_ops_purchasing_routes_director', $toDirector['success'] && $toDirector['status'] === 'MENUNGGU_DIREKTUR', $toDirector);
         $director = $this->approve($f['director'], $code, 'ACC');
@@ -106,10 +111,16 @@ class PojasaPhase4Check extends CI_Controller
     private function testNormalDepartmentHappyPath($f)
     {
         $code = 'P4TESTKEUHAPPY1';
-        $this->createRequest($code, 'KEUANGAN', 'MENUNGGU_KADEP', $f['pic']);
+        $this->createRequest($code, 'KEUANGAN', 'MENUNGGU_PURCHASING_AWAL', $f['pic']);
+        $initialPurchasing = $this->approve($f['purchasing'], $code, 'SUBMIT');
+        $this->assert('normal_initial_purchasing_routes_to_kadep', $initialPurchasing['success'] && $initialPurchasing['status'] === 'MENUNGGU_KADEP', $initialPurchasing);
         $this->approve($f['kadep_keu'], $code, 'ACC');
+        $toOps = $this->approve($f['purchasing'], $code, 'SUBMIT');
+        $this->assert('all_departments_route_to_ops', $toOps['success'] && $toOps['status'] === 'MENUNGGU_DIRUT_OPS', $toOps);
+        $ops = $this->approve($f['director_ops'], $code, 'ACC');
+        $this->assert('normal_ops_returns_to_purchasing', $ops['success'] && $ops['status'] === 'MENUNGGU_PURCHASING_DIROPS', $ops);
         $toDirector = $this->approve($f['purchasing'], $code, 'SUBMIT');
-        $this->assert('non_special_skips_ops', $toDirector['success'] && $toDirector['status'] === 'MENUNGGU_DIREKTUR', $toDirector);
+        $this->assert('normal_post_ops_purchasing_routes_director', $toDirector['success'] && $toDirector['status'] === 'MENUNGGU_DIREKTUR', $toDirector);
         $director = $this->approve($f['director'], $code, 'ACC');
         $this->assert('director_acc_atomically_issues_spk_normal', $director['success'] && $director['status'] === 'SPK_TERBIT' && !empty($director['no_spk']), $director);
     }
@@ -131,9 +142,9 @@ class PojasaPhase4Check extends CI_Controller
         $save = $this->M_PojasaPic->save_draft($f['pic'], $revisionCode, $header, array(array('nama_scope' => 'Scope revisi', 'deskripsi' => 'Revisi PIC', 'qty' => 1, 'satuan' => 'LOT', 'harga_estimasi' => 150000)), array());
         $submit = $this->M_PojasaPic->submit_request($f['pic'], $revisionCode);
         $revisionRow = $this->db->get_where('tbpo_jasa_revisi', array('kd_po_jasa' => $revisionCode, 'revision_no' => 2))->row();
-        $this->assert('pic_revision_resubmits_to_kadep', $save['success'] && $submit['success'] && $submit['status'] === 'MENUNGGU_KADEP' && !empty($revisionRow->submitted_at), array($save, $submit));
-        $kadepNotification = (int) $this->db->where(array('kd_po_jasa' => $revisionCode, 'recipient_user_id' => $f['kadep_keu']['id_user'], 'event_type' => 'MENUNGGU_KADEP'))->count_all_results('tbpo_jasa_notifikasi');
-        $this->assert('revision_resubmit_notifies_kadep', $kadepNotification > 0, $kadepNotification);
+        $this->assert('pic_revision_resubmits_to_initial_purchasing', $save['success'] && $submit['success'] && $submit['status'] === 'MENUNGGU_PURCHASING_AWAL' && !empty($revisionRow->submitted_at), array($save, $submit));
+        $purchasingNotification = (int) $this->db->where(array('kd_po_jasa' => $revisionCode, 'recipient_user_id' => $f['purchasing']['id_user'], 'event_type' => 'MENUNGGU_PURCHASING_AWAL'))->count_all_results('tbpo_jasa_notifikasi');
+        $this->assert('revision_resubmit_notifies_purchasing', $purchasingNotification > 0, $purchasingNotification);
 
         $pendingCode = 'P4TESTPENDING01';
         $this->createRequest($pendingCode, 'KEUANGAN', 'MENUNGGU_KADEP', $f['pic']);
@@ -186,7 +197,7 @@ class PojasaPhase4Check extends CI_Controller
         }
         $gaRequest = $this->M_PojasaCore->get_request('P4TESTREJOPS01');
         $keuRequest = $this->M_PojasaCore->get_request('P4TESTREJDIR01');
-        $this->assert('director_ops_access_only_special_departments', $this->M_PojasaWorkflow->can_access_request($f['director_ops'], $gaRequest) && !$this->M_PojasaWorkflow->can_access_request($f['director_ops'], $keuRequest));
+        $this->assert('director_ops_accesses_all_departments', $this->M_PojasaWorkflow->can_access_request($f['director_ops'], $gaRequest) && $this->M_PojasaWorkflow->can_access_request($f['director_ops'], $keuRequest));
         $this->assert('kadep_access_only_own_department', $this->M_PojasaWorkflow->can_access_request($f['kadep_ga'], $gaRequest) && !$this->M_PojasaWorkflow->can_access_request($f['kadep_ga'], $keuRequest));
         $approval = $this->db->get_where('tbpo_jasa_approval', array('kd_po_jasa' => 'P4TESTREJDIR01'))->row();
         $logCount = (int) $this->db->where('kd_po_jasa', 'P4TESTREJDIR01')->count_all_results('tbpo_jasa_log_aktivitas');

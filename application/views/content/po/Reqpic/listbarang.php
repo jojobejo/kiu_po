@@ -49,7 +49,13 @@
                                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox">Buka File</a>
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-block btn-success btn-sm " data-toggle="modal" data-target="#addreq<?= $l->kode_sys ?>">
+                                        <a href="#" class="btn btn-block btn-success btn-sm js-add-request-item" data-toggle="modal" data-target="#addreq"
+                                            data-kode-sys="<?= htmlspecialchars($l->kode_sys, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-kode-adm="<?= htmlspecialchars($l->kode_adm, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-satuan="<?= htmlspecialchars($l->id_satuan, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-kategori="<?= htmlspecialchars($l->kat_barang, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-nama="<?= htmlspecialchars($l->nama_barang, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-deskripsi="<?= htmlspecialchars($l->descnk, ENT_QUOTES, 'UTF-8') ?>">
                                             <i class="fa fa-solid fa-cart-plus"></i>
                                         </a>
                                     </td>

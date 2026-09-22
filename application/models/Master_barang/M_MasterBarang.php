@@ -315,6 +315,36 @@ class M_MasterBarang extends CI_Model
         JOIN tbpo_satuan b ON b.id_satuan = a.satuan 
         JOIN tbpo_user c ON c.kode_user = a.req_by");
     }
+
+    public function get_pojasa_material_usulan()
+    {
+        return $this->db->select('u.*, r.nm_user, r.departemen')
+            ->from('tbpo_jasa_material_usulan u')->join('tbpo_jasa_request r', 'r.kd_po_jasa = u.kd_po_jasa', 'left')
+            ->order_by("FIELD(u.status_usulan, 'SUBMITTED', 'REVISION_REQUIRED', 'MAPPED_EXISTING', 'APPROVED_NEW_MASTER', 'REJECTED')", '', false)
+            ->order_by('u.created_at', 'DESC')->get()->result();
+    }
+
+    public function decide_pojasa_material_usulan($id, $action, $actorId, $note, $masterId = null)
+    {
+        $this->db->trans_begin();
+        $proposal = $this->db->query('SELECT * FROM tbpo_jasa_material_usulan WHERE id_usulan_barang = ? FOR UPDATE', array((int) $id))->row();
+        if (!$proposal || !in_array($proposal->status_usulan, array('SUBMITTED', 'REVISION_REQUIRED'), true)) {
+            $this->db->trans_rollback(); return false;
+        }
+        $update = array('status_usulan' => $action, 'catatan_purchasing' => $note, 'reviewed_by' => (int) $actorId, 'reviewed_at' => date('Y-m-d H:i:s'));
+        if ($action === 'MAPPED_EXISTING' || $action === 'APPROVED_NEW_MASTER') {
+            $master = $this->db->get_where('tbpo_barang_nk', array('id_brg_nk' => (int) $masterId))->row();
+            if (!$master) { $this->db->trans_rollback(); return false; }
+            $update['id_brg_nk_hasil'] = (int) $master->id_brg_nk;
+            $update['kd_barang_hasil'] = $master->kd_barang;
+            $this->db->where('id_usulan_barang', (int) $id)->update('tbpo_jasa_material', array(
+                'id_brg_nk' => (int) $master->id_brg_nk, 'reference_type' => 'MASTER', 'kd_barang_snapshot' => $master->kd_barang
+            ));
+        }
+        $this->db->where('id_usulan_barang', (int) $id)->update('tbpo_jasa_material_usulan', $update);
+        if ($this->db->trans_status() === false) { $this->db->trans_rollback(); return false; }
+        $this->db->trans_commit(); return true;
+    }
     public function get_all_req_barang_pic($kdu)
     {
         return $this->db->query("SELECT a.id_reqmbarang,c.nama_user , a.nama_barang , a.deskripsi , b.nm_satuan , c.departement

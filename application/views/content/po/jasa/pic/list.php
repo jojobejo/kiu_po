@@ -1,4 +1,25 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<style>
+  #pojasaPicTable .pojasa-pic-actions-column {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  #pojasaPicTable .pojasa-pic-status-column {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  #pojasaPicTable .pojasa-pic-actions {
+    display: inline-flex;
+    gap: .25rem;
+    white-space: nowrap;
+  }
+
+  #pojasaPicTable .pojasa-pic-actions .btn {
+    margin-right: 0 !important;
+  }
+</style>
 <div class="content-wrapper">
   <div class="content-header">
     <div class="container-fluid">
@@ -31,7 +52,7 @@
                 <select id="filterStatus" class="form-control">
                   <option value="">Semua status</option>
                   <?php foreach ($statuses as $status) : ?>
-                    <option value="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?></option>
+                    <option value="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(isset($status_labels[$status]) ? $status_labels[$status] : $status, ENT_QUOTES, 'UTF-8') ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
@@ -63,12 +84,11 @@
               <thead>
                 <tr>
                   <th>Tanggal</th>
-                  <th>Kode Request</th>
                   <th>Vendor Usulan</th>
-                  <th>Jadwal</th>
                   <th>Total Estimasi</th>
                   <th>Status</th>
-                  <th style="min-width:150px">Aksi</th>
+                  <th>Status PO Pembelian</th>
+                  <th class="pojasa-pic-actions-column">Aksi</th>
                 </tr>
               </thead>
             </table>

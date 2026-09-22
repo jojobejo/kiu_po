@@ -23,10 +23,12 @@ class M_PojasaIntegration extends CI_Model
 
         return $this->db->field_exists('source_module', 'tbpo_po_nk')
             && $this->db->field_exists('source_material_id', 'tbpo_detail_po_nk')
-            && $this->db->field_exists('source_type', 'tbpo_jasa_biaya_aktual');
+            && $this->db->field_exists('source_type', 'tbpo_jasa_biaya_aktual')
+            && $this->db->field_exists('revision_no', 'tbpo_jasa_draft_pembelian')
+            && $this->db->field_exists('id_transnk', 'tbpo_jasa_purchase_receipt');
     }
 
-    public function create_purchase_submission($context, $requestCode, $token = null)
+    public function create_purchase_submission($context, $requestCode, $token = null, $developmentMode = false)
     {
         $ownsTransaction = !$this->db->trans_active();
         if ($ownsTransaction) {
@@ -38,22 +40,33 @@ class M_PojasaIntegration extends CI_Model
 
         $request = $this->db->query('SELECT * FROM tbpo_jasa_request WHERE kd_po_jasa=? FOR UPDATE', array($requestCode))->row();
         $spk = $this->db->query('SELECT * FROM tbpo_jasa_spk WHERE kd_po_jasa=? FOR UPDATE', array($requestCode))->row();
-        if (!$request || !$spk || empty($request->no_spk)) {
+        if (!$request || (!$developmentMode && (!$spk || empty($request->no_spk)))) {
             return $this->finishFailure($ownsTransaction, 'SPK_NOT_FOUND');
         }
-        if (!in_array($context['role'], array('ADMIN', 'PURCHASING', 'DIREKTUR'), true)) {
+        if (!in_array($context['role'], array('ADMIN', 'PURCHASING'), true)) {
             return $this->finishFailure($ownsTransaction, 'FORBIDDEN');
         }
+        // A request can retain drafts from an earlier PIC revision.  A purchase
+        // submission must only ever use the material set that is active now.
+        $activeRevision = !empty($request->edit_revision_no)
+            ? (int) $request->edit_revision_no
+            : max(1, (int) $request->revision_no);
 
-        $sourceReference = $this->submissionReference($requestCode, $spk);
-        $existing = $this->db->get_where('tbpo_jasa_purchase_submission', array('source_reference' => $sourceReference))->row();
+        $sourceReference = $developmentMode
+            ? 'PO_JASA_DEV:' . $requestCode . ':REV:' . $activeRevision
+            : $this->submissionReference($requestCode, $spk);
+        $existing = $developmentMode
+            ? $this->db->get_where('tbpo_po_nk', array('source_module' => 'PO_JASA_DEV', 'source_reference' => $sourceReference))->row()
+            : $this->db->get_where('tbpo_jasa_purchase_submission', array('source_reference' => $sourceReference))->row();
         if ($existing) {
             return $this->finishSuccess($ownsTransaction, array(
-                'success' => true, 'code' => 'IDEMPOTENT_REPLAY',
-                'id_submission' => (int) $existing->id_submission, 'kd_po_nk' => $existing->kd_po_nk,
+                'success' => true, 'code' => $developmentMode ? 'DEV_IDEMPOTENT_REPLAY' : 'IDEMPOTENT_REPLAY',
+                'id_submission' => $developmentMode ? null : (int) $existing->id_submission,
+                'id_po_nk' => (int) $existing->id_po_nk,
+                'kd_po_nk' => $existing->kd_po_nk,
             ));
         }
-        if ($token) {
+        if (!$developmentMode && $token) {
             $tokenReplay = $this->db->get_where('tbpo_jasa_purchase_submission', array('idempotency_token' => $token))->row();
             if ($tokenReplay) {
                 if ($tokenReplay->kd_po_jasa !== $requestCode) {
@@ -65,13 +78,18 @@ class M_PojasaIntegration extends CI_Model
                 ));
             }
         }
+        $kadepCode = $this->departmentHeadCode($request);
+        if ($kadepCode === null) {
+            return $this->finishFailure($ownsTransaction, 'KADEP_NOT_FOUND');
+        }
 
         $drafts = $this->db->query(
             "SELECT d.*,m.nama_material,m.deskripsi,m.satuan,m.id_brg_nk,b.kd_br_adm,b.kd_barang,b.kat_barang,b.satuan AS stock_unit "
             . "FROM tbpo_jasa_draft_pembelian d JOIN tbpo_jasa_material m ON m.id_material=d.id_material "
+            . "AND m.kd_po_jasa=d.kd_po_jasa AND m.revision_no=d.revision_no AND m.is_active=1 "
             . "LEFT JOIN tbpo_barang_nk b ON b.id_brg_nk=m.id_brg_nk "
-            . "WHERE d.kd_po_jasa=? AND d.status_draft='DRAFT' ORDER BY d.id_draft_pembelian ASC FOR UPDATE",
-            array($requestCode)
+            . "WHERE d.kd_po_jasa=? AND d.revision_no=? AND d.status_draft='DRAFT' ORDER BY d.id_draft_pembelian ASC FOR UPDATE",
+            array($requestCode, $activeRevision)
         )->result();
         if (!$drafts) {
             return $this->finishSuccess($ownsTransaction, array('success' => true, 'code' => 'NO_ACTIVE_DRAFT', 'id_submission' => null, 'kd_po_nk' => null));
@@ -96,25 +114,33 @@ class M_PojasaIntegration extends CI_Model
         }
         $this->db->insert('tbpo_po_nk', array(
             'jns_po' => 2, 'kd_po_nk' => $purchaseCode, 'kd_po_req' => $requestCode,
-            'nopo' => 'AUTO-' . $spk->no_spk, 'kd_user' => $context['kode_user'],
+            // The purchasing user creates the document, but the legacy PO owner
+            // remains the PIC who submitted the originating PO Jasa request.
+            'nopo' => $developmentMode ? 'DEV-' . $requestCode : 'AUTO-' . $spk->no_spk, 'kd_user' => $request->kd_user,
             'nm_user' => $request->nm_user, 'tgl_transaksi' => $today, 'jml_item' => count($drafts),
             'total_harga' => (int) round($total), 'status' => 'PROSES PEMBELIAN',
             'departemen' => $request->departemen,
-            'tj_pembelian' => 'Pengajuan otomatis material PO Jasa ' . $requestCode . ' / SPK ' . $spk->no_spk,
+            'tj_pembelian' => $developmentMode
+                ? 'Pengajuan DEV material PO Jasa ' . $requestCode . ' tanpa SPK'
+                : 'Pengajuan otomatis material PO Jasa ' . $requestCode . ' / SPK ' . $spk->no_spk,
             'tax' => 0, 'hrg_pajak' => 0, 'hrg_nyata' => 0, 'status_hrg_nyata' => 0,
-            'acc_with' => $context['kode_user'], 'acc_with_kadep' => '',
-            'source_module' => 'PO_JASA', 'source_reference' => $sourceReference,
-            'source_spk_no' => $spk->no_spk, 'source_spk_version' => max(1, (int) $spk->spk_version_no),
+            'acc_with' => $context['kode_user'], 'acc_with_kadep' => $kadepCode,
+            'source_module' => $developmentMode ? 'PO_JASA_DEV' : 'PO_JASA', 'source_reference' => $sourceReference,
+            'source_spk_no' => $developmentMode ? null : $spk->no_spk,
+            'source_spk_version' => $developmentMode ? null : max(1, (int) $spk->spk_version_no),
         ));
         $poId = (int) $this->db->insert_id();
-        $this->db->insert('tbpo_jasa_purchase_submission', array(
-            'kd_po_jasa' => $requestCode, 'id_spk' => (int) $spk->id_spk,
-            'no_spk' => $spk->no_spk, 'spk_version_no' => max(1, (int) $spk->spk_version_no),
-            'source_reference' => $sourceReference, 'id_po_nk' => $poId, 'kd_po_nk' => $purchaseCode,
-            'status' => 'PROSES_PEMBELIAN', 'idempotency_token' => $token ?: null,
-            'created_by' => (int) $context['id_user'],
-        ));
-        $submissionId = (int) $this->db->insert_id();
+        $submissionId = null;
+        if (!$developmentMode) {
+            $this->db->insert('tbpo_jasa_purchase_submission', array(
+                'kd_po_jasa' => $requestCode, 'id_spk' => (int) $spk->id_spk,
+                'no_spk' => $spk->no_spk, 'spk_version_no' => max(1, (int) $spk->spk_version_no),
+                'source_reference' => $sourceReference, 'id_po_nk' => $poId, 'kd_po_nk' => $purchaseCode,
+                'status' => 'PROSES_PEMBELIAN', 'idempotency_token' => $token ?: null,
+                'created_by' => (int) $context['id_user'],
+            ));
+            $submissionId = (int) $this->db->insert_id();
+        }
 
         foreach ($drafts as $draft) {
             $detailReference = $sourceReference . ':DRAFT:' . (int) $draft->id_draft_pembelian;
@@ -130,35 +156,39 @@ class M_PojasaIntegration extends CI_Model
                 'hrg_satuan' => (int) round($draft->harga_estimasi), 'hrg_nyata' => 0,
                 'total_harga' => (int) round((float) $draft->qty * (float) $draft->harga_estimasi),
                 'total_nyata' => 0, 'gbr_produk' => 'Karisma.png',
-                'source_module' => 'PO_JASA', 'source_reference' => $detailReference,
+                'source_module' => $developmentMode ? 'PO_JASA_DEV' : 'PO_JASA', 'source_reference' => $detailReference,
                 'source_material_id' => (int) $draft->id_material, 'source_draft_id' => (int) $draft->id_draft_pembelian,
             ));
             $detailId = (int) $this->db->insert_id();
-            $this->db->insert('tbpo_jasa_purchase_submission_detail', array(
-                'id_submission' => $submissionId, 'kd_po_jasa' => $requestCode,
-                'id_material' => (int) $draft->id_material, 'id_draft_pembelian' => (int) $draft->id_draft_pembelian,
-                'id_detail_po_nk' => $detailId, 'qty_submitted' => (float) $draft->qty,
-                'estimated_unit_price' => (float) $draft->harga_estimasi, 'fulfillment_status' => 'DIAJUKAN',
-            ));
-            $this->db->where('id_draft_pembelian', (int) $draft->id_draft_pembelian)->update('tbpo_jasa_draft_pembelian', array(
-                'status_draft' => 'DIAJUKAN_KE_PO_PEMBELIAN', 'submitted_po_nk_id' => $poId,
-                'submitted_po_nk_code' => $purchaseCode, 'submitted_detail_po_nk_id' => $detailId,
-                'submitted_at' => date('Y-m-d H:i:s'), 'version' => (int) $draft->version + 1,
-            ));
+            if (!$developmentMode) {
+                $this->db->insert('tbpo_jasa_purchase_submission_detail', array(
+                    'id_submission' => $submissionId, 'kd_po_jasa' => $requestCode,
+                    'id_material' => (int) $draft->id_material, 'id_draft_pembelian' => (int) $draft->id_draft_pembelian,
+                    'id_detail_po_nk' => $detailId, 'qty_submitted' => (float) $draft->qty,
+                    'estimated_unit_price' => (float) $draft->harga_estimasi, 'fulfillment_status' => 'DIAJUKAN',
+                ));
+                $this->db->where('id_draft_pembelian', (int) $draft->id_draft_pembelian)->update('tbpo_jasa_draft_pembelian', array(
+                    'status_draft' => 'DIAJUKAN_KE_PO_PEMBELIAN', 'submitted_po_nk_id' => $poId,
+                    'submitted_po_nk_code' => $purchaseCode, 'submitted_detail_po_nk_id' => $detailId,
+                    'submitted_at' => date('Y-m-d H:i:s'), 'version' => (int) $draft->version + 1,
+                ));
+            }
         }
 
-        $this->log($context, $request, 'PO_PEMBELIAN_OTOMATIS_DIBUAT', array(
+        $this->log($context, $request, $developmentMode ? 'PO_PEMBELIAN_DEV_DIBUAT' : 'PO_PEMBELIAN_OTOMATIS_DIBUAT', array(
             'id_submission' => $submissionId, 'id_po_nk' => $poId, 'kd_po_nk' => $purchaseCode,
-            'source_reference' => $sourceReference, 'draft_count' => count($drafts),
+            'source_reference' => $sourceReference, 'draft_count' => count($drafts), 'development_mode' => $developmentMode,
         ));
-        $this->notify($request, 'PO_PEMBELIAN_OTOMATIS_DIBUAT', 'Pengajuan pembelian PO Jasa',
-            $purchaseCode . ' dibuat otomatis dari ' . $requestCode . '.', array('PURCHASING'));
+        if (!$developmentMode) {
+            $this->notify($request, 'PO_PEMBELIAN_OTOMATIS_DIBUAT', 'Pengajuan pembelian PO Jasa',
+                $purchaseCode . ' dibuat otomatis dari ' . $requestCode . '.', array('PURCHASING'));
+        }
 
         if ($this->db->trans_status() === false) {
             return $this->finishFailure($ownsTransaction, 'DATABASE_ERROR');
         }
         return $this->finishSuccess($ownsTransaction, array(
-            'success' => true, 'code' => 'CREATED', 'id_submission' => $submissionId,
+            'success' => true, 'code' => $developmentMode ? 'DEV_CREATED' : 'CREATED', 'id_submission' => $submissionId,
             'id_po_nk' => $poId, 'kd_po_nk' => $purchaseCode,
         ));
     }
@@ -180,12 +210,18 @@ class M_PojasaIntegration extends CI_Model
             return array('success' => true, 'code' => 'IDEMPOTENT_REPLAY', 'id_receipt' => (int) $replay->id_purchase_receipt);
         }
         $row = $this->db->query(
-            'SELECT sd.*,s.id_po_nk,s.kd_po_nk,s.id_spk,s.spk_version_no,p.status po_status,r.* '
+            'SELECT sd.*,m.id_brg_nk,s.id_po_nk,s.kd_po_nk,s.id_spk,s.spk_version_no,p.status po_status,r.*, '
+            . 'b.kd_barang,b.kd_br_adm,b.kat_barang,b.satuan AS stock_satuan '
             . 'FROM tbpo_jasa_purchase_submission_detail sd JOIN tbpo_jasa_purchase_submission s ON s.id_submission=sd.id_submission '
-            . 'JOIN tbpo_po_nk p ON p.id_po_nk=s.id_po_nk JOIN tbpo_jasa_request r ON r.kd_po_jasa=sd.kd_po_jasa '
+            . 'JOIN tbpo_po_nk p ON p.id_po_nk=s.id_po_nk JOIN tbpo_jasa_material m ON m.id_material=sd.id_material '
+            . 'LEFT JOIN tbpo_barang_nk b ON b.id_brg_nk=m.id_brg_nk JOIN tbpo_jasa_request r ON r.kd_po_jasa=sd.kd_po_jasa '
             . 'WHERE sd.id_detail_po_nk=? AND sd.kd_po_jasa=? FOR UPDATE',
             array((int) $detailId, $requestCode)
         )->row();
+        if ($row && empty($row->id_brg_nk)) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'MANUAL_MASTER_REQUIRED');
+        }
         if (!$row || in_array($row->po_status, array('PENGAJUAN DIBATALKAN', 'REJECT'), true)) {
             $this->db->trans_rollback();
             return array('success' => false, 'code' => 'PURCHASE_DETAIL_INVALID');
@@ -206,6 +242,15 @@ class M_PojasaIntegration extends CI_Model
             'idempotency_token' => $token, 'processed_by' => (int) $context['id_user'],
         ));
         $receiptId = (int) $this->db->insert_id();
+        $transactionId = $this->postStockTransaction(
+            $row, $quantity, '11511', $date, $context,
+            'Penerimaan ON_HAND PO Jasa ' . $row->kd_po_nk . ' - ' . $receiptReference
+        );
+        if (!$transactionId) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'STOCK_POSTING_FAILED');
+        }
+        $this->db->where('id_purchase_receipt', $receiptId)->update('tbpo_jasa_purchase_receipt', array('id_transnk' => $transactionId));
         $newReceived = round((float) $row->qty_received + (float) $quantity, 2);
         $detailStatus = $newReceived + 0.000001 >= (float) $row->qty_submitted ? 'ON_HAND' : 'PARTIAL_ON_HAND';
         $this->db->where('id_submission_detail', (int) $row->id_submission_detail)->update('tbpo_jasa_purchase_submission_detail', array(
@@ -245,11 +290,14 @@ class M_PojasaIntegration extends CI_Model
             ->where('fulfillment_status !=', 'ON_HAND')->count_all_results('tbpo_jasa_purchase_submission_detail');
         $submissionStatus = $pendingCount === 0 ? 'ON_HAND' : 'PARTIAL_ON_HAND';
         $this->db->where('id_submission', (int) $row->id_submission)->update('tbpo_jasa_purchase_submission', array('status' => $submissionStatus));
-        $this->db->where('id_po_nk', (int) $row->id_po_nk)->update('tbpo_po_nk', array('status' => $pendingCount === 0 ? 'DONE' : 'PROSES PEMBELIAN'));
+        // PO Pembelian yang dibuat oleh PO Jasa harus selalu berada pada antrian
+        // monitoring pembelian. Status pemenuhan material tetap dicatat terpisah
+        // pada submission/detail, sehingga header legacy tidak boleh berubah DONE.
+        $this->db->where('id_po_nk', (int) $row->id_po_nk)->update('tbpo_po_nk', array('status' => 'PROSES PEMBELIAN'));
 
         $this->log($context, $row, 'PO_PEMBELIAN_ON_HAND', array(
             'id_purchase_receipt' => $receiptId, 'id_biaya_aktual' => $costId,
-            'id_detail_po_nk' => (int) $detailId, 'quantity' => $quantity,
+            'id_detail_po_nk' => (int) $detailId, 'id_transnk' => $transactionId, 'quantity' => $quantity,
             'unit_price' => $unitPrice, 'total' => $total, 'status' => $costStatus,
         ));
         $this->notify($row, 'PO_PEMBELIAN_ON_HAND', 'Biaya otomatis PO Jasa',
@@ -262,7 +310,7 @@ class M_PojasaIntegration extends CI_Model
             return array('success' => false, 'code' => 'DATABASE_ERROR');
         }
         $this->db->trans_commit();
-        return array('success' => true, 'code' => $detailStatus, 'id_receipt' => $receiptId, 'id_cost' => $costId, 'cost_status' => $costStatus);
+        return array('success' => true, 'code' => $detailStatus, 'id_receipt' => $receiptId, 'id_cost' => $costId, 'id_transnk' => $transactionId, 'cost_status' => $costStatus);
     }
 
     public function reverse_receipt($context, $requestCode, $receiptId, $reason, $token)
@@ -294,6 +342,29 @@ class M_PojasaIntegration extends CI_Model
         ));
         $reversalId = (int) $this->db->insert_id();
         $request = $this->db->get_where('tbpo_jasa_request', array('kd_po_jasa' => $requestCode))->row();
+        $stockItem = $this->db->query(
+            'SELECT b.kd_barang,b.kd_br_adm,b.kat_barang,b.satuan AS stock_satuan,s.kd_po_nk '
+            . 'FROM tbpo_jasa_purchase_submission_detail sd '
+            . 'JOIN tbpo_jasa_purchase_submission s ON s.id_submission=sd.id_submission '
+            . 'JOIN tbpo_jasa_material m ON m.id_material=sd.id_material '
+            . 'JOIN tbpo_barang_nk b ON b.id_brg_nk=m.id_brg_nk '
+            . 'WHERE sd.id_submission_detail=? FOR UPDATE',
+            array((int) $original->id_submission_detail)
+        )->row();
+        if (!$stockItem) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'MANUAL_MASTER_REQUIRED');
+        }
+        $stockItem->kd_user = $request->kd_user;
+        $stockTransactionId = $this->postStockTransaction(
+            $stockItem, (float) $original->qty_received, '11514', date('Y-m-d'), $context,
+            'Reversal ON_HAND PO Jasa ' . $stockItem->kd_po_nk . ' - ' . $reference
+        );
+        if (!$stockTransactionId) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'STOCK_POSTING_FAILED');
+        }
+        $this->db->where('id_purchase_receipt', $reversalId)->update('tbpo_jasa_purchase_receipt', array('id_transnk' => $stockTransactionId));
         $spk = $this->db->get_where('tbpo_jasa_spk', array('kd_po_jasa' => $requestCode))->row();
         $sourceCost = $this->db->get_where('tbpo_jasa_biaya_aktual', array('source_receipt_reference' => $original->receipt_reference))->row();
         $this->db->insert('tbpo_jasa_biaya_aktual', array(
@@ -331,16 +402,18 @@ class M_PojasaIntegration extends CI_Model
         $submission = $this->db->get_where('tbpo_jasa_purchase_submission', array('id_submission' => (int) $detail->id_submission))->row();
         $this->db->where('id_submission', (int) $detail->id_submission)->update('tbpo_jasa_purchase_submission', array('status' => $submissionStatus));
         if ($submission) {
-            $this->db->where('id_po_nk', (int) $submission->id_po_nk)->update('tbpo_po_nk', array('status' => $pendingCount === 0 ? 'DONE' : 'PROSES PEMBELIAN'));
+            // Reversal tidak mengubah header PO Jasa menjadi DONE; status
+            // penerimaan tetap tersedia di tbpo_jasa_purchase_submission.
+            $this->db->where('id_po_nk', (int) $submission->id_po_nk)->update('tbpo_po_nk', array('status' => 'PROSES PEMBELIAN'));
         }
-        $this->log($context, $request, 'PO_PEMBELIAN_ON_HAND_DIBALIK', array('original_receipt_id' => (int) $receiptId, 'reversal_receipt_id' => $reversalId, 'id_biaya_aktual' => $costId, 'reason' => $reason));
+        $this->log($context, $request, 'PO_PEMBELIAN_ON_HAND_DIBALIK', array('original_receipt_id' => (int) $receiptId, 'reversal_receipt_id' => $reversalId, 'id_biaya_aktual' => $costId, 'id_transnk' => $stockTransactionId, 'reason' => $reason));
         $this->notify($request, 'PO_PEMBELIAN_ON_HAND_DIBALIK', 'Penyesuaian biaya PO Jasa', 'Penerimaan dibalik: ' . $reason, array('PIC', 'PURCHASING'));
         if ($this->db->trans_status() === false) {
             $this->db->trans_rollback();
             return array('success' => false, 'code' => 'DATABASE_ERROR');
         }
         $this->db->trans_commit();
-        return array('success' => true, 'code' => 'REVERSED', 'id_receipt' => $reversalId, 'id_cost' => $costId);
+        return array('success' => true, 'code' => 'REVERSED', 'id_receipt' => $reversalId, 'id_cost' => $costId, 'id_transnk' => $stockTransactionId);
     }
 
     public function get_submission_state($requestCode)
@@ -348,7 +421,14 @@ class M_PojasaIntegration extends CI_Model
         if (!$this->schema_ready()) {
             return array('submission' => null, 'details' => array(), 'receipts' => array(), 'adjustments' => array());
         }
-        $submission = $this->db->order_by('id_submission', 'DESC')->get_where('tbpo_jasa_purchase_submission', array('kd_po_jasa' => $requestCode))->row_array();
+        $submission = $this->db->select('s.*, p.status AS po_status')
+            ->from('tbpo_jasa_purchase_submission s')
+            ->join('tbpo_po_nk p', 'p.id_po_nk = s.id_po_nk', 'left')
+            ->where('s.kd_po_jasa', $requestCode)
+            ->order_by('s.id_submission', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row_array();
         if (!$submission) {
             return array('submission' => null, 'details' => array(), 'receipts' => array(), 'adjustments' => array());
         }
@@ -359,6 +439,81 @@ class M_PojasaIntegration extends CI_Model
         $receipts = $this->db->order_by('id_purchase_receipt', 'DESC')->get_where('tbpo_jasa_purchase_receipt', array('kd_po_jasa' => $requestCode))->result_array();
         $adjustments = $this->db->order_by('id_adjustment', 'DESC')->get_where('tbpo_jasa_purchase_adjustment', array('kd_po_jasa' => $requestCode))->result_array();
         return array('submission' => $submission, 'details' => $details, 'receipts' => $receipts, 'adjustments' => $adjustments);
+    }
+
+    /**
+     * Removes an automatically generated legacy PO only before it has any
+     * receipt or adjustment. The originating purchase drafts are reopened so
+     * Purchasing can revise the remaining quantity and submit a new PO.
+     */
+    public function delete_purchase_submission($context, $requestCode, $reason)
+    {
+        if (!$this->schema_ready() || !in_array($context['role'], array('ADMIN', 'PURCHASING'), true)) {
+            return array('success' => false, 'code' => 'FORBIDDEN');
+        }
+
+        $this->db->trans_begin();
+        $request = $this->db->query('SELECT * FROM tbpo_jasa_request WHERE kd_po_jasa=? FOR UPDATE', array($requestCode))->row();
+        if (!$request) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'NOT_FOUND');
+        }
+        $submission = $this->db->query(
+            'SELECT * FROM tbpo_jasa_purchase_submission WHERE kd_po_jasa=? ORDER BY id_submission DESC LIMIT 1 FOR UPDATE',
+            array($requestCode)
+        )->row();
+        if (!$submission) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'NOT_FOUND');
+        }
+        $purchase = $this->db->query('SELECT * FROM tbpo_po_nk WHERE id_po_nk=? FOR UPDATE', array((int) $submission->id_po_nk))->row();
+        if (!$purchase || $purchase->source_module !== 'PO_JASA' || $purchase->status !== 'PROSES PEMBELIAN') {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'PURCHASE_DELETE_NOT_ALLOWED');
+        }
+        $details = $this->db->query(
+            'SELECT * FROM tbpo_jasa_purchase_submission_detail WHERE id_submission=? FOR UPDATE',
+            array((int) $submission->id_submission)
+        )->result();
+        $detailIds = array_map(function ($detail) { return (int) $detail->id_submission_detail; }, $details);
+        if ($detailIds) {
+            $receiptCount = (int) $this->db->where_in('id_submission_detail', $detailIds)->count_all_results('tbpo_jasa_purchase_receipt');
+            if ($receiptCount > 0) {
+                $this->db->trans_rollback();
+                return array('success' => false, 'code' => 'PURCHASE_DELETE_RECEIPT_EXISTS');
+            }
+            $adjustmentCount = (int) $this->db->where_in('id_submission_detail', $detailIds)->count_all_results('tbpo_jasa_purchase_adjustment');
+            if ($adjustmentCount > 0) {
+                $this->db->trans_rollback();
+                return array('success' => false, 'code' => 'PURCHASE_DELETE_ADJUSTMENT_EXISTS');
+            }
+        }
+
+        foreach ($details as $detail) {
+            $draft = $this->db->query('SELECT * FROM tbpo_jasa_draft_pembelian WHERE id_draft_pembelian=? FOR UPDATE', array((int) $detail->id_draft_pembelian))->row();
+            if ($draft && $draft->status_draft === 'DIAJUKAN_KE_PO_PEMBELIAN') {
+                $this->db->where('id_draft_pembelian', (int) $draft->id_draft_pembelian)->update('tbpo_jasa_draft_pembelian', array(
+                    'status_draft' => 'DRAFT', 'submitted_po_nk_id' => null, 'submitted_po_nk_code' => null,
+                    'submitted_detail_po_nk_id' => null, 'submitted_at' => null, 'version' => (int) $draft->version + 1,
+                ));
+            }
+        }
+        if ($detailIds) {
+            $this->db->where_in('id_submission_detail', $detailIds)->delete('tbpo_jasa_purchase_submission_detail');
+        }
+        $this->db->where('id_submission', (int) $submission->id_submission)->delete('tbpo_jasa_purchase_submission');
+        $this->db->where(array('kd_po_nk' => $purchase->kd_po_nk, 'source_module' => 'PO_JASA'))->delete('tbpo_detail_po_nk');
+        $this->db->where(array('id_po_nk' => (int) $purchase->id_po_nk, 'source_module' => 'PO_JASA'))->delete('tbpo_po_nk');
+        $this->log($context, $request, 'PO_PEMBELIAN_DIHAPUS', array(
+            'id_submission' => (int) $submission->id_submission, 'id_po_nk' => (int) $purchase->id_po_nk,
+            'kd_po_nk' => $purchase->kd_po_nk, 'reason' => $reason,
+        ));
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'DATABASE_ERROR');
+        }
+        $this->db->trans_commit();
+        return array('success' => true, 'code' => 'PURCHASE_DELETED');
     }
 
     public function sync_material_change($context, $requestCode, $changeId, $materialId, $before, $after)
@@ -434,10 +589,54 @@ class M_PojasaIntegration extends CI_Model
         return 'PO_JASA:' . $requestCode . ':SPK:' . $spk->no_spk . ':V' . max(1, (int) $spk->spk_version_no);
     }
 
+    private function departmentHeadCode($request)
+    {
+        // The approved KADEP is the authoritative source.  The lookup supports
+        // legacy requests that predate the approval-audit column.
+        $approvedCode = trim((string) $request->acc_with_kadep);
+        if ($approvedCode !== '') {
+            return $approvedCode;
+        }
+        $head = $this->db->query(
+            'SELECT kode_user FROM tbpo_user WHERE aksess_lv=5 AND UPPER(TRIM(departement))=UPPER(TRIM(?)) ORDER BY id_user ASC LIMIT 1',
+            array($request->departemen)
+        )->row();
+        return $head ? (string) $head->kode_user : null;
+    }
+
     private function unitId($unitName)
     {
         $row = $this->db->query('SELECT id_satuan FROM tbpo_satuan WHERE UPPER(TRIM(nm_satuan))=UPPER(TRIM(?)) ORDER BY id_satuan ASC LIMIT 1', array((string) $unitName))->row();
         return $row ? (int) $row->id_satuan : 0;
+    }
+
+    /**
+     * Posts the authoritative stock movement for a Purchasing ON_HAND event.
+     * 11511 is stock-in from purchase; 11514 is the matching stock-out
+     * adjustment when that ON_HAND event is reversed.
+     */
+    private function postStockTransaction($item, $quantity, $accountCode, $date, $context, $description)
+    {
+        if (empty($item->kd_barang) || empty($item->kd_br_adm) || empty($item->kat_barang)
+            || (int) $item->stock_satuan < 1 || !in_array($accountCode, array('11511', '11514'), true)) {
+            return false;
+        }
+        $this->db->insert('tbpo_transaksi', array(
+            'kd_akun' => $accountCode,
+            'kd_po_nk' => substr((string) $item->kd_po_nk, 0, 25),
+            'kd_barang' => substr((string) $item->kd_barang, 0, 25),
+            'kd_barangsys' => substr((string) $item->kd_br_adm, 0, 25),
+            'keterangan' => $description,
+            'kat_barang' => substr((string) $item->kat_barang, 0, 25),
+            'tr_qty' => (float) $quantity,
+            'satuan' => (int) $item->stock_satuan,
+            'inputer' => substr((string) $context['kode_user'], 0, 25),
+            'req_by' => substr((string) $item->kd_user, 0, 25),
+            'tgl_transaksi' => substr((string) $date, 0, 10),
+            'create_at' => substr((string) $date, 0, 10),
+            'last_updated_by' => substr((string) $context['kode_user'], 0, 25),
+        ));
+        return $this->db->affected_rows() === 1 ? (int) $this->db->insert_id() : false;
     }
 
     private function isWholeNumber($value)

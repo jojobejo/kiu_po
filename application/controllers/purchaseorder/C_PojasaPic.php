@@ -8,6 +8,8 @@ class C_PojasaPic extends CI_Controller
         parent::__construct();
         $this->load->model('PO/M_PojasaPic');
         $this->load->model('PO/M_PojasaExecution');
+        $this->load->model('PO/M_PojasaIntegration');
+        $this->load->model('PO/M_PojasaPickup');
         $this->load->helper(array('pojasa_authorization', 'pojasa_status', 'pojasa_document'));
     }
 
@@ -18,6 +20,7 @@ class C_PojasaPic extends CI_Controller
         }
         $data = $this->baseData('Request PO Jasa PIC');
         $data['statuses'] = pojasa_statuses();
+        $data['status_labels'] = $this->statusLabels();
         $this->render('content/po/jasa/pic/list', $data, 'content/po/jasa/pic/list_js');
     }
 
@@ -84,7 +87,19 @@ class C_PojasaPic extends CI_Controller
         $data['can_edit'] = $this->M_PojasaPic->can_edit($request, $context);
         $data['execution'] = $this->M_PojasaExecution->schema_ready()
             ? $this->M_PojasaExecution->get_state($context, $request->kd_po_jasa) : false;
+        $data['purchase_integration'] = $this->M_PojasaIntegration->get_submission_state($request->kd_po_jasa);
+        $data['pickup_state'] = $this->M_PojasaPickup->state($request->kd_po_jasa);
         $this->render('content/po/jasa/pic/detail', $data, 'content/po/jasa/pic/detail_js');
+    }
+
+    public function request_pickup()
+    {
+        if (!$this->guardAjax('POST', true)) return;
+        $code = $this->normalizeRequestCode($this->input->post('kd_po_jasa', true));
+        $token = strtolower(trim((string) $this->input->post('idempotency_token', true)));
+        if (!$this->validUuid($token)) return $this->json(false, 'VALIDATION_ERROR', 'Token aksi tidak valid.', array(), 422);
+        $result = $this->M_PojasaPickup->request($this->context(), $code, $token);
+        return $this->json($result['success'], $result['code'], $result['success'] ? 'Permintaan pengambilan dikirim ke Kadep.' : 'Seluruh material harus tersedia dan memiliki master barang sebelum pengambilan diajukan.', array('pickup' => $this->M_PojasaPickup->state($code)), $result['success'] ? 200 : 409);
     }
 
     public function execution_state($requestCode)
@@ -205,6 +220,27 @@ class C_PojasaPic extends CI_Controller
         )));
     }
 
+    public function material_catalog()
+    {
+        if (!$this->guardAjax('GET')) return;
+        $result = $this->M_PojasaPic->search_material_catalog(
+            $this->input->get('term', true), (int) $this->input->get('page', true)
+        );
+        $items = array();
+        foreach ($result['items'] as $row) {
+            $items[] = array(
+                'id' => (int) $row['id_brg_nk'],
+                'text' => $row['kd_barang'] . ' — ' . $row['nama_barang'],
+                'kd_barang' => $row['kd_barang'],
+                'nama_barang' => $row['nama_barang'],
+                'deskripsi' => $row['descnk'],
+                'satuan' => $row['satuan'],
+                'qty_ready' => (float) $row['qty_ready'],
+            );
+        }
+        return $this->json(true, 'OK', 'Katalog material dimuat.', array('results' => $items, 'pagination' => array('more' => $result['more'])));
+    }
+
     public function save_draft()
     {
         if (!$this->guardAjax('POST', true)) {
@@ -248,14 +284,16 @@ class C_PojasaPic extends CI_Controller
         if (!$this->validRequestCode($requestCode)) {
             return $this->json(false, 'VALIDATION_ERROR', 'Kode request tidak valid.', array(), 422, array('kd_po_jasa' => 'Kode request wajib diisi.'));
         }
-        $result = $this->M_PojasaPic->submit_request($this->context(), $requestCode);
+        $allowWithoutDocuments = (string) $this->input->post('allow_without_documents', true) === '1';
+        $result = $this->M_PojasaPic->submit_request($this->context(), $requestCode, $allowWithoutDocuments);
         if (!$result['success']) {
             if ($result['code'] === 'SUBMIT_VALIDATION') {
                 return $this->json(false, $result['code'], 'Request belum memenuhi syarat pengajuan.', array(), 422, $result['errors']);
             }
             return $this->modelError($result['code']);
         }
-        return $this->json(true, 'SUBMITTED', 'Request berhasil diajukan dan menunggu approval KADEP.', array(
+        $message = 'Request berhasil diajukan dan menunggu pemeriksaan awal Purchasing.';
+        return $this->json(true, 'SUBMITTED', $message, array(
             'request_code' => $requestCode,
             'status' => $result['status'],
             'detail_url' => base_url('pojasa/pic/detail/' . $requestCode),
@@ -477,6 +515,8 @@ class C_PojasaPic extends CI_Controller
         $errors = array();
         $vendorCode = strtoupper(trim((string) (isset($payload['kd_vendor_jasa']) ? $payload['kd_vendor_jasa'] : '')));
         $vendorProposal = trim((string) (isset($payload['vendor_usulan']) ? $payload['vendor_usulan'] : ''));
+        $plannedStartDate = trim((string) (isset($payload['tgl_mulai_pekerjaan']) ? $payload['tgl_mulai_pekerjaan'] : ''));
+        $plannedCompletionDate = trim((string) (isset($payload['tgl_selesai_pekerjaan']) ? $payload['tgl_selesai_pekerjaan'] : ''));
         $purpose = trim((string) (isset($payload['tujuan_pekerjaan']) ? $payload['tujuan_pekerjaan'] : ''));
         $notes = trim((string) (isset($payload['catatan_pic']) ? $payload['catatan_pic'] : ''));
         if ($vendorCode !== '' && $vendorProposal !== '') {
@@ -493,6 +533,14 @@ class C_PojasaPic extends CI_Controller
         if (mb_strlen($notes) > 10000) {
             $errors['catatan_pic'] = 'Catatan maksimal 10.000 karakter.';
         }
+        if (!$this->validDate($plannedStartDate)) {
+            $errors['tgl_mulai_pekerjaan'] = 'Tanggal rencana start pekerjaan wajib berformat YYYY-MM-DD.';
+        }
+        if (!$this->validDate($plannedCompletionDate)) {
+            $errors['tgl_selesai_pekerjaan'] = 'Target penyelesaian wajib berformat YYYY-MM-DD.';
+        } elseif ($this->validDate($plannedStartDate) && $plannedCompletionDate < $plannedStartDate) {
+            $errors['tgl_selesai_pekerjaan'] = 'Target penyelesaian tidak boleh lebih awal dari tanggal rencana start pekerjaan.';
+        }
 
         $scopes = $this->validateLines(isset($payload['scopes']) ? $payload['scopes'] : array(), 'scope', $errors);
         $materials = $this->validateLines(isset($payload['materials']) ? $payload['materials'] : array(), 'material', $errors);
@@ -504,7 +552,9 @@ class C_PojasaPic extends CI_Controller
             'success' => true,
             'header' => array(
                 'tgl_request' => $today,
-                'tgl_target' => $today,
+                'tgl_target' => $plannedCompletionDate,
+                'tgl_mulai_pekerjaan' => $plannedStartDate,
+                'tgl_selesai_pekerjaan' => $plannedCompletionDate,
                 'kd_vendor_jasa' => $vendorCode !== '' ? $vendorCode : null,
                 'vendor_usulan' => $vendorCode === '' && $vendorProposal !== '' ? $vendorProposal : null,
                 'tujuan_pekerjaan' => $purpose,
@@ -559,8 +609,32 @@ class C_PojasaPic extends CI_Controller
             if ($type === 'scope') {
                 $clean[] = array('nama_scope' => $name, 'deskripsi' => $description, 'qty' => $qty, 'satuan' => $unit, 'harga_estimasi' => $price);
             } else {
-                // PIC only states the need. Purchasing decides stock/purchase fulfillment during review.
-                $clean[] = array('id_brg_nk' => null, 'nama_material' => $name, 'deskripsi' => $description, 'qty_kebutuhan' => $qty, 'satuan' => $unit, 'harga_estimasi' => $price, 'sumber_material' => 'BELUM_DITENTUKAN');
+                $catalogId = (int) (isset($row['id_brg_nk']) ? $row['id_brg_nk'] : 0);
+                $referenceType = strtoupper(trim((string) (isset($row['reference_type']) ? $row['reference_type'] : ($catalogId ? 'MASTER' : 'MANUAL'))));
+                if (!in_array($referenceType, array('MASTER', 'MANUAL'), true)) {
+                    $errors[$type . '_' . $index . '_reference'] = 'Referensi barang tidak valid.';
+                    continue;
+                }
+                $master = null;
+                if ($referenceType === 'MASTER') {
+                    $master = $this->M_PojasaPic->get_catalog_material($catalogId);
+                    if (!$master) {
+                        $errors[$type . '_' . $index . '_reference'] = 'Barang master tidak ditemukan atau tidak aktif.';
+                        continue;
+                    }
+                    // Do not trust browser-sent master text: Purchasing-owned master data wins.
+                    $name = trim((string) $master['nama_barang']);
+                    $description = trim((string) $master['descnk']);
+                    if ((string) $master['satuan'] !== '') $unit = (string) $master['satuan'];
+                }
+                $clean[] = array(
+                    'id_brg_nk' => $master ? (int) $master['id_brg_nk'] : null,
+                    'id_usulan_barang' => (int) (isset($row['id_usulan_barang']) ? $row['id_usulan_barang'] : 0),
+                    'reference_type' => $referenceType,
+                    'kd_barang_snapshot' => $master ? $master['kd_barang'] : null,
+                    'nama_material' => $name, 'deskripsi' => $description, 'qty_kebutuhan' => $qty,
+                    'satuan' => $unit, 'harga_estimasi' => $price, 'sumber_material' => 'BELUM_DITENTUKAN'
+                );
             }
         }
         return $clean;
@@ -695,7 +769,10 @@ class C_PojasaPic extends CI_Controller
     private function datatableRow($row)
     {
         $editable = in_array($row['status'], array('DRAFT', 'REVISI_PIC'), true);
-        $actions = '<a class="btn btn-info btn-sm mr-1" href="' . base_url('pojasa/pic/detail/' . rawurlencode($row['kd_po_jasa'])) . '" title="Detail"><i class="fas fa-eye"></i></a>';
+        $detailUrl = $row['status'] === 'MENUNGGU_KONFIRMASI_PIC'
+            ? base_url('pojasa/workflow/detail/' . rawurlencode($row['kd_po_jasa']))
+            : base_url('pojasa/pic/detail/' . rawurlencode($row['kd_po_jasa']));
+        $actions = '<a class="btn btn-info btn-sm mr-1" href="' . $detailUrl . '" title="Detail"><i class="fas fa-eye"></i></a>';
         if ($editable) {
             $actions .= '<a class="btn btn-warning btn-sm mr-1" href="' . base_url('pojasa/pic/edit/' . rawurlencode($row['kd_po_jasa'])) . '" title="Edit"><i class="fas fa-edit"></i></a>';
             $actions .= '<button class="btn btn-success btn-sm mr-1 btn-submit-request" data-code="' . htmlspecialchars($row['kd_po_jasa'], ENT_QUOTES, 'UTF-8') . '" title="Ajukan"><i class="fas fa-paper-plane"></i></button>';
@@ -705,13 +782,47 @@ class C_PojasaPic extends CI_Controller
         }
         return array(
             'tgl_request' => $row['tgl_request'],
-            'kd_po_jasa' => htmlspecialchars($row['kd_po_jasa'], ENT_QUOTES, 'UTF-8'),
             'vendor' => htmlspecialchars((string) ($row['nama_vendor_tampil'] ?: '-'), ENT_QUOTES, 'UTF-8'),
-            'jadwal' => htmlspecialchars($row['tgl_mulai_pekerjaan'] && $row['tgl_selesai_pekerjaan'] ? $row['tgl_mulai_pekerjaan'] . ' s/d ' . $row['tgl_selesai_pekerjaan'] : '-', ENT_QUOTES, 'UTF-8'),
             'total' => 'Rp ' . number_format((float) $row['estimasi_total'], 0, ',', '.'),
-            'status' => '<span class="badge badge-' . $this->statusColor($row['status']) . '">' . htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') . '</span>',
-            'actions' => $actions,
+            'status' => '<span class="badge badge-' . $this->statusColor($row['status']) . '">' . htmlspecialchars($this->statusLabel($row['status']), ENT_QUOTES, 'UTF-8') . '</span>',
+            'po_pembelian_status' => !empty($row['kd_po_nk'])
+                ? '<span class="badge badge-info">' . htmlspecialchars((string) ($row['po_pembelian_status'] ?: '-'), ENT_QUOTES, 'UTF-8') . '</span>'
+                : '-',
+            'actions' => '<div class="pojasa-pic-actions">' . $actions . '</div>',
         );
+    }
+
+    private function statusLabels()
+    {
+        return array(
+            'DRAFT' => 'Draft',
+            'MENUNGGU_PURCHASING_AWAL' => 'Menunggu review awal Purchasing',
+            'MENUNGGU_KONFIRMASI_PIC' => 'Menunggu konfirmasi PIC',
+            'MENUNGGU_KADEP' => 'Menunggu persetujuan Kadep',
+            'PENDING_KADEP' => 'Ditunda Kadep',
+            'REVISI_PIC' => 'Perlu revisi PIC',
+            'REVISI_PURCHASING_KADEP' => 'Perlu revisi Purchasing dari Kadep',
+            'MENUNGGU_PURCHASING' => 'Menunggu review Purchasing',
+            'MENUNGGU_DIRUT_OPS' => 'Menunggu persetujuan Direktur Operasional',
+            'MENUNGGU_PURCHASING_DIROPS' => 'Menunggu review Purchasing',
+            'REVISI_PURCHASING_DIROPS' => 'Perlu revisi Purchasing dari Direktur Operasional',
+            'MENUNGGU_DIREKTUR' => 'Menunggu persetujuan Direktur',
+            'REVISI_PURCHASING_DIRUT' => 'Perlu revisi Purchasing dari Direktur',
+            'MENUNGGU_PENERBITAN_PURCHASING' => 'Menunggu penerbitan SPK oleh Purchasing',
+            'SPK_TERBIT' => 'SPK terbit',
+            'ON_PROGRESS' => 'Dalam pengerjaan',
+            'SELESAI' => 'Pekerjaan selesai',
+            'DITUTUP' => 'Ditutup',
+            'DITOLAK_KADEP' => 'Ditolak Kadep',
+            'DITOLAK_DIRUT_OPS' => 'Ditolak Direktur Operasional',
+            'DITOLAK_DIREKTUR' => 'Ditolak Direktur',
+        );
+    }
+
+    private function statusLabel($status)
+    {
+        $labels = $this->statusLabels();
+        return isset($labels[$status]) ? $labels[$status] : $status;
     }
 
     private function statusColor($status)

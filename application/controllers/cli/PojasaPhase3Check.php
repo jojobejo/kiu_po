@@ -106,7 +106,7 @@ class PojasaPhase3Check extends CI_Controller
 
         $submitted = $this->M_PojasaPic->submit_request($context, $code);
         $submittedRequest = $this->M_PojasaPic->get_request($code, $context);
-        $this->assert('draft_submitted_to_kadep', $submitted['success'] && $submittedRequest->status === 'MENUNGGU_KADEP', $submitted);
+        $this->assert('draft_submitted_to_initial_purchasing', $submitted['success'] && $submittedRequest->status === 'MENUNGGU_PURCHASING_AWAL', $submitted);
         $this->assert('submitted_request_locked', !$this->M_PojasaPic->can_edit($submittedRequest, $context));
         $submittedRequest->status = 'PENDING_KADEP';
         $this->assert('pending_kadep_locked', !$this->M_PojasaPic->can_edit($submittedRequest, $context));
@@ -121,7 +121,7 @@ class PojasaPhase3Check extends CI_Controller
         $this->assert('revision_saved_as_new_revision', $revisionSaved['success'] && (int) $revisionRequest->edit_revision_no === 2 && (int) $revisionSaved['revision_no'] === 2, $revisionSaved);
         $revisionSubmitted = $this->M_PojasaPic->submit_request($context, $code);
         $revisionRequest = $this->M_PojasaPic->get_request($code, $context);
-        $this->assert('revision_resubmitted', $revisionSubmitted['success'] && (int) $revisionRequest->revision_no === 2 && $revisionRequest->status === 'MENUNGGU_KADEP', $revisionSubmitted);
+        $this->assert('revision_resubmitted', $revisionSubmitted['success'] && (int) $revisionRequest->revision_no === 2 && $revisionRequest->status === 'MENUNGGU_PURCHASING_AWAL', $revisionSubmitted);
 
         $second = $this->M_PojasaPic->save_draft($context, '', $header, $scopes, array());
         $secondCode = $second['request_code'];

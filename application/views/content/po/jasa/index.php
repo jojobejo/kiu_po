@@ -106,6 +106,7 @@ $canCreateRequest = isset($can_create_request) ? (bool) $can_create_request : in
                                         <th>No</th>
                                         <th>Kode</th>
                                         <th>SPK</th>
+                                        <th>PO Pembelian</th>
                                         <th>Toko / Vendor</th>
                                         <th>Departemen</th>
                                         <th>Total</th>
@@ -120,6 +121,7 @@ $canCreateRequest = isset($can_create_request) ? (bool) $can_create_request : in
                                             <td><?= $no++ ?></td>
                                             <td><?= pojasa_h($request->kd_po_jasa) ?></td>
                                             <td><?= pojasa_h($request->no_spk) ?></td>
+                                            <td><?php if (!empty($request->kd_po_nk)) : ?><strong><?= pojasa_h($request->kd_po_nk) ?></strong><br><span class="badge badge-info"><?= pojasa_h($request->po_pembelian_status ?: '-') ?></span><?php else : ?>-<?php endif; ?></td>
                                             <td><?= pojasa_h($request->nama_vendor) ?></td>
                                             <td><?= pojasa_h($request->departemen) ?></td>
                                             <td><?= pojasa_money($request->estimasi_total) ?></td>

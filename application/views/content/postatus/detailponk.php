@@ -24,6 +24,25 @@
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
+        <?php
+        $canManageManualMaster = is_super_admin() || in_array((string) $this->session->userdata('lv'), array('1', '2'), true);
+        $manualMasterCount = isset($manualMasterItems) ? count($manualMasterItems) : 0;
+        ?>
+        <?php if ($manualMasterCount > 0) : ?>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <div class="mr-3 mb-2 mb-md-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Terdapat <strong><?= $manualMasterCount ?></strong> master barang manual dari PO Jasa yang perlu diinput agar seluruh item PO pembelian dapat ditampilkan dan diproses.
+                    </div>
+                    <?php if ($canManageManualMaster) : ?>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#manualMasterList">
+                            <i class="fas fa-list"></i> Lihat List Master Barang Manual
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
         <div class="card">
             <div class="m-2">
                 <div class="">
@@ -547,12 +566,6 @@
                         Tambah Note Pembelian
                     </a>
                 </div>
-                <div class="col-md">
-                    <a class="btn btnAtas btn-sm btn-block" data-toggle="modal" data-target="#addfileupload<?= $s->kd_po_nk ?>">
-                        <i class="fa fa-solid fa-file-image"></i>
-                        Add file pendukung
-                    </a>
-                </div>
             </div>
         <?php endif; ?>
         <?php if ($canSwitchHargaNyata) : ?>
@@ -793,14 +806,15 @@
                     <tr>
                         <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
                     </tr>
+                    <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
                     <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
                     ?>
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
                                 <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                                    <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                                 <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                                 <?php endif; ?>
@@ -874,14 +888,15 @@
                     <tr>
                         <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
                     </tr>
+                    <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
                     <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
                     ?>
                         <tr>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                             <td colspan="4" style="padding-right:3%; font-weight: bold;">
                                 <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                                    <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                                    <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                                 <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                                     <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                                 <?php endif; ?>
@@ -998,14 +1013,15 @@
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
+        <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
         <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
         ?>
             <tr>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                     <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1068,14 +1084,15 @@
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
+        <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
         <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
         ?>
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                     <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1199,6 +1216,7 @@
             <tr>
                 <td colspan="11" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
             </tr>
+            <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 11)); ?>
             <?php foreach ($flupload as $f) : ?>
                 <tr>
                     <td colspan="8" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
@@ -1347,14 +1365,15 @@
             <tr>
                 <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
             </tr>
+            <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
             <?php foreach ($flupload as $f) :
-                                        $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                        $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
             ?>
                 <tr>
                     <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                     <td colspan="3" style="padding-right:3%; font-weight: bold;">
                         <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                            <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                            <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                         <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                             <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                         <?php endif; ?>
@@ -1408,14 +1427,15 @@
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
+        <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
         <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
         ?>
             <tr>
                 <td colspan="3" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="6" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                     <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1429,13 +1449,13 @@
             <td colspan="10" class="bg-black color-palette" style="text-align: center;">Bukti Pembelian</td>
         </tr>
         <?php foreach ($fluploadbukti as $fb) :
-                                    $imagePathb = "../images/upbukti/" . $fb->file_uploaded;
+                                    $imagePathb = base_url('postatusnk/purchase-proof/' . $fb->id_fk_bukti);
         ?>
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Buka File</a>
                     <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1462,13 +1482,13 @@
             <td colspan="10" class="bg-black color-palette" style="text-align: center;">Bukti Pembelian</td>
         </tr>
         <?php foreach ($fluploadbukti as $fb) :
-                                    $imagePathb = "../images/upbukti/" . $fb->file_uploaded;
+                                    $imagePathb = base_url('postatusnk/purchase-proof/' . $fb->id_fk_bukti);
         ?>
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Buka File</a>
                     <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1517,13 +1537,13 @@
             <td colspan="10" class="bg-black color-palette" style="text-align: center;">Bukti Pembelian</td>
         </tr>
         <?php foreach ($fluploadbukti as $fb) :
-                                    $imagePathb = "../images/upbukti/" . $fb->file_uploaded;
+                                    $imagePathb = base_url('postatusnk/purchase-proof/' . $fb->id_fk_bukti);
         ?>
             <tr>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="5" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Buka File</a>
                     <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1545,13 +1565,13 @@
             <td colspan="8" class="bg-black color-palette" style="text-align: center;">Bukti Pembelian</td>
         </tr>
         <?php foreach ($fluploadbukti as $fb) :
-                                    $imagePathb = "../images/upbukti/" . $fb->file_uploaded;
+                                    $imagePathb = base_url('postatusnk/purchase-proof/' . $fb->id_fk_bukti);
         ?>
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $fb->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($fb->kdfile == 'csv' || $fb->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Buka File</a>
                     <?php elseif (in_array($fb->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePathb ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $fb->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1670,14 +1690,15 @@
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
+        <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
         <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
         ?>
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                     <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1743,14 +1764,15 @@
         <tr>
             <td colspan="9" class="bg-black color-palette" style="text-align: center;">File Pendukung</td>
         </tr>
+        <?php $this->load->view('content/postatus/_pic_supporting_rows', array('documents' => $picSupportingDocuments, 'colspan' => 9)); ?>
         <?php foreach ($flupload as $f) :
-                                    $imagePath = "../images/filepndukung/" . $f->file_uploaded;
+                                    $imagePath = base_url('postatusnk/supporting-file/' . $f->id_file_nk);
         ?>
             <tr>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;"><?= $f->keterangan ?></td>
                 <td colspan="4" style="padding-right:3%; font-weight: bold;">
                     <?php if ($f->kdfile == 'csv' || $f->kdfile == 'pdf') : ?>
-                        <a href="<?= base_url('downloadfile/') . $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
+                        <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" target="_blank">Download File</a>
                     <?php elseif (in_array($f->kdfile, array('png', 'jpg', 'jpeg', 'webp'), true)) : ?>
                         <a href="<?= $imagePath ?>" class="btn btn-secondary btn-sm btn-block" data-toggle="lightbox" data-title="<?= $f->keterangan ?>">Buka File</a>
                     <?php endif; ?>
@@ -1891,6 +1913,70 @@
     <!-- /.content-header -->
 
 </div>
+<?php if ($manualMasterCount > 0 && $canManageManualMaster) : ?>
+    <div class="modal fade" id="manualMasterList" tabindex="-1" role="dialog" aria-labelledby="manualMasterListTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualMasterListTitle">Master Barang Manual PO Jasa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead class="thead-light"><tr><th>#</th><th>Nama Material</th><th>Deskripsi</th><th>Satuan</th><th>Qty</th><th>Aksi</th></tr></thead>
+                            <tbody>
+                                <?php foreach ($manualMasterItems as $manualIndex => $manualItem) : ?>
+                                    <tr>
+                                        <td><?= $manualIndex + 1 ?></td>
+                                        <td><?= htmlspecialchars((string) ($manualItem->nama_material ?: $manualItem->nama_barang), ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= htmlspecialchars((string) ($manualItem->deskripsi_material ?: $manualItem->deskripsi), ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= htmlspecialchars((string) $manualItem->satuan_material, ENT_QUOTES, 'UTF-8') ?></td>
+                                        <td><?= number_format((float) $manualItem->qty, 2, ',', '.') ?></td>
+                                        <td><button type="button" class="btn btn-primary btn-sm btn-open-manual-master" data-form="#manualMasterForm<?= (int) $manualItem->source_material_id ?>"><i class="fas fa-edit"></i> Input Master</button></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php foreach ($manualMasterItems as $manualItem) : ?>
+        <?php
+        $manualName = (string) ($manualItem->nama_material ?: $manualItem->nama_barang);
+        $manualDescription = (string) ($manualItem->deskripsi_material ?: $manualItem->deskripsi);
+        ?>
+        <div class="modal fade" id="manualMasterForm<?= (int) $manualItem->source_material_id ?>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form method="post" action="<?= base_url('postatusnk/master-barang-manual') ?>">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Input Master Barang Non Komersil</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="kd_po_nk" value="<?= htmlspecialchars((string) $kd, ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="id_material" value="<?= (int) $manualItem->source_material_id ?>">
+                            <div class="alert alert-info py-2">Material PO Jasa: <strong><?= htmlspecialchars($manualName, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                            <div class="form-group"><label>Kode Barang</label><input class="form-control" name="kd_br_adm" value="<?= htmlspecialchars((string) $manualMasterCode, ENT_QUOTES, 'UTF-8') ?>" readonly><small class="form-text text-muted">Digenerate otomatis dan diverifikasi kembali saat disimpan.</small></div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6"><label>Kategori Barang <span class="text-danger">*</span></label><select class="form-control" name="kat_barang" required><option value="">Pilih kategori</option><?php foreach ($kategoriBarangNk as $kategori) : ?><option value="<?= htmlspecialchars((string) $kategori->kd_kat, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) $kategori->nama_kategori, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
+                                <div class="form-group col-md-6"><label>Satuan <span class="text-danger">*</span></label><select class="form-control" name="satuan" required><option value="">Pilih satuan</option><?php foreach ($satuanBarangNk as $satuan) : ?><option value="<?= (int) $satuan->id_satuan ?>"<?= strtoupper(trim((string) $satuan->nm_satuan)) === strtoupper(trim((string) $manualItem->satuan_material)) ? ' selected' : '' ?>><?= htmlspecialchars((string) $satuan->nm_satuan, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
+                            </div>
+                            <div class="form-group"><label>Nama Barang <span class="text-danger">*</span></label><input class="form-control" name="nama_barang" maxlength="180" value="<?= htmlspecialchars($manualName, ENT_QUOTES, 'UTF-8') ?>" required></div>
+                            <div class="form-group"><label>Deskripsi / Spesifikasi</label><textarea class="form-control" name="descnk" rows="3"><?= htmlspecialchars($manualDescription, ENT_QUOTES, 'UTF-8') ?></textarea></div>
+                            <input type="hidden" name="minimum_stock" value="0">
+                        </div>
+                        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Rekam</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 <script>
     (function initPonkDetailAjax() {
         if (typeof window.jQuery === 'undefined') {
@@ -1999,6 +2085,13 @@
                     $submitButton.prop('disabled', false);
                 }
             });
+        });
+
+        $(document).off('click.ponkManualMaster', '.btn-open-manual-master').on('click.ponkManualMaster', '.btn-open-manual-master', function() {
+            var target = $(this).data('form');
+            $('#manualMasterList').one('hidden.bs.modal', function() {
+                $(target).modal('show');
+            }).modal('hide');
         });
     })();
 </script>

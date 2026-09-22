@@ -1900,17 +1900,42 @@ class C_PoStatus extends CI_Controller
         $data['kdbarang']  = $this->M_Postatus->generatekd();
         $data['flupload']  = $this->M_Postatus->flupload($kd)->result();
         $data['fluploadbukti']  = $this->M_Postatus->fluploadbukti($kd)->result();
+        $data['picSupportingDocuments'] = $this->M_Postatus->get_pic_supporting_documents($kd);
         $data['tax']    = $this->M_Postatus->getTax();
         $data['diskon'] = $this->M_Postatus->getDiskon($kd);
         $data['totalDiskon'] = $this->M_Postatus->totalDiskon($kd);
         $data['hrgnyata'] = $this->M_Postatus->counhrgnyata($kd);
         $data['ntpembelian'] = $this->M_Postatus->get_note_pembelian($kd);
         $data['hargaNyataSummary'] = $this->M_Postatus->get_harga_nyata_summary($kd);
+        $data['manualMasterItems'] = $this->M_Postatus->get_manual_master_required_for_ponk($kd);
+        $data['manualMasterCode'] = $this->M_Postatus->generate_unique_manual_master_code();
+        $data['kategoriBarangNk'] = $this->M_Postatus->get_kategori_barang_nk();
+        $data['satuanBarangNk'] = $this->M_Postatus->get_satuan_barang_nk();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailponk', $data);
         $this->load->view('partial/footer');
+    }
+
+    public function simpan_master_barang_manual_pojasa()
+    {
+        if (!is_super_admin() && !in_array((string) $this->session->userdata('lv'), array('1', '2'), true)) {
+            show_error('Akses ditolak.', 403);
+            return;
+        }
+
+        $kdpo = trim((string) $this->input->post('kd_po_nk', true));
+        $materialId = (int) $this->input->post('id_material', true);
+        $result = $this->M_Postatus->save_manual_master_barang_pojasa($kdpo, $materialId, array(
+            'kat_barang' => $this->input->post('kat_barang', true),
+            'nama_barang' => $this->input->post('nama_barang', true),
+            'descnk' => $this->input->post('descnk', true),
+            'satuan' => $this->input->post('satuan', true),
+        ), (string) $this->session->userdata('kode'));
+
+        $this->session->set_flashdata($result['status'] ? 'success' : 'error', $result['message']);
+        redirect('detailponk/' . $kdpo);
     }
 
     private function blockedPonkEditStatuses()
@@ -2233,6 +2258,53 @@ class C_PoStatus extends CI_Controller
         $tjpem          = $this->input->post('tjpembelian');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
+
+        // PO Pembelian otomatis dari PO Jasa tidak boleh mengikuti penutupan
+        // PO non-komersil biasa.  Saat ON HAND, catat pasangan stok masuk dari
+        // PO pembelian lalu stok keluar ke PO Jasa yang menjadi sumbernya.
+        $pojasaPosting = $this->M_Postatus->post_pojasa_on_hand_stock_pair(
+            $kdpo,
+            $tgl ?: date('Y-m-d'),
+            (string) $this->session->userdata('kode')
+        );
+        if ($pojasaPosting['success'] || $pojasaPosting['code'] === 'ALREADY_POSTED') {
+            if ($pojasaPosting['success']) {
+                $this->M_Postatus->addNote(array(
+                    'kd_po' => $kdpo,
+                    'isi_note' => 'ON HAND PO JASA - stok masuk PO Pembelian dan stok keluar ke PO Jasa',
+                    'kd_user' => $departement,
+                    'nama_user' => $namauser,
+                    'note_for' => '1',
+                    'update_status' => '1',
+                ));
+            }
+            $this->session->set_flashdata(
+                $pojasaPosting['success'] ? 'success' : 'error',
+                $pojasaPosting['success']
+                    ? 'ON HAND PO Jasa berhasil dicatat: stok masuk dari PO Pembelian dan stok keluar ke PO Jasa.'
+                    : 'ON HAND PO Jasa sudah pernah dicatat; tidak ada transaksi stok tambahan.'
+            );
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+        if ($pojasaPosting['code'] !== 'NOT_PO_JASA') {
+            $this->session->set_flashdata('error', 'ON HAND PO Jasa gagal diproses: ' . $pojasaPosting['code']);
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
+        // Barang PO Jasa yang dibuat manual wajib memiliki master barang
+        // sebelum stok dan transaksi penerimaan dibentuk.
+        $manualMasterItems = $this->M_Postatus->get_manual_master_required_for_ponk($kdpo);
+        if (count($manualMasterItems) > 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Konfirmasi penerimaan belum dapat dilakukan. Terdapat ' . count($manualMasterItems) . ' master barang manual yang belum diinput. Silakan rekam master barang terlebih dahulu.'
+            );
+            redirect('detailponk/' . $kdpo);
+            return;
+        }
+
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
         $now            = date('Y-m-d');
 
@@ -2892,8 +2964,15 @@ class C_PoStatus extends CI_Controller
             return array('success' => false, 'message' => 'File evidence wajib dipilih.');
         }
 
-        if (!is_dir($path)) {
-            @mkdir($path, 0755, true);
+        if (!is_dir($path) && !@mkdir($path, 0777, true) && !is_dir($path)) {
+            return array('success' => false, 'message' => 'Folder tujuan upload tidak dapat dibuat.');
+        }
+
+        // Folder dapat telah dibuat oleh proses/web user lain. Beri izin tulis
+        // agar Purchasing selalu dapat menyimpan file pada folder departemen/tanggal.
+        @chmod($path, 0777);
+        if (!is_writable($path)) {
+            return array('success' => false, 'message' => 'Folder tujuan upload tidak dapat ditulis.');
         }
 
         $config = array(
@@ -2975,6 +3054,13 @@ class C_PoStatus extends CI_Controller
         $userup       = $this->session->userdata('kode');
         $namauser     = $this->session->userdata('nama_user');
         $statusRow    = $this->getPonkStatusRow($kdponk);
+
+        if (!$statusRow || (!is_super_admin() && (string) $this->session->userdata('lv') !== '2')) {
+            $this->session->set_flashdata('error', 'Hanya Purchasing yang dapat mengunggah bukti pembelian.');
+            redirect('detailponk/' . $kdponk);
+            return;
+        }
+
         $validHargaNyata = $this->validateHargaNyataBeforePembelian($kdponk, $statusRow);
 
         if (!$validHargaNyata['status']) {
@@ -2983,7 +3069,16 @@ class C_PoStatus extends CI_Controller
             return;
         }
 
-        $upload = $this->uploadPonkEvidenceFile('gambar_1', './images/upbukti/');
+        // Gunakan folder yang telah dibuat saat PIC mengunggah dokumen
+        // pendukung request ini. Request lama tanpa dokumen tetap memakai
+        // struktur folder departemen/tanggal yang sama.
+        $relativeDirectory = $this->M_Postatus->get_pic_supporting_directory($kdponk);
+        if ($relativeDirectory === null) {
+            $department = preg_replace('/[^A-Z0-9_-]+/', '_', strtoupper((string) $statusRow->departemen));
+            $department = trim($department, '_') ?: 'UMUM';
+            $relativeDirectory = 'assets/request-pendukung/' . $department . '/' . date('Y-m-d') . '/';
+        }
+        $upload = $this->uploadPonkEvidenceFile('gambar_1', FCPATH . $relativeDirectory);
         if (!$upload['success']) {
             $this->session->set_flashdata('error', $upload['message']);
             redirect('detailponk/' . $kdponk);
@@ -2995,7 +3090,7 @@ class C_PoStatus extends CI_Controller
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'     => pathinfo($image_data1['file_name'], PATHINFO_FILENAME),
+            'file_name'     => $relativeDirectory . $image_data1['file_name'],
             'file_uploaded' => $image_data1['file_name']
         );
         $dataKonfirm = array(
@@ -3014,7 +3109,7 @@ class C_PoStatus extends CI_Controller
         $this->M_Postatus->konfirmPonk($kdponk, $dataKonfirm);
         $this->M_Postatus->addNote($notedirektur);
         $sourceId = $this->M_Postatus->upbuktibeli($dataupload);
-        $this->recordPonkEvidenceArchive($kdponk, 'BUKTI PEMBELIAN BARANG', $keterangan, $image_data1, 'images/upbukti/', 'tbpo_file_bukti_beli', $sourceId);
+        $this->recordPonkEvidenceArchive($kdponk, 'BUKTI PEMBELIAN BARANG', $keterangan, $image_data1, $relativeDirectory, 'tbpo_file_bukti_beli', $sourceId);
 
         redirect('detailponk/' . $kdponk);
     }
@@ -3154,7 +3249,20 @@ class C_PoStatus extends CI_Controller
         $keterangan   = $this->input->post('desc_isi');
         $userup       = $this->session->userdata('kode');
 
-        $upload = $this->uploadPonkEvidenceFile('gambar_1', './images/filepndukung/');
+        if ((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+        $statusRow = $this->getPonkStatusRow($kdponk);
+        if (!$statusRow) {
+            show_404();
+            return;
+        }
+        $department = preg_replace('/[^A-Z0-9_-]+/', '_', strtoupper((string) $statusRow->departemen));
+        $department = trim($department, '_') ?: 'UMUM';
+        $relativeDirectory = 'assets/request-pendukung/' . $department . '/' . date('Y-m-d') . '/';
+
+        $upload = $this->uploadPonkEvidenceFile('gambar_1', FCPATH . $relativeDirectory);
         if (!$upload['success']) {
             $this->session->set_flashdata('error', $upload['message']);
             redirect('detailponk/' . $kdponk);
@@ -3166,14 +3274,74 @@ class C_PoStatus extends CI_Controller
             'kd_po_nk'      => $kdponk,
             'keterangan'    => $keterangan,
             'user_upload'   => $userup,
-            'file_name'   => pathinfo($image_data1['file_name'], PATHINFO_FILENAME),
+            // Legacy rows use only a basename. New rows retain the relative
+            // path so they can be served from the department/date folder.
+            'file_name'   => $relativeDirectory . $image_data1['file_name'],
             'file_uploaded'    => $image_data1['file_name']
         );
 
         $sourceId = $this->M_Postatus->add_file_po_nk($dataBarang);
-        $this->recordPonkEvidenceArchive($kdponk, 'FILE PENDUKUNG PENGAJUAN', $keterangan, $image_data1, 'images/filepndukung/', 'tbpo_file_nk', $sourceId);
+        $this->recordPonkEvidenceArchive($kdponk, 'FILE PENDUKUNG PENGAJUAN', $keterangan, $image_data1, $relativeDirectory, 'tbpo_file_nk', $sourceId);
 
         redirect('detailponk/' . $kdponk);
+    }
+
+    public function supporting_file($fileId)
+    {
+        $file = $this->M_Postatus->get_supporting_file((int) $fileId);
+        $statusRow = $file ? $this->getPonkStatusRow($file->kd_po_nk) : null;
+        $level = (string) $this->session->userdata('lv');
+        $canAccess = is_super_admin() || $level === '2'
+            || (($level === '4' || $level === '5') && $statusRow && $statusRow->departemen === $this->session->userdata('departemen'));
+        if (!$file || !$statusRow || !$canAccess) {
+            show_404();
+            return;
+        }
+        $path = realpath(FCPATH . ltrim($file->display_path, '/'));
+        $assetBase = realpath(FCPATH . 'assets/request-pendukung');
+        $legacyBase = realpath(FCPATH . 'images/filepndukung');
+        $withinAsset = $assetBase && $path && strpos($path, $assetBase . DIRECTORY_SEPARATOR) === 0;
+        $withinLegacy = $legacyBase && $path && strpos($path, $legacyBase . DIRECTORY_SEPARATOR) === 0;
+        if ((!$withinAsset && !$withinLegacy) || !is_file($path)) {
+            show_404();
+            return;
+        }
+        $mime = function_exists('finfo_open') ? (new finfo(FILEINFO_MIME_TYPE))->file($path) : 'application/octet-stream';
+        $inline = strpos($mime, 'image/') === 0 || in_array($mime, array('application/pdf', 'text/plain'), true);
+        $name = str_replace(array('"', "\r", "\n"), '', $file->file_uploaded);
+        $this->output->set_content_type($mime)->set_header('X-Content-Type-Options: nosniff')
+            ->set_header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . $name . '"')
+            ->set_output(file_get_contents($path));
+    }
+
+    public function purchase_proof($fileId)
+    {
+        $file = $this->M_Postatus->get_purchase_proof_file((int) $fileId);
+        $statusRow = $file ? $this->getPonkStatusRow($file->kd_po_nk) : null;
+        $level = (string) $this->session->userdata('lv');
+        $canAccess = is_super_admin() || $level === '2'
+            || (($level === '4' || $level === '5') && $statusRow && $statusRow->departemen === $this->session->userdata('departemen'));
+        if (!$file || !$statusRow || !$canAccess) {
+            show_404();
+            return;
+        }
+
+        $path = realpath(FCPATH . ltrim($file->display_path, '/'));
+        $assetBase = realpath(FCPATH . 'assets/request-pendukung');
+        $legacyBase = realpath(FCPATH . 'images/upbukti');
+        $withinAsset = $assetBase && $path && strpos($path, $assetBase . DIRECTORY_SEPARATOR) === 0;
+        $withinLegacy = $legacyBase && $path && strpos($path, $legacyBase . DIRECTORY_SEPARATOR) === 0;
+        if ((!$withinAsset && !$withinLegacy) || !is_file($path)) {
+            show_404();
+            return;
+        }
+
+        $mime = function_exists('finfo_open') ? (new finfo(FILEINFO_MIME_TYPE))->file($path) : 'application/octet-stream';
+        $inline = strpos($mime, 'image/') === 0 || in_array($mime, array('application/pdf', 'text/plain'), true);
+        $name = str_replace(array('"', "\r", "\n"), '', $file->file_uploaded);
+        $this->output->set_content_type($mime)->set_header('X-Content-Type-Options: nosniff')
+            ->set_header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . $name . '"')
+            ->set_output(file_get_contents($path));
     }
 
     public function hrgnyataon($kdponk)

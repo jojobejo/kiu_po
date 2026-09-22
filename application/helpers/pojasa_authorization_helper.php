@@ -83,6 +83,9 @@ function pojasa_can_act_on_request($context, $request, $capability)
     if ($capability === 'PIC_OWNER') {
         return $role === 'PIC' && $requestOwner === (string) $context['kode_user'];
     }
+    if ($capability === 'PIC') {
+        return $role === 'PIC' && $requestOwner === (string) $context['kode_user'];
+    }
     if ($capability === 'KADEP') {
         return $role === 'KADEP' && $requestDepartment === $context['departemen'];
     }
@@ -93,7 +96,7 @@ function pojasa_can_act_on_request($context, $request, $capability)
         return $role === 'DIREKTUR';
     }
     if ($capability === 'DIREKTUR_OPERASIONAL') {
-        return $role === 'DIREKTUR_OPERASIONAL' && in_array($requestDepartment, array('IT', 'HRD', 'GA'), true);
+        return $role === 'DIREKTUR_OPERASIONAL';
     }
     if ($capability === 'COST_INPUT') {
         return $role === 'PIC' && $requestOwner === (string) $context['kode_user'];

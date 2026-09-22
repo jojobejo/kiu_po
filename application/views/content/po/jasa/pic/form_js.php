@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 (function($) {
   'use strict';
@@ -12,9 +13,11 @@
     upload: <?= json_encode(base_url('pojasa/ajax/pic/documents/upload')) ?>,
     removeDocument: <?= json_encode(base_url('pojasa/ajax/pic/documents/delete')) ?>,
     documents: <?= json_encode(base_url('pojasa/ajax/pic/documents/')) ?>
+    , materialCatalog: <?= json_encode(base_url('pojasa/ajax/pic/material-catalog')) ?>
   };
 
   calculateAll();
+  initializeMaterialCatalog($('#materialTable tbody'));
   if (requestCode) {
     loadDocuments();
   }
@@ -39,7 +42,9 @@
     $('#scopeTable tbody').append($('#scopeRowTemplate').html());
   });
   $('#addMaterialRow').on('click', function() {
-    $('#materialTable tbody').append($('#materialRowTemplate').html());
+    var row = $($('#materialRowTemplate').html());
+    $('#materialTable tbody').append(row);
+    initializeMaterialCatalog(row);
   });
   $(document).on('click', '.remove-line', function() {
     $(this).closest('tr').remove();
@@ -52,9 +57,31 @@
   });
 
   $('#submitRequest').on('click', function() {
+    var errors = validateSubmitForm();
+    if (errors.length) {
+      showIncompleteFormAlert(errors);
+      return;
+    }
+    if (!documents.length) {
+      Swal.fire({
+        title: 'Dokumen pendukung belum ada',
+        text: 'Belum ada dokumen pendukung yang diunggah. Apakah request tetap ingin dilanjutkan?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, tetap lanjutkan',
+        cancelButtonText: 'Tidak, kembali'
+      }).then(function(result) {
+        if (result.value) confirmSubmit(true);
+      });
+      return;
+    }
+    confirmSubmit(false);
+  });
+
+  function confirmSubmit(allowWithoutDocuments) {
     Swal.fire({
       title: 'Ajukan request?',
-      text: 'Data terbaru akan disimpan, lalu request dikirim ke KADEP. Selama menunggu approval request tidak dapat diedit.',
+      text: 'Data terbaru akan disimpan, lalu request dikirim ke Purchasing. Selama menunggu approval request tidak dapat diedit.',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Ya, simpan dan ajukan',
@@ -63,9 +90,9 @@
       if (!result.value) {
         return;
       }
-      saveDraft(true);
+      saveDraft(true, allowWithoutDocuments);
     });
-  });
+  }
 
   $('#uploadDocuments').on('click', function() {
     var input = $('#documentFiles')[0];
@@ -161,7 +188,7 @@
     });
   });
 
-  function saveDraft(andSubmit) {
+  function saveDraft(andSubmit, allowWithoutDocuments) {
     if (busy) {
       return;
     }
@@ -187,7 +214,7 @@
       }
       activateSavedDraft(response.data);
       if (andSubmit) {
-        submitSavedRequest();
+        submitSavedRequest(allowWithoutDocuments === true);
       } else {
         Swal.fire({ title: 'Draft tersimpan', text: response.message, icon: 'success', timer: 1600, showConfirmButton: false });
       }
@@ -203,8 +230,8 @@
     });
   }
 
-  function submitSavedRequest() {
-    post(endpoints.submit, { kd_po_jasa: requestCode }).done(function(response) {
+  function submitSavedRequest(allowWithoutDocuments) {
+    post(endpoints.submit, { kd_po_jasa: requestCode, allow_without_documents: allowWithoutDocuments ? 1 : 0 }).done(function(response) {
       updateCsrf(response);
       if (!response.success) {
         if (response.code === 'SUBMIT_VALIDATION' && response.errors && response.errors.documents) {
@@ -220,9 +247,9 @@
         title: 'Request diajukan',
         text: response.message,
         icon: 'success',
-        confirmButtonText: 'Lihat detail'
+        confirmButtonText: 'Mengerti'
       }).then(function() {
-        window.location.href = response.data.detail_url;
+        window.location.href = <?= json_encode(base_url('pojasa/pic')) ?>;
       });
     }).fail(function(xhr) {
       showAjaxError(xhr, 'Request gagal diajukan.');
@@ -259,6 +286,9 @@
     var materials = [];
     $('#materialTable tbody tr').each(function() {
       materials.push({
+        id_brg_nk: $(this).find('.material-catalog').val(),
+        id_usulan_barang: $(this).find('.material-proposal-id').val(),
+        reference_type: $(this).find('.material-reference-type').val(),
         nama_material: $(this).find('.line-name').val(),
         deskripsi: $(this).find('.line-description').val(),
         qty_kebutuhan: $(this).find('.line-qty').val(),
@@ -270,6 +300,8 @@
       kd_po_jasa: requestCode,
       kd_vendor_jasa: $('#vendorCode').val(),
       vendor_usulan: $('#vendorProposal').val(),
+      tgl_mulai_pekerjaan: $('#plannedStartDate').val(),
+      tgl_selesai_pekerjaan: $('#plannedCompletionDate').val(),
       tujuan_pekerjaan: $('#workPurpose').val(),
       catatan_pic: $('#picNotes').val(),
       scopes: scopes,
@@ -277,12 +309,131 @@
     };
   }
 
+  function validateSubmitForm() {
+    var errors = [];
+    var firstField = null;
+    function missing(label, field) {
+      errors.push(label);
+      if (!firstField && field && field.length) firstField = field;
+    }
+    function blank(value) { return $.trim(String(value || '')) === ''; }
+
+    var vendorCode = $('#vendorCode').val();
+    var vendorProposal = $('#vendorProposal').val();
+    if (!vendorCode && blank(vendorProposal)) missing('Vendor terdaftar atau Nama vendor / toko manual', $('#vendorCode'));
+    if (vendorCode && !blank(vendorProposal)) missing('Pilih hanya satu sumber vendor', $('#vendorCode'));
+    if (blank($('#plannedStartDate').val())) missing('Tanggal rencana start pekerjaan', $('#plannedStartDate'));
+    if (blank($('#plannedCompletionDate').val())) missing('Target penyelesaian', $('#plannedCompletionDate'));
+    if ($('#plannedStartDate').val() && $('#plannedCompletionDate').val() && $('#plannedCompletionDate').val() < $('#plannedStartDate').val()) {
+      missing('Target penyelesaian tidak boleh lebih awal dari tanggal rencana start pekerjaan', $('#plannedCompletionDate'));
+    }
+    if (blank($('#workPurpose').val())) missing('Tujuan pekerjaan', $('#workPurpose'));
+
+    var scopeRows = 0;
+    $('#scopeTable tbody tr').each(function(index) {
+      var row = $(this);
+      var values = [row.find('.line-name').val(), row.find('.line-description').val(), row.find('.line-qty').val(), row.find('.line-unit').val(), row.find('.line-price').val()];
+      if (values.every(blank)) return;
+      scopeRows++;
+      validateLine(row, 'Scope pekerjaan baris ' + (index + 1), errors, function(field) {
+        if (!firstField) firstField = field;
+      });
+    });
+    if (!scopeRows) missing('Minimal satu baris Scope Pekerjaan', $('#addScopeRow'));
+
+    $('#materialTable tbody tr').each(function(index) {
+      var row = $(this);
+      var values = [row.find('.line-name').val(), row.find('.line-description').val(), row.find('.line-qty').val(), row.find('.line-unit').val(), row.find('.line-price').val()];
+      if (values.every(blank)) return;
+      validateLine(row, 'Material / Alat dan Bahan baris ' + (index + 1), errors, function(field) {
+        if (!firstField) firstField = field;
+      });
+    });
+    validateSubmitForm.firstField = firstField;
+    return errors;
+  }
+
+  function validateLine(row, label, errors, setFirstField) {
+    var fields = [
+      { selector: '.line-name', label: 'Nama' },
+      { selector: '.line-description', label: 'Deskripsi' },
+      { selector: '.line-qty', label: 'Qty' },
+      { selector: '.line-unit', label: 'Satuan' },
+      { selector: '.line-price', label: 'Harga estimasi' }
+    ];
+    fields.forEach(function(item) {
+      var field = row.find(item.selector);
+      if ($.trim(String(field.val() || '')) === '') {
+        errors.push(label + ': ' + item.label);
+        setFirstField(field);
+      }
+    });
+  }
+
+  function showIncompleteFormAlert(errors) {
+    var list = '<ul class="text-left mb-0 pl-4">' + errors.map(function(error) {
+      return '<li>' + escapeHtml(error) + '</li>';
+    }).join('') + '</ul>';
+    Swal.fire({
+      title: 'Form belum lengkap',
+      html: 'Lengkapi isian berikut sebelum mengajukan request:' + list,
+      icon: 'warning',
+      confirmButtonText: 'Mengerti'
+    }).then(function() {
+      if (validateSubmitForm.firstField) validateSubmitForm.firstField.trigger('focus');
+    });
+  }
+
+  function initializeMaterialCatalog(container) {
+    container.find('.material-catalog').each(function() {
+      var select = $(this);
+      if (select.hasClass('select2-hidden-accessible')) return;
+      select.select2({
+        width: '100%', placeholder: 'Cari kode atau nama barang master', allowClear: true,
+        ajax: {
+          url: endpoints.materialCatalog, dataType: 'json', delay: 250,
+          data: function(params) { return { term: params.term || '', page: params.page || 1 }; },
+          processResults: function(response) { return response && response.success ? response.data : { results: [] }; }
+        },
+        minimumInputLength: 1,
+        templateResult: function(item) {
+          if (item.loading) return item.text;
+          var qty = Number(item.qty_ready || 0);
+          var color = qty > 0 ? 'success' : 'danger';
+          return $('<div class="d-flex justify-content-between align-items-center"><span><strong></strong><small class="d-block text-muted"></small></span><span class="badge badge-' + color + ' ml-2"></span></div>')
+            .find('strong').text(item.text || '').end()
+            .find('small').text(item.deskripsi || '').end()
+            .find('.badge').text('Qty ready: ' + qty.toLocaleString('id-ID', {maximumFractionDigits: 2}) + (item.satuan ? ' ' + item.satuan : '')).end();
+        },
+        templateSelection: function(item) { return item.text || ''; }
+      });
+      var selectedId = select.data('selected-id');
+      var selectedText = select.data('selected-text');
+      if (selectedId && selectedText) {
+        select.append(new Option(selectedText, selectedId, true, true)).trigger('change.select2');
+      }
+      select.on('select2:select', function(event) {
+        var item = event.params.data || {};
+        var row = select.closest('.material-row');
+        row.find('.material-reference-type').val('MASTER');
+        row.find('.material-proposal-id').val('');
+        row.find('.material-proposal-label').empty();
+        row.find('.line-name').val(item.nama_barang || '').prop('readonly', true);
+        row.find('.line-description').val(item.deskripsi || '').prop('readonly', true);
+        if (item.satuan) row.find('.line-unit').val(item.satuan);
+      }).on('select2:clear', function() {
+        var row = select.closest('.material-row');
+        row.find('.material-reference-type').val('MANUAL');
+        row.find('.line-name, .line-description').prop('readonly', false);
+      });
+    });
+  }
+
   function calculateAll() {
     var scope = calculateTable('#scopeTable');
     var material = calculateTable('#materialTable');
     $('#scopeTotal').text(formatRupiah(scope));
     $('#materialTotal').text(formatRupiah(material));
-    $('#grandTotal').text(formatRupiah(scope + material));
   }
 
   function calculateTable(selector) {

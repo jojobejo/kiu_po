@@ -5,6 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  */
 class M_Stocknonkomersil  extends CI_Model
 {
+    private $stockLifoView = false;
     function __construct()
     {
         parent::__construct();
@@ -17,6 +18,21 @@ class M_Stocknonkomersil  extends CI_Model
 
     private function stock_base_sql()
     {
+        $hasLifo = $this->db->table_exists('tbpo_stock_lifo_batch');
+        $lifoSelect = $hasLifo ? ",
+            COALESCE(lifo.batch_aktif, 0) AS batch_lifo_aktif,
+            COALESCE(lifo.qty_perlu_harga, 0) AS qty_lifo_perlu_harga,
+            COALESCE(lifo.nilai_lifo, 0) AS nilai_lifo,
+            (SELECT lb.harga_satuan FROM tbpo_stock_lifo_batch lb
+                WHERE lb.kd_barang=a.kd_barang AND lb.status_batch='AKTIF' AND lb.status_harga='VALID' AND lb.qty_sisa > 0
+                ORDER BY lb.tgl_efektif DESC, lb.id_batch DESC LIMIT 1) AS harga_lifo_aktif" : ", 0 AS batch_lifo_aktif, 0 AS qty_lifo_perlu_harga, 0 AS nilai_lifo, NULL AS harga_lifo_aktif";
+        $lifoJoin = $hasLifo ? " LEFT JOIN (
+            SELECT kd_barang,
+                SUM(CASE WHEN status_batch='AKTIF' AND qty_sisa > 0 THEN 1 ELSE 0 END) AS batch_aktif,
+                SUM(CASE WHEN status_batch='AKTIF' AND status_harga='PERLU_HARGA' THEN qty_sisa ELSE 0 END) AS qty_perlu_harga,
+                SUM(CASE WHEN status_batch='AKTIF' AND status_harga='VALID' THEN qty_sisa * harga_satuan ELSE 0 END) AS nilai_lifo
+            FROM tbpo_stock_lifo_batch GROUP BY kd_barang
+        ) lifo ON lifo.kd_barang=a.kd_barang" : '';
         return "SELECT
             a.kd_barang AS kode_barangs,
             a.kd_br_adm AS kode_barang,
@@ -41,7 +57,7 @@ class M_Stocknonkomersil  extends CI_Model
                 WHEN (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)) <= 0 THEN 'habis'
                 WHEN (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)) <= COALESCE(a.minimum_stock, 0) THEN 'hampir_habis'
                 ELSE 'aman'
-            END AS status_stock
+            END AS status_stock{$lifoSelect}
         FROM tbpo_barang_nk a
         JOIN tbpo_satuan b ON b.id_satuan = a.satuan
         LEFT JOIN tbpo_barang_nk_lokasi l ON l.id_lokasi = a.kd_lokasi
@@ -53,7 +69,7 @@ class M_Stocknonkomersil  extends CI_Model
             FROM tbpo_transaksi
             WHERE kd_akun IN ('11511', '11512', '11513', '11514')
             GROUP BY kd_barang
-        ) tr ON tr.kd_barang = a.kd_barang";
+        ) tr ON tr.kd_barang = a.kd_barang{$lifoJoin}";
     }
 
     private function stock_filter_sql($params, &$binds)
@@ -96,12 +112,24 @@ class M_Stocknonkomersil  extends CI_Model
             1 => 'stock.nama_barang',
             2 => 'stock.deskripsi',
             3 => 'stock.qty_ready',
-            4 => 'stock.minimum_stock',
-            5 => 'stock.qty_saran_po',
-            6 => 'stock.status_stock',
-            7 => 'stock.satuan',
-            8 => 'stock.nama_lokasi'
+            4 => 'stock.batch_lifo_aktif',
+            5 => 'stock.harga_lifo_aktif',
+            6 => 'stock.nilai_lifo',
+            7 => 'stock.qty_lifo_perlu_harga',
+            8 => 'stock.minimum_stock',
+            9 => 'stock.qty_saran_po',
+            10 => 'stock.status_stock',
+            11 => 'stock.satuan',
+            12 => 'stock.nama_lokasi'
         ];
+        // Tampilan tanpa otorisasi nominal tidak mengirim kolom LIFO ke DataTables.
+        if (empty($this->stockLifoView)) {
+            $columns = [
+                0 => 'stock.kode_barang', 1 => 'stock.nama_barang', 2 => 'stock.deskripsi',
+                3 => 'stock.qty_ready', 4 => 'stock.minimum_stock', 5 => 'stock.qty_saran_po',
+                6 => 'stock.status_stock', 7 => 'stock.satuan', 8 => 'stock.nama_lokasi'
+            ];
+        }
 
         $order_column = isset($columns[$column]) ? $columns[$column] : $columns[0];
         $order_dir = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
@@ -118,6 +146,7 @@ class M_Stocknonkomersil  extends CI_Model
 
     public function get_stock_datatable($params)
     {
+        $this->stockLifoView = !empty($params['lifo_view']);
         $base_sql = $this->stock_base_sql();
         $binds = [];
         $filter_sql = $this->stock_filter_sql($params, $binds);

@@ -38,6 +38,24 @@
 
                         <!-- Tempat menampilkan hasil -->
                         <div id="result"></div>
+                        <?php if ($lifo_summary !== null && $can_manage_lifo_price) : ?>
+                            <div class="row mb-3">
+                                <div class="col-md-3"><div class="small-box bg-info"><div class="inner"><h4><?= (float) $lifo_summary->qty_batch ?></h4><p>Qty Batch LIFO</p></div></div></div>
+                                <div class="col-md-3"><div class="small-box bg-success"><div class="inner"><h4><?= (int) $lifo_summary->batch_aktif ?></h4><p>Batch Aktif</p></div></div></div>
+                                <div class="col-md-3"><div class="small-box bg-primary"><div class="inner"><h4>Rp <?= number_format($lifo_summary->nilai_lifo, 0, ',', '.') ?></h4><p>Nilai Stok LIFO</p></div></div></div>
+                                <div class="col-md-3"><div class="small-box <?= (float) $lifo_summary->qty_perlu_harga > 0 ? 'bg-danger' : 'bg-secondary' ?>"><div class="inner"><h4><?= (float) $lifo_summary->qty_perlu_harga ?></h4><p>Qty Perlu Harga</p></div></div></div>
+                            </div>
+                            <h4 class="mt-3">Lapisan Stok LIFO Tersisa</h4>
+                            <table class="table table-bordered table-sm mb-4">
+                                <thead style="background-color: #212529; color:white;"><tr><td>Urutan</td><td>Tanggal Masuk</td><td>Referensi</td><td>Sumber</td><td>Qty Awal</td><td>Qty Sisa</td><td>Harga / Unit</td><td>Nilai Sisa</td><td>Dasar Harga</td><?php if ($can_manage_lifo_price) : ?><td>#</td><?php endif; ?></tr></thead>
+                                <tbody><?php foreach ($lifo_batches as $index => $batch) : ?><tr>
+                                    <td><?= $index + 1 ?></td><td><?= $batch->tgl_efektif ?></td><td><?= $batch->referensi_sumber ?></td><td><?= $batch->jenis_sumber ?></td><td><?= $batch->qty_awal ?></td><td><?= $batch->qty_sisa ?></td>
+                                    <td><?= $batch->status_harga === 'VALID' ? 'Rp ' . number_format($batch->harga_satuan, 0, ',', '.') : '<span class="badge badge-danger">Perlu harga</span>' ?></td>
+                                    <td><?= $batch->status_harga === 'VALID' ? 'Rp ' . number_format($batch->qty_sisa * $batch->harga_satuan, 0, ',', '.') : '-' ?></td><td><?= $batch->dasar_harga ?></td>
+                                    <?php if ($can_manage_lifo_price) : ?><td><?php if ($batch->status_harga === 'PERLU_HARGA') : ?><form method="post" action="<?= base_url('stocknonkomersil/save_lifo_price') ?>"><input type="hidden" name="id_batch" value="<?= $batch->id_batch ?>"><input type="hidden" name="kd_barang" value="<?= $i->kode_sistem ?>"><input class="form-control form-control-sm mb-1" name="harga_satuan" type="number" min="1" placeholder="Harga"><input class="form-control form-control-sm mb-1" name="alasan" required placeholder="Alasan"><button class="btn btn-sm btn-warning">Simpan</button></form><?php endif; ?></td><?php endif; ?>
+                                </tr><?php endforeach; ?></tbody>
+                            </table>
+                        <?php endif; ?>
                         <table class="table table-bordered mb-5">
                             <thead style="background-color: #212529; color:white;">
                                 <tr>

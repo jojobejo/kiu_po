@@ -1,51 +1,51 @@
-<?php foreach ($lstock as $l) : ?>
-    <div class="modal fade" id="addreq<?= $l->kode_sys ?>">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Item Request - <span style="text-transform:uppercase"><b><?= $l->nama_barang ?></b></span></h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <?php echo form_open_multipart('addtmpreqbarang'); ?>
-                    <div class="form-group">
-                        <div class="row" hidden>
-                            <div class="col-sm-8">
-                                <input class="form-control" type="text" id="kdbys" name="kdbys" value="<?= $l->kode_sys ?>" readonly />
-                                <input class="form-control" type="text" id="kdbr" name="kdbr" value="<?= $l->kode_adm ?>" readonly />
-                                <input class="form-control" type="text" id="idsat" name="idsat" value="<?= $l->id_satuan ?>" readonly />
-                                <input class="form-control" type="text" id="katbr" name="katbr" value="<?= $l->kat_barang ?>" readonly />
-                                <input class="form-control" type="text" id="nm_barang" name="nm_barang" value="<?= $l->nama_barang ?>" readonly />
-                                <input class="form-control" type="text" id="descnk_isi" name="descnk_isi" value="<?= $l->descnk ?>" readonly />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">Keterangan<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="ket_isi" name="ket_isi" value="" placeholder="Inputkan keterangan kebutuhan" /></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-sm-3 control-label text-right" for="kd_user">QTY<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" value="" placeholder="Inputkan jumlah kebutuhan" /></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-                </form>
+<div class="modal fade" id="addreq" tabindex="-1" role="dialog" aria-labelledby="addreqTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="addreqTitle">Add Item Request - <span id="addreqItemName" style="text-transform:uppercase"><b></b></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
-            <!-- /.modal-content -->
+            <?php echo form_open_multipart('addtmpreqbarang'); ?>
+            <div class="modal-body">
+                <input type="hidden" id="kdbys" name="kdbys">
+                <input type="hidden" id="kdbr" name="kdbr">
+                <input type="hidden" id="idsat" name="idsat">
+                <input type="hidden" id="katbr" name="katbr">
+                <input type="hidden" id="nm_barang" name="nm_barang">
+                <input type="hidden" id="descnk_isi" name="descnk_isi">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label text-sm-right" for="ket_isi">Keterangan<span class="required">*</span></label>
+                    <div class="col-sm-8"><input class="form-control" type="text" id="ket_isi" name="ket_isi" placeholder="Inputkan keterangan kebutuhan" required></div>
+                </div>
+                <div class="form-group row mb-0">
+                    <label class="col-sm-3 col-form-label text-sm-right" for="qty_isi">QTY<span class="required">*</span></label>
+                    <div class="col-sm-8"><input class="form-control" type="number" id="qty_isi" name="qty_isi" min="1" step="1" placeholder="Inputkan jumlah kebutuhan" required></div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+            </form>
         </div>
-        <!-- /.modal-dialog -->
     </div>
-<?php endforeach; ?>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    $(document).on('click', '.js-add-request-item', function () {
+        var item = $(this);
+        $('#addreqItemName').text(item.attr('data-nama'));
+        $('#kdbys').val(item.attr('data-kode-sys'));
+        $('#kdbr').val(item.attr('data-kode-adm'));
+        $('#idsat').val(item.attr('data-satuan'));
+        $('#katbr').val(item.attr('data-kategori'));
+        $('#nm_barang').val(item.attr('data-nama'));
+        $('#descnk_isi').val(item.attr('data-deskripsi'));
+        $('#ket_isi, #qty_isi').val('');
+    });
+});
+</script>
 
 <div class="modal fade" id="reqmasterbarang">
     <div class="modal-dialog modal-lg">

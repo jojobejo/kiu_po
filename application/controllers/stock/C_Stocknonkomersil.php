@@ -7,11 +7,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class C_Stocknonkomersil extends CI_Controller
 
 {
+    private function can_manage_lifo()
+    {
+        return in_array((string) $this->session->userdata('lv'), array('1', '2'), true)
+            || in_array((string) $this->session->userdata('kode'), array('KEU02', 'KEU09'), true);
+    }
 
     function __construct()
     {
         parent::__construct();
         $this->load->model('stock/M_Stocknonkomersil');
+        $this->load->model('stock/M_StockLifo');
         $this->load->model('PO/M_Postatus');
         $this->load->model('PO/M_Purchase');
         $this->load->library('form_validation');
@@ -91,6 +97,9 @@ class C_Stocknonkomersil extends CI_Controller
         $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
         $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
         $data['trash']      = $this->M_Stocknonkomersil->get_data_trash($kdbarang)->result();
+        $data['lifo_summary'] = $this->M_StockLifo->get_summary($kdbarang);
+        $data['lifo_batches'] = $this->M_StockLifo->get_active_batches($kdbarang);
+        $data['can_manage_lifo_price'] = $this->can_manage_lifo();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -189,6 +198,20 @@ class C_Stocknonkomersil extends CI_Controller
         $now            = date('Y-m-d H:i:s');
         $now1           = date('Y-m-d');
 
+        if (!in_array($kdakun, array('11513', '11514'), true) || (float) $adjqty <= 0) {
+            $this->session->set_flashdata('error', 'Kode akun adjustment dan qty positif wajib diisi.');
+            redirect('detailtransaksi/' . $kdbrsistem);
+            return;
+        }
+        if ($kdakun === '11514' && $this->M_StockLifo->schema_ready()) {
+            $availability = $this->M_StockLifo->can_allocate_outgoing($kdbrsistem, $adjqty);
+            if (!$availability['allowed']) {
+                $this->session->set_flashdata('error', $availability['message'] . ' Lengkapi harga batch pada Detail Transaksi terlebih dahulu.');
+                redirect('detailtransaksi/' . $kdbrsistem);
+                return;
+            }
+        }
+
         $generatekd         = array(
             'kd_barang'     => $adjustmentkd
         );
@@ -210,8 +233,22 @@ class C_Stocknonkomersil extends CI_Controller
             'update_at'         => $now
         );
 
+        $this->db->trans_begin();
         $this->M_Stocknonkomersil->generatekd($generatekd);
         $this->M_Stocknonkomersil->insttransaksi($insrtadjustment);
+        $transactionId = (int) $this->db->insert_id();
+        if ($this->M_StockLifo->schema_ready()) {
+            $lifoResult = $kdakun === '11513'
+                ? $this->M_StockLifo->register_incoming_transaction($transactionId, $this->session->userdata('kode'))
+                : $this->M_StockLifo->allocate_new_outgoing($transactionId);
+            if (!$lifoResult['success']) {
+                $this->db->trans_rollback();
+                $this->session->set_flashdata('error', $lifoResult['message']);
+                redirect('detailtransaksi/' . $kdbrsistem);
+                return;
+            }
+        }
+        $this->db->trans_commit();
 
         if ($kdakun == '11513') {
             $inputnote = array(
@@ -238,6 +275,26 @@ class C_Stocknonkomersil extends CI_Controller
             $this->M_Stocknonkomersil->insrt_note($inputnote);
             redirect('detailtransaksi/' . $kdbrsistem);
         }
+    }
+
+    public function save_lifo_price()
+    {
+        $kodeBarang = $this->input->post('kd_barang', true);
+        if (!$this->can_manage_lifo()) {
+            show_error('Anda tidak berwenang mengubah harga batch LIFO.', 403);
+            return;
+        }
+        if (!$this->M_StockLifo->schema_ready()) {
+            $this->session->set_flashdata('error', 'Schema LIFO belum tersedia.');
+            redirect('detailtransaksi/' . $kodeBarang);
+            return;
+        }
+        $result = $this->M_StockLifo->set_manual_price(
+            (int) $this->input->post('id_batch'), $this->input->post('harga_satuan'),
+            $this->input->post('alasan', true), $this->session->userdata('kode')
+        );
+        $this->session->set_flashdata($result['success'] ? 'success' : 'error', $result['message']);
+        redirect('detailtransaksi/' . $kodeBarang);
     }
     public function nkrestok()
     {
@@ -353,10 +410,16 @@ class C_Stocknonkomersil extends CI_Controller
                 'start' => max(0, (int)$this->input->get('start')),
                 'length' => ($length > 0 && $length <= 100) ? $length : 10,
                 'order_column' => is_array($order) && isset($order[0]['column']) ? (int)$order[0]['column'] : 0,
-                'order_dir' => is_array($order) && isset($order[0]['dir']) ? (string)$order[0]['dir'] : 'asc'
+                'order_dir' => is_array($order) && isset($order[0]['dir']) ? (string)$order[0]['dir'] : 'asc',
+                'lifo_view' => $this->can_manage_lifo()
             ];
 
             $result = $this->M_Stocknonkomersil->get_stock_datatable($params);
+            if (!$this->can_manage_lifo()) {
+                foreach ($result['data'] as $row) {
+                    unset($row->batch_lifo_aktif, $row->qty_lifo_perlu_harga, $row->nilai_lifo, $row->harga_lifo_aktif);
+                }
+            }
 
             $this->output
                 ->set_content_type('application/json')
@@ -370,6 +433,11 @@ class C_Stocknonkomersil extends CI_Controller
         }
 
         $stock = $this->M_Stocknonkomersil->v_stock($lokasi, $status_stock);
+        if (!$this->can_manage_lifo()) {
+            foreach ($stock as $row) {
+                unset($row->batch_lifo_aktif, $row->qty_lifo_perlu_harga, $row->nilai_lifo, $row->harga_lifo_aktif);
+            }
+        }
 
         $this->output
             ->set_content_type('application/json')

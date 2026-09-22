@@ -267,12 +267,28 @@ class C_MasterBarang extends CI_Controller
         $data['kdqrcode']       = $this->M_MasterBarang->generate_qrcode();
         $data['katbarang']      = $this->M_MasterBarang->getkatbarang();
         $data['satuan']         = $this->M_MasterBarang->getsatuanbr();
+        $data['pojasa_usulan']  = $this->db->table_exists('tbpo_jasa_material_usulan') ? $this->M_MasterBarang->get_pojasa_material_usulan() : array();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/mbarang/vreqmbarang', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/mbarang/datatables');
+    }
+
+    public function keputusan_usulan_pojasa()
+    {
+        if (!$this->can_manage_masterbarang() || !$this->db->table_exists('tbpo_jasa_material_usulan')) { show_error('Akses ditolak.', 403); return; }
+        $id = (int) $this->input->post('id_usulan_barang', true);
+        $action = strtoupper(trim((string) $this->input->post('action', true)));
+        $note = trim((string) $this->input->post('catatan_purchasing', true));
+        $masterId = (int) $this->input->post('id_brg_nk', true);
+        if (!in_array($action, array('MAPPED_EXISTING', 'APPROVED_NEW_MASTER', 'REVISION_REQUIRED', 'REJECTED'), true) || $id <= 0 || (in_array($action, array('MAPPED_EXISTING', 'APPROVED_NEW_MASTER'), true) && $masterId <= 0)) {
+            $this->session->set_flashdata('error', 'Keputusan usulan tidak valid.'); redirect('vrequestmbarang'); return;
+        }
+        $saved = $this->M_MasterBarang->decide_pojasa_material_usulan($id, $action, (int) $this->session->userdata('id'), $note, $masterId ?: null);
+        $this->session->set_flashdata($saved ? 'success' : 'error', $saved ? 'Usulan PO Jasa berhasil diperbarui dan transaksi ditautkan bila master dipilih.' : 'Usulan tidak dapat diperbarui.');
+        redirect('vrequestmbarang');
     }
     public function aprovedmasterbarang()
     {

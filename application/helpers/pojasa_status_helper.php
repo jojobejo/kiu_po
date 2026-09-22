@@ -5,14 +5,19 @@ function pojasa_statuses()
 {
     return array(
         'DRAFT',
+        'MENUNGGU_PURCHASING_AWAL',
+        'MENUNGGU_KONFIRMASI_PIC',
         'MENUNGGU_KADEP',
         'PENDING_KADEP',
         'REVISI_PIC',
+        'REVISI_PURCHASING_KADEP',
         'MENUNGGU_PURCHASING',
         'MENUNGGU_DIRUT_OPS',
+        'MENUNGGU_PURCHASING_DIROPS',
         'REVISI_PURCHASING_DIROPS',
         'MENUNGGU_DIREKTUR',
         'REVISI_PURCHASING_DIRUT',
+        'MENUNGGU_PENERBITAN_PURCHASING',
         'SPK_TERBIT',
         'ON_PROGRESS',
         'SELESAI',
@@ -51,42 +56,45 @@ function pojasa_next_status($currentStatus, $action, $departemen, $dirutOpsAppro
 {
     $currentStatus = strtoupper(trim((string) $currentStatus));
     $action = strtoupper(trim((string) $action));
-    $requiresDirutOps = pojasa_requires_dirut_ops($departemen);
-
     $transitions = array(
-        'DRAFT' => array('SUBMIT' => 'MENUNGGU_KADEP'),
-        'MENUNGGU_KADEP' => array(
+        'DRAFT' => array('SUBMIT' => 'MENUNGGU_PURCHASING_AWAL'),
+        'MENUNGGU_PURCHASING_AWAL' => array('UPDATE' => 'MENUNGGU_KONFIRMASI_PIC'),
+        'MENUNGGU_KONFIRMASI_PIC' => array(
             'ACC' => 'MENUNGGU_PURCHASING',
-            'PENDING' => 'PENDING_KADEP',
             'REVISI' => 'REVISI_PIC',
+        ),
+        'MENUNGGU_KADEP' => array(
+            'ACC' => 'MENUNGGU_DIRUT_OPS',
+            'PENDING' => 'PENDING_KADEP',
+            'REVISI' => 'REVISI_PURCHASING_KADEP',
             'REJECT' => 'DITOLAK_KADEP',
         ),
         'PENDING_KADEP' => array(
-            'ACC' => 'MENUNGGU_PURCHASING',
-            'REVISI' => 'REVISI_PIC',
+            'ACC' => 'MENUNGGU_DIRUT_OPS',
+            'REVISI' => 'REVISI_PURCHASING_KADEP',
             'REJECT' => 'DITOLAK_KADEP',
         ),
-        'REVISI_PIC' => array('SUBMIT' => 'MENUNGGU_KADEP'),
+        'REVISI_PIC' => array('SUBMIT' => 'MENUNGGU_PURCHASING_AWAL'),
+        'MENUNGGU_PURCHASING' => array('SUBMIT' => 'MENUNGGU_KADEP'),
         'MENUNGGU_DIRUT_OPS' => array(
-            'ACC' => 'MENUNGGU_PURCHASING',
+            'ACC' => 'MENUNGGU_DIREKTUR',
             'REVISI' => 'REVISI_PURCHASING_DIROPS',
             'REJECT' => 'DITOLAK_DIRUT_OPS',
         ),
+        'REVISI_PURCHASING_KADEP' => array('SUBMIT' => 'MENUNGGU_KADEP'),
         'REVISI_PURCHASING_DIROPS' => array('SUBMIT' => 'MENUNGGU_DIRUT_OPS'),
+        'MENUNGGU_PURCHASING_DIROPS' => array('SUBMIT' => 'MENUNGGU_DIREKTUR'),
         'MENUNGGU_DIREKTUR' => array(
-            'ACC' => 'SPK_TERBIT',
+            'ACC' => 'MENUNGGU_PENERBITAN_PURCHASING',
             'REVISI' => 'REVISI_PURCHASING_DIRUT',
             'REJECT' => 'DITOLAK_DIREKTUR',
         ),
         'REVISI_PURCHASING_DIRUT' => array('SUBMIT' => 'MENUNGGU_DIREKTUR'),
+        'MENUNGGU_PENERBITAN_PURCHASING' => array('TERBITKAN' => 'SPK_TERBIT'),
         'SPK_TERBIT' => array('PROGRESS' => 'ON_PROGRESS'),
         'ON_PROGRESS' => array('PROGRESS' => 'ON_PROGRESS', 'SELESAI' => 'SELESAI'),
         'SELESAI' => array('TUTUP' => 'DITUTUP'),
     );
-
-    if ($currentStatus === 'MENUNGGU_PURCHASING' && $action === 'SUBMIT') {
-        return $requiresDirutOps && !$dirutOpsApproved ? 'MENUNGGU_DIRUT_OPS' : 'MENUNGGU_DIREKTUR';
-    }
 
     return isset($transitions[$currentStatus][$action]) ? $transitions[$currentStatus][$action] : false;
 }
@@ -97,11 +105,21 @@ function pojasa_workflow_stage($status)
     if (in_array($status, array('MENUNGGU_KADEP', 'PENDING_KADEP'), true)) {
         return 'KADEP';
     }
-    if (in_array($status, array('MENUNGGU_PURCHASING', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true)) {
+    if (in_array($status, array(
+        'MENUNGGU_PURCHASING_AWAL',
+        'MENUNGGU_PURCHASING',
+        'REVISI_PURCHASING_KADEP',
+        'REVISI_PURCHASING_DIROPS',
+        'REVISI_PURCHASING_DIRUT',
+        'MENUNGGU_PENERBITAN_PURCHASING',
+    ), true)) {
         return 'PURCHASING';
     }
     if ($status === 'MENUNGGU_DIRUT_OPS') {
         return 'DIREKTUR_OPERASIONAL';
+    }
+    if ($status === 'MENUNGGU_KONFIRMASI_PIC') {
+        return 'PIC';
     }
     if ($status === 'MENUNGGU_DIREKTUR') {
         return 'DIREKTUR';
@@ -119,8 +137,20 @@ function pojasa_workflow_actions($status)
     if ($status === 'PENDING_KADEP') {
         return array('ACC', 'REVISI', 'REJECT');
     }
-    if (in_array($status, array('MENUNGGU_PURCHASING', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true)) {
+    if ($status === 'MENUNGGU_PURCHASING_AWAL') {
+        return array('UPDATE');
+    }
+    if ($status === 'MENUNGGU_PURCHASING') {
         return array('SUBMIT');
+    }
+    if ($status === 'MENUNGGU_PENERBITAN_PURCHASING') {
+        return array('TERBITKAN');
+    }
+    if (in_array($status, array('REVISI_PURCHASING_KADEP', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true)) {
+        return array('SUBMIT');
+    }
+    if ($status === 'MENUNGGU_KONFIRMASI_PIC') {
+        return array('ACC', 'REVISI');
     }
     if (in_array($status, array('MENUNGGU_DIRUT_OPS', 'MENUNGGU_DIREKTUR'), true)) {
         return array('ACC', 'REVISI', 'REJECT');

@@ -145,6 +145,10 @@ $config['composer_autoload'] = FALSE;
 // Temporary server-only PO Jasa draft calculation trace. Keep disabled in production.
 $config['pojasa_draft_diagnostic'] = (ENVIRONMENT !== 'production');
 
+// Temporary development control for validating automatic PO Pembelian records.
+// Set to FALSE (or remove the related view/JS code) when UAT is complete.
+$config['pojasa_enable_dev_purchase_button'] = (ENVIRONMENT !== 'production');
+
 /*
 |--------------------------------------------------------------------------
 | Allowed URL Characters

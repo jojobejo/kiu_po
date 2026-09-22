@@ -3,7 +3,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class M_PojasaPurchasing extends CI_Model
 {
-    private $planningStatuses = array('MENUNGGU_PURCHASING', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT');
+    private $planningStatuses = array(
+        'MENUNGGU_PURCHASING_AWAL', 'MENUNGGU_PURCHASING', 'MENUNGGU_PURCHASING_DIROPS',
+        'REVISI_PURCHASING_KADEP', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT',
+    );
 
     public function __construct()
     {
@@ -38,7 +41,7 @@ class M_PojasaPurchasing extends CI_Model
             return pojasa_normalize_department($request->departemen) === $context['departemen'];
         }
         if ($context['role'] === 'DIREKTUR_OPERASIONAL') {
-            return pojasa_requires_dirut_ops($request->departemen);
+            return true;
         }
         return false;
     }
@@ -411,11 +414,12 @@ class M_PojasaPurchasing extends CI_Model
         }
         $existing = $this->db->query('SELECT * FROM tbpo_jasa_draft_pembelian WHERE kd_po_jasa=? AND id_material=? FOR UPDATE', array($requestCode, $materialId))->row();
         $reserved = $this->materialReserved($materialId);
+        $availableStock = $this->availableStockForMaterial($material);
         $activeDraft = $this->activeDraftQuantity($materialId, $existing ? (int) $existing->id_draft_pembelian : null);
-        $shortage = max(0, (float) $material->qty_kebutuhan - $reserved - $activeDraft);
+        $shortage = max(0, (float) $material->qty_kebutuhan - $availableStock - $reserved - $activeDraft);
         if ((bool) $this->config->item('pojasa_draft_diagnostic')) {
             log_message('debug', 'POJASA_DRAFT_VALIDATION ' . json_encode(array(
-                'qty_kebutuhan' => (float) $material->qty_kebutuhan, 'reservasi_aktif' => $reserved,
+                'qty_kebutuhan' => (float) $material->qty_kebutuhan, 'stok_tersedia' => $availableStock, 'reservasi_aktif' => $reserved,
                 'draft_aktif' => $activeDraft, 'kekurangan' => $shortage, 'qty_input' => (float) $data['qty'],
                 'kd_po_jasa' => $requestCode, 'id_material' => (int) $materialId,
             )));
@@ -615,8 +619,9 @@ class M_PojasaPurchasing extends CI_Model
                 ->join('tbpo_jasa_vendor v', 'v.id_vendor_jasa=d.id_vendor_jasa', 'left')
                 ->where(array('d.kd_po_jasa' => $request->kd_po_jasa, 'd.id_material' => (int) $material['id_material']))->get()->row_array();
             $material['reserved_qty'] = $this->materialReserved((int) $material['id_material']);
+            $material['qty_ready'] = $this->availableStockForMaterial((object) $material);
             $material['active_draft_qty'] = $this->activeDraftQuantity((int) $material['id_material']);
-            $material['remaining_need'] = max(0, (float) $material['qty_kebutuhan'] - (float) $material['reserved_qty'] - (float) $material['active_draft_qty']);
+            $material['remaining_need'] = max(0, (float) $material['qty_kebutuhan'] - (float) $material['qty_ready'] - (float) $material['reserved_qty'] - (float) $material['active_draft_qty']);
         }
         $spk = $this->db->get_where('tbpo_jasa_spk', array('kd_po_jasa' => $request->kd_po_jasa))->row_array();
         $spkRevisions = array();
@@ -718,6 +723,14 @@ class M_PojasaPurchasing extends CI_Model
             array((int) $stockId)
         )->row();
         return $row ? max(0, (float) $row->qty) : 0.0;
+    }
+
+    private function availableStockForMaterial($material)
+    {
+        $stockId = (int) (is_object($material) ? $material->id_brg_nk : $material['id_brg_nk']);
+        if ($stockId <= 0) return 0.0;
+        $stock = $this->db->query('SELECT qty_ready FROM v_stockbarangnk WHERE id_brg_nk=? LIMIT 1', array($stockId))->row();
+        return max(0, (float) ($stock ? $stock->qty_ready : 0) - $this->reservedStock($stockId));
     }
 
     private function materialReserved($materialId)

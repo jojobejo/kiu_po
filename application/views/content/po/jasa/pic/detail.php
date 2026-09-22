@@ -13,12 +13,17 @@ $money = static function ($amount) {
 };
 $statusColors = array(
     'DRAFT' => 'secondary', 'REVISI_PIC' => 'warning', 'PENDING_KADEP' => 'warning',
-    'MENUNGGU_KADEP' => 'info', 'MENUNGGU_PURCHASING' => 'info', 'MENUNGGU_DIRUT_OPS' => 'info', 'MENUNGGU_DIREKTUR' => 'info',
+    'MENUNGGU_PURCHASING_AWAL' => 'info', 'MENUNGGU_KADEP' => 'info', 'MENUNGGU_PURCHASING' => 'info',
+    'MENUNGGU_DIRUT_OPS' => 'info', 'MENUNGGU_PURCHASING_DIROPS' => 'info', 'MENUNGGU_DIREKTUR' => 'info',
     'SPK_TERBIT' => 'primary', 'ON_PROGRESS' => 'primary', 'SELESAI' => 'success', 'DITUTUP' => 'dark',
     'DITOLAK_KADEP' => 'danger', 'DITOLAK_DIRUT_OPS' => 'danger', 'DITOLAK_DIREKTUR' => 'danger',
 );
 $statusColor = isset($statusColors[$request->status]) ? $statusColors[$request->status] : 'secondary';
 $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
+$poPembelian = !empty($purchase_integration['submission']) ? $purchase_integration['submission'] : null;
+$poPembelianDetailUrl = !empty($request->no_spk) && !empty($poPembelian['kd_po_nk'])
+    ? base_url('detailponk/' . rawurlencode($poPembelian['kd_po_nk']))
+    : null;
 ?>
 <div class="content-wrapper">
   <div class="content-header">
@@ -37,6 +42,9 @@ $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
           <?php if (!empty($request->no_spk)) : ?>
             <a href="<?= base_url('pojasa/spk/' . rawurlencode($request->kd_po_jasa)) ?>" class="btn btn-info"><i class="fas fa-file-contract mr-1"></i> Lihat SPK</a>
           <?php endif; ?>
+          <?php if ($poPembelianDetailUrl) : ?>
+            <a href="<?= $poPembelianDetailUrl ?>" class="btn btn-success"><i class="fas fa-shopping-cart mr-1"></i> Lihat PO Pembelian</a>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -45,7 +53,7 @@ $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
   <section class="content">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-8">
+        <div class="col-12">
           <div class="card card-outline card-primary">
             <div class="card-header"><h3 class="card-title"><i class="fas fa-file-alt mr-1"></i> Informasi Request</h3></div>
             <div class="card-body">
@@ -55,16 +63,11 @@ $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
               </div>
               <hr>
               <strong>Tujuan pekerjaan</strong><p class="mb-3" style="white-space:pre-wrap"><?= $h($request->tujuan_pekerjaan ?: '-') ?></p>
+              <div class="card card-outline card-info mb-3"><div class="card-body py-2"><strong>PO Pembelian</strong><div><?= $poPembelian ? $h($poPembelian['kd_po_nk'] . ' · ' . (!empty($poPembelian['po_status']) ? $poPembelian['po_status'] : $poPembelian['status'])) : 'Belum ada PO Pembelian.' ?></div><?php if ($poPembelianDetailUrl) : ?><a href="<?= $poPembelianDetailUrl ?>" class="btn btn-success btn-sm mt-2"><i class="fas fa-external-link-alt mr-1"></i>Buka Detail PO Pembelian</a><?php endif; ?></div></div>
+              <?php if (!empty($pickup_state['ready']) && !empty($pickup_state['eligible'])) : ?><div class="alert alert-success"><strong>Seluruh barang tersedia di Purchasing.</strong> <button type="button" class="btn btn-success btn-sm ml-2" id="pojasaPickupRequest">Ajukan pengambilan ke Kadep</button></div><?php elseif (!empty($pickup_state['ready']) && !empty($pickup_state['unmapped_count'])) : ?><div class="alert alert-warning mb-3">Pengambilan terkunci: <?= (int)$pickup_state['unmapped_count'] ?> barang manual belum ditautkan ke master.</div><?php elseif (!empty($pickup_state['pickup'])) : ?><div class="alert alert-info mb-3">Status pengambilan: <strong><?= $h($pickup_state['pickup']['status']) ?></strong></div><?php endif; ?>
               <strong>Catatan PIC</strong><p class="mb-0" style="white-space:pre-wrap"><?= $h($request->catatan_pic ?: '-') ?></p>
             </div>
           </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="small-box bg-info">
-            <div class="inner"><h3><?= $money($request->estimasi_total) ?></h3><p>Total estimasi</p></div>
-            <div class="icon"><i class="fas fa-calculator"></i></div>
-          </div>
-          <div class="card"><div class="card-body p-2"><div class="d-flex justify-content-between"><span>Jasa</span><strong><?= $money($request->estimasi_total_jasa) ?></strong></div><div class="d-flex justify-content-between"><span>Material</span><strong><?= $money($request->estimasi_total_bahan) ?></strong></div></div></div>
         </div>
       </div>
 
@@ -89,7 +92,7 @@ $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
               <h5>Material / alat dan bahan</h5>
               <div class="table-responsive"><table class="table table-sm table-bordered table-striped"><thead><tr><th>#</th><th>Nama</th><th>Deskripsi</th><th class="text-right">Qty</th><th>Satuan</th><th>Sumber</th><th class="text-right">Harga</th><th class="text-right">Subtotal</th></tr></thead><tbody>
                 <?php if (!$materials) : ?><tr><td colspan="8" class="text-center text-muted">Belum ada material.</td></tr><?php endif; ?>
-                <?php foreach ($materials as $row) : ?><tr><td><?= (int) $row['line_no'] ?></td><td><?= $h($row['nama_material']) ?></td><td style="white-space:pre-wrap"><?= $h($row['deskripsi']) ?></td><td class="text-right"><?= $h($row['qty_kebutuhan']) ?></td><td><?= $h($row['satuan']) ?></td><td><?= $h($row['sumber_material']) ?></td><td class="text-right"><?= $money($row['harga_estimasi']) ?></td><td class="text-right"><?= $money($row['total_estimasi']) ?></td></tr><?php endforeach; ?>
+                <?php foreach ($materials as $row) : ?><tr><td><?= (int) $row['line_no'] ?></td><td><?= $h($row['nama_material']) ?></td><td style="white-space:pre-wrap"><?= $h($row['deskripsi']) ?></td><td class="text-right"><?= $h($row['qty_kebutuhan']) ?></td><td><?= $h(isset($row['satuan_tampil']) ? $row['satuan_tampil'] : $row['satuan']) ?></td><td><?= $h($row['sumber_material']) ?></td><td class="text-right"><?= $money($row['harga_estimasi']) ?></td><td class="text-right"><?= $money($row['total_estimasi']) ?></td></tr><?php endforeach; ?>
               </tbody></table></div>
             </div>
 
@@ -139,9 +142,9 @@ $vendorName = $request->nama_vendor ?: $request->vendor_usulan;
                 <?php foreach ($history['progress'] as $row) : ?><tr><td><?= $h($value($row, 'tgl_progress')) ?></td><td style="white-space:pre-wrap"><?= $h($value($row, 'aktivitas', $value($row, 'milestone'))) ?></td><td><?= $h($value($row, 'progress_persen', 0)) ?>%</td><td><?= $h($value($row, 'status_progress')) ?></td><td style="white-space:pre-wrap"><?= $h($value($row, 'kendala')) ?></td><td style="white-space:pre-wrap"><?= $h($value($row, 'tindak_lanjut')) ?></td><td style="white-space:pre-wrap"><?= $h($value($row, 'catatan')) ?></td><td><?php if ((int) $value($row, 'id_dokumen_evidence', 0) > 0) : ?><a class="btn btn-xs btn-info" target="_blank" href="<?= base_url('pojasa/pic/document/' . (int) $row['id_dokumen_evidence']) ?>">Lihat</a><?php else : ?>-<?php endif; ?></td></tr><?php endforeach; ?>
               </tbody></table></div>
               <div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Penerimaan material stok</h5><?php if ($execution && $execution['can_receive'] && $execution['allocations']) : ?><button id="pojasaReceiptAction" class="btn btn-success btn-sm" data-toggle="modal" data-target="#pojasaReceiptModal"><i class="fas fa-box-open mr-1"></i> Konfirmasi diterima</button><?php endif; ?></div>
-              <div class="table-responsive mb-4"><table class="table table-sm table-bordered"><thead><tr><th>Tanggal</th><th>No. penerimaan</th><th>Material</th><th>Qty diterima</th><th>Referensi stok</th></tr></thead><tbody id="pojasaReceiptBody">
-                <?php if (!$execution || !$execution['receipts']) : ?><tr><td colspan="5" class="text-center text-muted">Belum ada penerimaan material.</td></tr><?php endif; ?>
-                <?php if ($execution) foreach ($execution['receipts'] as $row) : ?><tr><td><?= $h($row['receipt_at']) ?></td><td><?= $h($row['no_receipt']) ?></td><td><?= $h($row['nama_material']) ?></td><td><?= $h($row['qty_received'] . ' ' . $row['satuan']) ?></td><td><?= (int) $row['id_transnk'] ?></td></tr><?php endforeach; ?>
+              <div class="table-responsive mb-4"><table class="table table-sm table-bordered"><thead><tr><th>Tanggal</th><th>No. penerimaan</th><th>Sumber</th><th>Material</th><th>Qty diterima</th><th>Kode akun / ref. stok</th></tr></thead><tbody id="pojasaReceiptBody">
+                <?php if (!$execution || !$execution['receipts']) : ?><tr><td colspan="6" class="text-center text-muted">Belum ada penerimaan material.</td></tr><?php endif; ?>
+                <?php if ($execution) foreach ($execution['receipts'] as $row) : ?><tr><td><?= $h($row['receipt_at']) ?></td><td><?= $h($row['no_receipt']) ?></td><td><?= $h(isset($row['record_type']) && $row['record_type'] === 'REVERSAL' ? 'Reversal ON_HAND Purchasing' : (isset($row['receipt_source']) && $row['receipt_source'] === 'ON_HAND_PURCHASING' ? 'ON_HAND Purchasing' : (isset($row['receipt_source']) && $row['receipt_source'] === 'ON_HAND_LEGACY_PO' ? 'ON HAND PO Pembelian' : 'Penerimaan PIC'))) ?></td><td><?= $h($row['nama_material']) ?></td><td><?= $h($row['qty_received'] . ' ' . $row['satuan']) ?></td><td><?= $h((isset($row['kd_akun']) ? $row['kd_akun'] : '11512') . ' / ' . (int) $row['id_transnk']) ?></td></tr><?php endforeach; ?>
               </tbody></table></div>
               <div class="d-flex justify-content-between align-items-center mb-2"><h5 class="mb-0">Biaya aktual</h5><?php if ($execution && $execution['can_cost']) : ?><button id="pojasaCostAction" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#pojasaCostModal"><i class="fas fa-receipt mr-1"></i> Catat biaya</button><?php endif; ?></div>
               <div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Tanggal</th><th>Sumber</th><th>Jenis</th><th>Deskripsi</th><th class="text-right">Nominal</th><th>Status</th><th>Bukti / Referensi</th><th>Aksi</th></tr></thead><tbody id="pojasaCostBody">

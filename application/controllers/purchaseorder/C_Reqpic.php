@@ -122,6 +122,43 @@ class C_Reqpic extends CI_Controller
         $this->load->view('content/po/Reqpic/datatablesreq');
     }
 
+    /** Daftar pengajuan pengambilan yang harus dikonfirmasi oleh Purchasing. */
+    public function index_pickup()
+    {
+        if ((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $data['title'] = 'Konfirmasi Penyerahan Barang';
+        $data['getlistpic'] = $this->M_Reqpic->getlistpickup()->result();
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/pickup', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
+
+    /** Daftar permohonan pengambilan barang dari PIC untuk KADEP terkait. */
+    public function index_pickup_approval_kadep()
+    {
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $data['title'] = 'Approval Pengambilan Barang';
+        $data['requests'] = $this->M_Reqpic->get_pickup_approval_waiting_kadep(
+            $this->session->userdata('departemen'),
+            is_super_admin()
+        )->result();
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/po/Reqpic/pickup_approval_kadep', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
+
     public function index_accreq()
     {
         $kduser = $this->session->userdata('kode');
@@ -132,13 +169,58 @@ class C_Reqpic extends CI_Controller
         $data['countreq']   = $this->M_Reqpic->countRequser('1', $kduser);
         $data['generatekd'] = $this->M_Purchase->kdnonkomersial();
         $data['jumlahbr']   = $this->M_Reqpic->countjmltmpbr($kduser);
-        $data['getlistpic'] = $this->M_Reqpic->getlistpicreqacc()->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/po/Reqpic/view_req/vreq1', $data);
         $this->load->view('partial/footer');
-        $this->load->view('content/po/Reqpic/datatablesreq');
+    }
+
+    /** Data daftar request Purchasing; dipanggil DataTables tanpa reload halaman. */
+    public function ajax_request_list()
+    {
+        if ((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) {
+            $this->output->set_status_header(403)->set_content_type('application/json')
+                ->set_output(json_encode(array('data' => array())));
+            return;
+        }
+
+        $scope = $this->input->get('scope', true) === 'all' ? 'all' : 'request_acc';
+        $requests = $this->M_Reqpic->get_request_list($scope)->result();
+        $rows = array();
+        foreach ($requests as $request) {
+            $status = trim((string) $request->status);
+            $statusPo = trim((string) $request->status_po);
+            $rows[] = array(
+                htmlspecialchars($request->nm_user, ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars($request->departemen, ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars(function_exists('format_tgl_lahir') ? format_tgl_lahir($request->tgl_transaksi) : $request->tgl_transaksi, ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars($request->tj_pembelian, ENT_QUOTES, 'UTF-8'),
+                $this->request_status_badge($status),
+                $this->purchase_status_badge($statusPo),
+                '<a class="btn btn-block btn-primary btn-sm" href="' . base_url('reqpic/detreqbarangpic/' . rawurlencode($request->kd_po_nk)) . '" title="Detail request"><i class="fas fa-eye"></i></a>',
+            );
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode(array('data' => $rows)));
+    }
+
+    private function request_status_badge($status)
+    {
+        $class = in_array($status, array('REQUEST ACC', 'MENUNGGU ACC KADEP'), true) ? 'btn-warning' : 'btn-secondary';
+        return '<span class="btn btn-block ' . $class . ' btn-sm m-1"><b>' . htmlspecialchars($status, ENT_QUOTES, 'UTF-8') . '</b></span>';
+    }
+
+    private function purchase_status_badge($status)
+    {
+        $classes = array(
+            'ON PROGRESS - KADEP' => 'btn-warning', 'ACC-KADEP' => 'btn-primary', 'SEDANG DIAJUKAN' => 'btn-warning',
+            'ACC DIREKTUR' => 'btn-primary', 'PROSES PEMBELIAN' => 'btn-primary', 'DONE' => 'btn-success', 'REJECT' => 'btn-danger',
+        );
+        if ($status === '0' || $status === '') {
+            return '<span class="btn btn-block btn-secondary btn-sm"><b>BARANG READY</b></span>';
+        }
+        return '<span class="btn btn-block ' . (isset($classes[$status]) ? $classes[$status] : 'btn-secondary') . ' btn-sm"><b>'
+            . htmlspecialchars($status, ENT_QUOTES, 'UTF-8') . '</b></span>';
     }
 
     public function index_acckadep()
@@ -148,10 +230,10 @@ class C_Reqpic extends CI_Controller
             return;
         }
 
-        $data['title'] = 'Approval Request PIC';
-        $data['getlistpic'] = $this->M_Reqpic->getlistpicreqkadep(
+        $data['title'] = 'Approval PO KADEP';
+        $data['getlistpic'] = $this->M_Reqpic->get_purchase_waiting_kadep(
             $this->session->userdata('departemen'),
-            $this->session->userdata('kode')
+            is_super_admin()
         )->result();
 
         $this->load->view('partial/header', $data);
@@ -397,15 +479,23 @@ class C_Reqpic extends CI_Controller
     public function addnewreq($kduser)
     {
         date_default_timezone_set("Asia/Jakarta");
+        $session_kduser = $this->session->userdata('kode');
+
+        // Never use a user code from the URL to read or delete another PIC's draft.
+        if (empty($session_kduser) || $kduser !== $session_kduser) {
+            show_error('Pengajuan hanya dapat diproses dari draft milik PIC yang sedang login.', 403, 'Akses ditolak');
+            return;
+        }
+
+        $kduser = $session_kduser;
         $nmuser = $this->session->userdata('nama_user');
         $dep    = $this->session->userdata('departemen');
         $kdus   = $this->session->userdata('kode');
-        $totbr  = $this->input->post('totbr');
         $tjuan  = $this->input->post('intj');
 
         $now    = date('Y-m-d');
 
-        $tmp    = $this->M_Reqpic->get_tmp_non_komersil($kduser);
+        $tmp = array();
         $kdponk = '';
         $success = false;
         $message = 'Request gagal disimpan';
@@ -421,7 +511,18 @@ class C_Reqpic extends CI_Controller
 
             $this->db->trans_begin();
 
-            $statusAwal = (string) $this->session->userdata('lv') === '4' ? 'MENUNGGU ACC KADEP' : 'ON PROGRESS';
+            // Lock the current PIC's rows before copying them. A second submit
+            // must wait, then sees an empty draft instead of merging its data.
+            $tmp = $this->M_Reqpic->get_tmp_non_komersil_for_update($kduser);
+            if (empty($tmp)) {
+                $this->db->trans_rollback();
+                $message = 'Draft request sudah kosong atau sedang diproses.';
+                break;
+            }
+
+            // PIC submits directly to Purchasing. KADEP approval happens after
+            // Purchasing has prepared the purchase order.
+            $statusAwal = 'ON PROGRESS';
 
             $inpdataponk = array(
                 'jns_po'        => '2',
@@ -429,7 +530,8 @@ class C_Reqpic extends CI_Controller
                 'kd_user'       => $kduser,
                 'nm_user'       => $nmuser,
                 'tgl_transaksi' => $now,
-                'jml_item'      => $totbr,
+                // Count on the server so a submitted form cannot change it.
+                'jml_item'      => count($tmp),
                 'status'        => $statusAwal,
                 'departemen'    => $dep,
                 'tj_pembelian'  => $tjuan
@@ -455,7 +557,7 @@ class C_Reqpic extends CI_Controller
 
             $inputnt    = array(
                 'kd_po'         => $kdponk,
-                'isi_note'      => $statusAwal === 'MENUNGGU ACC KADEP' ? 'REQUEST BARU - MENUNGGU ACC KADEP' : 'REQUEST BARU',
+                'isi_note'      => 'REQUEST BARU - MENUNGGU PROSES PURCHASING',
                 'kd_user'       => $kdus,
                 'nama_user'     => $nmuser,
                 'note_for'      => '2',
@@ -463,6 +565,23 @@ class C_Reqpic extends CI_Controller
 
             );
             $this->M_Purchase->addNote($inputnt);
+
+            // Dokumen pendukung bersifat opsional. Jika ada file yang dipilih,
+            // tetap simpan dengan alur dan folder dokumen PIC yang sama.
+            $documentUpload = $this->has_supporting_upload()
+                ? $this->store_supporting_documents($dep)
+                : array('success' => true, 'message' => '', 'documents' => array(), 'paths' => array());
+            if (!$documentUpload['success']) {
+                $this->db->trans_rollback();
+                $message = $documentUpload['message'];
+                break;
+            }
+            foreach ($documentUpload['documents'] as $document) {
+                $document['kd_po_nk'] = $kdponk;
+                $document['departemen'] = $dep;
+                $document['uploaded_by'] = $kduser;
+                $this->M_Reqpic->add_supporting_document($document);
+            }
 
             if ($tmp) {
                 foreach ($tmp as $t) {
@@ -483,10 +602,15 @@ class C_Reqpic extends CI_Controller
                     $this->M_Reqpic->input_detail_po_nk($listdetreq);
                 }
             }
-            $this->M_Reqpic->hapus_tmp_nk($kduser);
+            $tmp_ids = array();
+            foreach ($tmp as $draft) {
+                $tmp_ids[] = $draft->id_tmp_nk;
+            }
+            $this->M_Reqpic->hapus_tmp_nk_by_ids($kduser, $tmp_ids);
 
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
+                $this->remove_supporting_files($documentUpload['paths']);
                 continue;
             }
 
@@ -506,7 +630,7 @@ class C_Reqpic extends CI_Controller
                     'message'         => $message,
                     'kdponk'          => $kdponk,
                     'tgl_transaksi'   => function_exists('format_tgl_lahir') ? format_tgl_lahir($now) : $now,
-                    'jml_item'        => $totbr,
+                    'jml_item'        => $success ? count($tmp) : 0,
                     'tj_pembelian'    => $tjuan,
                     'detail_url'      => base_url('reqpic/detreqbarangpic/' . $kdponk),
                     'pending_url'     => base_url('reqpic/requestpending/' . $kdponk)
@@ -519,6 +643,121 @@ class C_Reqpic extends CI_Controller
         }
 
         redirect('reqpic');
+    }
+
+    /** Menyimpan file pada assets/request-pendukung/{departemen}/{YYYY-MM-DD}/. */
+    private function store_supporting_documents($department)
+    {
+        $files = isset($_FILES['dokumen_pendukung']) ? $_FILES['dokumen_pendukung'] : array();
+        $names = isset($files['name']) && is_array($files['name']) ? $files['name'] : array();
+        $departmentName = preg_replace('/[^A-Z0-9_-]+/', '_', strtoupper((string) $department));
+        $departmentName = trim($departmentName, '_') ?: 'UMUM';
+        $relativeDirectory = 'assets/request-pendukung/' . $departmentName . '/' . date('Y-m-d') . '/';
+        $absoluteDirectory = FCPATH . $relativeDirectory;
+
+        if (!is_dir($absoluteDirectory) && !@mkdir($absoluteDirectory, 0775, true) && !is_dir($absoluteDirectory)) {
+            return array('success' => false, 'message' => 'Folder dokumen pendukung tidak dapat dibuat.', 'documents' => array(), 'paths' => array());
+        }
+
+        $config = array(
+            'upload_path' => $absoluteDirectory,
+            'allowed_types' => 'jpg|jpeg|png|pdf|txt|xls|xlsx',
+            'max_size' => 10240,
+            'overwrite' => false,
+            'encrypt_name' => true,
+            'detect_mime' => true,
+        );
+        $this->load->library('upload', $config);
+        $documents = array();
+        $paths = array();
+
+        foreach ($names as $index => $name) {
+            if (empty($name)) {
+                continue;
+            }
+            $_FILES['reqpic_supporting_document'] = array(
+                'name' => $name,
+                'type' => $files['type'][$index],
+                'tmp_name' => $files['tmp_name'][$index],
+                'error' => $files['error'][$index],
+                'size' => $files['size'][$index],
+            );
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('reqpic_supporting_document')) {
+                $this->remove_supporting_files($paths);
+                unset($_FILES['reqpic_supporting_document']);
+                return array('success' => false, 'message' => $name . ': ' . strip_tags($this->upload->display_errors('', '')), 'documents' => array(), 'paths' => array());
+            }
+
+            $uploaded = $this->upload->data();
+            $absolutePath = $absoluteDirectory . $uploaded['file_name'];
+            $relativePath = $relativeDirectory . $uploaded['file_name'];
+            $mimeType = function_exists('finfo_open') ? (new finfo(FILEINFO_MIME_TYPE))->file($absolutePath) : $uploaded['file_type'];
+            $paths[] = $relativePath;
+            $documents[] = array(
+                'file_path' => $relativePath,
+                'file_original' => substr(basename($uploaded['client_name']), 0, 180),
+                'mime_type' => $mimeType,
+                'file_size_bytes' => (int) filesize($absolutePath),
+                'sha256' => hash_file('sha256', $absolutePath),
+            );
+        }
+        unset($_FILES['reqpic_supporting_document']);
+
+        if (empty($documents)) {
+            return array('success' => false, 'message' => 'Dokumen pendukung wajib diunggah.', 'documents' => array(), 'paths' => array());
+        }
+        return array('success' => true, 'message' => '', 'documents' => $documents, 'paths' => $paths);
+    }
+
+    private function has_supporting_upload()
+    {
+        return isset($_FILES['dokumen_pendukung']['name'])
+            && is_array($_FILES['dokumen_pendukung']['name'])
+            && (bool) array_filter($_FILES['dokumen_pendukung']['name']);
+    }
+
+    private function remove_supporting_files(array $paths)
+    {
+        $base = realpath(FCPATH . 'assets/request-pendukung');
+        foreach ($paths as $relativePath) {
+            $path = realpath(FCPATH . ltrim($relativePath, '/'));
+            if ($base && $path && strpos($path, $base . DIRECTORY_SEPARATOR) === 0 && is_file($path)) {
+                @unlink($path);
+            }
+        }
+    }
+
+    /** Menampilkan dokumen setelah validasi akses berdasarkan departemen. */
+    public function supporting_document($documentId)
+    {
+        $document = $this->M_Reqpic->get_supporting_document((int) $documentId);
+        $request = $document ? $this->M_Reqpic->getrequestrow($document->kd_po_nk) : null;
+        $level = (string) $this->session->userdata('lv');
+        $canAccess = is_super_admin() || $level === '2'
+            || (($level === '4' || $level === '5') && $request && $request->departemen === $this->session->userdata('departemen'));
+
+        if (!$document || !$request || !$canAccess) {
+            show_404();
+            return;
+        }
+
+        $base = realpath(FCPATH . 'assets/request-pendukung');
+        $path = realpath(FCPATH . ltrim($document->file_path, '/'));
+        if (!$base || !$path || strpos($path, $base . DIRECTORY_SEPARATOR) !== 0 || !is_file($path)) {
+            show_404();
+            return;
+        }
+
+        $inline = strpos($document->mime_type, 'image/') === 0 || in_array($document->mime_type, array('application/pdf', 'text/plain'), true);
+        $name = str_replace(array('"', "\r", "\n"), '', $document->file_original);
+        $this->output
+            ->set_content_type($document->mime_type ?: 'application/octet-stream')
+            ->set_header('X-Content-Type-Options: nosniff')
+            ->set_header('X-Frame-Options: SAMEORIGIN')
+            ->set_header('Cache-Control: private, no-store, max-age=0')
+            ->set_header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . $name . '"')
+            ->set_output(file_get_contents($path));
     }
 
     public function acc_req_kadep()
@@ -598,16 +837,83 @@ class C_Reqpic extends CI_Controller
         redirect('reqpicacckadep');
     }
 
-    private function generate_kdponk_req($kode_user, $offset = 0)
+    /**
+     * Approval request barang non-komersil dari halaman detail KADEP.
+     * Catatan selalu dicatat pada log note request agar dapat dilihat PIC.
+     */
+    public function process_req_kadep()
     {
-        $kode_user = strtoupper($kode_user);
-        $prefix = '';
-
-        if ($kode_user == 'KARYAWAN4') {
-            $prefix = 'GA';
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
         }
 
-        $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tbpo_generate_kd_ponk WHERE DATE(create_at)=CURDATE()");
+        $kdreqpo = $this->input->post('kdreqpo', true);
+        $action = strtoupper(trim((string) $this->input->post('approval_action', true)));
+        $note = trim((string) $this->input->post('approval_note', true));
+        $request = $this->M_Reqpic->getrequestrow($kdreqpo);
+        $actions = array(
+            'ACC' => array('status' => 'ON PROGRESS', 'note' => 'REQUEST PIC DISETUJUI KADEP'),
+            'REJECT' => array('status' => 'PENDING', 'note' => 'REQUEST PIC DITOLAK KADEP'),
+            'REVISI' => array('status' => 'REVISI PO', 'note' => 'REQUEST PIC REVISI KADEP'),
+        );
+
+        if (!$request || $request->status !== 'MENUNGGU ACC KADEP' || !isset($actions[$action])) {
+            $this->session->set_flashdata('error', 'Request atau aksi approval tidak valid.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        if (!is_super_admin() && $request->departemen !== $this->session->userdata('departemen')) {
+            $this->session->set_flashdata('error', 'Request berbeda departemen.');
+            redirect('reqpicacckadep');
+            return;
+        }
+
+        if ($note === '') {
+            $this->session->set_flashdata('error', 'Catatan approval wajib diisi.');
+            redirect('reqpic/detreqbarangpic/' . $kdreqpo);
+            return;
+        }
+
+        $this->db->trans_begin();
+        $this->M_Reqpic->updatereqnk($kdreqpo, array(
+            'status' => $actions[$action]['status'],
+            'acc_with' => $this->session->userdata('kode'),
+        ));
+        $this->M_Purchase->addNote(array(
+            'kd_po' => $kdreqpo,
+            'isi_note' => $actions[$action]['note'] . ' - ' . $note,
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '2',
+            'update_status' => '2',
+        ));
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('error', 'Approval gagal disimpan.');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'Approval KADEP berhasil disimpan.');
+        }
+
+        redirect('reqpic/detreqbarangpic/' . $kdreqpo);
+    }
+
+    private function generate_kdponk_req($kode_user, $offset = 0)
+    {
+        // Format: NPONK{ddmmyy}{KODE-PIC}{urutan-4-digit}, e.g.
+        // NPONK160926KARYAWAN40001. PIC identity keeps simultaneous
+        // submissions from different PICs in separate number namespaces.
+        $pic_code = preg_replace('/[^A-Z0-9]/', '', strtoupper((string) $kode_user));
+        $pic_code = substr($pic_code !== '' ? $pic_code : 'PIC', 0, 10);
+        $prefix = 'NPONK' . date('dmy') . $pic_code;
+
+        $cd1 = $this->db->query(
+            'SELECT MAX(RIGHT(kd_barang, 4)) AS kd_max FROM tbpo_generate_kd_ponk WHERE kd_barang LIKE ?',
+            array($prefix . '%')
+        );
         $kd1 = "0001";
 
         if ($cd1->num_rows() > 0) {
@@ -617,7 +923,7 @@ class C_Reqpic extends CI_Controller
             }
         }
 
-        return $prefix . 'NPONK' . date('dmy') . $kd1;
+        return $prefix . $kd1;
     }
 
     public function detreqbarangpic($kdpo)
@@ -642,6 +948,7 @@ class C_Reqpic extends CI_Controller
             $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['detreq']             = $this->M_Reqpic->getreqwheres($kdpo)->result();
             $data['log']                = $this->M_Reqpic->getNoted($kdpo);
+            $data['supportingDocuments'] = $this->M_Reqpic->get_supporting_documents($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -667,6 +974,7 @@ class C_Reqpic extends CI_Controller
             $data['log']             = $this->M_Reqpic->getNoted($kdpo);
             $data['gettrs']          = $this->M_Reqpic->gettr($kdpo)->result();
             $data['gettr']           = $this->M_Reqpic->getdetailreq($kdpo)->result();
+            $data['supportingDocuments'] = $this->M_Reqpic->get_supporting_documents($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -693,6 +1001,7 @@ class C_Reqpic extends CI_Controller
             $data['totsts']             = $this->M_Reqpic->gettotsts($kdpo)->result();
             $data['detreq']             = $this->M_Reqpic->getreqwheres($kdpo)->result();
             $data['log']                = $this->M_Reqpic->getNoted($kdpo);
+            $data['supportingDocuments'] = $this->M_Reqpic->get_supporting_documents($kdpo);
 
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
@@ -1348,10 +1657,19 @@ class C_Reqpic extends CI_Controller
 
     public function reqpicconfirmed()
     {
+        if ((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) {
+            show_404();
+            return;
+        }
         $kdadmin    = $this->session->userdata('kode');
         $nmadmin    = $this->session->userdata('nama_user');
         $kdporeq    = $this->input->post('kdreqpo');
         $kdponk     = $this->input->post('kdponk');
+        $request    = $this->M_Reqpic->getrequestrow($kdporeq);
+        if (!$request || $request->status !== 'REQUEST ACC') {
+            show_error('Request tidak valid untuk konfirmasi barang tersedia.', 422, 'Status request tidak valid');
+            return;
+        }
         $now        = date('Y-m-d h:m:s');
         $now1       = date('Y-m-d');
         $tmp        = $this->M_Reqpic->getdatapobaru($kdponk)->result();
@@ -1410,9 +1728,18 @@ class C_Reqpic extends CI_Controller
     }
     public function reqpicconfirmed_plus()
     {
+        if ((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) {
+            show_404();
+            return;
+        }
         $kdadmin    = $this->session->userdata('kode');
         $nmadmin    = $this->session->userdata('nama_user');
         $kdporeq    = $this->input->post('kdreqpo');
+        $request    = $this->M_Reqpic->getrequestrow($kdporeq);
+        if (!$request || $request->status !== 'REQUEST ACC') {
+            show_error('Request tidak valid untuk konfirmasi barang tersedia.', 422, 'Status request tidak valid');
+            return;
+        }
 
         $updatests  = array(
             'status'    => 'BARANG TERSEDIA',
@@ -1433,6 +1760,113 @@ class C_Reqpic extends CI_Controller
         redirect('reqpic/detreqbarangpic/' . $kdporeq);
     }
 
+    /** PIC mengajukan persetujuan KADEP sebelum barang tersedia diserahkan. */
+    public function request_pickup_approval_pic()
+    {
+        if ((string) $this->session->userdata('lv') !== '4' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $kdponk = $this->input->post('kdponk', true);
+        $request = $this->M_Reqpic->getrequestrow($kdponk);
+        if (!$request || $request->status !== 'BARANG TERSEDIA'
+            || (!is_super_admin() && $request->kd_user !== $this->session->userdata('kode'))) {
+            $this->session->set_flashdata('error', 'Request tidak valid untuk pengajuan pengambilan barang.');
+            redirect('reqpic/detreqbarangpic/' . $kdponk);
+            return;
+        }
+
+        $this->db->trans_begin();
+        $updated = $this->M_Reqpic->update_request_status_if_current($kdponk, 'BARANG TERSEDIA', array(
+            'status' => 'MENUNGGU ACC PENGAMBILAN',
+        ));
+        if (!$updated) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('error', 'Status request telah berubah. Silakan muat ulang halaman.');
+            redirect('reqpic/detreqbarangpic/' . $kdponk);
+            return;
+        }
+        $this->M_Purchase->addNote(array(
+            'kd_po' => $kdponk,
+            'isi_note' => 'PENGAJUAN PERSETUJUAN PENGAMBILAN BARANG OLEH PIC',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '2',
+            'update_status' => '2',
+        ));
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('error', 'Permohonan pengambilan barang gagal disimpan.');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', 'Permohonan pengambilan berhasil dikirim ke KADEP.');
+        }
+        redirect('reqpic/detreqbarangpic/' . $kdponk);
+    }
+
+    /** KADEP menyetujui atau menolak permohonan pengambilan dari PIC. */
+    public function decide_pickup_approval_kadep()
+    {
+        if ((string) $this->session->userdata('lv') !== '5' && !is_super_admin()) {
+            show_404();
+            return;
+        }
+
+        $kdponk = $this->input->post('kdponk', true);
+        $decision = strtoupper((string) $this->input->post('decision', true));
+        $note = trim((string) $this->input->post('note', true));
+        $request = $this->M_Reqpic->getrequestrow($kdponk);
+        if (!$request || trim((string) $request->status) !== 'MENUNGGU ACC PENGAMBILAN'
+            || (!is_super_admin() && $request->departemen !== $this->session->userdata('departemen'))
+            || !in_array($decision, array('ACC', 'TOLAK'), true)
+            || ($decision === 'TOLAK' && $note === '')) {
+            $this->session->set_flashdata('error', 'Keputusan pengambilan tidak valid. Catatan penolakan wajib diisi.');
+            redirect('reqpicpickupapproval');
+            return;
+        }
+
+        $approved = $decision === 'ACC';
+        $this->db->trans_begin();
+        $updated = $this->M_Reqpic->update_request_status_if_current(
+            $kdponk,
+            'MENUNGGU ACC PENGAMBILAN',
+            $approved ? array('status' => 'MENUNGGU PENYERAHAN BARANG', 'acc_with' => $this->session->userdata('kode')) : array('status' => 'BARANG TERSEDIA')
+        );
+        if (!$updated) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('error', 'Status request telah berubah. Keputusan tidak disimpan.');
+            redirect('reqpicpickupapproval');
+            return;
+        }
+        $this->M_Purchase->addNote(array(
+            'kd_po' => $kdponk,
+            'isi_note' => $approved
+                ? 'PENGAJUAN PENGAMBILAN BARANG DISETUJUI KADEP' . ($note !== '' ? ': ' . $note : '')
+                : 'PENGAJUAN PENGAMBILAN BARANG DITOLAK KADEP: ' . $note,
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '2',
+            'update_status' => '2',
+        ));
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('error', 'Keputusan pengambilan gagal disimpan.');
+        } else {
+            $this->db->trans_commit();
+            $this->session->set_flashdata('success', $approved
+                ? 'Pengambilan disetujui dan telah diteruskan ke Purchasing.'
+                : 'Pengambilan ditolak. Request dikembalikan ke status BARANG TERSEDIA.');
+        }
+        redirect('reqpicpickupapproval');
+    }
+
+    /** Kompatibilitas URL lama; pengajuan kini dilakukan oleh PIC. */
+    public function request_pickup_kadep()
+    {
+        $this->request_pickup_approval_pic();
+    }
+
     public function reqpicdone()
     {
         $kdponk     = $this->input->post('kdponk');
@@ -1441,6 +1875,12 @@ class C_Reqpic extends CI_Controller
         $now        = date('Y-m-d');
         $kduser     = $this->session->userdata('kode');
         $nmuser     = $this->session->userdata('nama_user');
+        $request    = $this->M_Reqpic->getrequestrow($kdponk);
+        $pickupWaitingStatuses = array('MENUNGGU PENYERAHAN BARANG', 'MENUNGGU PENYERAHAN BARAN');
+        if (((string) $this->session->userdata('lv') !== '2' && !is_super_admin()) || !$request || !in_array(trim((string) $request->status), $pickupWaitingStatuses, true)) {
+            show_error('Hanya Purchasing yang dapat mengonfirmasi penyerahan barang.', 403, 'Akses ditolak');
+            return;
+        }
         $tmp        = $this->M_Reqpic->getdatapobarureq($kdponk)->result();
 
         if ($actdone == '1') {
@@ -1453,7 +1893,7 @@ class C_Reqpic extends CI_Controller
 
             $inputnt    = array(
                 'kd_po'         => $kdponk,
-                'isi_note'      => 'ON HAND - ' . $pic,
+                'isi_note'      => 'BARANG DISERAHKAN PURCHASING - ' . $pic,
                 'kd_user'       => $kduser,
                 'nama_user'     => $nmuser,
                 'note_for'      => '2',
@@ -1518,7 +1958,7 @@ class C_Reqpic extends CI_Controller
             $this->M_Reqpic->updatereqnk($kdponk, $updatests);
             $inputnt    = array(
                 'kd_po'         => $kdponk,
-                'isi_note'      => 'ON HAND - ' . $pic,
+                'isi_note'      => 'BARANG DISERAHKAN PURCHASING - ' . $pic,
                 'kd_user'       => $kduser,
                 'nama_user'     => $nmuser,
                 'note_for'      => '2',
@@ -1548,6 +1988,7 @@ class C_Reqpic extends CI_Controller
                 redirect('reqpic/detreqbarangpic/' . $kdponk);
             }
         }
+        redirect('reqpic/detreqbarangpic/' . $kdponk);
     }
 
     public function po_nk_req_revisi_note()

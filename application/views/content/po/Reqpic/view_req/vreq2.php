@@ -38,7 +38,9 @@
                                     <td><?= $g->departemen ?></td>
                                     <td><?= format_tgl_lahir($g->tgl_transaksi) ?></td>
                                     <td><?= $g->tj_pembelian ?></td>
-                                    <td><a class="btn btn-block btn-info btn-sm"><b><?= $g->status ?></b></a></td>
+                                    <td>
+                                        <a class="btn btn-block <?= strpos(trim((string) $g->status), 'MENUNGGU PENYERAHAN') === 0 ? 'btn-secondary' : 'btn-info' ?> btn-sm"><b><?= htmlspecialchars(trim((string) $g->status), ENT_QUOTES, 'UTF-8') ?></b></a>
+                                    </td>
                                     <!-- <?php if ($g->status == 'ON PROGRESS') : ?>
                                             <td><a class="btn btn-block btn-warning btn-sm"><b><?= $g->status ?></b></a></td>
                                         <?php elseif ($g->status == 'REQUEST ACC') : ?>

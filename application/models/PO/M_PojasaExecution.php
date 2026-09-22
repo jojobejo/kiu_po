@@ -54,13 +54,45 @@ class M_PojasaExecution extends CI_Model
             . 'ORDER BY m.line_no, a.id_allocation',
             array($requestCode)
         )->result_array();
-        $receipts = $this->db->query(
-            'SELECT h.*, d.qty_received, d.id_allocation, m.nama_material, m.satuan, d.id_transnk '
+        $hasPurchaseReceipts = $this->db->table_exists('tbpo_jasa_purchase_receipt')
+            && $this->db->field_exists('id_transnk', 'tbpo_jasa_purchase_receipt');
+        $hasLegacyOnHandPosting = $this->db->table_exists('tbpo_po_nk')
+            && $this->db->field_exists('source_module', 'tbpo_po_nk')
+            && $this->db->field_exists('source_material_id', 'tbpo_detail_po_nk');
+        $receiptBindings = array($requestCode);
+        $receiptSql =
+            "SELECT h.receipt_at,h.no_receipt,d.qty_received,d.id_allocation,m.nama_material,m.satuan,d.id_transnk,"
+            . "'PENERIMAAN_PIC' receipt_source,'RECEIPT' record_type,'11512' kd_akun "
             . 'FROM tbpo_jasa_stock_receipt h '
             . 'JOIN tbpo_jasa_stock_receipt_detail d ON d.id_receipt = h.id_receipt '
             . 'JOIN tbpo_jasa_material m ON m.id_material = d.id_material '
-            . 'WHERE h.kd_po_jasa = ? ORDER BY h.receipt_at DESC, d.id_receipt_detail DESC',
-            array($requestCode)
+            . 'WHERE h.kd_po_jasa = ? ';
+        if ($hasPurchaseReceipts) {
+            $receiptSql .= "UNION ALL SELECT pr.on_hand_date,pr.receipt_reference,pr.qty_received,NULL,m.nama_material,m.satuan,pr.id_transnk,"
+                    . "'ON_HAND_PURCHASING',pr.record_type,t.kd_akun FROM tbpo_jasa_purchase_receipt pr "
+                    . 'JOIN tbpo_jasa_material m ON m.id_material=pr.id_material '
+                    . 'LEFT JOIN tbpo_transaksi t ON t.id_transnk=pr.id_transnk '
+                    . 'WHERE pr.kd_po_jasa=? ';
+            $receiptBindings[] = $requestCode;
+        }
+        if ($hasLegacyOnHandPosting) {
+            // Legacy Purchasing ON HAND posts the physical issue directly to
+            // tbpo_transaksi.  Expose that outgoing leg in the same PIC table
+            // using its existing receipt headers, without treating it as a
+            // PIC-entered receipt.
+            $receiptSql .= "UNION ALL SELECT t.tgl_transaksi,CONCAT('ONHAND-',p.kd_po_nk),t.tr_qty,NULL,"
+                . "m.nama_material,m.satuan,t.id_transnk,'ON_HAND_LEGACY_PO','RECEIPT',t.kd_akun "
+                . 'FROM tbpo_transaksi t '
+                . "JOIN tbpo_po_nk p ON p.kd_po_req=t.kd_po_nk AND p.source_module='PO_JASA' "
+                . 'JOIN tbpo_detail_po_nk d ON d.kd_po_nk=p.kd_po_nk AND d.kd_barang=t.kd_barang '
+                . 'JOIN tbpo_jasa_material m ON m.id_material=d.source_material_id '
+                . "WHERE t.kd_po_nk=? AND t.kd_akun='11512' "
+                . "AND t.keterangan LIKE CONCAT('ON_HAND PO Jasa ',p.kd_po_nk,' - stok keluar ke PO Jasa %') ";
+            $receiptBindings[] = $requestCode;
+        }
+        $receipts = $this->db->query(
+            $receiptSql . 'ORDER BY receipt_at DESC, id_transnk DESC',
+            $receiptBindings
         )->result_array();
         $costs = $this->db->query(
             'SELECT c.*, d.file_original evidence_name, d.mime_type evidence_mime '
@@ -222,7 +254,7 @@ class M_PojasaExecution extends CI_Model
             return null;
         }
         $row = $this->db->query(
-            "SELECT COUNT(*) total, SUM(status IN ('MENUNGGU_KADEP','PENDING_KADEP','MENUNGGU_PURCHASING','MENUNGGU_DIRUT_OPS','MENUNGGU_DIREKTUR')) menunggu, "
+            "SELECT COUNT(*) total, SUM(status IN ('MENUNGGU_PURCHASING_AWAL','MENUNGGU_KADEP','PENDING_KADEP','MENUNGGU_PURCHASING','MENUNGGU_DIRUT_OPS','MENUNGGU_PURCHASING_DIROPS','MENUNGGU_DIREKTUR','MENUNGGU_PENERBITAN_PURCHASING')) menunggu, "
             . "SUM(status IN ('SPK_TERBIT','ON_PROGRESS')) berjalan, SUM(status IN ('SELESAI','DITUTUP')) selesai "
             . 'FROM tbpo_jasa_request WHERE ' . implode(' AND ', $where),
             $binds

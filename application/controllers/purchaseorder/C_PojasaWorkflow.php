@@ -7,6 +7,9 @@ class C_PojasaWorkflow extends CI_Controller
     {
         parent::__construct();
         $this->load->model('PO/M_PojasaWorkflow');
+        $this->load->model('PO/M_PojasaIntegration');
+        $this->load->model('PO/M_PojasaPickup');
+        $this->load->model('PO/M_PojasaDemo');
         $this->load->helper(array('pojasa_authorization', 'pojasa_status'));
     }
 
@@ -17,6 +20,7 @@ class C_PojasaWorkflow extends CI_Controller
         }
         $data = $this->baseData('Workflow Approval PO Jasa');
         $data['work_statuses'] = $this->M_PojasaWorkflow->work_statuses($this->context());
+        $data['can_create_demo'] = $this->context()['role'] === 'PURCHASING' && $this->M_PojasaDemo->schema_ready();
         $this->render('content/po/jasa/workflow/list', $data, 'content/po/jasa/workflow/workflow_js');
     }
 
@@ -36,12 +40,46 @@ class C_PojasaWorkflow extends CI_Controller
         $data['request'] = $request;
         $data['scopes'] = $this->M_PojasaWorkflow->get_scopes($request->kd_po_jasa, $revision);
         $data['materials'] = $this->M_PojasaWorkflow->get_materials($request->kd_po_jasa, $revision);
+        $data['purchasing_totals'] = $this->M_PojasaWorkflow->get_purchasing_totals($request->kd_po_jasa, $revision);
         $data['documents'] = $this->M_PojasaWorkflow->get_documents($request->kd_po_jasa);
         $data['history'] = $this->M_PojasaWorkflow->get_history($request->kd_po_jasa);
         $data['allowed_actions'] = $this->M_PojasaWorkflow->allowed_actions($context, $request);
         $data['can_edit_purchasing'] = $this->M_PojasaWorkflow->can_edit_purchasing($context, $request);
+        $data['final_approval_view'] = in_array($context['role'], array('KADEP', 'DIREKTUR_OPERASIONAL', 'DIREKTUR'), true);
         $data['vendors'] = $this->M_PojasaWorkflow->get_active_vendors();
+        $data['pickup_state'] = $this->M_PojasaPickup->state($request->kd_po_jasa);
+        $data['purchase_integration'] = $this->M_PojasaIntegration->get_submission_state($request->kd_po_jasa);
+        $data['purchasingReviewNote'] = ($context['role'] === 'PIC' && $request->status === 'MENUNGGU_KONFIRMASI_PIC')
+            ? $this->M_PojasaWorkflow->get_latest_purchasing_review_note($request->kd_po_jasa)
+            : null;
         $this->render('content/po/jasa/workflow/detail', $data, 'content/po/jasa/workflow/workflow_js');
+    }
+
+    public function pickup_decision()
+    {
+        if (!$this->guardAjax('POST', true)) return;
+        $code = $this->normalizeCode($this->input->post('kd_po_jasa', true));
+        $action = strtoupper(trim((string)$this->input->post('action', true)));
+        if (!in_array($action, array('ACC', 'REJECT'), true)) return $this->json(false, 'VALIDATION_ERROR', 'Keputusan tidak valid.', array(), 422);
+        $result = $this->M_PojasaPickup->decide($this->context(), $code, $action, trim((string)$this->input->post('note', true)));
+        return $this->json($result['success'], $result['code'], $result['success'] ? 'Keputusan pengambilan tersimpan.' : 'Anda tidak berwenang memutuskan pengambilan ini.', array('pickup' => $this->M_PojasaPickup->state($code)), $result['success'] ? 200 : 403);
+    }
+
+    public function create_demo()
+    {
+        if (!$this->guardAjax('POST', true)) return;
+        $context = $this->context();
+        if ($context['role'] !== 'PURCHASING') {
+            return $this->json(false, 'FORBIDDEN', 'Automasi demo hanya dapat dijalankan oleh Purchasing.', array(), 403);
+        }
+        $result = $this->M_PojasaDemo->create($context);
+        if (!$result['success']) {
+            $message = $result['code'] === 'STOCK_NOT_FOUND'
+                ? 'Tidak ada barang nonkomersial dengan stok tersedia untuk dijadikan demo.'
+                : 'Automasi demo gagal dibuat (' . $result['code'] . ').';
+            return $this->json(false, $result['code'], $message, array(), $result['code'] === 'STOCK_NOT_FOUND' ? 422 : 500);
+        }
+        return $this->json(true, 'CREATED', 'Data demo PO Jasa, SPK, master barang baru, dan PO Pembelian berhasil dibuat.', $result);
     }
 
     public function datatable()
@@ -195,6 +233,10 @@ class C_PojasaWorkflow extends CI_Controller
     private function validateReview($request, $payload)
     {
         $errors = array();
+        $segment = strtolower(trim((string) (isset($payload['segment']) ? $payload['segment'] : '')));
+        if (!in_array($segment, array('purchasing', 'scope', 'material'), true)) {
+            $errors['segment'] = 'Segmen review tidak valid.';
+        }
         $vendorCode = strtoupper(trim((string) (isset($payload['kd_vendor_jasa']) ? $payload['kd_vendor_jasa'] : '')));
         $note = trim((string) (isset($payload['note']) ? $payload['note'] : ''));
         $startDate = trim((string) (isset($payload['tgl_mulai_pekerjaan']) ? $payload['tgl_mulai_pekerjaan'] : ''));
@@ -205,35 +247,37 @@ class C_PojasaWorkflow extends CI_Controller
         if (mb_strlen($note) > 5000) {
             $errors['note'] = 'Catatan maksimal 5.000 karakter.';
         }
-        if (in_array($request->status, array('REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true) && $note === '') {
+        if ($segment === 'purchasing' && in_array($request->status, array('REVISI_PURCHASING_KADEP', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true) && $note === '') {
             $errors['note'] = 'Catatan perbaikan wajib diisi sebelum revisi disimpan.';
         }
-        if (($startDate !== '' && !$this->validDate($startDate)) || ($endDate !== '' && !$this->validDate($endDate))) {
+        if ($segment === 'purchasing' && ($startDate === '' || $endDate === '')) {
+            $errors['jadwal'] = 'Tanggal mulai dan selesai wajib diisi.';
+        } elseif ($segment === 'purchasing' && (!$this->validDate($startDate) || !$this->validDate($endDate))) {
             $errors['jadwal'] = 'Tanggal mulai dan selesai harus valid.';
-        } elseif (($startDate === '') !== ($endDate === '')) {
-            $errors['jadwal'] = 'Tanggal mulai dan selesai harus diisi bersamaan.';
-        } elseif ($startDate !== '' && $endDate < $startDate) {
+        } elseif ($segment === 'purchasing' && $endDate < $startDate) {
             $errors['jadwal'] = 'Tanggal selesai tidak boleh lebih awal dari tanggal mulai.';
         }
         $revision = $this->M_PojasaWorkflow->effective_revision($request);
         $scopeMap = array();
         foreach ($this->M_PojasaWorkflow->get_scopes($request->kd_po_jasa, $revision) as $row) {
-            $scopeMap[(int) $row['line_no']] = $row;
+            $scopeMap[(int) $row['id_scope']] = $row;
         }
         $materialMap = array();
         foreach ($this->M_PojasaWorkflow->get_materials($request->kd_po_jasa, $revision) as $row) {
-            $materialMap[(int) $row['line_no']] = $row;
+            $materialMap[(int) $row['id_material']] = $row;
         }
-        $scopes = $this->validatePriceRows(isset($payload['scopes']) ? $payload['scopes'] : array(), $scopeMap, true, $errors);
-        $materials = $this->validatePriceRows(isset($payload['materials']) ? $payload['materials'] : array(), $materialMap, false, $errors);
+        $scopes = $segment === 'scope' ? $this->validateReviewRows(isset($payload['scopes']) ? $payload['scopes'] : array(), $scopeMap, true, $errors) : array();
+        $materials = $segment === 'material' ? $this->validateReviewRows(isset($payload['materials']) ? $payload['materials'] : array(), $materialMap, false, $errors) : array();
+        $deletedScopes = $segment === 'scope' ? $this->validateDeletedRows(isset($payload['deleted_scopes']) ? $payload['deleted_scopes'] : array(), $scopeMap, 'scope', $errors) : array();
+        $deletedMaterials = $segment === 'material' ? $this->validateDeletedRows(isset($payload['deleted_materials']) ? $payload['deleted_materials'] : array(), $materialMap, 'material', $errors) : array();
         return array(
             'success' => !$errors,
             'errors' => $errors,
-            'payload' => array('kd_vendor_jasa' => $vendorCode, 'note' => $note, 'tgl_mulai_pekerjaan' => $startDate ?: null, 'tgl_selesai_pekerjaan' => $endDate ?: null, 'scopes' => $scopes, 'materials' => $materials),
+            'payload' => array('segment' => $segment, 'kd_vendor_jasa' => $vendorCode, 'note' => $note, 'tgl_mulai_pekerjaan' => $startDate ?: null, 'tgl_selesai_pekerjaan' => $endDate ?: null, 'scopes' => $scopes, 'materials' => $materials, 'deleted_scopes' => $deletedScopes, 'deleted_materials' => $deletedMaterials),
         );
     }
 
-    private function validatePriceRows($rows, $sourceMap, $isScope, &$errors)
+    private function validateReviewRows($rows, $sourceMap, $isScope, &$errors)
     {
         if (!is_array($rows) || count($rows) > 500) {
             $errors[$isScope ? 'scopes' : 'materials'] = 'Baris review tidak valid atau melebihi 500.';
@@ -241,57 +285,63 @@ class C_PojasaWorkflow extends CI_Controller
         }
         $clean = array();
         foreach ($rows as $index => $row) {
-            $lineNo = isset($row['line_no']) ? (int) $row['line_no'] : 0;
-            if ($lineNo <= 0 || !isset($sourceMap[$lineNo])) {
-                $errors[($isScope ? 'scope_' : 'material_') . $index] = 'Referensi baris tidak ditemukan.';
-                continue;
+            $id = isset($row['id']) ? (int) $row['id'] : 0;
+            $isNew = !empty($row['is_new']);
+            if (!$isNew && ($id <= 0 || !isset($sourceMap[$id]))) {
+                $errors[($isScope ? 'scope_' : 'material_') . $index] = 'Referensi baris tidak ditemukan.'; continue;
             }
-            $price = $this->parseAmount(isset($row['harga_estimasi']) ? $row['harga_estimasi'] : '');
-            $sourceQty = $isScope ? $sourceMap[$lineNo]['qty'] : $sourceMap[$lineNo]['qty_kebutuhan'];
+            $source = $isNew ? array() : $sourceMap[$id];
+            $price = $this->parseCurrencyAmount(isset($row['harga_pembanding']) ? $row['harga_pembanding'] : '');
+            $sourceQty = $isScope ? (isset($source['qty']) ? $source['qty'] : '') : (isset($source['qty_kebutuhan']) ? $source['qty_kebutuhan'] : '');
             $qty = $this->parseAmount(isset($row['qty']) ? $row['qty'] : $sourceQty);
             $nameKey = $isScope ? 'nama_scope' : 'nama_material';
-            $name = trim((string) (isset($row[$nameKey]) ? $row[$nameKey] : $sourceMap[$lineNo][$nameKey]));
-            $description = trim((string) (isset($row['deskripsi']) ? $row['deskripsi'] : $sourceMap[$lineNo]['deskripsi']));
-            $unit = trim((string) (isset($row['satuan']) ? $row['satuan'] : $sourceMap[$lineNo]['satuan']));
-            if ($price === false || $price < 0 || $price >= 10000000000000000 || $qty === false || $qty <= 0) {
-                $errors[($isScope ? 'scope_' : 'material_') . $index] = 'Harga estimasi tidak valid.';
+            $name = trim((string) (isset($row[$nameKey]) ? $row[$nameKey] : (isset($source[$nameKey]) ? $source[$nameKey] : '')));
+            $description = trim((string) (isset($row['deskripsi']) ? $row['deskripsi'] : (isset($source['deskripsi']) ? $source['deskripsi'] : '')));
+            $unit = trim((string) (isset($row['satuan']) ? $row['satuan'] : (isset($source['satuan']) ? $source['satuan'] : '')));
+            if (($price !== false && ($price < 0 || $price >= 10000000000000000)) || ($isNew && ($price === false || $price < 0)) || $qty === false || $qty <= 0) {
+                $errors[($isScope ? 'scope_' : 'material_') . $index] = 'Harga pembanding atau quantity tidak valid.';
                 continue;
             }
             if ($name === '' || mb_strlen($name) > 255 || mb_strlen($description) > 5000 || $unit === '' || mb_strlen($unit) > 50) {
                 $errors[($isScope ? 'scope_' : 'material_') . $index] = 'Nama, deskripsi, quantity, atau satuan tidak valid.';
                 continue;
             }
-            if (!$isScope && !empty($sourceMap[$lineNo]['planning_locked']) && (
-                $name !== (string) $sourceMap[$lineNo]['nama_material'] ||
-                $description !== (string) $sourceMap[$lineNo]['deskripsi'] ||
-                abs($qty - (float) $sourceMap[$lineNo]['qty_kebutuhan']) > 0.000001 ||
-                $unit !== (string) $sourceMap[$lineNo]['satuan']
+            if (!$isScope && !$isNew && !empty($source['planning_locked']) && (
+                $name !== (string) $source['nama_material'] || $description !== (string) $source['deskripsi'] ||
+                abs($qty - (float) $source['qty_kebutuhan']) > 0.000001 || $unit !== (string) $source['satuan']
             )) {
                 $errors['material_locked_' . $index] = 'Identitas dan quantity material terkunci karena sudah memiliki reservasi/draft aktif.';
                 continue;
             }
             $cleanRow = array(
-                'line_no' => $lineNo,
+                'id' => $id, 'is_new' => $isNew,
                 'qty' => $qty,
-                'harga_estimasi' => $price,
+                'harga_pembanding' => $price === false ? null : $price,
                 $nameKey => $name,
                 'deskripsi' => $description !== '' ? $description : null,
                 'satuan' => $unit,
             );
-            if ($isScope) {
-                $note = trim((string) (isset($row['keterangan_purchasing']) ? $row['keterangan_purchasing'] : ''));
-                if (mb_strlen($note) > 5000) {
-                    $errors['scope_note_' . $index] = 'Keterangan scope maksimal 5.000 karakter.';
-                    continue;
-                }
-                $cleanRow['keterangan_purchasing'] = $note !== '' ? $note : null;
-            } else {
-                $cleanRow['sumber_material'] = (string) $sourceMap[$lineNo]['computed_source'];
+            $purchasingNote = trim((string) (isset($row['keterangan_purchasing']) ? $row['keterangan_purchasing'] : ''));
+            if (mb_strlen($purchasingNote) > 5000 || ($price !== false && $purchasingNote === '')) {
+                $errors[($isScope ? 'scope_note_' : 'material_note_') . $index] = 'Keterangan Purchasing wajib diisi saat harga pembanding diisi.';
+                continue;
             }
+            $cleanRow['keterangan_purchasing'] = $purchasingNote !== '' ? $purchasingNote : null;
+            if (!$isScope && !$isNew) { $cleanRow['id_brg_nk'] = $source['id_brg_nk']; $cleanRow['reference_type'] = $source['reference_type']; }
             $clean[] = $cleanRow;
         }
-        if (count($clean) !== count($sourceMap)) {
-            $errors[$isScope ? 'scopes' : 'materials'] = 'Seluruh baris aktif harus disertakan dalam review.';
+        return $clean;
+    }
+
+    private function validateDeletedRows($rows, $sourceMap, $type, &$errors)
+    {
+        if (!is_array($rows) || count($rows) > 500) { $errors['deleted_' . $type] = 'Data penghapusan tidak valid.'; return array(); }
+        $clean = array();
+        foreach ($rows as $index => $row) {
+            $id = isset($row['id']) ? (int) $row['id'] : 0; $reason = trim((string) (isset($row['reason']) ? $row['reason'] : ''));
+            if ($id <= 0 || !isset($sourceMap[$id]) || $reason === '' || mb_strlen($reason) > 5000) { $errors['deleted_' . $type . '_' . $index] = 'Alasan penghapusan ' . $type . ' wajib diisi.'; continue; }
+            if ($type === 'material' && !empty($sourceMap[$id]['planning_locked'])) { $errors['deleted_material_' . $index] = 'Material yang sudah memiliki reservasi/draft aktif tidak dapat dihapus.'; continue; }
+            $clean[] = array('id' => $id, 'reason' => $reason);
         }
         return $clean;
     }
@@ -299,27 +349,76 @@ class C_PojasaWorkflow extends CI_Controller
     private function statePayload($request, $context)
     {
         $history = $this->M_PojasaWorkflow->get_history($request->kd_po_jasa);
-        $isPurchasingRevision = in_array($request->status, array('REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true);
+        $revisionNo = $this->M_PojasaWorkflow->effective_revision($request);
+        $materials = $this->M_PojasaWorkflow->get_materials($request->kd_po_jasa, $revisionNo);
+        $draftReviewCount = 0;
+        $draftReviewMaterials = array();
+        foreach ($materials as $material) {
+            if ((float) $material['remaining_need'] > 0.000001) {
+                $draftReviewCount++;
+                $draftReviewMaterials[] = (string) $material['nama_material'];
+            }
+        }
+        $purchasingTotals = $this->M_PojasaWorkflow->get_purchasing_totals($request->kd_po_jasa, $revisionNo);
+        $isFinalApprovalView = in_array($context['role'], array('KADEP', 'DIREKTUR_OPERASIONAL', 'DIREKTUR'), true);
+        $isPurchasingRevision = in_array($request->status, array('REVISI_PURCHASING_KADEP', 'REVISI_PURCHASING_DIROPS', 'REVISI_PURCHASING_DIRUT'), true);
         $revisionReady = !$isPurchasingRevision || (
             !empty($request->edit_revision_no)
             && !empty($request->purchasing_revision_saved_at)
             && $request->purchasing_revision_status === $request->status
         );
+        $purchasingRevisionNotes = array();
+        $reviewSegments = array('purchasing' => false, 'scope' => false, 'material' => false);
+        $reviewPrefix = $isPurchasingRevision ? 'REVISI_PURCHASING_' : 'REVIEW_PURCHASING_';
+        foreach ($history['logs'] as $log) {
+            if ($log['event_type'] === 'REVISI_PURCHASING_DISIMPAN' || $log['event_type'] === 'REVISI_PURCHASING_PURCHASING_DISIMPAN') {
+                $purchasingRevisionNotes[] = $log;
+            }
+            foreach (array('purchasing', 'scope', 'material') as $segment) {
+                if ($log['event_type'] === $reviewPrefix . strtoupper($segment) . '_DISIMPAN'
+                    && (int) $log['revision_no'] === $revisionNo) {
+                    $reviewSegments[$segment] = true;
+                }
+            }
+        }
+        if (!$isPurchasingRevision && !empty($request->reviewed_at_purchasing)
+            && !array_filter($reviewSegments)) {
+            $reviewSegments = array('purchasing' => true, 'scope' => true, 'material' => true);
+        }
         return array(
             'request' => array(
                 'kd_po_jasa' => $request->kd_po_jasa, 'status' => $request->status,
                 'status_version' => (int) $request->status_version, 'revision_no' => (int) $request->revision_no,
                 'nm_user' => $request->nm_user, 'departemen' => $request->departemen,
                 'tujuan_pekerjaan' => $request->tujuan_pekerjaan,
+                'purchasing_note' => $request->purchasing_note,
+                'reviewed_at_purchasing' => $request->reviewed_at_purchasing,
+                'purchasing_revision_saved_at' => $request->purchasing_revision_saved_at,
+                'purchasing_revision_status' => $request->purchasing_revision_status,
                 'vendor' => $request->nama_vendor ?: $request->vendor_usulan,
-                'estimasi_total' => (float) $request->estimasi_total, 'no_spk' => $request->no_spk,
+                'estimasi_total' => (float) $request->estimasi_total,
+                'estimasi_purchasing' => $request->estimasi_purchasing === null ? null : (float) $request->estimasi_purchasing,
+                'estimasi_final' => (float) $purchasingTotals['grand_total'],
+                'estimasi_final_jasa' => (float) $purchasingTotals['jasa'],
+                'estimasi_final_material' => (float) $purchasingTotals['material'],
+                'no_spk' => $request->no_spk,
             ),
             'allowed_actions' => $this->M_PojasaWorkflow->allowed_actions($context, $request),
             'can_edit_purchasing' => $this->M_PojasaWorkflow->can_edit_purchasing($context, $request),
+            'draft_review_required' => $context['role'] === 'PURCHASING'
+                && $request->status === 'MENUNGGU_PURCHASING_AWAL'
+                && $draftReviewCount > 0,
+            'draft_review_count' => $draftReviewCount,
+            'draft_review_materials' => $draftReviewMaterials,
+            'review_segments' => $reviewSegments,
             'revision_ready' => $revisionReady,
+            'final_approval_view' => $isFinalApprovalView,
             'detail_url' => base_url('pojasa/workflow/detail/' . $request->kd_po_jasa),
             'approvals' => $history['approvals'], 'revisions' => $history['revisions'],
-            'materials' => $this->M_PojasaWorkflow->get_materials($request->kd_po_jasa, $this->M_PojasaWorkflow->effective_revision($request)),
+            'purchasing_revision_notes' => $purchasingRevisionNotes,
+            'purchasing_totals' => $purchasingTotals,
+            'materials' => $materials,
+            'purchase_drafts' => $this->M_PojasaWorkflow->get_active_purchase_drafts($request->kd_po_jasa, $revisionNo),
             'csrf_token' => pojasa_csrf_token(),
         );
     }
@@ -472,6 +571,17 @@ class C_PojasaWorkflow extends CI_Controller
         return is_numeric($value) && is_finite((float) $value) ? round((float) $value, 2) : false;
     }
 
+    /** Harga pembanding ditampilkan dengan pemisah ribuan Indonesia, mis. 150.000. */
+    private function parseCurrencyAmount($value)
+    {
+        $value = str_replace(' ', '', trim((string) $value));
+        if ($value === '') return false;
+        if (preg_match('/^\d{1,3}(?:\.\d{3})+$/', $value)) {
+            $value = str_replace('.', '', $value);
+        }
+        return $this->parseAmount($value);
+    }
+
     private function statusColor($status)
     {
         if (strpos($status, 'DITOLAK_') === 0) {
@@ -479,6 +589,9 @@ class C_PojasaWorkflow extends CI_Controller
         }
         if (strpos($status, 'REVISI_') === 0 || $status === 'PENDING_KADEP') {
             return 'warning';
+        }
+        if ($status === 'SPK_TERBIT') {
+            return 'success';
         }
         return 'info';
     }

@@ -14,9 +14,10 @@
         <div id="workflowModalContent" class="d-none">
           <div class="row">
             <div class="col-md-6"><dl class="row mb-2"><dt class="col-5">Request</dt><dd class="col-7" id="workflowSummaryCode"></dd><dt class="col-5">PIC</dt><dd class="col-7" id="workflowSummaryPic"></dd><dt class="col-5">Departemen</dt><dd class="col-7" id="workflowSummaryDepartment"></dd></dl></div>
-            <div class="col-md-6"><dl class="row mb-2"><dt class="col-5">Status</dt><dd class="col-7"><span id="workflowSummaryStatus" class="badge badge-info"></span></dd><dt class="col-5">Vendor</dt><dd class="col-7" id="workflowSummaryVendor"></dd><dt class="col-5">Estimasi</dt><dd class="col-7" id="workflowSummaryTotal"></dd></dl></div>
+            <div class="col-md-6"><dl class="row mb-2"><dt class="col-5">Status</dt><dd class="col-7"><span id="workflowSummaryStatus" class="badge badge-info"></span></dd><dt class="col-5">Vendor</dt><dd class="col-7" id="workflowSummaryVendor"></dd><dt class="col-5" id="workflowSummaryTotalLabel">Estimasi</dt><dd class="col-7" id="workflowSummaryTotal"></dd></dl></div>
           </div>
           <div class="border rounded p-2 mb-3"><strong>Tujuan pekerjaan</strong><div id="workflowSummaryPurpose" style="white-space:pre-wrap"></div></div>
+          <div id="workflowActionError" class="alert alert-danger d-none" role="alert"><div class="font-weight-bold"><i class="fas fa-exclamation-circle mr-1"></i>Aksi Purchasing belum dapat diproses</div><div id="workflowActionErrorDetail" class="mt-1"></div></div>
           <label>Pilih aksi</label>
           <div id="workflowActionChoices" class="mb-3"></div>
           <div id="workflowRevisionSaveHint" class="alert alert-warning d-none mb-3">Perbaikan Purchasing harus disimpan melalui halaman detail sebelum dapat diajukan ulang.</div>
@@ -30,6 +31,18 @@
         <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
         <button type="button" id="workflowExecuteAction" class="btn btn-primary" disabled><i class="fas fa-check mr-1"></i> Proses</button>
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="workflowDraftPurchaseModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-light"><h5 class="modal-title"><i class="fas fa-shopping-cart mr-1"></i>Draft PO Pembelian</h5><button type="button" class="close" data-dismiss="modal"><span>&times;</span></button></div>
+      <div class="modal-body">
+        <div class="alert alert-light border py-2"><strong>Aturan qty:</strong> draft maksimal sebesar sisa kebutuhan setelah stok tersedia, reservasi aktif, dan draft aktif diperhitungkan.</div>
+        <div class="table-responsive"><table class="table table-sm table-bordered mb-0"><thead><tr><th>Material</th><th class="text-right">Qty</th><th class="text-right">Harga</th><th>Keterangan</th><th>#</th></tr></thead><tbody id="workflowDraftPurchaseBody"></tbody></table></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button></div>
     </div>
   </div>
 </div>

@@ -9,6 +9,7 @@ class C_PojasaPurchasing extends CI_Controller
         $this->load->model('PO/M_PojasaPurchasing');
         $this->load->model('PO/M_PojasaIntegration');
         $this->load->model('PO/M_PojasaSpkChange');
+        $this->load->model('PO/M_PojasaPickup');
         $this->load->helper(array('pojasa_authorization', 'pojasa_status', 'pojasa_document'));
     }
 
@@ -45,6 +46,14 @@ class C_PojasaPurchasing extends CI_Controller
             return $this->json(false, 'NOT_FOUND', 'Request tidak ditemukan.', array(), 404);
         }
         return $this->json(true, 'OK', 'Data Purchasing dimuat.', $this->statePayload($request, $context));
+    }
+
+    public function pickup_prepare()
+    {
+        if (!$this->guardAjax('POST', true, true)) return;
+        $code = $this->code($this->input->post('kd_po_jasa', true));
+        $result = $this->M_PojasaPickup->prepare($this->context(), $code, trim((string)$this->input->post('note', true)));
+        return $this->json($result['success'], $result['code'], $result['success'] ? 'Barang ditandai siap diambil.' : 'Permintaan belum siap diproses.', array('pickup' => $this->M_PojasaPickup->state($code)), $result['success'] ? 200 : 403);
     }
 
     public function vendor_search()
@@ -229,6 +238,37 @@ class C_PojasaPurchasing extends CI_Controller
         return $this->freshStateResponse($requestCode, $result['code'], $result['code'] === 'NO_ACTIVE_DRAFT' ? 'Tidak ada draft aktif untuk diajukan.' : 'PO Pembelian berhasil disinkronkan.');
     }
 
+    public function purchase_delete()
+    {
+        if (!$this->guardAjax('POST', true, true)) return;
+        $requestCode = $this->code($this->input->post('kd_po_jasa', true));
+        $reason = trim((string) $this->input->post('reason', true));
+        if ($reason === '' || mb_strlen($reason) > 5000) {
+            return $this->json(false, 'VALIDATION_ERROR', 'Alasan penghapusan PO Pembelian wajib diisi.', array(), 422);
+        }
+        $result = $this->M_PojasaIntegration->delete_purchase_submission($this->context(), $requestCode, $reason);
+        if (!$result['success']) return $this->modelError($result);
+        return $this->freshStateResponse($requestCode, $result['code'], 'PO Pembelian dihapus; draft material dikembalikan untuk diperbaiki atau diajukan ulang.');
+    }
+
+    public function dev_purchase_submit()
+    {
+        if (!$this->guardAjax('POST', true, true)) return;
+        if (!(bool) $this->config->item('pojasa_enable_dev_purchase_button')) {
+            return $this->json(false, 'FORBIDDEN', 'Fitur DEV generate PO Pembelian sedang dinonaktifkan.', array(), 403);
+        }
+        $context = $this->context();
+        if (!in_array($context['role'], array('ADMIN', 'PURCHASING'), true)) {
+            return $this->json(false, 'FORBIDDEN', 'Fitur DEV hanya untuk Admin atau Purchasing.', array(), 403);
+        }
+        $requestCode = $this->code($this->input->post('kd_po_jasa', true));
+        $token = strtolower(trim((string) $this->input->post('idempotency_token', true)));
+        if (!$this->validUuid($token)) return $this->json(false, 'VALIDATION_ERROR', 'Token aksi tidak valid.', array(), 422);
+        $result = $this->M_PojasaIntegration->create_purchase_submission($context, $requestCode, $token, true);
+        if (!$result['success']) return $this->modelError($result);
+        return $this->json(true, $result['code'], $result['code'] === 'NO_ACTIVE_DRAFT' ? 'Tidak ada draft aktif untuk diuji.' : 'PO Pembelian DEV berhasil dibuat tanpa menunggu SPK.', array('kd_po_nk' => $result['kd_po_nk'], 'id_po_nk' => isset($result['id_po_nk']) ? $result['id_po_nk'] : null, 'csrf_token' => pojasa_csrf_token()));
+    }
+
     public function purchase_receive()
     {
         if (!$this->guardAjax('POST', true, true)) return;
@@ -244,7 +284,7 @@ class C_PojasaPurchasing extends CI_Controller
         }
         $result = $this->M_PojasaIntegration->receive_purchase($this->context(), $requestCode, $detailId, $qty, $price, $date, $document, $token);
         if (!$result['success']) return $this->modelError($result);
-        return $this->freshStateResponse($requestCode, $result['code'], 'Penerimaan dicatat dan biaya aktual dibentuk otomatis.');
+        return $this->freshStateResponse($requestCode, $result['code'], 'Penerimaan, biaya aktual, dan transaksi stok masuk (akun 11511) berhasil dibentuk otomatis.');
     }
 
     public function purchase_reverse()
@@ -257,7 +297,7 @@ class C_PojasaPurchasing extends CI_Controller
         if ($receiptId <= 0 || $reason === '' || mb_strlen($reason) > 5000 || !$this->validUuid($token)) return $this->json(false, 'VALIDATION_ERROR', 'Penerimaan, alasan reversal, dan token wajib valid.', array(), 422);
         $result = $this->M_PojasaIntegration->reverse_receipt($this->context(), $requestCode, $receiptId, $reason, $token);
         if (!$result['success']) return $this->modelError($result);
-        return $this->freshStateResponse($requestCode, $result['code'], 'Reversal penerimaan dan biaya berhasil dicatat.');
+        return $this->freshStateResponse($requestCode, $result['code'], 'Reversal penerimaan, biaya, dan transaksi penyesuaian stok keluar (akun 11514) berhasil dicatat.');
     }
 
     public function change_submit()
@@ -406,6 +446,11 @@ class C_PojasaPurchasing extends CI_Controller
         $state['can_approve_spk_revision'] = $context['role'] === 'DIREKTUR';
         $state['document_url'] = base_url('pojasa/workflow/document/');
         $state['purchase_integration'] = $this->M_PojasaIntegration->get_submission_state($request->kd_po_jasa);
+        $state['can_delete_purchase'] = in_array($context['role'], array('ADMIN', 'PURCHASING'), true)
+            && !empty($state['purchase_integration']['submission'])
+            && empty($state['purchase_integration']['receipts'])
+            && empty($state['purchase_integration']['adjustments']);
+        $state['pickup'] = $this->M_PojasaPickup->state($request->kd_po_jasa);
         $state['spk_changes'] = $this->M_PojasaSpkChange->state($context, $request);
         $state['spk_urls'] = array('view' => base_url('pojasa/spk/' . $request->kd_po_jasa), 'print' => base_url('pojasa/spk/' . $request->kd_po_jasa . '/print'), 'download' => base_url('pojasa/spk/' . $request->kd_po_jasa . '/download'));
         $state['csrf_token'] = pojasa_csrf_token();
@@ -497,7 +542,11 @@ class C_PojasaPurchasing extends CI_Controller
             'REVISION_NOT_PENDING' => array(409, 'Pengajuan Revisi SPK tidak lagi menunggu keputusan.'), 'CONCURRENT_UPDATE' => array(409, 'Data berubah bersamaan; muat ulang data.'),
             'SCHEDULE_INVALID' => array(422, 'Jadwal Revisi SPK tidak valid.'),
             'SPK_NOT_FOUND' => array(409, 'SPK belum terbit.'), 'LEGACY_INTEGER_REQUIRED' => array(422, 'Quantity dan harga harus bilangan bulat agar kompatibel dengan PO Pembelian lama.'),
-            'PURCHASE_DETAIL_INVALID' => array(409, 'Detail PO Pembelian tidak valid.'), 'RECEIPT_QUANTITY_INVALID' => array(422, 'Quantity penerimaan melebihi sisa yang belum diterima.'),
+            'PURCHASE_DELETE_NOT_ALLOWED' => array(409, 'PO hanya dapat dihapus saat masih berstatus PROSES PEMBELIAN.'),
+            'PURCHASE_DELETE_RECEIPT_EXISTS' => array(409, 'PO tidak dapat dihapus karena sudah memiliki penerimaan. Lakukan reversal penerimaan sesuai prosedur.'),
+            'PURCHASE_DELETE_ADJUSTMENT_EXISTS' => array(409, 'PO tidak dapat dihapus karena sudah memiliki catatan perubahan/penyesuaian.'),
+            'KADEP_NOT_FOUND' => array(409, 'KADEP untuk departemen pengaju belum tersedia; PO Pembelian otomatis tidak dapat dibuat.'),
+            'PURCHASE_DETAIL_INVALID' => array(409, 'Detail PO Pembelian tidak valid.'), 'MANUAL_MASTER_REQUIRED' => array(409, 'Barang manual harus ditautkan ke master barang sebelum penerimaan dicatat.'), 'RECEIPT_QUANTITY_INVALID' => array(422, 'Quantity penerimaan melebihi sisa yang belum diterima.'),
             'RECEIPT_NOT_REVERSIBLE' => array(409, 'Penerimaan tidak dapat dibalik atau sudah pernah direversal.'),
             'REVISION_INVALID' => array(422, 'Isi perubahan SPK tidak valid.'), 'REVISION_ITEM_INVALID' => array(422, 'Baris perubahan SPK tidak valid.'),
             'NO_CHANGES' => array(422, 'Tidak ada perubahan yang diajukan.'), 'REVISION_COST_INVALID' => array(422, 'Biaya overbudget yang diajukan tidak valid.'),

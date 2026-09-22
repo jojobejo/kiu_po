@@ -691,7 +691,10 @@ class M_PoStatus extends CI_Model
     public function getDetailnk($kd)
     {
         $this->db->select('a.*');
-        $this->db->select('c.gbr_barang AS gbr_barang');
+        // PO Jasa dapat membawa material manual yang belum mempunyai master
+        // barang.  Tetap tampilkan baris PO tersebut agar Purchasing dapat
+        // melengkapi master-nya dari halaman detail PO.
+        $this->db->select("COALESCE(c.gbr_barang, 'Karisma.png') AS gbr_barang", false);
         if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
             $this->db->select('COALESCE(r.qty_nyata, a.qty) AS qty_nyata', false);
             $this->db->select('COALESCE(r.harga_nyata, a.hrg_nyata) AS hrg_nyata', false);
@@ -710,13 +713,170 @@ class M_PoStatus extends CI_Model
             $this->db->select('NULL AS realisasi_updated_at', false);
         }
         $this->db->from('tbpo_detail_po_nk a');
-        $this->db->join('tbpo_user b', 'b.kode_user = a.kd_user');
-        $this->db->join('tbpo_barang_nk c', 'c.kd_barang = a.kd_barang');
+        $this->db->join('tbpo_user b', 'b.kode_user = a.kd_user', 'left');
+        $this->db->join('tbpo_barang_nk c', 'c.kd_barang = a.kd_barang', 'left');
         if ($this->db->table_exists('tbpo_realisasi_detail_po_nk')) {
             $this->db->join('tbpo_realisasi_detail_po_nk r', 'r.id_det_po_nk = a.id_det_po_nk', 'left');
         }
         $this->db->where('a.kd_po_nk', $kd);
         return $this->db->get()->result();
+    }
+
+    public function get_manual_master_required_for_ponk($kdpo)
+    {
+        if (!$this->db->table_exists('tbpo_jasa_material')
+            || !$this->db->field_exists('source_material_id', 'tbpo_detail_po_nk')) {
+            return array();
+        }
+
+        return $this->db->query(
+            "SELECT d.id_det_po_nk, d.source_material_id, d.nama_barang, d.deskripsi,
+                    d.qty, d.hrg_satuan, p.kd_po_req AS kd_po_jasa,
+                    m.nama_material, m.deskripsi AS deskripsi_material, m.satuan AS satuan_material
+             FROM tbpo_detail_po_nk d
+             JOIN tbpo_po_nk p ON p.kd_po_nk = d.kd_po_nk
+             JOIN tbpo_jasa_material m ON m.id_material = d.source_material_id
+             LEFT JOIN tbpo_barang_nk b ON b.id_brg_nk = m.id_brg_nk
+             WHERE d.kd_po_nk = ?
+               AND (d.source_module IN ('PO_JASA', 'PO_JASA_DEV') OR p.source_module IN ('PO_JASA', 'PO_JASA_DEV'))
+               AND (m.id_brg_nk IS NULL OR m.id_brg_nk = 0 OR b.id_brg_nk IS NULL)
+             ORDER BY d.id_det_po_nk ASC",
+            array($kdpo)
+        )->result();
+    }
+
+    public function get_kategori_barang_nk()
+    {
+        return $this->db->order_by('nama_kategori', 'ASC')->get('tbpo_kat_br')->result();
+    }
+
+    public function get_satuan_barang_nk()
+    {
+        return $this->db->order_by('nm_satuan', 'ASC')->get('tbpo_satuan')->result();
+    }
+
+    /**
+     * Generates a PONK code that is absent from both code columns on the
+     * non-commercial master table. The caller may invoke this inside a
+     * transaction; the final existence check then runs under that transaction.
+     */
+    public function generate_unique_manual_master_code()
+    {
+        $prefix = 'PONK' . date('dmy');
+        $like = $prefix . '%';
+        $sequence = $this->db->query(
+            "SELECT GREATEST(\n"
+            . "  COALESCE(MAX(CAST(RIGHT(kd_barang, 4) AS UNSIGNED)), 0),\n"
+            . "  COALESCE(MAX(CAST(RIGHT(kd_br_adm, 4) AS UNSIGNED)), 0)\n"
+            . ") AS kd_max\n"
+            . "FROM tbpo_barang_nk\n"
+            . "WHERE kd_barang LIKE ? OR kd_br_adm LIKE ?",
+            array($like, $like)
+        )->row();
+        $next = (int) ($sequence ? $sequence->kd_max : 0) + 1;
+
+        for ($candidateNumber = $next; $candidateNumber <= 9999; $candidateNumber++) {
+            $code = $prefix . sprintf('%04d', $candidateNumber);
+            $exists = $this->db->group_start()
+                ->where('kd_barang', $code)
+                ->or_where('kd_br_adm', $code)
+                ->group_end()
+                ->count_all_results('tbpo_barang_nk') > 0;
+            if (!$exists) {
+                return $code;
+            }
+        }
+
+        return false;
+    }
+
+    public function save_manual_master_barang_pojasa($kdpo, $materialId, $payload, $inputer)
+    {
+        if (!$this->db->table_exists('tbpo_jasa_material')
+            || !$this->db->field_exists('source_material_id', 'tbpo_detail_po_nk')) {
+            return array('status' => false, 'message' => 'Struktur integrasi PO Jasa belum tersedia.');
+        }
+
+        $this->db->trans_begin();
+        $detail = $this->db->query(
+            "SELECT d.id_det_po_nk, d.source_material_id, p.kd_po_req
+             FROM tbpo_detail_po_nk d
+             JOIN tbpo_po_nk p ON p.kd_po_nk = d.kd_po_nk
+             JOIN tbpo_jasa_material m ON m.id_material = d.source_material_id
+             WHERE d.kd_po_nk = ? AND d.source_material_id = ?
+               AND (d.source_module IN ('PO_JASA', 'PO_JASA_DEV') OR p.source_module IN ('PO_JASA', 'PO_JASA_DEV'))
+               AND (m.id_brg_nk IS NULL OR m.id_brg_nk = 0)
+             FOR UPDATE",
+            array($kdpo, (int) $materialId)
+        )->row();
+
+        if (!$detail) {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Item manual tidak ditemukan atau master barangnya sudah direkam.');
+        }
+
+        if (trim((string) $payload['kat_barang']) === '' || (int) $payload['satuan'] <= 0 || trim((string) $payload['nama_barang']) === '') {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Kategori, nama barang, dan satuan wajib diisi.');
+        }
+        if (!$this->db->where('kd_kat', $payload['kat_barang'])->count_all_results('tbpo_kat_br')
+            || !$this->db->where('id_satuan', (int) $payload['satuan'])->count_all_results('tbpo_satuan')) {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Kategori atau satuan tidak valid.');
+        }
+
+        $kodeBarang = $this->generate_unique_manual_master_code();
+        if ($kodeBarang === false) {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Kode barang otomatis tidak dapat dibuat.');
+        }
+        $kodeAdmin = $kodeBarang;
+        $now = date('Y-m-d H:i:s');
+        $master = array(
+            'kd_barang' => $kodeBarang,
+            'kd_br_adm' => $kodeAdmin,
+            'kat_barang' => $payload['kat_barang'],
+            'nama_barang' => trim((string) $payload['nama_barang']),
+            'descnk' => trim((string) $payload['descnk']),
+            'satuan' => (int) $payload['satuan'],
+            'minimum_stock' => 0,
+            'gbr_barang' => 'Karisma.png',
+            'qrcode_path' => '',
+            'qrcode_data' => '',
+            'inputer' => $inputer,
+            'create_at' => $now,
+            'last_updated' => $inputer,
+        );
+        $this->db->insert('tbpo_barang_nk', $master);
+        $masterId = (int) $this->db->insert_id();
+        $this->db->insert('tbpo_generate_kd', array('kd_barang' => $kodeBarang));
+
+        $materialUpdate = array('id_brg_nk' => $masterId);
+        if ($this->db->field_exists('kd_barang_snapshot', 'tbpo_jasa_material')) {
+            $materialUpdate['kd_barang_snapshot'] = $kodeBarang;
+        }
+        $this->db->where('id_material', (int) $materialId)
+            ->where('(id_brg_nk IS NULL OR id_brg_nk = 0)', null, false)
+            ->update('tbpo_jasa_material', $materialUpdate);
+        if ($this->db->affected_rows() !== 1) {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Master barang telah direkam oleh pengguna lain.');
+        }
+
+        $this->db->where(array('kd_po_nk' => $kdpo, 'source_material_id' => (int) $materialId))->update('tbpo_detail_po_nk', array(
+            'kd_bsys' => $kodeAdmin,
+            'kd_barang' => $kodeBarang,
+            'kat_barang' => $payload['kat_barang'],
+            'satuan' => (int) $payload['satuan'],
+            'gbr_produk' => 'Karisma.png',
+        ));
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Master barang gagal disimpan.');
+        }
+        $this->db->trans_commit();
+        return array('status' => true, 'message' => 'Master barang berhasil direkam dan item PO pembelian telah dilengkapi.');
     }
 
     public function get_last_harga_barang_nk($kodeBarang, $kodeBarangSys = '')
@@ -783,19 +943,76 @@ class M_PoStatus extends CI_Model
     {
         return $this->db->query("SELECT 
         a.*,
+        CASE WHEN a.file_name LIKE 'assets/request-pendukung/%' THEN a.file_name ELSE CONCAT('images/filepndukung/', a.file_uploaded) END AS display_path,
         LOWER(SUBSTRING_INDEX(a.file_uploaded,'.',-1)) AS kdfile
         FROM tbpo_file_nk a
         JOIN tbpo_user b ON b.kode_user = a.user_upload
         WHERE a.kd_po_nk = '$kdpo'");
     }
+
+    function get_supporting_file($id)
+    {
+        return $this->db->query("SELECT a.*, CASE WHEN a.file_name LIKE 'assets/request-pendukung/%' THEN a.file_name ELSE CONCAT('images/filepndukung/', a.file_uploaded) END AS display_path
+            FROM tbpo_file_nk a
+            WHERE a.id_file_nk = ?", array((int) $id))->row();
+    }
+
+    /** Dokumen yang diunggah PIC pada request asal dari PO non-komersil ini. */
+    function get_pic_supporting_documents($kdpo)
+    {
+        if (!$this->db->table_exists('tbpo_req_nk_supporting_file')) {
+            return array();
+        }
+
+        return $this->db->query("SELECT d.*
+            FROM tbpo_req_nk_supporting_file d
+            JOIN tbpo_po_nk p ON p.kd_po_req = d.kd_po_nk
+            WHERE p.kd_po_nk = ?
+            ORDER BY d.id_supporting_file ASC", array($kdpo))->result();
+    }
+
+    /**
+     * Folder dokumen pendukung PIC untuk PO pembelian ini. Bukti pembelian
+     * harus disimpan bersama dokumen request asal, bukan di folder baru milik
+     * tanggal upload Purchasing.
+     */
+    function get_pic_supporting_directory($kdpo)
+    {
+        if (!$this->db->table_exists('tbpo_req_nk_supporting_file')) {
+            return null;
+        }
+
+        $document = $this->db->query("SELECT d.file_path
+            FROM tbpo_req_nk_supporting_file d
+            JOIN tbpo_po_nk p ON p.kd_po_req = d.kd_po_nk
+            WHERE p.kd_po_nk = ?
+              AND d.file_path LIKE 'assets/request-pendukung/%'
+            ORDER BY d.id_supporting_file ASC
+            LIMIT 1", array($kdpo))->row();
+
+        if (!$document || empty($document->file_path)) {
+            return null;
+        }
+
+        $directory = trim(str_replace('\\', '/', dirname($document->file_path)), '/');
+        return strpos($directory, 'assets/request-pendukung/') === 0 ? $directory . '/' : null;
+    }
     function fluploadbukti($kdpo)
     {
         return $this->db->query("SELECT 
         a.*,
+        CASE WHEN a.file_name LIKE 'assets/request-pendukung/%' THEN a.file_name ELSE CONCAT('images/upbukti/', a.file_uploaded) END AS display_path,
         LOWER(SUBSTRING_INDEX(a.file_uploaded,'.',-1)) AS kdfile
         FROM tbpo_file_bukti_beli a
         JOIN tbpo_user b ON b.kode_user = a.user_upload
         WHERE a.kd_po_nk = '$kdpo'");
+    }
+
+    function get_purchase_proof_file($id)
+    {
+        return $this->db->query("SELECT a.*, CASE WHEN a.file_name LIKE 'assets/request-pendukung/%' THEN a.file_name ELSE CONCAT('images/upbukti/', a.file_uploaded) END AS display_path
+            FROM tbpo_file_bukti_beli a
+            WHERE a.id_fk_bukti = ?", array((int) $id))->row();
     }
 
     // function fluploads($kdpo)
@@ -1466,6 +1683,137 @@ class M_PoStatus extends CI_Model
         $this->db->where('kd_po_nk', $kd);
         $query = $this->db->get()->result();
         return $query;
+    }
+
+    /**
+     * Posts the physical movement for an automatically-created PO Jasa
+     * purchase.  The stock is received under the purchase PO (11511) and is
+     * immediately issued to the originating PO Jasa (11512).  This must stay
+     * separate from the normal non-commercial PO flow.  The header is marked
+     * DONE only after both legs of every stock movement are persisted.
+     */
+    public function post_pojasa_on_hand_stock_pair($kdpo, $transactionDate, $actorCode)
+    {
+        if (!$this->db->table_exists('tbpo_jasa_purchase_submission')
+            || !$this->db->field_exists('source_module', 'tbpo_po_nk')) {
+            return array('success' => false, 'code' => 'NOT_PO_JASA');
+        }
+
+        $this->db->trans_begin();
+        $header = $this->db->query(
+            "SELECT * FROM tbpo_po_nk WHERE kd_po_nk=? AND source_module='PO_JASA' FOR UPDATE",
+            array($kdpo)
+        )->row();
+        if (!$header) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'PURCHASE_NOT_READY');
+        }
+        if ($header->status === 'DONE') {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'ALREADY_POSTED');
+        }
+        if ($header->status !== 'PROSES PEMBELIAN') {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'PURCHASE_NOT_READY');
+        }
+
+        // The detail-receipt screen may have already recorded all or part of
+        // this purchase.  Never let the legacy all-item button post a second
+        // movement on top of that more granular flow.
+        $hasGranularReceipt = $this->db->table_exists('tbpo_jasa_purchase_submission_detail')
+            && (int) $this->db->query(
+                'SELECT COUNT(*) total FROM tbpo_jasa_purchase_submission_detail sd '
+                . 'JOIN tbpo_jasa_purchase_submission s ON s.id_submission=sd.id_submission '
+                . 'WHERE s.kd_po_nk=? AND sd.qty_received > 0',
+                array($kdpo)
+            )->row()->total > 0;
+        if ($hasGranularReceipt) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'USE_DETAIL_RECEIPT');
+        }
+
+        // This guard makes repeated clicks harmless and prevents duplicate stock.
+        $alreadyPosted = (int) $this->db->where(array(
+            'kd_po_nk' => $kdpo,
+            'kd_akun' => '11511',
+        ))->like('keterangan', 'ON_HAND PO Jasa ' . $kdpo . ' - stok masuk', 'after')
+            ->count_all_results('tbpo_transaksi');
+        if ($alreadyPosted > 0) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'ALREADY_POSTED');
+        }
+
+        $items = $this->db->query(
+            "SELECT d.*, b.id_brg_nk, b.kd_barang, b.kd_br_adm, b.kat_barang, b.satuan AS stock_satuan,
+                    m.qty_kebutuhan
+             FROM tbpo_detail_po_nk d
+             JOIN tbpo_barang_nk b ON b.kd_barang=d.kd_barang
+             JOIN tbpo_jasa_material m ON m.id_material=d.source_material_id
+             WHERE d.kd_po_nk=? ORDER BY d.id_det_po_nk ASC FOR UPDATE",
+            array($kdpo)
+        )->result();
+        if (!$items) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'ITEM_NOT_FOUND');
+        }
+
+        foreach ($items as $item) {
+            if (empty($item->kd_barang) || empty($item->kd_br_adm) || empty($item->kat_barang)
+                || (int) $item->stock_satuan < 1 || (float) $item->qty <= 0
+                || (float) $item->qty_kebutuhan <= 0) {
+                $this->db->trans_rollback();
+                return array('success' => false, 'code' => 'MASTER_BARANG_INVALID');
+            }
+
+            // Barang dari PO Pembelian otomatis melengkapi kebutuhan material
+            // jasa.  Keluarkan stok yang tersedia setelah penerimaan, paling
+            // banyak sebesar kebutuhan material jasa.  Contoh: ready 2,
+            // kebutuhan 4, PO 2 => IN 2 dan OUT 4 (stok akhir 0).
+            $stockRow = $this->db->query(
+                'SELECT qty_ready FROM v_stockbarangnk WHERE id_brg_nk=? LIMIT 1',
+                array((int) $item->id_brg_nk)
+            )->row();
+            $qtyReady = max(0, (float) ($stockRow ? $stockRow->qty_ready : 0));
+            $qtyIn = (float) $item->qty;
+            $qtyOut = min((float) $item->qty_kebutuhan, $qtyReady + $qtyIn);
+            $base = array(
+                'kd_barang' => $item->kd_barang,
+                'kd_barangsys' => $item->kd_br_adm,
+                'kat_barang' => $item->kat_barang,
+                'tr_qty' => $qtyIn,
+                'satuan' => (int) $item->stock_satuan,
+                'inputer' => $actorCode,
+                'req_by' => $header->kd_user,
+                'tgl_transaksi' => $transactionDate,
+                'create_at' => date('Y-m-d'),
+                'last_updated_by' => $actorCode,
+            );
+            $this->db->insert('tbpo_transaksi', array_merge($base, array(
+                'kd_akun' => '11511', 'kd_po_nk' => $kdpo,
+                'keterangan' => 'ON_HAND PO Jasa ' . $kdpo . ' - stok masuk PO Pembelian',
+            )));
+            $this->db->insert('tbpo_transaksi', array_merge($base, array(
+                'kd_akun' => '11512', 'kd_po_nk' => $header->kd_po_req,
+                'tr_qty' => $qtyOut,
+                'keterangan' => 'ON_HAND PO Jasa ' . $kdpo . ' - stok keluar ke PO Jasa ' . $header->kd_po_req
+                    . ' (ready ' . $qtyReady . ', kebutuhan ' . (float) $item->qty_kebutuhan . ')',
+            )));
+        }
+
+        $this->db->where('id_po_nk', (int) $header->id_po_nk)
+            ->where('status', 'PROSES PEMBELIAN')
+            ->update('tbpo_po_nk', array('status' => 'DONE'));
+        if ($this->db->affected_rows() !== 1) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'STATUS_UPDATE_FAILED');
+        }
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return array('success' => false, 'code' => 'DATABASE_ERROR');
+        }
+        $this->db->trans_commit();
+        return array('success' => true, 'code' => 'POSTED', 'item_count' => count($items));
     }
     function input_transaksi($data)
     {

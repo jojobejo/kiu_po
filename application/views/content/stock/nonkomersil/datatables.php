@@ -101,6 +101,22 @@
                         }
                     },
                     {
+                        "data": "batch_lifo_aktif",
+                        "render": function(data) { return escHtml(formatQty(data)); }
+                    },
+                    {
+                        "data": "harga_lifo_aktif",
+                        "render": function(data) { return data === null ? '-' : escHtml(formatCurrency(data)); }
+                    },
+                    {
+                        "data": "nilai_lifo",
+                        "render": function(data) { return escHtml(formatCurrency(data)); }
+                    },
+                    {
+                        "data": null,
+                        "render": function(_, __, row) { return buildLifoStatus(row.qty_lifo_perlu_harga); }
+                    },
+                    {
                         "data": "minimum_stock",
                         "render": function(data) {
                             return escHtml(formatQty(data));
@@ -237,6 +253,16 @@
             function formatQty(qty) {
                 var value = parseFloat(qty || 0);
                 return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+            }
+
+            function formatCurrency(value) {
+                return 'Rp ' + Math.round(parseFloat(value || 0)).toLocaleString('id-ID');
+            }
+
+            function buildLifoStatus(qtyPerluHarga) {
+                return parseFloat(qtyPerluHarga || 0) > 0
+                    ? '<span class="badge badge-danger">Perlu Harga</span>'
+                    : '<span class="badge badge-success">Lengkap</span>';
             }
 
             function loadStockData() {

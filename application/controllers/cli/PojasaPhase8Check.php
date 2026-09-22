@@ -45,6 +45,9 @@ class PojasaPhase8Check extends CI_Controller
         $this->db->insert('tbpo_jasa_stock_allocation', array('kd_po_jasa'=>$code,'id_material'=>$material1,'id_brg_nk'=>$this->stockId(),'qty_allocation'=>2,'qty_received'=>0,'qty_released'=>0,'status_allocation'=>'ACTIVE','allocated_by'=>$users['purchasing']['id_user']));
         $this->draft($code, $material1, 3, 20000, $users['purchasing']);
         $this->draft($code, $material2, 4, 30000, $users['purchasing']);
+        $this->db->insert('tbpo_jasa_material', array('kd_po_jasa'=>$code,'revision_no'=>0,'line_no'=>1,'nama_material'=>'Draft revisi lama','deskripsi'=>'Tidak boleh ikut diajukan','qty_kebutuhan'=>99,'satuan'=>'PCS','harga_estimasi'=>1,'total_estimasi'=>99,'sumber_material'=>'PEMBELIAN','created_by'=>$users['pic']['id_user'],'is_active'=>0));
+        $staleMaterial = (int) $this->db->insert_id();
+        $this->db->insert('tbpo_jasa_draft_pembelian', array('kd_po_jasa'=>$code,'revision_no'=>0,'id_material'=>$staleMaterial,'qty'=>99,'harga_estimasi'=>1,'keterangan'=>'Stale P8','status_draft'=>'DRAFT','version'=>1,'idempotency_token'=>$this->token(),'created_by'=>$users['purchasing']['id_user']));
         $materials = $this->M_PojasaWorkflow->get_materials($code, 1);
         $this->assert('fulfillment_formula_backend_computed', abs($materials[0]['reserved_qty']-2)<0.000001 && abs($materials[0]['active_draft_qty']-3)<0.000001 && abs($materials[0]['remaining_need']-5)<0.000001 && $materials[0]['computed_source']==='CAMPURAN');
         $this->assert('material_with_active_planning_is_locked', !empty($materials[0]['planning_locked']));
@@ -52,25 +55,35 @@ class PojasaPhase8Check extends CI_Controller
         $created = $this->M_PojasaIntegration->create_purchase_submission($users['purchasing'], $code, $this->token());
         $state = $this->M_PojasaIntegration->get_submission_state($code);
         $this->assert('one_comprehensive_purchase_header_created', $created['success'] && $created['code']==='CREATED' && count($state['details'])===2);
-        $this->assert('purchase_header_starts_proses_pembelian', $state['submission']['status']==='PROSES_PEMBELIAN' && $this->db->get_where('tbpo_po_nk', array('id_po_nk'=>$state['submission']['id_po_nk']))->row()->status==='PROSES PEMBELIAN');
+        $purchaseHeader = $this->db->get_where('tbpo_po_nk', array('id_po_nk'=>$state['submission']['id_po_nk']))->row();
+        $this->assert('purchase_header_starts_proses_pembelian', $state['submission']['status']==='PROSES_PEMBELIAN' && $purchaseHeader->status==='PROSES PEMBELIAN');
+        $this->assert('purchase_submission_excludes_stale_material_drafts_and_keeps_pic_owner', $purchaseHeader->kd_user===$users['pic']['kode_user'] && $purchaseHeader->acc_with_kadep==='KADEP-P8-IT' && (int)$this->db->where(array('id_material'=>$staleMaterial,'status_draft'=>'DRAFT'))->count_all_results('tbpo_jasa_draft_pembelian')===1);
         $this->assert('drafts_are_mapped_and_locked_after_submission', (int)$this->db->where(array('kd_po_jasa'=>$code,'status_draft'=>'DIAJUKAN_KE_PO_PEMBELIAN'))->count_all_results('tbpo_jasa_draft_pembelian')===2);
         $this->assert('purchase_creation_does_not_post_stock', (int)$this->db->count_all('tbpo_transaksi')===$legacyTransactions);
         $replay = $this->M_PojasaIntegration->create_purchase_submission($users['purchasing'], $code, $this->token());
         $this->assert('purchase_submission_is_idempotent_by_spk_version', $replay['success'] && $replay['code']==='IDEMPOTENT_REPLAY' && $replay['kd_po_nk']===$created['kd_po_nk']);
         $noDraftCode='P8TESTEMPTY01';$this->createRequest($noDraftCode,$users['pic'],'FINANCE');$poBefore=(int)$this->db->count_all('tbpo_po_nk');$noDraft=$this->M_PojasaIntegration->create_purchase_submission($users['purchasing'],$noDraftCode,$this->token());
         $this->assert('spk_without_draft_does_not_create_empty_purchase', $noDraft['success'] && $noDraft['code']==='NO_ACTIVE_DRAFT' && (int)$this->db->count_all('tbpo_po_nk')===$poBefore);
+        $devCode='P8TESTDEV001'; list($devScope,$devMaterial,$devMaterial2)=$this->createRequest($devCode,$users['pic'],'IT');
+        $this->db->where('kd_po_jasa',$devCode)->delete('tbpo_jasa_spk');
+        $this->draft($devCode,$devMaterial,2,18000,$users['purchasing']);
+        $devCreated=$this->M_PojasaIntegration->create_purchase_submission($users['purchasing'],$devCode,$this->token(),true);
+        $devHeader=$devCreated['success'] ? $this->db->get_where('tbpo_po_nk',array('id_po_nk'=>$devCreated['id_po_nk']))->row() : null;
+        $this->assert('dev_purchase_can_create_legacy_po_without_spk_and_preserves_draft', $devCreated['success'] && $devCreated['code']==='DEV_CREATED' && $devHeader && $devHeader->status==='PROSES PEMBELIAN' && $devHeader->source_module==='PO_JASA_DEV' && (int)$this->db->where(array('kd_po_jasa'=>$devCode,'status_draft'=>'DRAFT'))->count_all_results('tbpo_jasa_draft_pembelian')===1);
 
         $detail1 = $state['details'][0]; $detail2 = $state['details'][1];
         $receiptToken = $this->token();
         $partial = $this->M_PojasaIntegration->receive_purchase($users['purchasing'], $code, $detail1['id_detail_po_nk'], 1, 150000, '2026-09-11', 'SJ-P8-1', $receiptToken);
+        $onHandTransaction = !empty($partial['id_transnk']) ? $this->db->get_where('tbpo_transaksi', array('id_transnk' => (int) $partial['id_transnk']))->row() : null;
         $this->assert('partial_on_hand_creates_automatic_cost', $partial['success'] && $partial['code']==='PARTIAL_ON_HAND' && (int)$this->db->where(array('kd_po_jasa'=>$code,'record_type'=>'AUTOMATIC'))->count_all_results('tbpo_jasa_biaya_aktual')===1);
+        $this->assert('on_hand_posts_stock_in_account_11511', $onHandTransaction && $onHandTransaction->kd_akun==='11511' && (float)$onHandTransaction->tr_qty===1.0);
         $this->assert('overbudget_cost_waits_for_revision_approval', $partial['cost_status']==='MENUNGGU_PERSETUJUAN_REVISI');
         $partialReplay = $this->M_PojasaIntegration->receive_purchase($users['purchasing'], $code, $detail1['id_detail_po_nk'], 1, 150000, '2026-09-11', 'SJ-P8-1', $receiptToken);
         $this->assert('receipt_replay_does_not_duplicate_cost', $partialReplay['success'] && $partialReplay['code']==='IDEMPOTENT_REPLAY' && (int)$this->db->where(array('kd_po_jasa'=>$code,'record_type'=>'AUTOMATIC'))->count_all_results('tbpo_jasa_biaya_aktual')===1);
         $this->M_PojasaIntegration->receive_purchase($users['purchasing'], $code, $detail1['id_detail_po_nk'], 2, 20000, '2026-09-11', 'SJ-P8-2', $this->token());
         $this->M_PojasaIntegration->receive_purchase($users['purchasing'], $code, $detail2['id_detail_po_nk'], 4, 30000, '2026-09-11', 'SJ-P8-3', $this->token());
         $state = $this->M_PojasaIntegration->get_submission_state($code);
-        $this->assert('all_received_maps_legacy_done_to_on_hand', $state['submission']['status']==='ON_HAND' && $this->db->get_where('tbpo_po_nk', array('id_po_nk'=>$state['submission']['id_po_nk']))->row()->status==='DONE');
+        $this->assert('all_received_keeps_legacy_purchase_in_process', $state['submission']['status']==='ON_HAND' && $this->db->get_where('tbpo_po_nk', array('id_po_nk'=>$state['submission']['id_po_nk']))->row()->status==='PROSES PEMBELIAN');
         $reversed = $this->M_PojasaIntegration->reverse_receipt($users['purchasing'], $code, $partial['id_receipt'], 'Barang dikembalikan.', $this->token());
         $this->assert('receipt_reversal_is_additive_and_audited', $reversed['success'] && (int)$this->db->where(array('kd_po_jasa'=>$code,'record_type'=>'REVERSAL'))->count_all_results('tbpo_jasa_purchase_receipt')===1 && (int)$this->db->where(array('kd_po_jasa'=>$code,'record_type'=>'REVERSAL'))->count_all_results('tbpo_jasa_biaya_aktual')===1);
 
@@ -106,9 +119,9 @@ class PojasaPhase8Check extends CI_Controller
     private function createRequest($code, $pic, $department)
     {
         $spkNo='SPKJ-'.$code;
-        $this->db->insert('tbpo_jasa_request', array('kd_po_jasa'=>$code,'kd_user'=>$pic['kode_user'],'nm_user'=>$pic['nama_user'],'departemen'=>$department,'tgl_request'=>'2026-09-11','tgl_target'=>'2026-09-30','tgl_mulai_pekerjaan'=>'2026-09-11','tgl_selesai_pekerjaan'=>'2026-09-30','lokasi_pekerjaan'=>'Test','tujuan_pekerjaan'=>'Phase 8','estimasi_total_jasa'=>10000,'estimasi_total_bahan'=>200000,'estimasi_total'=>210000,'estimasi_disetujui'=>210000,'status'=>'SPK_TERBIT','status_version'=>1,'revision_no'=>1,'no_spk'=>$spkNo));
+        $this->db->insert('tbpo_jasa_request', array('kd_po_jasa'=>$code,'kd_user'=>$pic['kode_user'],'nm_user'=>$pic['nama_user'],'departemen'=>$department,'tgl_request'=>'2026-09-11','tgl_target'=>'2026-09-30','tgl_mulai_pekerjaan'=>'2026-09-11','tgl_selesai_pekerjaan'=>'2026-09-30','lokasi_pekerjaan'=>'Test','tujuan_pekerjaan'=>'Phase 8','estimasi_total_jasa'=>10000,'estimasi_total_bahan'=>200000,'estimasi_total'=>210000,'estimasi_disetujui'=>210000,'status'=>'SPK_TERBIT','status_version'=>1,'revision_no'=>1,'no_spk'=>$spkNo,'acc_with_kadep'=>'KADEP-P8-IT'));
         $this->db->insert('tbpo_jasa_scope', array('kd_po_jasa'=>$code,'revision_no'=>1,'line_no'=>1,'jenis_scope'=>'JASA','nama_scope'=>'Scope P8','deskripsi'=>'Scope test','qty'=>1,'satuan'=>'LS','harga_estimasi'=>10000,'total_estimasi'=>10000,'is_active'=>1)); $scope=(int)$this->db->insert_id();
-        $ids=array(); foreach (array(array(1,10,10000),array(2,4,25000)) as $m) { $this->db->insert('tbpo_jasa_material', array('kd_po_jasa'=>$code,'revision_no'=>1,'line_no'=>$m[0],'nama_material'=>'Material P8 '.$m[0],'deskripsi'=>'Test','qty_kebutuhan'=>$m[1],'satuan'=>'PCS','harga_estimasi'=>$m[2],'total_estimasi'=>$m[1]*$m[2],'sumber_material'=>'PEMBELIAN','created_by'=>$pic['id_user'],'is_active'=>1)); $ids[]=(int)$this->db->insert_id(); }
+        $stockId=$this->stockId(); $ids=array(); foreach (array(array(1,10,10000),array(2,4,25000)) as $m) { $this->db->insert('tbpo_jasa_material', array('kd_po_jasa'=>$code,'revision_no'=>1,'line_no'=>$m[0],'nama_material'=>'Material P8 '.$m[0],'deskripsi'=>'Test','qty_kebutuhan'=>$m[1],'satuan'=>'PCS','harga_estimasi'=>$m[2],'total_estimasi'=>$m[1]*$m[2],'sumber_material'=>'PEMBELIAN','id_brg_nk'=>$stockId,'created_by'=>$pic['id_user'],'is_active'=>1)); $ids[]=(int)$this->db->insert_id(); }
         $request=$this->M_PojasaCore->get_request($code); $this->db->insert('tbpo_jasa_spk',array('kd_po_jasa'=>$code,'no_spk'=>$spkNo,'revision_no'=>1,'spk_version_no'=>1,'issued_by'=>$pic['id_user'],'issued_at'=>'2026-09-11 08:00:00','snapshot_json'=>json_encode(array('request'=>(array)$request)),'template_version'=>'DRAFT-SPK-COMPAT-V1','document_status'=>'ISSUED'));
         return array($scope,$ids[0],$ids[1]);
     }
@@ -118,6 +131,6 @@ class PojasaPhase8Check extends CI_Controller
     private function users(){ $p=$this->db->query("SELECT * FROM tbpo_user WHERE aksess_lv=2 AND UPPER(TRIM(departement))='PURCHASING' LIMIT 1")->row_array();$d=$this->db->query("SELECT * FROM tbpo_user WHERE aksess_lv=3 AND UPPER(TRIM(departement))='DIREKTUR' LIMIT 1")->row_array();$o=$this->db->query("SELECT * FROM tbpo_user WHERE aksess_lv=6 LIMIT 1")->row_array();$pic=$this->db->query('SELECT * FROM tbpo_user WHERE aksess_lv=4 LIMIT 1')->row_array();if(!$p||!$d||!$o||!$pic)return false;return array('purchasing'=>$this->context($p),'director'=>$this->context($d),'dirops'=>$this->context($o),'pic'=>$this->context($pic));}
     private function context($u){return array('id_user'=>(int)$u['id_user'],'kode_user'=>$u['kode_user'],'nama_user'=>$u['nama_user'],'departemen'=>pojasa_normalize_department($u['departement']),'role'=>pojasa_role_from_context($u['aksess_lv'],$u['departement']));}
     private function token(){return sprintf('80000000-0000-4000-8000-%012d',$this->sequence++);}
-    private function counts(){return array('request'=>(int)$this->db->count_all('tbpo_jasa_request'),'po'=>(int)$this->db->count_all('tbpo_po_nk'),'detail'=>(int)$this->db->count_all('tbpo_detail_po_nk'),'submission'=>(int)$this->db->count_all('tbpo_jasa_purchase_submission'),'receipt'=>(int)$this->db->count_all('tbpo_jasa_purchase_receipt'),'cost'=>(int)$this->db->count_all('tbpo_jasa_biaya_aktual'),'change'=>(int)$this->db->count_all('tbpo_jasa_spk_change'),'archive'=>(int)$this->db->count_all('tbpo_jasa_spk_archive'));}
+    private function counts(){return array('request'=>(int)$this->db->count_all('tbpo_jasa_request'),'po'=>(int)$this->db->count_all('tbpo_po_nk'),'detail'=>(int)$this->db->count_all('tbpo_detail_po_nk'),'submission'=>(int)$this->db->count_all('tbpo_jasa_purchase_submission'),'receipt'=>(int)$this->db->count_all('tbpo_jasa_purchase_receipt'),'transaction'=>(int)$this->db->count_all('tbpo_transaksi'),'cost'=>(int)$this->db->count_all('tbpo_jasa_biaya_aktual'),'change'=>(int)$this->db->count_all('tbpo_jasa_spk_change'),'archive'=>(int)$this->db->count_all('tbpo_jasa_spk_archive'));}
     private function assert($name,$passed,$detail=null){$row=array('name'=>$name,'passed'=>(bool)$passed);if(!$passed&&$detail!==null)$row['detail']=$detail;$this->checks[]=$row;}
 }

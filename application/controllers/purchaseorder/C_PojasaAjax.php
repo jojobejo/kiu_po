@@ -7,6 +7,7 @@ class C_PojasaAjax extends CI_Controller
     {
         parent::__construct();
         $this->load->model('PO/M_PojasaCore');
+        $this->load->model('PO/M_PojasaWorkflow');
         $this->load->helper(array('pojasa_authorization', 'pojasa_status', 'pojasa_document'));
     }
 
@@ -94,11 +95,11 @@ class C_PojasaAjax extends CI_Controller
         if (!$this->validRequestCode($requestCode)) {
             $errors['kd_po_jasa'] = 'Kode request tidak valid.';
         }
-        if (!in_array($action, array('ACC', 'PENDING', 'REVISI', 'REJECT', 'SUBMIT'), true)) {
+        if (!in_array($action, array('ACC', 'PENDING', 'REVISI', 'REJECT', 'SUBMIT', 'UPDATE', 'TERBITKAN'), true)) {
             $errors['action'] = 'Aksi approval tidak valid.';
         }
-        if (in_array($action, array('REVISI', 'REJECT'), true) && $note === '') {
-            $errors['note'] = 'Catatan wajib diisi untuk revisi atau reject.';
+        if (in_array($action, array('REVISI', 'REJECT', 'UPDATE'), true) && $note === '') {
+            $errors['note'] = 'Catatan wajib diisi untuk revisi, update, atau reject.';
         }
         if (mb_strlen($note) > 5000) {
             $errors['note'] = 'Catatan maksimal 5.000 karakter.';
@@ -116,8 +117,30 @@ class C_PojasaAjax extends CI_Controller
             return $this->jsonResponse(false, 'VALIDATION_ERROR', 'Periksa kembali aksi approval.', array(), 422, $errors);
         }
 
+        $context = pojasa_session_context();
+        // The Purchasing UI warning is enforced server-side as well.  The
+        // request cannot move to PIC while an item's cart/draft remains active.
+        if ($context['role'] === 'PURCHASING' && $action === 'UPDATE') {
+            $request = $this->M_PojasaWorkflow->get_request($requestCode, $context);
+            if ($request && $request->status === 'MENUNGGU_PURCHASING_AWAL') {
+                $pending = 0;
+                $pendingMaterials = array();
+                foreach ($this->M_PojasaWorkflow->get_materials($requestCode, $this->M_PojasaWorkflow->effective_revision($request)) as $material) {
+                    if ((float) $material['remaining_need'] > 0.000001) {
+                        $pending++;
+                        $pendingMaterials[] = (string) $material['nama_material'];
+                    }
+                }
+                if ($pending > 0) {
+                    return $this->jsonResponse(false, 'PURCHASE_DRAFT_REVIEW_REQUIRED',
+                        'Masih ada ' . $pending . ' material dengan draft pembelian aktif. Tinjau dan cek ulang seluruh draft sebelum melanjutkan workflow.',
+                        array('pending_material_count' => $pending, 'pending_materials' => $pendingMaterials), 409);
+                }
+            }
+        }
+
         $result = $this->M_PojasaCore->process_approval(
-            pojasa_session_context(),
+            $context,
             $requestCode,
             $action,
             $note,
@@ -129,9 +152,11 @@ class C_PojasaAjax extends CI_Controller
             return $this->businessError($result['code']);
         }
 
-        $message = $result['status'] === 'SPK_TERBIT'
-            ? 'Direktur menyetujui request dan SPK diterbitkan otomatis.'
-            : 'Status approval PO Jasa berhasil diperbarui.';
+        $message = $result['status'] === 'MENUNGGU_PENERBITAN_PURCHASING'
+            ? 'ACC Direktur berhasil memperbarui status request. Penerbitan SPK dan PO Pembelian akan diproses oleh Purchasing.'
+            : ($result['status'] === 'SPK_TERBIT'
+            ? 'SPK dan PO Pembelian berhasil diterbitkan oleh Purchasing.'
+            : 'Status approval PO Jasa berhasil diperbarui.');
         return $this->jsonResponse(true, $result['code'], $message, array(
             'status' => $result['status'],
             'no_spk' => $result['no_spk'],
@@ -149,7 +174,7 @@ class C_PojasaAjax extends CI_Controller
         return $this->jsonResponse(
             false,
             'MANUAL_SPK_DISABLED',
-            'SPK tidak dapat diterbitkan manual oleh Purchasing. SPK terbit otomatis dalam transaksi ACC Direktur.',
+            'SPK diterbitkan oleh Purchasing setelah ACC Direktur melalui tombol Terbitkan SPK & PO Pembelian pada workflow.',
             array(),
             409
         );
@@ -519,7 +544,8 @@ class C_PojasaAjax extends CI_Controller
             'FORBIDDEN' => array(403, 'Akses terhadap request ditolak.'),
             'INVALID_STATUS' => array(409, 'Status request tidak mengizinkan aksi ini.'),
             'INVALID_ACTION' => array(409, 'Aksi tidak sesuai dengan status atau role aktif.'),
-            'NOTE_REQUIRED' => array(422, 'Catatan wajib diisi untuk revisi atau reject.'),
+            'NOTE_REQUIRED' => array(422, 'Catatan wajib diisi untuk revisi, update, atau konfirmasi PIC.'),
+            'PURCHASING_REVIEW_NOT_SAVED' => array(409, 'Simpan seluruh review Purchasing sebelum mengirim update ke PIC.'),
             'REVISION_NOT_SAVED' => array(409, 'Perbaikan revisi Purchasing wajib disimpan sebelum diajukan ulang.'),
             'SCHEDULE_REQUIRED' => array(422, 'Purchasing wajib menyimpan tanggal mulai dan selesai yang valid sebelum pengajuan final.'),
             'IDEMPOTENCY_CONFLICT' => array(409, 'Idempotency token sudah digunakan untuk request lain.'),

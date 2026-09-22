@@ -3,6 +3,14 @@
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
+                    <?php foreach (array('success' => 'success', 'error' => 'danger') as $flashKey => $alertClass) : ?>
+                        <?php if ($this->session->flashdata($flashKey)) : ?>
+                            <div class="alert alert-<?= $alertClass ?> alert-dismissible fade show" role="alert">
+                                <?= htmlspecialchars($this->session->flashdata($flashKey), ENT_QUOTES, 'UTF-8') ?>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                     <div class="row mb-2">
                         <div class="col-sm-6">
                         </div><!-- /.col -->
@@ -12,6 +20,10 @@
                             <a class="btn btn-block btn-warning btn-sm" href=""><i class="fas fa-exclamation-triangle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-exclamation-triangle"></i></a>
                         <?php elseif ($s->status == 'REQUEST ACC') : ?>
                             <a class="btn btn-block btn-info btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
+                        <?php elseif (strpos(trim((string) $s->status), 'MENUNGGU PENYERAHAN') === 0) : ?>
+                            <a class="btn btn-block btn-secondary btn-sm" href=""><i class="fas fa-truck-loading"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-truck-loading"></i></a>
+                        <?php elseif (trim((string) $s->status) == 'MENUNGGU ACC PENGAMBILAN') : ?>
+                            <a class="btn btn-block btn-warning btn-sm" href=""><i class="fas fa-user-clock"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-user-clock"></i></a>
                         <?php elseif ($s->status == 'DONE') : ?>
                             <a class="btn btn-block btn-success btn-sm" href=""><i class="fas fa-check-circle"></i>&nbsp;<?= $s->status ?>&nbsp;<i class="fas fa-check-circle"></i></a>
                         <?php endif; ?>
@@ -23,6 +35,13 @@
                                 <div class="col">
                                     <a class="btn btn-primary btn-sm btn-block" href="<?= base_url($this->session->userdata('lv') == '5' ? 'reqpicacckadep' : 'reqpic') ?>"><i class="fas fa-home"></i> <b>HOMEPAGE</b></a>
                                 </div>
+                                <?php if ($this->session->userdata('lv') == '5' && $s->status == 'MENUNGGU ACC KADEP') : ?>
+                                    <div class="col">
+                                        <button type="button" class="btn btn-success btn-sm btn-block" data-toggle="modal" data-target="#modalApprovalKadep">
+                                            <i class="fas fa-clipboard-check"></i> <b>APPROVAL KADEP</b>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                                 <?php if ($s->status == 'PENDING') : ?>
                                     <div class="col">
                                         <a href="<?= base_url('updated_po_nk/' . $s->kd_po_nk) ?>" class="btn btn-info btn-sm btn-block"><i class="fas fa-clipboard-check"></i> <b>UPDATED PO</b></a>
@@ -52,6 +71,65 @@
                                     <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
                                 </div>
                             </div>
+                            <?php $this->load->view('content/po/Reqpic/_supporting_documents', array('supportingDocuments' => $supportingDocuments)); ?>
+                            <?php if (!empty($stspo)) : ?>
+                                <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">Work in Process</b></a>
+                                <table class="table table-bordered table-striped mb-2">
+                                    <thead style="background-color: #212529; color:white;">
+                                        <tr>
+                                            <td>Nomor PO</td>
+                                            <td>Status Order</td>
+                                            <td>Tanggal PO</td>
+                                            <td>Nama Pengaju</td>
+                                            <td>Departement</td>
+                                            <td>Tujuan Pembelian</td>
+                                            <td>#</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($stspo as $st) : ?>
+                                            <?php
+                                            $statusClass = 'btn-warning';
+                                            $statusIcon = 'fa-clock';
+                                            $statusText = $st->status;
+
+                                            if ($st->status === 'DONE') {
+                                                $statusClass = 'btn-success';
+                                                $statusIcon = 'fa-thumbs-up';
+                                            } elseif ($st->status === 'REJECT') {
+                                                $statusClass = 'btn-danger';
+                                                $statusIcon = 'fa-times';
+                                            } elseif (in_array($st->status, array('ACC-KADEP', 'ACC DIREKTUR', 'PROSES PEMBELIAN'), true)) {
+                                                $statusClass = 'btn-primary';
+                                                $statusIcon = 'fa-thumbs-up';
+                                            } elseif ($st->status === 'PO REVISI') {
+                                                $statusIcon = 'fa-undo';
+                                            } elseif ($st->status === 'PENDING') {
+                                                $statusIcon = 'fa-pause';
+                                            } elseif ($st->status === 'ON PROGRESS - KADEP') {
+                                                $statusText = 'MENUNGGU ACC KADEP';
+                                            }
+                                            ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($st->nopo, ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td>
+                                                    <a class="btn btn-block <?= $statusClass ?> btn-sm">
+                                                        <i class="fas <?= $statusIcon ?>"></i>&nbsp;
+                                                        <?= htmlspecialchars($statusText, ENT_QUOTES, 'UTF-8') ?>
+                                                    </a>
+                                                </td>
+                                                <td><?= htmlspecialchars($st->tgltr, ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td><?= htmlspecialchars($st->nmuser, ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td><?= htmlspecialchars($st->dep, ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td><?= htmlspecialchars($st->tjbeli, ENT_QUOTES, 'UTF-8') ?></td>
+                                                <td>
+                                                    <a href="<?= base_url('detailponk/' . rawurlencode($st->kdpo)) ?>" class="btn btn-block btn-primary btn-sm" target="_blank" rel="noopener" title="Lihat detail PO"><i class="fas fa-eye"></i></a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
                             <?php if ($s->status == 'ON PROGRESS' || $s->status == 'MENUNGGU ACC KADEP') : ?>
                                 <table class="table table-bordered table-striped mt-4 mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
@@ -75,7 +153,7 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                            <?php elseif ($s->status == 'BARANG TERSEDIA') : ?>
+                            <?php elseif ($s->status == 'BARANG TERSEDIA' || trim((string) $s->status) == 'MENUNGGU ACC PENGAMBILAN') : ?>
                                 <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">item list barang request</b></a>
                                 <table class="table table-bordered table-striped mb-2">
                                     <thead style="background-color: #212529; color:white;">
@@ -101,6 +179,17 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
+                                <?php if ($this->session->userdata('lv') == '4' && $s->status == 'BARANG TERSEDIA') : ?>
+                                    <form action="<?= base_url('reqpic/pickup-approval/request') ?>" method="post">
+                                        <input type="hidden" name="kdponk" value="<?= htmlspecialchars($s->kd_po_nk, ENT_QUOTES, 'UTF-8') ?>">
+                                        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-paper-plane"></i> AJUKAN PERSETUJUAN PENGAMBILAN KE KADEP</button>
+                                    </form>
+                                <?php endif; ?>
+                                <?php if (trim((string) $s->status) == 'MENUNGGU ACC PENGAMBILAN') : ?>
+                                    <div class="alert alert-warning mt-4 mb-0"><i class="fas fa-user-clock"></i> Permohonan pengambilan telah dikirim dan sedang menunggu persetujuan KADEP.</div>
+                                <?php endif; ?>
+                            <?php elseif (strpos(trim((string) $s->status), 'MENUNGGU PENYERAHAN') === 0) : ?>
+                                <div class="alert alert-info mt-4 mb-0"><i class="fas fa-clock"></i> Pengajuan pengambilan telah dikirim. Menunggu konfirmasi penyerahan dari Purchasing.</div>
                             <?php elseif ($s->status == 'PENDING') : ?>
                                 <a href="#" class="btn btn-warning btn-block mt-4"><b style="text-transform: uppercase;">item list barang request</b></a>
                                 <table class="table table-bordered table-striped mb-2">
@@ -125,7 +214,7 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                            <?php elseif ($s->status == 'PO REVISI') : ?>
+                            <?php elseif ($s->status == 'REVISI PO') : ?>
                                 <!-- MODAL START REVISI -->
                                 <?php foreach ($getitmlistpicreq as $d) : ?>
                                     <div class="modal fade" id="modaleditbarang<?= $d->idbarang ?>">
@@ -256,7 +345,6 @@
                                     </tbody>
                                 </table>
                             <?php elseif ($s->status == 'REQUEST ACC') : ?>
-                                <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">Work in Process</b></a>
                                 <a href="#" class="btn btn-success btn-block mt-4"><b style="text-transform: uppercase;">item list</b></a>
                                 <table class="table table-bordered table-striped mb-2 ">
                                     <thead style="background-color: #212529; color:white;">
@@ -315,6 +403,38 @@
                             <?php endif; ?>
                         </div>
                     </div>
+                    <?php if ($this->session->userdata('lv') == '5' && $s->status == 'MENUNGGU ACC KADEP') : ?>
+                        <div class="modal fade" id="modalApprovalKadep" tabindex="-1" role="dialog" aria-labelledby="modalApprovalKadepLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <form action="<?= base_url('process_req_kadep') ?>" method="post" class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalApprovalKadepLabel">Approval Request Barang</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="kdreqpo" value="<?= htmlspecialchars($s->kd_po_nk, ENT_QUOTES, 'UTF-8') ?>">
+                                        <div class="form-group">
+                                            <label for="approval_action">Aksi Approval</label>
+                                            <select class="form-control" id="approval_action" name="approval_action" required>
+                                                <option value="ACC">ACC</option>
+                                                <option value="REVISI">REVISI</option>
+                                                <option value="REJECT">REJECT</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label for="approval_note">Catatan</label>
+                                            <textarea class="form-control" id="approval_note" name="approval_note" rows="4" required></textarea>
+                                            <small class="form-text text-muted">Catatan akan ditampilkan pada tabel Note request.</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-primary">Simpan Approval</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                     <div class="row mr-2">
                         <div class="col-md-8">
                             <div class="noteDirektur">
@@ -427,6 +547,7 @@
                                     <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->departemen ?>" class="form-control" readonly>
                                 </div>
                             </div>
+                            <?php $this->load->view('content/po/Reqpic/_supporting_documents', array('supportingDocuments' => $supportingDocuments)); ?>
 
 
                             <!-- STATUS : REQUEST ACC  -->
@@ -910,27 +1031,19 @@
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-                                <?php if (!empty($stspo)) : ?>
-                                    <?php foreach ($stspo as $st) : ?>
-                                        <div class="col">
-                                            <?php echo form_open_multipart('reqpicdone'); ?>
-                                            <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                            <input type="text" id="kdponks" name="kdponks" style="max-width: 550px;" value="<?= $st->kdpo ?>" class="form-control" readonly hidden>
-                                            <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                            <input type="text" id="actdone" name="actdone" style="max-width: 550px;" value="1" class="form-control" readonly hidden>
-                                            <input type="text" id="tgl" name="tgl" style="max-width: 550px;" value="<?= $s->tgl_transaksi ?>" class="form-control" readonly hidden>
-                                            <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else : ?>
-                                    <?php echo form_open_multipart('reqpicdone'); ?>
-                                    <input type="text" id="kdponk" name="kdponk" style="max-width: 550px;" value="<?= $s->kd_po_nk ?>" class="form-control" readonly hidden>
-                                    <input type="text" id="kd_user" name="kd_user" style="max-width: 550px;" value="<?= $s->nm_user ?>" class="form-control" readonly hidden>
-                                    <input type="text" id="actdone" name="actdone" style="max-width: 550px;" value="2" class="form-control" readonly hidden>
-                                    <button type="submit" class="btn btn-block btn-primary btn-sm"><i class="fas fa-cloud-upload-alt"></i>&nbsp;REQUEST DONE</button>
-                                <?php endif; ?>
+                                <div class="alert alert-info mb-0">Menunggu KADEP mengajukan pengambilan barang.</div>
 
                                 <!-- END BARANG TERSEDIA -->
+
+                                <!-- STATUS : MENUNGGU PENYERAHAN BARANG -->
+                            <?php elseif (strpos(trim((string) $s->status), 'MENUNGGU PENYERAHAN') === 0) : ?>
+                                <div class="alert alert-warning mt-4">KADEP telah mengajukan pengambilan barang. Konfirmasikan setelah barang diserahkan.</div>
+                                <?php echo form_open_multipart('reqpicdone'); ?>
+                                <input type="hidden" name="kdponk" value="<?= htmlspecialchars($s->kd_po_nk, ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="kd_user" value="<?= htmlspecialchars($s->nm_user, ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="actdone" value="<?= !empty($stspo) ? '1' : '2' ?>">
+                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-check-circle"></i> KONFIRMASI PENYERAHAN BARANG</button>
+                                </form>
 
                                 <!-- STATUS : DONE -->
                             <?php elseif ($s->status == 'DONE') : ?>

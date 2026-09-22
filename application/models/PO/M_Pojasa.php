@@ -192,6 +192,11 @@ class M_Pojasa extends CI_Model
         $this->db->select('r.*, v.nama_vendor, v.kategori_jasa, v.nama_pic, v.no_telpon');
         $this->db->from('tbpo_jasa_request r');
         $this->db->join('tbpo_jasa_vendor v', 'v.kd_vendor_jasa = r.kd_vendor_jasa', 'left');
+        if ($this->db->table_exists('tbpo_jasa_purchase_submission')) {
+            $this->db->select('ps.kd_po_nk, pn.status AS po_pembelian_status');
+            $this->db->join('tbpo_jasa_purchase_submission ps', 'ps.kd_po_jasa=r.kd_po_jasa', 'left');
+            $this->db->join('tbpo_po_nk pn', 'pn.id_po_nk=ps.id_po_nk', 'left');
+        }
 
         if ((string) $lv === '4') {
             $this->db->where('r.kd_user', $kode_user);
