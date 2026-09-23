@@ -185,6 +185,18 @@ khusus di langkah 4 mempertahankan seluruh data tersebut dan memasang indeks
 non-unik agar modul tetap berjalan. Indeks unik hanya boleh ditambahkan setelah
 duplikat historis direkonsiliasi oleh pemilik data.
 
+### Dump data versi 2 (23 September 2026)
+
+Untuk dump lampiran `u676129830_kiupo (2).sql`, gunakan file hasil akhir
+`dist/u676129830_kiupo_v2_php83_migrated_20260923.sql`. File ini sudah
+memuat data versi 2, migrasi tabel `tb_*` menjadi `tbpo_*`, struktur PO Jasa,
+Request PIC, dan view stok tanpa `DEFINER` dari server lama.
+
+Impor file ini hanya ke database `u676129830_kiuponkomersil` yang kosong.
+Jangan mengimpornya ke database yang sebelumnya sudah berisi dump versi 1,
+karena dump lengkap ini membuat ulang tabel dan dapat gagal akibat tabel/data
+yang sudah ada.
+
 ## 5. File upload dan izin tulis
 
 Upload isi folder-file berikut beserta subfoldernya. Beri izin tulis kepada

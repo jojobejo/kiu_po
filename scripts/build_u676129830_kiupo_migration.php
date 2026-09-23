@@ -7,8 +7,8 @@
  */
 
 $root = dirname(__DIR__);
-$source = '/Users/itkarisma/Downloads/u676129830_kiupo (1).sql';
-$output = $root . '/dist/u676129830_kiupo_php83_migrated.sql';
+$source = '/Users/itkarisma/Downloads/u676129830_kiupo (2).sql';
+$output = $root . '/dist/u676129830_kiupo_v2_php83_migrated_20260923.sql';
 $targetDatabase = 'u676129830_kiuponkomersil';
 
 $migrations = array(
