@@ -41,7 +41,41 @@ class M_MasterBarang extends CI_Model
 
     public function get_all_masterbarang()
     {
-        return $this->db->query("SELECT * FROM tb_barang_nk a JOIN tb_satuan b ON b.id_satuan = a.satuan JOIN tb_kat_br c ON c.kd_kat = a.kat_barang");
+        return $this->db->query("SELECT
+            a.id_brg_nk,
+            a.kd_barang,
+            a.kd_br_adm,
+            a.kat_barang,
+            a.nama_barang,
+            a.descnk,
+            a.satuan,
+            a.minimum_stock,
+            a.gbr_barang,
+            a.qrcode_path,
+            a.qrcode_data,
+            b.id_satuan,
+            b.nm_satuan,
+            c.nama_kategori
+        FROM tb_barang_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        JOIN tb_kat_br c ON c.kd_kat = a.kat_barang");
+    }
+
+    public function get_masterbarangnk_by_kd_barang($kode_barang)
+    {
+        $kode_barang = trim((string) $kode_barang);
+
+        if ($kode_barang === '') {
+            return null;
+        }
+
+        return $this->db
+            ->select('id_brg_nk, kd_barang, kd_br_adm, nama_barang')
+            ->from('tb_barang_nk')
+            ->where('kd_barang', $kode_barang)
+            ->limit(1)
+            ->get()
+            ->row();
     }
     public function get_all_req_barang()
     {

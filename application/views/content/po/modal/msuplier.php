@@ -14,13 +14,13 @@
                     <div class="form-group" hidden>
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">kode_suplier<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="kd_sup" name="kd_sup" value="<?= $b->kd_suplier ?>" readonly /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="kd_sup" name="kd_sup" value="<?= $b->kd_suplier ?>" /></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <label class="col-sm-3 control-label text-right" for="kd_user">Nama Suplier<span class="required">*</span></label>
-                            <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $b->nama_suplier ?>" readonly /></div>
+                            <div class="col-sm-8"><input class="form-control" type="text" id="nama_isi" name="nama_isi" value="<?= $b->nama_suplier ?>" /></div>
                         </div>
                     </div>
                     <div class="form-group">

@@ -10,8 +10,8 @@
                 </div>
                 <div class="modal-body">
                     <?php echo form_open_multipart('addtmpreqbarang'); ?>
-                    <div class="form-group" hidden>
-                        <div class="row">
+                    <div class="form-group">
+                        <div class="row" hidden>
                             <div class="col-sm-8">
                                 <input class="form-control" type="text" id="kdbys" name="kdbys" value="<?= $l->kode_sys ?>" readonly />
                                 <input class="form-control" type="text" id="kdbr" name="kdbr" value="<?= $l->kode_adm ?>" readonly />

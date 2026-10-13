@@ -43,7 +43,7 @@ class C_Order extends CI_Controller
         $data['total']  = $this->M_Purchase->sumTransaksiPenjualan($kdsuplier);
         $data['kdpo']   = $this->M_Purchase->kdpo($kduser, $kdsuplier);
         $data['satuan'] = $this->M_Purchase->getSatuan();
-        $data['tax']    = $this->M_Purchase->gettmptax($kdsuplier)->result();
+        $data['tax']    = $this->M_Purchase->gettmptax($kdsuplier);
         $data['taxx']    = $this->M_Purchase->getTax();
         $data['taxpo'] = $this->M_Purchase->gettaxposup($kdsuplier)->result();
 
@@ -54,6 +54,7 @@ class C_Order extends CI_Controller
         $this->load->view('content/po/datatables');
         $this->load->view('content/po/ajaxPO');
     }
+
     public function add_tax_tmp()
     {
         $kdsup  = $this->input->post('kd_suplier_isi');
@@ -192,7 +193,7 @@ class C_Order extends CI_Controller
         $this->M_MasterBarang->editBarang($idbarang, $dataBarang);
         redirect('purchase/listBarang/' . $kdsuplier);
     }
-    
+
     public function hapusBarang($id, $kdsuplier)
     {
         $this->M_MasterBarang->hapusBarang($id);

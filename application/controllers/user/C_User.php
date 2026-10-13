@@ -93,7 +93,7 @@ class C_User extends CI_Controller
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
-        $this->load->view('content/User/bodySetting', $data);
+        $this->load->view('content/user/bodysetting', $data);
         $this->load->view('partial/footer');
     }
     public function editPassword()
@@ -110,5 +110,10 @@ class C_User extends CI_Controller
 
         $this->session->set_flashdata("edited", "Data Berhasil Dirubah");
         redirect('Auth');
+    }
+    
+    public function test()
+    {
+
     }
 }
