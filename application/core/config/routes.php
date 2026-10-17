@@ -196,6 +196,7 @@ $route['add_promosi_cp/(:any)']                         = 'purchaseorder/C_Reqpi
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk']                                    = 'postatus/C_PoStatus/postatusnk';
+$route['cancel_pengajuan_ponk']                         = 'postatus/C_PoStatus/cancel_pengajuan_ponk';
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
