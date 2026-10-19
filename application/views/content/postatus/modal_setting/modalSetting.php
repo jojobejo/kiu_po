@@ -463,3 +463,40 @@
             <!-- /.modal-dialog -->
         </div>
     <?php endforeach; ?>
+
+
+    <?php foreach ($status as $s) : ?>
+        <div class="modal fade" id="modalSelectTemplate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Pilih Template Printout</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <?php echo form_open('shipment_to'); ?>
+                        <input type="hidden" id="kd_po_modal" name="kd_po">
+                        <div class="form-group">
+                            <label for="template">Pilih Template</label>
+                            <select name="template_isi" id="template_isi" class="form-control" required>
+                                <option value="-">-- Pilih Format Note --</option>
+                                <?php foreach ($ntformat as $nf) :
+                                    $selected = $s->kd_printout_note != '' ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $nf->kd_nt_template ?>" <?= $selected ?>><?= $nf->nama_note ?></option>
+                                <?php endforeach; ?>
+                                <input type="text" placeholder="kd_po_shipment" name="update_shipment" id="update_shipment" value="<?= $s->kd_po ?>" readonly hidden>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan & Cetak</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php endforeach; ?>

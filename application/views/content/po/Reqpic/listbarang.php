@@ -4,7 +4,11 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <a href="<?= base_url('reqpic') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
+                    <?php if ($this->session->userdata('lv') == '2') : ?>
+                        <a href="<?= base_url('reqpic/admrestock') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
+                    <?php else : ?>
+                        <a href="<?= base_url('reqpic') ?>" class="btn btn-success btn-block"><i class="fas fa-home"></i> BACK</a>
+                    <?php endif; ?>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#reqmasterbarang"><i class="fas fa-folder-plus">&nbsp;</i>Req Master Barang</a>

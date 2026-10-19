@@ -19,8 +19,13 @@ class C_Stocknonkomersil extends CI_Controller
 
     public function index()
     {
+        $lokasi = trim((string)$this->input->get('lokasi', true));
+
         $data['title'] = 'List Stock Non Komersil';
-        $data['stocknk'] = $this->M_Stocknonkomersil->v_stock();
+        $data['selected_lokasi'] = $lokasi;
+        $data['lokasi_option'] = $this->M_Stocknonkomersil->get_master_lokasi();
+        $data['lokasi_option_modal'] = $data['lokasi_option'];
+        $data['stocknk'] = array();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -80,6 +85,7 @@ class C_Stocknonkomersil extends CI_Controller
         $data['item']       = $this->M_Stocknonkomersil->get_data_item($kdbarang)->result();
         $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm($kdbarang)->result();
         $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
+        $data['trash']      = $this->M_Stocknonkomersil->get_data_trash($kdbarang)->result();
 
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
@@ -87,6 +93,67 @@ class C_Stocknonkomersil extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/stock/nonkomersil/datatables');
     }
+
+    public function trash_transaksi($key, $id)
+    {
+        $action = $key;
+
+        switch ($action) {
+                // 1 = delete transaksi
+                // 2 = redo transaksi
+            case '1':
+                $item_tr = $this->M_Stocknonkomersil->get_data_itemtr($id)->result();
+                if ($item_tr) {
+                    foreach ($item_tr as $t) {
+                        $trashdata = array(
+                            'kd_akun'           => $t->kd_akun,
+                            'kd_po_nk'          => $t->kd_po_nk,
+                            'kd_barang'         => $t->kd_barang,
+                            'kd_barangsys'      => $t->kd_barangsys,
+                            'keterangan'        => $t->keterangan,
+                            'kat_barang'        => $t->kat_barang,
+                            'tr_qty'            => $t->tr_qty,
+                            'satuan'            => $t->satuan,
+                            'inputer'           => $t->inputer,
+                            'req_by'            => $t->req_by,
+                            'tgl_transaksi'     => $t->tgl_transaksi,
+                            'create_at'         => $t->create_at,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $this->M_Stocknonkomersil->insert_trash_bin_tr($trashdata);
+                        $this->M_Stocknonkomersil->deldettransaksi($id);
+                        redirect('detailtransaksi/' . $t->kd_barang);
+                    }
+                }
+                break;
+            case '2':
+                $item_trs = $this->M_Stocknonkomersil->get_data_trashid($id)->result();
+                if ($item_trs) {
+                    foreach ($item_trs as $t) {
+                        $trashdata = array(
+                            'kd_akun'           => $t->kd_akun,
+                            'kd_po_nk'          => $t->kd_po_nk,
+                            'kd_barang'         => $t->kd_barang,
+                            'kd_barangsys'      => $t->kd_barangsys,
+                            'keterangan'        => $t->keterangan,
+                            'kat_barang'        => $t->kat_barang,
+                            'tr_qty'            => $t->tr_qty,
+                            'satuan'            => $t->satuan,
+                            'inputer'           => $t->inputer,
+                            'req_by'            => $t->req_by,
+                            'tgl_transaksi'     => $t->tgl_transaksi,
+                            'create_at'         => $t->create_at,
+                            'last_updated_by'   => $this->session->userdata('kode')
+                        );
+                        $this->M_Stocknonkomersil->insttransaksi($trashdata);
+                        $this->M_Stocknonkomersil->delete_trash($id);
+                        redirect('detailtransaksi/' . $t->kd_barang);
+                    }
+                }
+                break;
+        }
+    }
+
     public function revisitr($akun, $kdpo, $kdbr)
     {
         $data['title']      = 'Revisi Qty Persedian';
@@ -210,5 +277,180 @@ class C_Stocknonkomersil extends CI_Controller
         );
         $this->M_Stocknonkomersil->inputtmprestock($inputdt);
         redirect('nkrestok');
+    }
+
+    public function filterqtybytgl()
+    {
+        $start_date = $this->input->post('start_date');
+        $end_date = $this->input->post('end_date');
+        $kdbarang = $this->input->post('kdbarang');
+
+        $data['title']      = 'Detail Stock Barang By Tanggal';
+        $data['start_date'] = $start_date;
+        $data['end_date']   = $end_date;
+
+        $data['item']       = $this->M_Stocknonkomersil->get_item_bytgl($start_date, $end_date, $kdbarang)->result();
+        $data['note']       = $this->M_Stocknonkomersil->get_note($kdbarang);
+        $data['stock']      = $this->M_Stocknonkomersil->get_detail_transaksi_itm_date($start_date, $end_date, $kdbarang)->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/stock_detailitm', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+    public function tr_allstock()
+    {
+        $data['title']      = 'List Transaksi Allstock';
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/histori_stock_all_ponk', $data);
+        $this->load->view('partial/footer');
+    }
+
+    public function fetch_tracking_data()
+    {
+        $tgl1 = $this->input->get('tanggal_1');
+        $tgl2 = $this->input->get('tanggal_2');
+
+        $data = $this->M_Stocknonkomersil->get_filtered_data($tgl1, $tgl2);
+        echo json_encode($data);
+    }
+
+    public function master_lokasi()
+    {
+        $data['title'] = 'Master Lokasi';
+        $data['lokasi'] = $this->M_Stocknonkomersil->get_master_lokasi();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/stock/nonkomersil/master_lokasi', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/stock/nonkomersil/datatables');
+    }
+
+    public function ajax_stocknonkomersil()
+    {
+        $lokasi = trim((string)$this->input->get('lokasi', true));
+        $status_stock = trim((string)$this->input->get('status_stock', true));
+        $draw = $this->input->get('draw');
+
+        if ($draw !== null) {
+            $order = $this->input->get('order');
+            $search = $this->input->get('search');
+            $length = (int)$this->input->get('length');
+
+            $params = [
+                'lokasi' => $lokasi,
+                'status_stock' => $status_stock,
+                'search' => is_array($search) && isset($search['value']) ? trim((string)$search['value']) : '',
+                'start' => max(0, (int)$this->input->get('start')),
+                'length' => ($length > 0 && $length <= 100) ? $length : 10,
+                'order_column' => is_array($order) && isset($order[0]['column']) ? (int)$order[0]['column'] : 0,
+                'order_dir' => is_array($order) && isset($order[0]['dir']) ? (string)$order[0]['dir'] : 'asc'
+            ];
+
+            $result = $this->M_Stocknonkomersil->get_stock_datatable($params);
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'draw' => (int)$draw,
+                    'recordsTotal' => $result['records_total'],
+                    'recordsFiltered' => $result['records_filtered'],
+                    'data' => $result['data']
+                ]));
+            return;
+        }
+
+        $stock = $this->M_Stocknonkomersil->v_stock($lokasi, $status_stock);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => true,
+                'data' => $stock
+            ]));
+    }
+
+    public function update_minimum_stock()
+    {
+        $level = (string)$this->session->userdata('lv');
+        if ($level !== '1' && $level !== '2') {
+            $this->output
+                ->set_status_header(403)
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => false]));
+            return;
+        }
+
+        $kode_barang = trim((string)$this->input->post('kode_barang', true));
+        $minimum_stock = (float)$this->input->post('minimum_stock');
+
+        $updated = false;
+        if ($kode_barang !== '' && $minimum_stock >= 0) {
+            $updated = $this->M_Stocknonkomersil->update_minimum_stock($kode_barang, $minimum_stock);
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => (bool)$updated
+            ]));
+    }
+
+    public function update_lokasi_barang()
+    {
+        $kode_barang = trim((string)$this->input->post('kode_barang', true));
+        $id_lokasi = (int)$this->input->post('id_lokasi');
+
+        $updated = false;
+        if ($kode_barang !== '' && $id_lokasi > 0) {
+            $updated = $this->M_Stocknonkomersil->update_lokasi_barang($kode_barang, $id_lokasi);
+        }
+
+        if ($this->input->is_ajax_request()) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status' => (bool)$updated
+                ]));
+            return;
+        }
+
+        redirect('stocknonkomersil');
+    }
+
+    public function add_master_lokasi()
+    {
+        $nama_lokasi = trim($this->input->post('nama_lokasi'));
+        if ($nama_lokasi !== '') {
+            $this->M_Stocknonkomersil->add_master_lokasi([
+                'nama_lokasi' => $nama_lokasi
+            ]);
+        }
+
+        redirect('master_lokasi');
+    }
+
+    public function edit_master_lokasi()
+    {
+        $id_lokasi = $this->input->post('id_lokasi');
+        $nama_lokasi = trim($this->input->post('nama_lokasi'));
+
+        if ($id_lokasi && $nama_lokasi !== '') {
+            $this->M_Stocknonkomersil->update_master_lokasi($id_lokasi, [
+                'nama_lokasi' => $nama_lokasi
+            ]);
+        }
+
+        redirect('master_lokasi');
+    }
+
+    public function hapus_master_lokasi($id)
+    {
+        $this->M_Stocknonkomersil->delete_master_lokasi($id);
+        redirect('master_lokasi');
     }
 }

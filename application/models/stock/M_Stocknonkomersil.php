@@ -14,9 +14,152 @@ class M_Stocknonkomersil  extends CI_Model
     {
         return $this->db->get('')->result();
     }
-    public function v_stock()
+
+    private function stock_base_sql()
     {
-        return $this->db->get('v_stockbarangnk')->result();
+        return "SELECT
+            a.kd_barang AS kode_barangs,
+            a.kd_br_adm AS kode_barang,
+            a.nama_barang,
+            a.descnk AS deskripsi,
+            a.gbr_barang,
+            COALESCE(tr.qty_in, 0) AS qty_in,
+            COALESCE(tr.qty_out, 0) AS qty_out,
+            (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)) AS qty_ready,
+            b.id_satuan,
+            b.nm_satuan AS satuan,
+            a.id_brg_nk,
+            a.kat_barang,
+            a.kd_lokasi AS id_lokasi,
+            l.nama_lokasi,
+            COALESCE(a.minimum_stock, 0) AS minimum_stock,
+            CASE
+                WHEN COALESCE(a.minimum_stock, 0) > 0 THEN GREATEST(COALESCE(a.minimum_stock, 0) - (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)), 0)
+                ELSE 0
+            END AS qty_saran_po,
+            CASE
+                WHEN (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)) <= 0 THEN 'habis'
+                WHEN (COALESCE(tr.qty_in, 0) - COALESCE(tr.qty_out, 0)) <= COALESCE(a.minimum_stock, 0) THEN 'hampir_habis'
+                ELSE 'aman'
+            END AS status_stock
+        FROM tb_barang_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        LEFT JOIN tb_barang_nk_lokasi l ON l.id_lokasi = a.kd_lokasi
+        LEFT JOIN (
+            SELECT
+                kd_barang,
+                SUM(CASE WHEN kd_akun IN ('11511', '11513') THEN tr_qty ELSE 0 END) AS qty_in,
+                SUM(CASE WHEN kd_akun IN ('11512', '11514') THEN tr_qty ELSE 0 END) AS qty_out
+            FROM tb_transaksi
+            WHERE kd_akun IN ('11511', '11512', '11513', '11514')
+            GROUP BY kd_barang
+        ) tr ON tr.kd_barang = a.kd_barang";
+    }
+
+    private function stock_filter_sql($params, &$binds)
+    {
+        $where = [];
+        $lokasi = isset($params['lokasi']) ? trim((string)$params['lokasi']) : '';
+        $status_stock = isset($params['status_stock']) ? trim((string)$params['status_stock']) : '';
+        $search = isset($params['search']) ? trim((string)$params['search']) : '';
+
+        if ($lokasi !== '') {
+            if (ctype_digit($lokasi)) {
+                $where[] = 'stock.id_lokasi = ?';
+                $binds[] = (int)$lokasi;
+            } else {
+                $where[] = 'stock.nama_lokasi = ?';
+                $binds[] = $lokasi;
+            }
+        }
+
+        if ($search !== '') {
+            $like = '%' . $search . '%';
+            $where[] = '(stock.kode_barang LIKE ? OR stock.kode_barangs LIKE ? OR stock.nama_barang LIKE ? OR stock.deskripsi LIKE ? OR stock.satuan LIKE ? OR stock.nama_lokasi LIKE ?)';
+            array_push($binds, $like, $like, $like, $like, $like, $like);
+        }
+
+        if ($status_stock === 'perlu_po') {
+            $where[] = "stock.status_stock IN ('habis', 'hampir_habis')";
+        } elseif (in_array($status_stock, ['habis', 'hampir_habis', 'aman'], true)) {
+            $where[] = 'stock.status_stock = ?';
+            $binds[] = $status_stock;
+        }
+
+        return $where ? ' WHERE ' . implode(' AND ', $where) : '';
+    }
+
+    private function stock_order_sql($column, $direction)
+    {
+        $columns = [
+            0 => 'stock.kode_barang',
+            1 => 'stock.nama_barang',
+            2 => 'stock.deskripsi',
+            3 => 'stock.qty_ready',
+            4 => 'stock.minimum_stock',
+            5 => 'stock.qty_saran_po',
+            6 => 'stock.status_stock',
+            7 => 'stock.satuan',
+            8 => 'stock.nama_lokasi'
+        ];
+
+        $order_column = isset($columns[$column]) ? $columns[$column] : $columns[0];
+        $order_dir = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
+
+        return " ORDER BY {$order_column} {$order_dir}";
+    }
+
+    private function has_stock_filters($params)
+    {
+        return trim((string)(isset($params['lokasi']) ? $params['lokasi'] : '')) !== ''
+            || trim((string)(isset($params['status_stock']) ? $params['status_stock'] : '')) !== ''
+            || trim((string)(isset($params['search']) ? $params['search'] : '')) !== '';
+    }
+
+    public function get_stock_datatable($params)
+    {
+        $base_sql = $this->stock_base_sql();
+        $binds = [];
+        $filter_sql = $this->stock_filter_sql($params, $binds);
+        $order_sql = $this->stock_order_sql(
+            isset($params['order_column']) ? (int)$params['order_column'] : 0,
+            isset($params['order_dir']) ? (string)$params['order_dir'] : 'asc'
+        );
+        $start = isset($params['start']) ? max(0, (int)$params['start']) : 0;
+        $length = isset($params['length']) ? (int)$params['length'] : 10;
+        $length = ($length > 0 && $length <= 100) ? $length : 10;
+
+        $data_sql = "SELECT stock.* FROM ({$base_sql}) stock{$filter_sql}{$order_sql} LIMIT ?, ?";
+        $data_binds = array_merge($binds, [$start, $length]);
+
+        $count_sql = "SELECT COUNT(*) AS total FROM ({$base_sql}) stock{$filter_sql}";
+        $total_sql = 'SELECT COUNT(*) AS total FROM tb_barang_nk';
+
+        $records_total = (int)$this->db->query($total_sql)->row()->total;
+        $records_filtered = $this->has_stock_filters($params)
+            ? (int)$this->db->query($count_sql, $binds)->row()->total
+            : $records_total;
+        $data = $this->db->query($data_sql, $data_binds)->result();
+
+        return [
+            'records_total' => $records_total,
+            'records_filtered' => $records_filtered,
+            'data' => $data
+        ];
+    }
+
+    public function v_stock($lokasi = '', $status_stock = '')
+    {
+        $params = [
+            'lokasi' => $lokasi,
+            'status_stock' => $status_stock,
+            'search' => ''
+        ];
+        $binds = [];
+        $base_sql = $this->stock_base_sql();
+        $filter_sql = $this->stock_filter_sql($params, $binds);
+
+        return $this->db->query("SELECT stock.* FROM ({$base_sql}) stock{$filter_sql} ORDER BY stock.kode_barang ASC", $binds)->result();
     }
 
     public function v_stockzero()
@@ -85,6 +228,47 @@ class M_Stocknonkomersil  extends CI_Model
         return $this->db->get('tb_satuan')->result();
     }
 
+    public function get_master_lokasi()
+    {
+        $this->db->select('*');
+        $this->db->from('tb_barang_nk_lokasi');
+        $this->db->order_by('id_lokasi', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    public function add_master_lokasi($data)
+    {
+        return $this->db->insert('tb_barang_nk_lokasi', $data);
+    }
+
+    public function update_master_lokasi($id, $data)
+    {
+        $this->db->where('id_lokasi', $id);
+        return $this->db->update('tb_barang_nk_lokasi', $data);
+    }
+
+    public function delete_master_lokasi($id)
+    {
+        $this->db->where('id_lokasi', $id);
+        return $this->db->delete('tb_barang_nk_lokasi');
+    }
+
+    public function update_lokasi_barang($kode_barang, $id_lokasi)
+    {
+        $this->db->where('kd_br_adm', $kode_barang);
+        return $this->db->update('tb_barang_nk', [
+            'kd_lokasi' => $id_lokasi
+        ]);
+    }
+
+    public function update_minimum_stock($kode_barang, $minimum_stock)
+    {
+        $this->db->where('kd_barang', $kode_barang);
+        return $this->db->update('tb_barang_nk', [
+            'minimum_stock' => $minimum_stock
+        ]);
+    }
+
     function kdnonkomersial()
     {
         $cd1 = $this->db->query("SELECT MAX(RIGHT(kd_barang,4)) AS kd_max FROM tb_generate_kd WHERE DATE(create_at)=CURDATE()");
@@ -102,14 +286,17 @@ class M_Stocknonkomersil  extends CI_Model
         $kdnk1 = 'PONK' . date('dmy') . $kd1;
         return $kdnk1;
     }
+
     function generatekd($data)
     {
         $this->db->insert('tb_generate_kd', $data);
     }
+
     function insttransaksi($data)
     {
         $this->db->insert('tb_transaksi', $data);
     }
+
     public function get_data_item($kd)
     {
         return $this->db->query("SELECT
@@ -128,6 +315,99 @@ class M_Stocknonkomersil  extends CI_Model
         WHERE a.kd_barang = '$kd'
         ");
     }
+
+    // public function get_item_bytgl($tgl1, $tgl2, $kd)
+    // {
+    //     return $this->db->query("SELECT 
+    //     a.kd_barang,
+    //     b.nama_barang,
+    //     SUM(CASE WHEN a.kd_akun IN ('11511', '11513') THEN a.tr_qty ELSE 0 END) AS qty_in,
+    //     SUM(CASE WHEN a.kd_akun IN ('11512', '11514') THEN a.tr_qty ELSE 0 END) AS qty_out,
+    //     (SUM(CASE WHEN a.kd_akun IN ('11511', '11513') THEN a.tr_qty ELSE 0 END) - 
+    //     SUM(CASE WHEN a.kd_akun IN ('11512', '11514') THEN a.tr_qty ELSE 0 END)) AS hasil
+    // FROM tb_transaksi a
+    // JOIN tb_barang_nk b ON b.kd_barang = a.kd_barang
+    // WHERE a.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2'
+    // AND a.kd_barang = '$kd'
+    // GROUP BY a.kd_barang, b.nama_barang;
+    //     ");
+    // }
+
+    public function get_item_bytgl($tgl1, $tgl2, $kd)
+    {
+        return $this->db->query("SELECT 
+        a.kd_barang AS kode_sistem,
+        a.kd_br_adm AS kode_barang,
+        a.nama_barang AS nama_barang,
+        a.descnk AS deskripsi,
+        d.qty_ready AS qty_ready,
+        b.nm_satuan AS satuan,
+        a.kat_barang AS katbr,
+        b.id_satuan AS satuanid,
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11511', '11513') THEN t.tr_qty ELSE 0 END), 0) AS qty_in,
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11512', '11514') THEN t.tr_qty ELSE 0 END), 0) AS qty_out,
+        (COALESCE(SUM(CASE WHEN t.kd_akun IN ('11511', '11513') THEN t.tr_qty ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN t.kd_akun IN ('11512', '11514') THEN t.tr_qty ELSE 0 END), 0)) AS hasil
+        FROM tb_barang_nk a
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        JOIN tb_kat_br c ON c.kd_kat = a.kat_barang
+        JOIN v_stockbarangnk d ON d.kode_barangs = a.kd_barang
+        LEFT JOIN tb_transaksi t ON t.kd_barang = a.kd_barang
+        AND t.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2' 
+        WHERE a.kd_barang = '$kd'
+        GROUP BY a.kd_barang, a.kd_br_adm, a.nama_barang, a.descnk, d.qty_ready, b.nm_satuan, a.kat_barang, b.id_satuan;");
+    }
+
+    public function getStockByDate($start_date, $end_date)
+    {
+        $this->db->select('*');
+        $this->db->from('tb_transaksi');
+
+        if (!empty($start_date) && !empty($end_date)) {
+            $this->db->where('tgl_transaksi >=', $start_date);
+            $this->db->where('tgl_transaksi <=', $end_date);
+        }
+
+        return $this->db->get()->result_array();
+    }
+
+    public function get_data_itemtr($id)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_transaksi a
+        WHERE a.id_transnk = '$id'
+        ");
+    }
+    public function get_detail_transaksi_itm_date($tgl1, $tgl2, $kd)
+    {
+        return $this->db->query("SELECT
+        a.id_transnk AS id,
+        a.kd_po_nk AS kd_transaksi,
+        a.kd_akun AS kd_akun,
+        a.tgl_transaksi AS tgl_transaksi,
+        a.tr_qty AS qty,
+        b.nm_satuan AS nm_satuan,
+        a.kd_barangsys AS kd_barang,
+        a.kd_barang AS kd_barangs,
+        f.nama_user AS inpt,
+        f.aksess_lv AS lvadm,
+        e.aksess_lv AS lvusr,
+        e.nama_user AS nmreq,
+        e.departement AS dep,
+        a.keterangan as ket
+        FROM tb_transaksi a 
+        JOIN tb_satuan b ON b.id_satuan = a.satuan
+        LEFT JOIN tb_req_nk c ON c.kd_po_nk = a.kd_po_nk 
+        LEFT JOIN tb_po_nk d ON d.kd_po_nk = a.kd_po_nk
+        LEFT JOIN tb_user e ON e.kode_user = a.req_by
+        LEFT JOIN tb_user f ON f.kode_user = a.inputer
+        WHERE a.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2'
+        AND a.kd_barang = '$kd'
+        ORDER BY a.id_transnk DESC
+        ");
+    }
+
     public function get_detail_transaksi_itm($kd)
     {
         return $this->db->query("SELECT
@@ -138,6 +418,7 @@ class M_Stocknonkomersil  extends CI_Model
         a.tr_qty AS qty,
         b.nm_satuan AS nm_satuan,
         a.kd_barangsys AS kd_barang,
+        a.kd_barang AS kd_barangs,
         f.nama_user AS inpt,
         f.aksess_lv AS lvadm,
         e.aksess_lv AS lvusr,
@@ -237,6 +518,54 @@ class M_Stocknonkomersil  extends CI_Model
         $this->db->from('tb_note_direktur a');
         $this->db->where('kd_po', $kd);
         return $this->db->get()->result();
+    }
+    public function deldettransaksi($id)
+    {
+        $this->db->where('id_transnk', $id);
+        return $this->db->delete('tb_transaksi');
+    }
+    public function insert_trash_bin_tr($data)
+    {
+        $this->db->insert('tb_transaksi_trashbin', $data);
+    }
+    public function get_data_trash($kd)
+    {
+        return $this->db->query("SELECT
+        a.*,
+        a.id_trashbin as id_trashbin,
+        b.departement AS departemen,
+        b.nama_user AS nm_user
+        FROM tb_transaksi_trashbin a
+        JOIN tb_user b ON b.kode_user = a.req_by 
+        WHERE a.kd_barang = '$kd'
+         ");
+    }
+    public function delete_trash($id)
+    {
+        $this->db->where('id_trashbin', $id);
+        return $this->db->delete('tb_transaksi_trashbin');
+    }
+    public function get_data_trashid($id)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tb_transaksi_trashbin a
+        WHERE a.id_trashbin = '$id'
+        ");
+    }
+
+    // FITER TGL TRANSAKSI NON KOMERSIL
+
+    public function get_filtered_data($tgl1, $tgl2)
+    {
+        $this->db->select('a.kd_akun AS jn_transaksi, a.tgl_transaksi, c.departement, c.nama_user, b.nama_barang, a.keterangan, a.tr_qty AS qty');
+        $this->db->from('tb_transaksi a');
+        $this->db->join('tb_barang_nk b', 'b.kd_barang = a.kd_barang');
+        $this->db->join('tb_user c', 'c.kode_user = a.req_by');
+        $this->db->where('a.tgl_transaksi >=', $tgl1);
+        $this->db->where('a.tgl_transaksi <=', $tgl2);
+        $query = $this->db->get();
+        return $query->result();
     }
 }
 
