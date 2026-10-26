@@ -110,7 +110,7 @@
                             </td>
                             <td><?= format_indo($p->tgl_transaksi) ?></td>
                             <td><?= $p->nama_user ?></td>
-                            <td><?= $p->departement ?></td>
+                            <td><?= htmlspecialchars($p->departemen, ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= $p->tj_pembelian ?></td>
                             <td>
                                 <div class="row">

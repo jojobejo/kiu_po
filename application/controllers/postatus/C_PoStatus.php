@@ -803,8 +803,20 @@ class C_PoStatus extends CI_Controller
 
     public function postatusnk()
     {
+        //VIEW-DIREKTORAT OPERASIONAL: seluruh PO nonkomersil, semua departemen
+        if ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'DIROP') {
+            $data['title'] = 'PO Status';
+            $data['po'] = $this->M_Postatus->getAllNk()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
         //VIEW-PURCHASING
-        if ($this->session->userdata('lv') == '2') {
+        elseif ($this->session->userdata('lv') == '2') {
 
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');

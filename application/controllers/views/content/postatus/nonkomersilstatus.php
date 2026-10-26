@@ -64,6 +64,31 @@
             <!-- KADEP VIEW -->
             <div class="row mb-3" id="ponkStatusFilter">
                 <div class="col-12">
+                    <?php if ($this->session->userdata('kode') == 'DIROP') : ?>
+                        <?php
+                        $ponkDepartments = array();
+                        foreach ($po as $poRow) {
+                            if (!empty($poRow->departemen)) {
+                                $ponkDepartments[] = $poRow->departemen;
+                            }
+                        }
+                        $ponkDepartments = array_unique($ponkDepartments);
+                        sort($ponkDepartments, SORT_NATURAL | SORT_FLAG_CASE);
+                        ?>
+                        <div class="mb-2" aria-label="Filter departemen">
+                            <div class="small font-weight-bold mb-1">Filter Departemen</div>
+                            <div class="d-flex flex-wrap">
+                                <button type="button" class="btn btn-primary btn-sm mr-2 mb-2 btn-filter-department-ponk active" data-department="" data-default-class="btn-outline-primary" data-active-class="btn-primary" aria-pressed="true">
+                                    <i class="fas fa-list"></i>&nbsp; Semua Departemen
+                                </button>
+                                <?php foreach ($ponkDepartments as $department) : ?>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mr-2 mb-2 btn-filter-department-ponk" data-department="<?= htmlspecialchars($department, ENT_QUOTES, 'UTF-8') ?>" data-default-class="btn-outline-primary" data-active-class="btn-primary" aria-pressed="false">
+                                        <?= htmlspecialchars(strtoupper($department), ENT_QUOTES, 'UTF-8') ?>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                     <div class="d-flex flex-wrap">
                         <button type="button" class="btn btn-dark btn-sm mr-2 mb-2 btn-filter-status-ponk active" data-status="" data-default-class="btn-dark">
                             <i class="fas fa-list"></i>&nbsp; SEMUA
@@ -117,7 +142,7 @@
                         <?php
                         $no = 1;
                         foreach ($ponk as $p) : ?>
-                            <tr data-status-order="<?= htmlspecialchars($p->status, ENT_QUOTES, 'UTF-8') ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p->status, ENT_QUOTES, 'UTF-8') ?>" data-department-order="<?= htmlspecialchars($p->departemen, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= htmlspecialchars($p->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
@@ -217,7 +242,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= htmlspecialchars($p->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td data-order="<?= htmlspecialchars(tanggal_sort_key($p->tgl_transaksi), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p->departement, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
@@ -298,7 +323,7 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>" data-department-order="<?= htmlspecialchars($p1->departemen, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= htmlspecialchars($p1->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
@@ -398,7 +423,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td data-order="<?= htmlspecialchars(tanggal_sort_key($p1->tgl_transaksi), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->departement, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
@@ -479,7 +504,7 @@
                         <?php
                         $no = 1;
                         foreach ($po as $p1) : ?>
-                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>">
+                            <tr data-status-order="<?= htmlspecialchars($p1->status, ENT_QUOTES, 'UTF-8') ?>" data-department-order="<?= htmlspecialchars($p1->departemen, ENT_QUOTES, 'UTF-8') ?>">
                                 <td><?= $no++; ?></td>
                                 <td><?= htmlspecialchars($p1->nopo, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
@@ -579,7 +604,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td data-order="<?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
+                                <td data-order="<?= htmlspecialchars(tanggal_sort_key($p1->tgl_transaksi), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($p1->tgl_transaksi, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->nama_user, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->departemen, ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($p1->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></td>
@@ -665,29 +690,36 @@
 
         var $ = window.jQuery;
         var selectedStatus = '';
+        var selectedDepartment = '';
         var table = $('#tballstatus').DataTable();
         table.order([3, 'desc']).draw();
 
         if (!window.ponkStatusFilterRegistered) {
             $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                if (settings.nTable.id !== 'tballstatus' || selectedStatus === '') {
+                if (settings.nTable.id !== 'tballstatus') {
                     return true;
                 }
 
-                var rowStatus = $(settings.aoData[dataIndex].nTr).attr('data-status-order');
-                return rowStatus === selectedStatus;
+                var $row = $(settings.aoData[dataIndex].nTr);
+                var rowStatus = $row.attr('data-status-order');
+                var rowDepartment = $row.attr('data-department-order');
+                var matchesStatus = selectedStatus === '' || rowStatus === selectedStatus;
+                var matchesDepartment = selectedDepartment === '' || rowDepartment === selectedDepartment;
+                return matchesStatus && matchesDepartment;
             });
             window.ponkStatusFilterRegistered = true;
         }
 
         function resetFilterButton($button) {
             var defaultClass = $button.attr('data-default-class');
-            $button.removeClass('btn-default active').addClass(defaultClass);
+            var activeClass = $button.attr('data-active-class') || 'btn-default';
+            $button.removeClass(activeClass + ' btn-default active').addClass(defaultClass);
         }
 
         function activateFilterButton($button) {
             var defaultClass = $button.attr('data-default-class');
-            $button.removeClass(defaultClass).addClass('btn-default active');
+            var activeClass = $button.attr('data-active-class') || 'btn-default';
+            $button.removeClass(defaultClass).addClass(activeClass + ' active');
         }
 
         $(document).off('click.ponkStatusFilter', '.btn-filter-status-ponk').on('click.ponkStatusFilter', '.btn-filter-status-ponk', function() {
@@ -698,6 +730,20 @@
                 resetFilterButton($(this));
             });
             activateFilterButton($button);
+
+            table.draw();
+        });
+
+        $(document).off('click.ponkDepartmentFilter', '.btn-filter-department-ponk').on('click.ponkDepartmentFilter', '.btn-filter-department-ponk', function() {
+            var $button = $(this);
+            selectedDepartment = $button.attr('data-department');
+
+            $('.btn-filter-department-ponk').each(function() {
+                resetFilterButton($(this));
+                $(this).attr('aria-pressed', 'false');
+            });
+            activateFilterButton($button);
+            $button.attr('aria-pressed', 'true');
 
             table.draw();
         });

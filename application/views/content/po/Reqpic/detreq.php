@@ -844,6 +844,19 @@
                                             <input type="number" id="jmltot" name="jmltot" style="max-width: 550px;" value="<?= $ct->hrg ?>" class="form-control" readonly hidden>
                                         <?php endforeach; ?>
                                         <input type="text" id="tjbuy" name="tjbuy" style="max-width: 550px;" value="<?= $s->tj_pembelian ?>" class="form-control" readonly hidden>
+                                        <div class="form-group mt-3">
+                                            <label for="kadep_departemen">Pilih Departemen Kadep Approval</label>
+                                            <select id="kadep_departemen" name="kadep_departemen" class="form-control" required>
+                                                <option value="">-- Pilih Departemen --</option>
+                                                <option value="GA">GA</option>
+                                                <option value="KEUANGAN">KEUANGAN</option>
+                                                <option value="LOGISTIK">LOGISTIK</option>
+                                                <option value="PROMOSI SEED">PROMOSI SEED</option>
+                                                <option value="PURCHASING">PURCHASING</option>
+                                                <option value="SALES">SALES</option>
+                                                <option value="DIROP">DIROP</option>
+                                            </select>
+                                        </div>
                                         <button type="submit" class="btn btn-block btn-primary btn-md"><B>ORDER CONFIRMED</B></button>
                                         <!-- END AKSI RESTOCK -->
 
