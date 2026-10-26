@@ -108,6 +108,7 @@ $route['pononkomersiljasa']                             = 'purchaseorder/pojasa/
 $route['stocknonkomersil']                              = 'stock/C_Stocknonkomersil';
 $route['stocknonkomersil/data']                         = 'stock/C_Stocknonkomersil/ajax_stocknonkomersil';
 $route['stocknonkomersil/update_lokasi']                = 'stock/C_Stocknonkomersil/update_lokasi_barang';
+$route['stocknonkomersil/update_minimum_stock']          = 'stock/C_Stocknonkomersil/update_minimum_stock';
 $route['pononkomersil/list_stocknkpo']                  = 'stock/C_Stocknonkomersil/list_stock_non_komersil_po';
 $route['detailtransaksi/(:any)']                        = 'stock/C_Stocknonkomersil/detailtransaksi/$1';
 $route['revisitr/(:any)/(:any)/(:any)']                 = 'stock/C_Stocknonkomersil/revisitr/$1/$2/$3';
@@ -158,6 +159,7 @@ $route['index_done']                                    = 'purchaseorder/C_Reqpi
 $route['listbarangready']                               = 'purchaseorder/C_Reqpic/list_barang_ready';
 $route['add_mbarang_tmp']                               = 'purchaseorder/C_Reqpic/addrequestmasterbarangready';
 $route['addtmpreqbarang']                               = 'purchaseorder/C_Reqpic/addtmpreqbarang';
+$route['addnewreq']                                     = 'purchaseorder/C_Reqpic/addnewreq';
 $route['addnewreq/(:any)']                              = 'purchaseorder/C_Reqpic/addnewreq/$1';
 
 $route['editedreqpic']                                  = 'purchaseorder/C_Reqpic/editedreqpic';
@@ -183,16 +185,19 @@ $route['updated_po_nk/(:any)']                          = 'purchaseorder/C_Reqpi
 $route['promosi_seed']                                  = 'purchaseorder/C_Reqpic/promosiseed';
 $route['list_barang_ready_seed']                        = 'purchaseorder/C_Reqpic/list_barang_ready_seed';
 $route['addtmpreqbarang_seed']                          = 'purchaseorder/C_Reqpic/addtmpreqbarang_seed';
+$route['add_promosi_seed']                              = 'purchaseorder/C_Reqpic/add_promosi_seed';
 $route['add_promosi_seed/(:any)']                       = 'purchaseorder/C_Reqpic/add_promosi_seed/$1';
 
 
 $route['promosi_cp']                                    = 'purchaseorder/C_Reqpic/promosicp';
 $route['list_barang_ready_cp']                          = 'purchaseorder/C_Reqpic/list_barang_ready_cp';
 $route['addtmpreqbarang_cp']                            = 'purchaseorder/C_Reqpic/addtmpreqbarang_cp';
+$route['add_promosi_cp']                                = 'purchaseorder/C_Reqpic/add_promosi_cp';
 $route['add_promosi_cp/(:any)']                         = 'purchaseorder/C_Reqpic/add_promosi_cp/$1';
 
 //PurchaseOrderNonKomersil - STATUS
 $route['postatusnk']                                    = 'postatus/C_PoStatus/postatusnk';
+$route['cancel_pengajuan_ponk']                         = 'postatus/C_PoStatus/cancel_pengajuan_ponk';
 $route['srcponkbytgl']                                  = 'postatus/C_PoStatus/srcponkbytgl';
 $route['postatusallnk']                                 = 'postatus/C_PoStatus/postatusallnk';
 $route['detailponk/(:any)']                             = 'postatus/C_PoStatus/detailponk/$1';
@@ -221,6 +226,8 @@ $route['historidone/(:any)/(:any)']                     = 'postatus/C_PoStatus/h
 $route['stsviewpo/(:any)']                              = 'postatus/C_PoStatus/stsviewpo/$1';
 $route['srcexpdone']                                    = 'postatus/C_PoStatus/srcexpdone';
 $route['downloadfile/(:any)']                           = 'postatus/C_PoStatus/downloadfile/$1';
+$route['postatusnk/update-tujuan-pembelian']            = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
+$route['update_tujuan_pembelian_ponk']                  = 'postatus/C_PoStatus/update_tujuan_pembelian_ponk';
 
 
 $route['edit_faktur_item_nk']                           = 'postatus/C_PoStatus/edit_faktur_item_nk';
@@ -320,6 +327,7 @@ $route['lap_nonkomersil']                               = 'laporan/C_Laporan';
 $route['srclapbeli']                                    = 'laporan/C_Laporan/srclapbeli';
 $route['export_laporan_pembelian_nk']                   = 'laporan/C_Laporan/export_laporan_pembelian_nk';
 $route['exported_allstock']                             = 'laporan/C_Laporan/exported_allstock';
+$route['export_cost_pic_ponk']                          = 'laporan/C_Laporan/export_cost_pic_ponk';
 
 //LAPORAN TRANSAKSI NON KOMERSIL
 $route['tr_allstock']                                   = 'laporan/C_Laporan/tr_allstock';

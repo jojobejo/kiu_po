@@ -32,8 +32,18 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload Cepat</button>
+                            <div class="col-md-3">
+                                <label class="mb-1"><b>Status Stock</b></label>
+                                <select id="filter_status_stock" class="form-control">
+                                    <option value="">Semua Status</option>
+                                    <option value="perlu_po">Harus Di-PO</option>
+                                    <option value="hampir_habis">Hampir Habis</option>
+                                    <option value="habis">Habis</option>
+                                    <option value="aman">Aman</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5 d-flex align-items-end">
+                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload</button>
                                 <button type="button" id="btn_reset_filter" class="btn btn-light">Reset</button>
                             </div>
                         </form>
@@ -45,6 +55,9 @@
                                     <td>Nama Barang</td>
                                     <td>Deskripsi</td>
                                     <td>Stock</td>
+                                    <td>Minimum Stock</td>
+                                    <td>Saran PO</td>
+                                    <td>Status</td>
                                     <td>Satuan</td>
                                     <td>Lokasi</td>
                                     <td>#</td>
@@ -74,8 +87,18 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload Cepat</button>
+                            <div class="col-md-3">
+                                <label class="mb-1"><b>Status Stock</b></label>
+                                <select id="filter_status_stock" class="form-control">
+                                    <option value="">Semua Status</option>
+                                    <option value="perlu_po">Harus Di-PO</option>
+                                    <option value="hampir_habis">Hampir Habis</option>
+                                    <option value="habis">Habis</option>
+                                    <option value="aman">Aman</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5 d-flex align-items-end">
+                                <button type="button" id="btn_reload_stock" class="btn btn-secondary mr-2">Reload</button>
                                 <button type="button" id="btn_reset_filter" class="btn btn-light">Reset</button>
                             </div>
                         </form>
@@ -86,6 +109,9 @@
                                     <td>Nama Barang</td>
                                     <td>Deskripsi</td>
                                     <td>Stock</td>
+                                    <td>Minimum Stock</td>
+                                    <td>Saran PO</td>
+                                    <td>Status</td>
                                     <td>Satuan</td>
                                     <td>Lokasi</td>
                                     <!-- <td>#</td> -->

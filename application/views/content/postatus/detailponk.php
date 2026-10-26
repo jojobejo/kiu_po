@@ -19,6 +19,11 @@
                 <div class="">
                     <div class="row">
                         <?php foreach ($status as $s) : ?>
+                            <?php
+                            $blockedPonkEditStatuses = array('ACC-KADEP', 'SEDANG DIAJUKAN', 'ON PROGRESS - KADEP', 'ACC DIREKTUR', 'PROSES PEMBELIAN', 'PENGAJUAN DIBATALKAN');
+                            $canUpdatePonkPengajuan = !in_array($s->status, $blockedPonkEditStatuses, true);
+                            $kdPonkDetail = isset($kd) ? $kd : $s->kd_po_nk;
+                            ?>
                             <div class="col-2">
                                 <label for="naSupp" class="">NOMOR PO : </label>
                                 <input type="text" id="naCus" name="naSupp" style="max-width: 550px;" value="<?= $s->nopo ?>" class="form-control" readonly>
@@ -95,6 +100,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-truck-moving"></i>PROSES PEMBELIAN</a>
                                         </div>
+                                    <?php elseif ($s->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-ban"></i> PENGAJUAN DIBATALKAN</a>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
 
@@ -151,6 +160,10 @@
                                     <?php elseif ($s->status == 'PROSES PEMBELIAN') : ?>
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-truck-moving"></i> PROSES PEMBELIAN</a>
+                                        </div>
+                                    <?php elseif ($s->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-ban"></i> PENGAJUAN DIBATALKAN</a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -228,6 +241,10 @@
                                         <div>
                                             <a href="#" class="btn btn-warning btn-block"><i class="fas fa-truck-moving"></i> PROSES PEMBELIAN</a>
                                         </div>
+                                    <?php elseif ($s->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                        <div>
+                                            <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-ban"></i> PENGAJUAN DIBATALKAN</a>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
 
@@ -258,6 +275,15 @@
                                         <div class="col">
                                             <label for="tgTrans" class="">Status Order : </label>
                                             <a href="#" class="btn btn-danger btn-block"><i class="fas fa-times"></i> Order Ditolak</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php elseif ($this->session->userdata('lv') == '3' && $s->status == 'PENGAJUAN DIBATALKAN') : ?>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="tgTrans" class="">Status Order : </label>
+                                            <a href="#" class="btn btn-secondary btn-block"><i class="fas fa-ban"></i> PENGAJUAN DIBATALKAN</a>
                                         </div>
                                     </div>
                                 </div>
@@ -321,15 +347,58 @@
                                 </div>
 
                             <?php endif; ?>
+                            <?php if ($canUpdatePonkPengajuan) : ?>
+                                <div class="col-lg">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-danger btn-block btn-cancel-pengajuan-ponk" data-kd-po-req="<?= htmlspecialchars($s->kd_po_req, ENT_QUOTES, 'UTF-8') ?>">
+                                        <i class="fas fa-ban"></i> CANCEL PENGAJUAN
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                     </div>
 
                 </div>
             </div>
             <div class="col">
-                <label for="noInv" class="">Tujuan Pembelian</label>
-                <textarea type="text" id="noInv" name="noInv" class="form-control mb-2" readonly><?= $s->tj_pembelian ?></textarea>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="tujuanPembelianPonk" class="mb-0">Tujuan Pembelian</label>
+                    <?php if ($canUpdatePonkPengajuan) : ?>
+                        <button type="button" class="btn btnAtas btn-sm" data-toggle="modal" data-target="#modalEditTujuanPembelianPonk<?= $s->kd_po_nk ?>">
+                            <i class="fas fa-pencil-alt"></i> EDIT DATA
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <textarea type="text" id="tujuanPembelianPonk" name="noInv" class="form-control mb-2" readonly><?= htmlspecialchars($s->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></textarea>
             </div>
         </div>
+
+        <?php if ($canUpdatePonkPengajuan) : ?>
+            <div class="modal fade" id="modalEditTujuanPembelianPonk<?= $s->kd_po_nk ?>" tabindex="-1" role="dialog" aria-labelledby="modalEditTujuanPembelianPonkLabel<?= $s->kd_po_nk ?>" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form class="modal-content form-edit-tujuan-pembelian-ponk">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditTujuanPembelianPonkLabel<?= $s->kd_po_nk ?>">Edit Tujuan Pembelian</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="kd_po_req" value="<?= htmlspecialchars($s->kd_po_req, ENT_QUOTES, 'UTF-8') ?>">
+                            <div class="form-group">
+                                <label>Tujuan Pembelian</label>
+                                <textarea name="tujuan_pembelian" class="form-control" rows="5" required><?= htmlspecialchars($s->tj_pembelian, ENT_QUOTES, 'UTF-8') ?></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- FITUR ADD -->
         <?php $this->load->view('content/postatus/modal_setting/modalponk') ?>
@@ -1683,4 +1752,115 @@
     <!-- /.content-header -->
 
 </div>
+<script>
+    (function initPonkDetailAjax() {
+        if (typeof window.jQuery === 'undefined') {
+            setTimeout(initPonkDetailAjax, 50);
+            return;
+        }
+
+        var $ = window.jQuery;
+        var cancelPengajuanUrl = '<?= base_url('cancel_pengajuan_ponk') ?>';
+        var updateTujuanUrl = '<?= site_url('postatusnk/update-tujuan-pembelian') ?>';
+
+        function showPonkAlert(icon, message, callback) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: icon,
+                    title: icon === 'success' ? 'Berhasil' : 'Gagal',
+                    text: message
+                }).then(function() {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                });
+                return;
+            }
+
+            alert(message);
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }
+
+        $(document).off('click.ponkCancel', '.btn-cancel-pengajuan-ponk').on('click.ponkCancel', '.btn-cancel-pengajuan-ponk', function() {
+            var kdPoReq = $(this).attr('data-kd-po-req');
+            var processCancel = function() {
+                $.ajax({
+                    url: cancelPengajuanUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        kd_po_req: kdPoReq
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            showPonkAlert('success', response.message, function() {
+                                location.reload();
+                            });
+                            return;
+                        }
+
+                        showPonkAlert('error', response.message);
+                    },
+                    error: function() {
+                        showPonkAlert('error', 'Terjadi kesalahan saat memproses data');
+                    }
+                });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cancel pengajuan?',
+                    text: 'Status PO NK akan diubah menjadi PENGAJUAN DIBATALKAN.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, cancel',
+                    cancelButtonText: 'Batal'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        processCancel();
+                    }
+                });
+                return;
+            }
+
+            if (confirm('Cancel pengajuan ini?')) {
+                processCancel();
+            }
+        });
+
+        $(document).off('submit.ponkTujuan', '.form-edit-tujuan-pembelian-ponk').on('submit.ponkTujuan', '.form-edit-tujuan-pembelian-ponk', function(e) {
+            e.preventDefault();
+
+            var $form = $(this);
+            var $submitButton = $form.find('button[type="submit"]');
+            $submitButton.prop('disabled', true);
+
+            $.ajax({
+                url: updateTujuanUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: $form.serialize(),
+                success: function(response) {
+                    if (response.status) {
+                        $form.closest('.modal').modal('hide');
+                        showPonkAlert('success', response.message, function() {
+                            location.reload();
+                        });
+                        return;
+                    }
+
+                    showPonkAlert('error', response.message);
+                },
+                error: function() {
+                    showPonkAlert('error', 'Terjadi kesalahan saat menyimpan data');
+                },
+                complete: function() {
+                    $submitButton.prop('disabled', false);
+                }
+            });
+        });
+    })();
+</script>
 <?php endforeach; ?>
