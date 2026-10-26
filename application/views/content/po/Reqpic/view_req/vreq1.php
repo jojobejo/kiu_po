@@ -55,6 +55,10 @@
                                             <a class="btn btn-block btn-primary btn-sm"><b><?= $g->status_po ?></b></a>
                                         <?php elseif ($g->status_po == 'DONE') : ?>
                                             <a class="btn btn-block btn-success btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == 'REJECT') : ?>
+                                            <a class="btn btn-block btn-danger btn-sm"><b><?= $g->status_po ?></b></a>
+                                        <?php elseif ($g->status_po == '0') : ?>
+                                            <a class="btn btn-block btn-secondary btn-sm"><b>BARANG READY</b></a>
                                         <?php endif; ?>
                                     </td>
                                     <td>

@@ -57,6 +57,16 @@
 
 /*
  *---------------------------------------------------------------
+ * APPLICATION TIMEZONE
+ *---------------------------------------------------------------
+ *
+ * Keep all PHP date/time calls aligned with Jakarta time for CRUD,
+ * reports, generated codes, uploads, and logs.
+ */
+	date_default_timezone_set('Asia/Jakarta');
+
+/*
+ *---------------------------------------------------------------
  * ERROR REPORTING
  *---------------------------------------------------------------
  *

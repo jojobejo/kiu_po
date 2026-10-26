@@ -38,7 +38,7 @@ class Dashboard extends CI_Controller
 
         // VIEW KARYAWAN
 
-        elseif ($this->session->userdata('lv') == '4') {
+        elseif ($this->session->userdata('lv') == '4' && $this->session->userdata('kode') != 'KEULOGICS01') {
             $data['title']  = 'Dashboard';
             $kduser = $this->session->userdata("kode");
 
@@ -52,6 +52,7 @@ class Dashboard extends CI_Controller
             $this->load->view('content/dashboard', $data);
             $this->load->view('partial/footer');
         }
+
         // VIEW KADEP
         elseif ($this->session->userdata('lv') == '5') {
             $data['title']  = 'Dashboard';
@@ -67,6 +68,7 @@ class Dashboard extends CI_Controller
             $this->load->view('content/dashboard', $data);
             $this->load->view('partial/footer');
         }
+
         // VIEW DIREKTUR
         elseif ($this->session->userdata('lv') == '3') {
             $data['title']  = 'Dashboard';
@@ -80,6 +82,20 @@ class Dashboard extends CI_Controller
             $this->load->view('partial/header', $data);
             $this->load->view('partial/sidebar');
             $this->load->view('content/dashboard', $data);
+            $this->load->view('partial/footer');
+        } elseif ($this->session->userdata('lv') == '4' && $this->session->userdata('kode') == 'KEULOGICS01') {
+
+            $data['title']  = 'Dashboard';
+            $kduser = $this->session->userdata("kode");
+
+            $data['all']    = $this->M_Dashboard->totalAll($kduser)->result();
+            $data['done']   = $this->M_Dashboard->totalDone($kduser)->result();
+            $data['progress'] = $this->M_Dashboard->totalOnProgress($kduser)->result();
+            $data['reject'] = $this->M_Dashboard->totalReject($kduser)->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar_ics');
+            $this->load->view('content/dashboards/dashboard.php', $data);
             $this->load->view('partial/footer');
         }
     }

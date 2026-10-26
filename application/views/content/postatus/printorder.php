@@ -233,6 +233,15 @@
                             ?>
                             <?php endforeach; ?>
                             <tr>
+
+                                <td style="text-align: center; background-color: lime; width: 50%; font-weight: bold; color: red;">
+                                    MOHON INFORMASI DAHULU,<br>
+                                    JIKA EXP DATE KURANG DARI 2 THN<br>
+                                    DARI TGL PENGIRIMAN
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
                                 <td rowspan="<?= $d ?>" style="text-align: justify; background-color: yellow;width: 50%;">
                                     * SHIP TO : <br>
                                     KARISMA INDOAGRO UNIVERSAL <br>

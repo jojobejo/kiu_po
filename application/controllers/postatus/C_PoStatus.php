@@ -16,6 +16,23 @@ class C_PoStatus extends CI_Controller
         $this->load->helper('download');
         $this->load->library('form_validation');
     }
+    
+    private function normalize_decimal_input($value)
+    {
+        $value = trim((string) $value);
+        $value = str_replace(' ', '', $value);
+
+        if ($value === '') {
+            return 0;
+        }
+
+        if (strpos($value, ',') !== false) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return is_numeric($value) ? (float) $value : 0;
+    }
 
     public function index()
     {
@@ -145,13 +162,13 @@ class C_PoStatus extends CI_Controller
         $data['kdpo'] = $this->M_Postatus->kdpo($kdpo);
         $data['ntformat'] = $this->M_Postatus->ntformat();
 
-
         $this->load->view('partial/header', $data);
         $this->load->view('partial/sidebar');
         $this->load->view('content/postatus/detailpo', $data);
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/ajaxstatus');
     }
+
     public function update_printout_po()
     {
         $kdpo   = $this->input->post('kdpo');
@@ -355,7 +372,7 @@ class C_PoStatus extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
         $itemconfirm    = $this->M_Postatus->getitemreq($kdpo)->result();
         $now            = date('Y-m-d');
-        $now1           = date('Y-m-d h:m:s');
+        $now1           = date('Y-m-d H:i:s');
 
         $updatestatus = array(
             'kd_po'     => $kdpo,
@@ -521,24 +538,25 @@ class C_PoStatus extends CI_Controller
     public function addNote()
     {
         $kdpo           = $this->input->post('kdpo');
-        $note           = $this->input->post('noteDitektur');
+        $note           = $this->input->post('note_direktur');
         $stslogin       = $this->session->userdata('lv');
         $departement    = $this->session->userdata('kode');
         $namauser       = $this->session->userdata('nama_user');
 
-        if ($stslogin == '1') {
+        if ($stslogin == '2') {
             $addNoteKeuangan = array(
                 'kd_po'     => $kdpo,
                 'isi_note'  => $note,
                 'kd_user'   => $departement,
                 'nama_user'   => $namauser,
-                'note_for'  => '1',
-                'update_status' => '1'
+                'note_for'  => '2',
+                'update_status' => 'ON PROGRESS'
             );
 
             $noteUpdateKeuangan = array(
-                'status'    => 'NOTE KEUANGAN'
+                'status'    => 'ON PROGRESS'
             );
+
             $this->M_Postatus->addNote($addNoteKeuangan);
             $this->M_Postatus->updateStatus($kdpo, $noteUpdateKeuangan);
         } else if ($stslogin == '3') {
@@ -557,6 +575,20 @@ class C_PoStatus extends CI_Controller
             $this->M_Postatus->updateStatus($kdpo, $noteUpdateDirektur);
         }
         redirect('detailPO/' . $kdpo);
+    }
+
+    public function shipment_to()
+    {
+        $kddpo          = $this->input->post('update_shipment');
+        $shipment_to    = $this->input->post('template_isi');
+
+        $dataupdated = array(
+            'kd_printout_note'  => $shipment_to
+        );
+
+        $this->M_Postatus->updateshipment($kddpo, $dataupdated);
+
+        redirect('printOrder/' . $kddpo);
     }
 
     public function revisiPO()
@@ -607,8 +639,8 @@ class C_PoStatus extends CI_Controller
         $kdbarang   = $this->input->post('kd_isi');
         $nmbarang   = $this->input->post('nama_isi');
         $satuan     = $this->input->post('satuan_isi');
-        $qty        = $this->input->post('qty_isi');
-        $hargaQty   = $this->input->post('hrg_isi');
+        $qty        = $this->normalize_decimal_input($this->input->post('qty_isi'));
+        $hargaQty   = $this->normalize_decimal_input($this->input->post('hrg_isi'));
         $hargahasil = $hargaQty * $qty;
 
         $data = array(
@@ -824,7 +856,90 @@ class C_PoStatus extends CI_Controller
             $this->load->view('content/postatus/nonkomersilstatus', $data);
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
+        } elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP02') {
+
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_seed()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
         }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP08') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getall_nk_kadep_keu_sales()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP07') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_seed()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP09') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getall_nk_promosi_cp()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-KADEP-SEED
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP10') {
+
+            $data['title'] = 'PO Status';
+
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+            $data['po']    = $this->M_Postatus->getAllNK_keu_purchasing()->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
         //VIEW-KADEP-KEUANGAN
         elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') == 'KEUANGAN') {
 
@@ -841,13 +956,48 @@ class C_PoStatus extends CI_Controller
             $this->load->view('partial/footer');
             $this->load->view('content/postatus/datatables');
         }
+
+        //VIEW-KADEP-GA
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP05') {
+
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
+        //VIEW-KADEP-LOGISTIK
+        elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('kode') == 'KADEP03') {
+
+            $data['title'] = 'PO Status';
+            $dp = $this->session->userdata('departemen');
+            $lv = $this->session->userdata('level');
+
+            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/postatus/nonkomersilstatus', $data);
+            $this->load->view('partial/footer');
+            $this->load->view('content/postatus/datatables');
+        }
+
         // VIEW KADEP != KEUANGAN
         elseif ($this->session->userdata('lv') == '5' && $this->session->userdata('departemen') != 'KEUANGAN') {
             $data['title'] = 'PO Status';
             $dp = $this->session->userdata('departemen');
             $lv = $this->session->userdata('level');
 
-            $data['po']    = $this->M_Postatus->getAllNK_kadep($dp)->result();
+            $data['po']    = $this->M_Postatus->getall_nk_kadep_keu_sales()->result();
             $data['ponk']    = $this->M_Postatus->getAllNK_keu()->result();
 
             $this->load->view('partial/header', $data);
@@ -904,6 +1054,7 @@ class C_PoStatus extends CI_Controller
         $this->load->view('content/postatus/detailponk', $data);
         $this->load->view('partial/footer');
     }
+
     public function edited_fk_nk()
     {
         $kdponk = $this->input->post('kdponk');
@@ -1097,10 +1248,11 @@ class C_PoStatus extends CI_Controller
         $kdpo           = $this->input->post('kdpo');
         $kdporeq        = $this->input->post('kdporeq');
         $tgl            = $this->input->post('tgl');
+        $tjpem          = $this->input->post('tjpembelian');
         $namauser       = $this->session->userdata('nama_user');
         $departement    = $this->session->userdata('kode');
         $tmp            = $this->M_Postatus->get_br_nk_det($kdpo);
-        $now = date('Y-m-d');
+        $now            = date('Y-m-d');
 
         if ($tmp) {
             foreach ($tmp as $t) {
@@ -1109,6 +1261,7 @@ class C_PoStatus extends CI_Controller
                     'kd_po_nk'          => $t->kd_po_nk,
                     'kd_barang'         => $t->kd_barang,
                     'kd_barangsys'      => $t->kd_bsys,
+                    'keterangan'        => $t->keterangan,
                     'kat_barang'        => $t->kat_barang,
                     'tr_qty'            => $t->qty,
                     'satuan'            => $t->satuan,
@@ -1802,6 +1955,99 @@ class C_PoStatus extends CI_Controller
         $this->load->view('partial/footer');
         $this->load->view('content/postatus/datatables');
     }
+    
+    public function cancel_pengajuan_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        $updated = $this->M_Postatus->cancel_pengajuan_ponk($ponk->kd_po_req);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'PO CANCEL - PENGAJUAN DIBATALKAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+    
+    public function update_tujuan_pembelian_ponk()
+    {
+        $kd_po_req = $this->input->post('kd_po_req', true);
+        $tujuan_pembelian = trim((string) $this->input->post('tujuan_pembelian', true));
+        list($isValid, $ponk, $message) = $this->validatePonkForAjax($kd_po_req);
+
+        if (!$isValid) {
+            return $this->responseJson(false, $message);
+        }
+
+        if ($tujuan_pembelian === '') {
+            return $this->responseJson(false, 'Tujuan pembelian tidak boleh kosong');
+        }
+
+        $updated = $this->M_Postatus->update_tujuan_pembelian_ponk($ponk->kd_po_req, $tujuan_pembelian);
+        if (!$updated) {
+            return $this->responseJson(false, 'Data gagal diperbarui');
+        }
+
+        $this->M_Postatus->addNote(array(
+            'kd_po' => $ponk->kd_po_nk,
+            'isi_note' => 'EDIT DATA TUJUAN PEMBELIAN',
+            'kd_user' => $this->session->userdata('kode'),
+            'nama_user' => $this->session->userdata('nama_user'),
+            'note_for' => '1',
+            'update_status' => '1'
+        ));
+
+        return $this->responseJson(true, 'Data berhasil diperbarui');
+    }
+
+    private function validatePonkForAjax($kd_po_req)
+    {
+        $kd_po_req = trim((string) $kd_po_req);
+        if ($kd_po_req === '') {
+            return array(false, null, 'Kode pengajuan tidak boleh kosong');
+        }
+
+        if (!$this->session->userdata('kode')) {
+            return array(false, null, 'Sesi login sudah berakhir, silakan login ulang');
+        }
+
+        $ponk = $this->M_Postatus->get_ponk_by_req($kd_po_req);
+        if (!$ponk) {
+            return array(false, null, 'Data pengajuan tidak ditemukan');
+        }
+
+        $blockedStatuses = array('DONE', 'REJECT', 'PENGAJUAN DIBATALKAN');
+        if (in_array($ponk->status, $blockedStatuses, true)) {
+            return array(false, null, 'Data dengan status ' . $ponk->status . ' tidak dapat diubah');
+        }
+
+        return array(true, $ponk, '');
+    }
+
+    private function responseJson($status, $message, $httpStatus = 200)
+    {
+        $this->output
+            ->set_status_header($httpStatus)
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'status' => (bool) $status,
+                'message' => $message
+            )));
+        return;
+    }
 
     public function historidone($lv, $user)
     {
@@ -1928,5 +2174,17 @@ class C_PoStatus extends CI_Controller
     public function downloadfile($path)
     {
         force_download($path);
+    }
+
+    public function promosiseed()
+    {
+        $data['title'] = 'PO Promosi Seed';
+        $data['hdone'] = $this->M_Postatus->getdatapodone()->result();
+
+        $this->load->view('partial/header', $data);
+        $this->load->view('partial/sidebar');
+        $this->load->view('content/postatus/dashboard_seed', $data);
+        $this->load->view('partial/footer');
+        $this->load->view('content/postatus/datatables');
     }
 }

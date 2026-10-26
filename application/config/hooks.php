@@ -11,3 +11,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	https://codeigniter.com/userguide3/general/hooks.html
 |
 */
+$hook['post_controller_constructor'][] = array(
+	'class'    => 'Database_timezone',
+	'function' => 'set_timezone',
+	'filename' => 'Database_timezone.php',
+	'filepath' => 'hooks',
+);
+
+// Enforce authentication centrally so every routed module is covered.
+$hook['post_controller_constructor'][] = array(
+	'class'    => 'Session_guard',
+	'function' => 'require_login',
+	'filename' => 'Session_guard.php',
+	'filepath' => 'hooks',
+);

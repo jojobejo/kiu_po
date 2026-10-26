@@ -44,24 +44,31 @@
     $(function() {
 
         var dballbarangkomersil;
+        var sourceParam = '<?php echo isset($source) ? $source : ''; ?>';
+        var ajaxUrl = "<?php echo site_url('stockkomersil/data'); ?>";
+        if (sourceParam === 'online' || sourceParam === 'local') {
+            ajaxUrl += '?source=' + encodeURIComponent(sourceParam);
+        }
 
         dballbarangkomersil = $('#list_stocknonkomersil').DataTable({
             "responsive": true,
             "lengthChange": false,
             "autoWidth": false,
             "processing": true,
-            "serverSide": true,
+            "serverSide": false,
+            "deferRender": true,
             "order": [],
 
             "ajax": {
-                "url": "<?php echo site_url('servergetallkomersil') ?>",
-                "type": "POST"
+                "url": ajaxUrl,
+                "type": "GET",
+                "dataSrc": "data"
             },
 
             "columnDefs": [{
-                "targets": [0],
+                "targets": [0, 5],
                 "orderable": false,
             }, ],
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
     });
 </script>

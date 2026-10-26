@@ -18,14 +18,22 @@ class M_Purchase extends CI_Model
     {
         return $this->db->get('tb_set_tax')->result();
     }
+
     public function gettmptax($kd)
     {
-        $this->db->select('*');
+        $this->db->select('COALESCE(tax, 0) AS tax');
         $this->db->from('tb_tmp_tax a');
         $this->db->where('kd_suplier', $kd);
         $query = $this->db->get();
-        return $query;
+
+        if ($query->num_rows() > 0) {
+            return $query->row()->tax;
+        } else {
+            return 0;
+        }
     }
+
+
     public function getSatuan()
     {
         return $this->db->get('tb_satuan')->result();
@@ -175,7 +183,34 @@ class M_Purchase extends CI_Model
             }
             date_default_timezone_set('Asia/Jakarta');
             return 'NKPO' . date('dmy') . $kdsuplier . $kd;
-        } else if ($kduser == 'KEU04') {
+        } else if ($kduser == 'KEU170626') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'LKPO' . date('dmy') . $kdsuplier . $kd;
+        } else if ($kduser == 'KEU111') {
+            $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
+            $kd = "";
+            if ($cd->num_rows() > 0) {
+                foreach ($cd->result() as $k) {
+                    $tmp = ((int)$k->kd_max) + 1;
+                    $kd = sprintf("%04s", $tmp);
+                }
+            } else {
+                $kd = "0001";
+            }
+            date_default_timezone_set('Asia/Jakarta');
+            return 'NVKPO' . date('dmy') . $kdsuplier . $kd;
+        }
+        else if ($kduser == 'KEU04') {
             $cd = $this->db->query("SELECT MAX(RIGHT(kd_po,4)) AS kd_max FROM tb_po WHERE DATE(create_at)=CURDATE()");
             $kd = "";
             if ($cd->num_rows() > 0) {
