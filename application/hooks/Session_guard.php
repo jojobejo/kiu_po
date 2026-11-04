@@ -9,7 +9,7 @@ class Session_guard
         $controller = strtolower((string) $CI->router->fetch_class());
 
         // Authentication endpoints must remain available to logged-out users.
-        if ($controller === 'auth' || $CI->input->is_cli_request()) {
+        if (in_array($controller, ['auth', 'sso'], TRUE) || $CI->input->is_cli_request()) {
             return;
         }
 

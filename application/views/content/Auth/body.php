@@ -60,6 +60,11 @@
                         </div>
                     </div>
                 </form>
+                <div class="row mt-2">
+                    <div class="col-md">
+                        <a href="<?= base_url('sso/login') ?>" class="btn btn-outline-primary btn-block">Masuk dengan Portal Karisma</a>
+                    </div>
+                </div>
                 <?php if ($this->session->flashdata("gagal")) : ?>
                     <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
                         <?php echo "<center>" . $this->session->flashdata("gagal") . "</center>" ?>

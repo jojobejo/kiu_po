@@ -54,6 +54,10 @@ $route['default_controller']                            = 'Auth';
 $route['404_override']                                  = '';
 $route['translate_uri_dashes']                          = FALSE;
 
+// Portal SSO endpoints are public entry points; Session_guard allows this controller.
+$route['sso/login']                                     = 'Sso/login';
+$route['sso/callback']                                  = 'Sso/callback';
+
 //user
 $route['user']                                          = 'User/C_User';
 $route['adduser']                                       = 'user/C_User/AddUser';
