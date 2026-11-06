@@ -92,7 +92,6 @@ class Sso extends CI_Controller
         // Konsumsi transaksi sebelum request jaringan agar callback tidak dapat dipakai ulang.
         $this->session->unset_userdata('portal_sso_pending');
         $token = $this->exchangeCode($code, $pending['verifier']);
-        $this->session->unset_userdata('portal_sso_pending');
         if ($token === NULL) {
             return $this->fail('Portal tidak dapat memvalidasi login. Silakan coba kembali.');
         }
@@ -127,6 +126,17 @@ class Sso extends CI_Controller
             return $this->fail('Akun atau level akses POERP tidak valid. Hubungi administrator aplikasi.');
         }
 
+        try {
+            $eventId = bin2hex(random_bytes(32));
+        } catch (Exception $exception) {
+            return $this->fail('Histori login tidak dapat disiapkan. Silakan coba kembali.');
+        }
+        if (!$this->recordLoginEvent($identity, $assignedAccountUsername, $eventId)) {
+            return $this->fail('Login dihentikan karena Portal belum mengonfirmasi histori penggunaan akun kerja.');
+        }
+
+        // Terbitkan identitas lokal hanya sesudah Portal mengonfirmasi histori.
+        $this->clearLocalIdentity();
         $this->session->sess_regenerate(TRUE);
         $this->session->set_userdata([
             'id' => $user->id_user,
@@ -139,21 +149,6 @@ class Sso extends CI_Controller
             'auth_method' => 'karismaerp_sso',
             'portal_sub' => $identity['sub'],
         ]);
-
-        if ($assignedAccountUsername !== NULL) {
-            try {
-                $eventId = bin2hex(random_bytes(32));
-            } catch (Exception $exception) {
-                $this->clearLocalIdentity();
-                $this->session->sess_regenerate(TRUE);
-                return $this->fail('Histori login tidak dapat disiapkan. Silakan coba kembali.');
-            }
-            if (!$this->recordLoginEvent($identity, $assignedAccountUsername, $eventId)) {
-                $this->clearLocalIdentity();
-                $this->session->sess_regenerate(TRUE);
-                return $this->fail('Login dihentikan karena Portal belum mengonfirmasi histori penggunaan akun kerja.');
-            }
-        }
         redirect('dashboard');
     }
 
