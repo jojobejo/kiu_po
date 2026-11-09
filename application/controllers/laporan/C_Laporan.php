@@ -92,7 +92,19 @@ class C_Laporan extends CI_Controller
 
     public function export_laporan_pembelian_nk()
     {
-        include APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+        // PHPExcel emits deprecations on PHP 8.3; they must not precede XLSX bytes.
+        error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+        ob_start();
+        require_once APPPATH . 'third_party/PHPExcel/PHPExcel.php';
+
+        $vartgl1 = isset($_SESSION['vartgl1']) ? $_SESSION['vartgl1'] : null;
+        $vartgl2 = isset($_SESSION['vartgl2']) ? $_SESSION['vartgl2'] : null;
+        if (!is_string($vartgl1) || !is_string($vartgl2)
+            || !$this->is_valid_date_export($vartgl1) || !$this->is_valid_date_export($vartgl2)) {
+            show_error('Pilih rentang tanggal laporan sebelum export Excel.', 400);
+            return;
+        }
+
         $excel = new PHPExcel();
         $excel->getProperties()->setCreator('it_karisma')
             ->setLastModifiedBy('it_karisma')
@@ -155,14 +167,7 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getStyle('I3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('J3')->applyFromArray($style_col);
 
-        $vartgl1           = $_SESSION['vartgl1'];
-        $vartgl2            = $_SESSION['vartgl2'];
-        $data['vartgl1']    = $vartgl1;
-        $data['vartgl2']    = $vartgl2;
-
         $export = $this->M_Laporanp->getdaterangelap($vartgl1, $vartgl2)->result();
-        $vartglexcel1 = date_indo($vartgl1);
-        $vartglexcel2 = date_indo($vartgl2);
 
 
         $no = 1;
@@ -204,16 +209,9 @@ class C_Laporan extends CI_Controller
         $excel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
         $excel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(-1);
         $excel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
-        $excel->getActiveSheet(0)->setTitle("lap_" . $vartglexcel1 . "_" . $vartglexcel2);
+        $excel->getActiveSheet(0)->setTitle('lap_' . str_replace('-', '', $vartgl1) . '_' . str_replace('-', '', $vartgl2));
         $excel->setActiveSheetIndex(0);
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="lap_beli_po_nonkomersil.xlsx"');
-        header('Cache-Control: max-age=0');
-
-
-        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
-        ob_end_clean();
-        $write->save('php://output');
+        $this->download_excel2007($excel, 'lap_beli_po_nonkomersil.xlsx');
     }
 
     public function exported_allstock()
