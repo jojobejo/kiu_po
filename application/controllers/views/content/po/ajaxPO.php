@@ -1,0 +1,163 @@
+<script>
+    $(document).ready(function() {
+
+        $("#tax_isi").on("input", function() {
+            var ppn = $(this).val();
+            var hasil = ppn / 100;
+            $('#hasil_ppn').val(hasil);
+        });
+
+    });
+
+    $("#selesai").on('click', function() {
+        var nopo = $("#po_isi").val();
+        var tgl = $("#tgl_isi").val();
+        var tmpo = $("#tmpo").val();
+        var gdg = $("#gdgpengiriman").val();
+        var jml = $("#jmlitem").val();
+        var kdpo = $("#kd_po_isi").val();
+        var suplier = $("#kdsuplier").val();
+        var harga = $("#jmlharga").val();
+        var tax = $("#taxisi_in").val();
+
+        if (jml == 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Tidak ada transaksi!',
+            });
+            return;
+        }
+
+        if (nopo == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Nomor PO belum terisi!',
+            });
+            return;
+        }
+
+        if (tgl == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Tanggal order belum terisi!',
+            });
+            return;
+        }
+
+        if (tax == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Kolom pajak (Tax) belum terisi!',
+            });
+            return;
+        }
+
+
+        Swal.fire({
+            title: 'Simpan Data?',
+            text: "Pastikan semua data sudah benar.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, simpan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url('rekam_po') ?>",
+                    type: "POST",
+                    data: {
+                        nopo: nopo,
+                        tgl: tgl,
+                        tmpo: tmpo,
+                        gdg: gdg,
+                        jml: jml,
+                        kdpo: kdpo,
+                        suplier: suplier,
+                        harga: harga,
+                        tax: tax
+                    },
+                    dataType: "JSON",
+                    cache: false,
+                    success: function(data) {
+                        if (data.msg == "success") {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Data PO berhasil direkam!',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(true);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Kesalahan',
+                                text: 'Terjadi kesalahan pada data!',
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Tidak dapat terhubung ke server.',
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+
+    $("#selesaink").on('click', function() {
+        var kdpo = $("#po_isi").val();
+        var nopo = $("#no_po_isi").val();
+        var nm_user = $("#nm_user").val();
+        var tgl = $("#tgl_isi").val();
+        var departemen = $("#dep_isi").val();
+        var tujuan = $("#tujuan_isi").val();
+        var jml = $("#jmlitem").val();
+        var harga = $("#jmlharga").val();
+
+        if (jml == 0) {
+            alert('tidak ada transaksi');
+        } else {
+            if (nopo == "") {
+                alert('Nomor PO tidak terisi');
+            } else if (tgl == "") {
+                alert('tgl order belum terisi');
+            } else {
+                $.ajax({
+                    url: "<?= base_url('rekam_po_nk') ?>",
+                    type: "POST",
+                    data: {
+                        kdpo: kdpo,
+                        nopo: nopo,
+                        nm_user: nm_user,
+                        tgl: tgl,
+                        departemen: departemen,
+                        tujuan: tujuan,
+                        jml: jml,
+                        harga: harga
+                    },
+                    dataType: "JSON",
+                    cache: false,
+                    success: function(data) {
+                        if (data.msg == "success") {
+                            alert('PO telah di simpan');
+                            location.reload(true);
+                        } else {
+                            alert('ada kesalahan data')
+                        }
+                    }
+                })
+            }
+        }
+    })
+</script>

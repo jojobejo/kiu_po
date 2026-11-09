@@ -891,7 +891,22 @@ class C_Reqpic extends CI_Controller
         $kduser     = $this->input->post('kdpic');
         $nmuser     = $this->input->post('pic');
         $jmlitm     = $this->input->post('jml');
-        $dep        = $this->input->post('dep');
+        $dep        = strtoupper(trim((string) $this->input->post('kadep_departemen')));
+        $allowedKadepDepartments = array(
+            'GA',
+            'KEUANGAN',
+            'LOGISTIK',
+            'PROMOSI SEED',
+            'PURCHASING',
+            'SALES',
+            'DIROP'
+        );
+
+        if (!in_array($dep, $allowedKadepDepartments, true)) {
+            show_error('Pilih departemen Kadep approval yang tersedia.', 400, 'Departemen approval tidak valid');
+            return;
+        }
+
         $jmltot     = $this->input->post('jmltot');
         $tjpem      = $this->input->post('tjbuy');
         $trtmp      = $this->M_Reqpic->getlisttmptr($kdreqpo)->result();

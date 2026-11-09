@@ -17,3 +17,11 @@ $hook['post_controller_constructor'][] = array(
 	'filename' => 'Database_timezone.php',
 	'filepath' => 'hooks',
 );
+
+// Enforce authentication centrally so every routed module is covered.
+$hook['post_controller_constructor'][] = array(
+	'class'    => 'Session_guard',
+	'function' => 'require_login',
+	'filename' => 'Session_guard.php',
+	'filepath' => 'hooks',
+);
