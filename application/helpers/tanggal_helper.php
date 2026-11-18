@@ -5,19 +5,73 @@ function format_indo($date)
 {
     date_default_timezone_set('Asia/Jakarta');
 
-    /** array hari dan bulan */
-    $Hari = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
-    $Bulan = array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
+    $date = trim((string) $date);
+    if ($date === '' || $date === '-' || $date === '0000-00-00' || $date === '0000-00-00 00:00:00') {
+        return '-';
+    }
 
-    /** pemisahan tahun, bulan, hari, dan waktu */
-    $tahun = substr($date, 0, 4);
-    $bulan = substr($date, 5, 2);
-    $tgl = substr($date, 8, 2);
-    $waktu = substr($date, 11, 5);
-    $hari = date("w", strtotime($date));
-    $result = $Hari[$hari] . ", " . $tgl . " " . $Bulan[(int)$bulan - 1] . " " . $tahun . " " . $waktu;
+    $timezone = new DateTimeZone('Asia/Jakarta');
+    $formats = array(
+        '!Y-m-d H:i:s',
+        '!Y-m-d H:i',
+        '!Y-m-d',
+        '!d/m/Y H:i:s',
+        '!d/m/Y H:i',
+        '!d/m/Y',
+        '!d-m-Y H:i:s',
+        '!d-m-Y H:i',
+        '!d-m-Y',
+        '!d.m.Y'
+    );
+    $parsedDate = false;
+
+    foreach ($formats as $format) {
+        $candidate = DateTimeImmutable::createFromFormat($format, $date, $timezone);
+        $errors = DateTimeImmutable::getLastErrors();
+        if ($candidate && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+            $parsedDate = $candidate;
+            break;
+        }
+    }
+
+    if (!$parsedDate) {
+        return htmlspecialchars($date, ENT_QUOTES, 'UTF-8');
+    }
+
+    $days = array("Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu");
+    $months = array("Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
+    $result = $days[(int) $parsedDate->format('w')] . ', ' . $parsedDate->format('d') . ' ' . $months[(int) $parsedDate->format('n') - 1] . ' ' . $parsedDate->format('Y');
+
+    if (preg_match('/\b\d{1,2}:\d{2}(?::\d{2})?\b/', $date)) {
+        $result .= ' ' . $parsedDate->format('H:i');
+    }
 
     return $result;
+}
+
+function tanggal_sort_key($date)
+{
+    $date = trim((string) $date);
+    if ($date === '' || $date === '-' || $date === '0000-00-00' || $date === '0000-00-00 00:00:00') {
+        return '0';
+    }
+
+    $timezone = new DateTimeZone('Asia/Jakarta');
+    $formats = array(
+        '!Y-m-d H:i:s', '!Y-m-d H:i', '!Y-m-d',
+        '!d/m/Y H:i:s', '!d/m/Y H:i', '!d/m/Y',
+        '!d-m-Y H:i:s', '!d-m-Y H:i', '!d-m-Y', '!d.m.Y'
+    );
+
+    foreach ($formats as $format) {
+        $parsedDate = DateTimeImmutable::createFromFormat($format, $date, $timezone);
+        $errors = DateTimeImmutable::getLastErrors();
+        if ($parsedDate && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+            return $parsedDate->format('YmdHis');
+        }
+    }
+
+    return '0';
 }
 
 

@@ -16,6 +16,21 @@ class Dashboard extends CI_Controller
 
     public function index()
     {
+        if ($this->session->userdata('status') !== 'is_login') {
+            redirect('Auth');
+            return;
+        }
+
+        // VIEW ADMIN
+        if ((string) $this->session->userdata('lv') === '1') {
+            $data['title'] = 'Dashboard Admin';
+
+            $this->load->view('partial/header', $data);
+            $this->load->view('partial/sidebar');
+            $this->load->view('content/dashboard_admin', $data);
+            $this->load->view('partial/footer');
+            return;
+        }
 
         // VIEW PURCHASING
 
@@ -97,6 +112,9 @@ class Dashboard extends CI_Controller
             $this->load->view('partial/sidebar_ics');
             $this->load->view('content/dashboards/dashboard.php', $data);
             $this->load->view('partial/footer');
+        } else {
+            $this->session->sess_destroy();
+            redirect('Auth');
         }
     }
 }

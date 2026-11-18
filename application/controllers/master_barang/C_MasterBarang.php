@@ -109,6 +109,7 @@ class C_MasterBarang extends CI_Controller
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descnk');
         $satuan     = $this->input->post('satuanisi');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->input->post('reqby');
 
         $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
@@ -122,6 +123,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'gbr_barang'    => "Karisma.png",
             'qrcode_data'   => $kdqrcode,
             'qrcode_path'   => $qrcpath,
@@ -151,13 +153,21 @@ class C_MasterBarang extends CI_Controller
         date_default_timezone_set("Asia/Jakarta");
 
         $kdbarang   = $this->input->post('kd_isi');
-        $kdbarang1  = $this->input->post('kd_adm');
+        $kdbarang1  = trim((string)$this->input->post('kd_adm'));
         $kdqrcode   = $this->input->post('qrc_isi');
         $katbarang  = $this->input->post('skatbr');
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->session->userdata('kode');
+
+        $existingBarang = $this->M_MasterBarang->get_masterbarangnk_by_kd_barang($kdbarang1);
+        if ($existingBarang) {
+            $this->session->set_flashdata('error', 'Kode barang ' . $kdbarang1 . ' telah di gunakan dengan nama barang: ' . $existingBarang->nama_barang);
+            redirect('masterbarangnk');
+            return;
+        }
 
         $qrcpath    = $this->M_MasterBarang->_generate_qrcode($nmbarang, $kdqrcode);
 
@@ -170,6 +180,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'gbr_barang'    => "Karisma.png",
             'qrcode_data'   => $kdqrcode,
             'qrcode_path'   => $qrcpath,
@@ -191,6 +202,25 @@ class C_MasterBarang extends CI_Controller
 
 
         redirect('masterbarangnk');
+    }
+
+    public function cek_kode_barangnk()
+    {
+        $kodeBarang = trim((string)$this->input->post('kd_barang', true));
+        if ($kodeBarang === '') {
+            $kodeBarang = trim((string)$this->input->post('kd_adm', true));
+        }
+
+        $barang = $this->M_MasterBarang->get_masterbarangnk_by_kd_barang($kodeBarang);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(array(
+                'status' => true,
+                'used' => (bool)$barang,
+                'kode_barang' => $barang ? $barang->kd_barang : $kodeBarang,
+                'nama_barang' => $barang ? $barang->nama_barang : ''
+            )));
     }
 
     public function inputqrcbrnk($id, $kdqrcode, $nmbarang)
@@ -222,6 +252,7 @@ class C_MasterBarang extends CI_Controller
         $nmbarang   = $this->input->post('nmbarang');
         $descnk     = $this->input->post('descisi');
         $satuan     = $this->input->post('stuanbr');
+        $minimum_stock = max(0, (float)$this->input->post('minimum_stock'));
         $inputer    = $this->session->userdata('kode');
         $dtinputbr = array(
             'kd_br_adm'     => $kdbarang1,
@@ -229,6 +260,7 @@ class C_MasterBarang extends CI_Controller
             'nama_barang'   => $nmbarang,
             'descnk'        => $descnk,
             'satuan'        => $satuan,
+            'minimum_stock' => $minimum_stock,
             'inputer'       => $inputer,
         );
         $this->M_MasterBarang->edit_mbarangnk($id, $dtinputbr);
